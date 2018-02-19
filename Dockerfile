@@ -38,8 +38,14 @@ COPY . /app
 
 RUN pip install --no-cache-dir -r /app/requirements.txt --src /usr/local/src
 
-COPY ./entrypoint.sh /entrypoint.sh
+COPY ./dockerfiles/django/production/start.sh /start.sh
+COPY ./dockerfiles/django/production/celary.sh /celary.sh
+COPY ./dockerfiles/django/entrypoint.sh /entrypoint.sh
 RUN sed -i 's/\r//' /entrypoint.sh \
-    && chmod +x /entrypoint.sh
+    && sed -i 's/\r//' /celary.sh \
+    && sed -i 's/\r//' /start.sh \
+    && chmod +x /entrypoint.sh \
+    && chmod +x /celary.sh \
+    && chmod +x /start.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
