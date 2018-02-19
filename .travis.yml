@@ -16,6 +16,7 @@ before_install:
 script:
 - docker build -t 234514569215.dkr.ecr.us-east-1.amazonaws.com/njcoast:staging-$TRAVIS_COMMIT .
 - docker tag 234514569215.dkr.ecr.us-east-1.amazonaws.com/njcoast:staging-$TRAVIS_COMMIT 234514569215.dkr.ecr.us-east-1.amazonaws.com/njcoast:staging
+- docker push 234514569215.dkr.ecr.us-east-1.amazonaws.com/njcoast:staging-$TRAVIS_COMMIT
 - docker push 234514569215.dkr.ecr.us-east-1.amazonaws.com/njcoast:staging
 after_success:
 - echo $VPNPASS | sudo openconnect vpnaccess.nd.edu -b --user=$VPNUSER --passwd-on-stdin
