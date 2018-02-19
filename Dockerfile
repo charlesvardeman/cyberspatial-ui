@@ -40,7 +40,7 @@ RUN pip install --no-cache-dir -r /app/requirements.txt --src /usr/local/src
 
 COPY ./start.sh /start.sh
 COPY ./celary.sh /celary.sh
-COPY ..sh /entrypoint.sh
+COPY ./entrypoint.sh /entrypoint.sh
 RUN sed -i 's/\r//' /entrypoint.sh \
     && sed -i 's/\r//' /celary.sh \
     && sed -i 's/\r//' /start.sh \
