@@ -15,7 +15,8 @@
         <div id="activeStormGroup">
             <div id="activeStorm" class="hidden">
                 <div id="storm_heading" class="map-layer-group-heading auto">
-                    <a id="storm_link" data-toggle="collapse" href="#hurricaneJose" aria-expanded="false" aria-controls="hurricaneJose"></a>
+                    <a id="storm_link" data-toggle="collapse" href="#hurricaneJose" aria-expanded="false"
+                       aria-controls="hurricaneJose"></a>
                 </div>
                 <p class="follow-unfollow" id="last_updated"></p>
             </div>
@@ -37,26 +38,26 @@
 <script src="{% static 'NJ-coast-heatmap/nj-coast.js' %}"></script>
 <script>
 
-    var storm_layer_list = {};
+    var storm_layer_dict = {}; // dictionary of layers added through active storm layer checkboxes
+    var update_map_layers = {}; // Dictionary of layers added through the explore scenarios box
 
     $(document).ready(function () {
-
-        console.log('IN THE STORM VISUALIZATION!');
         get_rss_feed();
     });
 
     /*
-Ajax call to the server. Returns JSON with layers in it.
-TODO: Will need to update url
-*/
+    Ajax call to the server. Returns JSON with layers in it.
+    TODO: Will need to update url
+    */
     function get_rss_feed() {
+        console.log('Requesting RSS Feed......');
         $.ajax({
             type: "GET",
             url: "/static/rss_feed.json",
             data: {},
             dataType: "json",
             success: function (result) {
-                console.log("RSS FEED -- SUCCESS!");
+                console.log("RSS Feed -- SUCCESS!");
                 console.log(result);
                 add_active_storm_to_menu(result.active_storms)
             },
@@ -67,9 +68,9 @@ TODO: Will need to update url
     }
 
     /*
-Function to pull the layer groups out and call the appropriate function
-for layer group or layer to be added to the menu.
- */
+    Function to pull the layer groups out and call the appropriate function
+    for layer group or layer to be added to the menu.
+     */
     function add_active_storm_to_menu(active_storms) {
         console.log("Adding storms to menu...");
         active_storms.forEach(function (item) {
@@ -97,54 +98,73 @@ for layer group or layer to be added to the menu.
                 .append("<span title=\"Unfollow\"><i class=\"fa fa-minus-circle\" aria-hidden=\"true\" id=\"" +
                     camelcaseName + "_unfollow\" onclick=\"unfollowClick($(this).parent().parent().parent().parent())\"></i></span>");
 
-            $(active_storm_template).append("<div class=\"collapse\" id=\"" + camelcaseName + "\">\n" +
+            $(active_storm_template).append("<div class=\"collapse active_storm\" id=\"" + camelcaseName + "\">\n" +
                 "<ul class=\"map-layers\">\n" +
-                "<li><input type=\"checkbox\" id=\""+ camelcaseName + "_wind_field_box\" onchange=\"storm_vis_check($(this))\"> Wind Field</li>\n" +
-                "<li><input type=\"checkbox\" id=\"" + camelcaseName + "_surge_box\" onchange=\"storm_vis_check($(this))\"> Surge</li>\n" +
-                "<li><input type=\"checkbox\" id=\"" + camelcaseName + "_total_run_up_box\" onchange=\"storm_vis_check($(this))\"> Total Run Up</li></ul>" +
-                "<div class=\"well plain orange\">\n" +
+                "<li><input type=\"checkbox\" id=\"" + camelcaseName + "_wind_field_box\" class=\"windfield_box scenario_box\" onchange=\"storm_vis_check($(this), '" + camelcaseName + "')\"> Wind Field</li>\n" +
+                "<li><input type=\"checkbox\" id=\"" + camelcaseName + "_surge_box\" class=\"surge_box scenario_box\" onchange=\"storm_vis_check($(this), '" + camelcaseName + "')\"> Surge</li>\n" +
+                "<li><input type=\"checkbox\" id=\"" + camelcaseName + "_total_run_up_box\" class=\"runup_box scenario_box\" onchange=\"storm_vis_check($(this), '" + camelcaseName + "')\"> Total Run Up</li></ul>" +
+                "<div class=\"well plain orange scenarios\">\n" +
                 "                  <h5>Explore Scenarios</h5>\n" +
                 "                  <ul class=\"map-layers\">\n" +
                 "                    <li class=\"explore-scenario-controls\">\n" +
                 "                      <p>Sea Level Rise</p>\n" +
                 "                      <div class=\"shp-controls\">\n" +
-                "                        <input class=\"range-input " + camelcaseName + "_slr_range\" data-target=\"slr\" min=\"0\" max=\"1.5\" step=\"0.1\" value=\"0\" type=\"range\">\n" +
-                "                        <input id=\"input_slr_" + camelcaseName + "\" class=\"num-input job-input " + camelcaseName + "_slr_input\" name=\"slr\" value=\"0\" type=\"text\"> \n" +
+                "                        <input id=\"" + camelcaseName + "_slr_slider\" class=\"range-input sealevel " + camelcaseName + "_slr_range\" data-target=\"slr\" min=\"0\" max=\"1.5\" step=\"0.5\" value=\"0\" type=\"range\">\n" +
+                "                        <input id=\"" + camelcaseName + "_input_slr\" class=\"sealevel num-input job-input " + camelcaseName + "_slr_input\" name=\"slr\" value=\"0\" type=\"text\"> \n" +
                 "                      </div>\n" +
                 "                    </li>\n" +
-                "                    <li class=\"explore-scenario-controls\">\n" +
+                "                    <li class=\"explore-scenario-controls controls-" + camelcaseName +"\">\n" +
                 "                      <p>Coastal Protection (e.g. dunes)</p>\n" +
-                "                      <ul class=\"one-line " + camelcaseName + "\"_dunes_radios\">\n" +
-                "                        <li><input type=\"radio\" name=\"dunes\" value=\"current\" checked> Current</li>\n" +
-                "                        <li><input type=\"radio\" name=\"dunes\" value=\"degraded\"> Degraded</li>\n" +
-                "                        <li><input type=\"radio\" name=\"dunes\" value=\"compromised\"> Compromised</li>\n" +
+                "                      <ul class=\"one-line " + camelcaseName + "_dunes_radios\">\n" +
+                "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_dunes\" value=\"current\" class=\"coastal_protection\" checked> Current</li>\n" +
+                "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_dunes\" value=\"degraded\" class=\"coastal_protection\"> Degraded</li>\n" +
+                "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_dunes\" value=\"compromised\" class=\"coastal_protection\"> Compromised</li>\n" +
                 "                      </ul>\n" +
                 "                    </li>\n" +
-                "                    <li class=\"explore-scenario-controls\">\n" +
+                "                    <li class=\"explore-scenario-controls controls-" + camelcaseName +"\">\n" +
                 "                      <p>Tides</p>\n" +
                 "                      <ul class=\"one-line " + camelcaseName + "_tide_radios\">\n" +
-                "                        <li><input type=\"radio\" name=\"tide\" value=\"low\"> Low</li>\n" +
-                "                        <li><input type=\"radio\" name=\"tide\" value=\"zero\" checked> Zero</li>\n" +
-                "                        <li><input type=\"radio\" name=\"tide\" value=\"high\"> High</li>\n" +
+                "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_tides\" value=\"low\" class=\"tides\"> Low</li>\n" +
+                "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_tides\" value=\"zero\" class=\"tides\" checked> Zero</li>\n" +
+                "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_tides\" value=\"high\" class=\"tides\"> High</li>\n" +
                 "                      </ul>\n" +
                 "                    </li>\n" +
-                "                    <li class=\"explore-scenario-controls\">\n" +
+                "                    <li class=\"explore-scenario-controls\" controls-" + camelcaseName +">\n" +
                 "                      <p>Analysis Type</p>\n" +
                 "                      <ul class=\"" + camelcaseName + "_analysis_radios\">\n" +
-                "                        <li><input type=\"radio\" name=\"analysis\" value=\"det\" checked> Deterministic</li>\n" +
-                "                        <li><input type=\"radio\" name=\"analysis\" value=\"prob-exp\"> Probabilistic <span>expected</span></li>\n" +
-                "                        <li><input type=\"radio\" name=\"analysis\" value=\"prob-ext\"> Probabilistic <span>extreme</span></li>\n" +
+                "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_analysis\" value=\"det\" class=\"analysistype\" checked> Deterministic</li>\n" +
+                "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_analysis\" value=\"prob-exp\" class=\"analysistype\"> Probabilistic <span>expected</span></li>\n" +
+                "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_analysis\" value=\"prob-ext\" class=\"analysistype\"> Probabilistic <span>extreme</span></li>\n" +
                 "                      </ul>\n" +
                 "                    </li>\n" +
                 "                  </ul>\n" +
-                "                  <a class=\"btn btn-primary btn-md btn-block " + camelcaseName + "_update_button\" onclick=\"updateMapClick(\"" + camelcaseName +"\")\" style=\"margin-top: 30px\">Update Map</a>\n" +
+                "                  <a id=\"" + camelcaseName + "_update_btn\" class=\"btn btn-primary btn-md btn-block " + camelcaseName + "_update_button\" " +
+                "onclick=\"updateMapClick('" + camelcaseName + "')\" style=\"margin-top: 30px\">Update Map</a>\n" +
                 "                </div></div>");
             // Unhide the block and append to the list
             $(active_storm_template).removeClass('hidden');
             $("#activeStormGroup").append(active_storm_template);
+
+            $('#' + camelcaseName + '_slr_slider').on('change', function () {
+                $('#' + camelcaseName + '_input_slr').val($('#' + camelcaseName + '_slr_slider').val())
+            });
+
+            $('#' + camelcaseName + '_input_slr').on('keyup', function () {
+                $('#' + camelcaseName + '_slr_slider').val($(this).val())
+            });
+
+            var scenario_controls = $('.controls-' + camelcaseName);
+            scenario_controls.find(".sealevel").attr("disabled", true);
+            scenario_controls.find(".coastal_protection").attr("disabled", true);
+            scenario_controls.find(".tides").attr("disabled", true);
+            scenario_controls.find(".analysistype").attr("disabled", true);
+            $('#' + camelcaseName + '_update_btn').attr("disabled", true);
         });
     }
 
+    /*
+    Function called when minus button is clicked on an active followed storm
+     */
     function unfollowClick(parent) {
         var storm_name = parent.attr('class');
         var classname = '.' + storm_name;
@@ -175,49 +195,184 @@ for layer group or layer to be added to the menu.
         console.log("Successfully unfollowed ", storm_name_text);
     }
 
+    /*
+    Function called when plus button is clicked on an active unfollowed storm
+     */
     function followClick(storm) {
         var storm_class_name = storm.attr('id');
         $('#activeStorm.' + storm_class_name).removeClass('hidden');
         $('#unfollowActiveStorm.' + storm_class_name).addClass('hidden');
+        console.log("Successfully followed ", storm_class_name);
     }
 
-    function storm_vis_check(layer_checkbox) {
-        if((layer_checkbox).is(":checked")) {
-            console.log(layer_checkbox.attr('id') + " is checked!!!");
+    /*
+    Function called when Wind Field, Surge, or Total Runup checkbox is checked for an active followed storm
+     */
+    function storm_vis_check(layer_checkbox, storm_name) {
+        if ((layer_checkbox).is(":checked")) {
 
-        //load heatmap data
-        var addressPoints = (function () {
-            var json = null;
-            jQuery.ajax({
-                'async': false,
-                'global': false,
-                'url': "{% static 'NJ-coast-heatmap/heatmap.json' %}",
-                'dataType': "json",
-                'success': function (data) {
-                    json = data;
-                }
-            });
-            return json;
-        })();
+            //load heatmap data
+            var addressPoints = (function () {
+                var json = null;
+                jQuery.ajax({
+                    'async': false,
+                    'global': false,
+                    'url': "{% static 'NJ-coast-heatmap/heatmap.json' %}",
+                    'dataType': "json",
+                    'success': function (data) {
+                        json = data;
+                    }
+                });
+                return json;
+            })();
 
-        var heat = L.heatLayer(addressPoints.runup, {max: 4, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
+            var heat = L.heatLayer(addressPoints.runup, {
+                max: 4,
+                radius: 25,
+                gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'},
+                blur: 10
+            }).addTo(mymap);
 
-        storm_layer_list[layer_checkbox.attr('id')] = heat;
+            storm_layer_dict[layer_checkbox.attr('id')] = heat;
+
 
         } else {
-            console.log(layer_checkbox.attr('id') + " is unchecked!!!");
             // Remove the layer toggled from this checkbox
-            mymap.removeLayer(storm_layer_list[layer_checkbox.attr('id')]);
-        }
+            mymap.removeLayer(storm_layer_dict[layer_checkbox.attr('id')]);
 
+
+        }
+        check_scenario_map_layers(storm_name);
     }
 
+    /*
+    Function called after Wind Field, Surge, or Total Runup checkbox is checked for an active followed storm to
+    determine which Explore Scenario controls should be enabled.
+     */
+    function check_scenario_map_layers(storm_name) {
+        var layers_checked = [];
+        console.log("CHECKING SCENARIO LAYERS...");
+        $("." + storm_name).find(".scenario_box").each(function () {
+            if (this.checked) {
+                layers_checked.push(this.className);
+            }
+        });
+
+        var scenario_controls = $('.controls-' + storm_name);
+
+        // determine which controls are available based on which checkboxes are checked
+        if (layers_checked.length == 0) {
+            scenario_controls.find(".sealevel").attr("disabled", true);
+            scenario_controls.find(".coastal_protection").attr("disabled", true);
+            scenario_controls.find(".tides").attr("disabled", true);
+            scenario_controls.find(".analysistype").attr("disabled", true);
+            $('#' + storm_name + '_update_btn').attr("disabled", true);
+        } else if (layers_checked.length == 1) {
+            if (layers_checked.indexOf("windfield_box scenario_box") > -1) {
+                scenario_controls.find(".sealevel").attr("disabled", true);
+                scenario_controls.find(".coastal_protection").attr("disabled", true);
+                scenario_controls.find(".tides").attr("disabled", true);
+                scenario_controls.find(".analysistype").attr("disabled", true);
+                $('#' + storm_name + '_update_btn').attr("disabled", true);
+            } else if (layers_checked.indexOf("surge_box scenario_box") > -1) {
+                scenario_controls.find(".sealevel").attr("disabled", false);
+                scenario_controls.find(".coastal_protection").attr("disabled", true);
+                scenario_controls.find(".tides").attr("disabled", false);
+                scenario_controls.find(".analysistype").attr("disabled", false);
+                $('#' + storm_name + '_update_btn').attr("disabled", false);
+            } else if (layers_checked.indexOf("runup_box scenario_box") > -1) {
+                scenario_controls.find(".sealevel").attr("disabled", false);
+                scenario_controls.find(".coastal_protection").attr("disabled", false);
+                scenario_controls.find(".tides").attr("disabled", false);
+                scenario_controls.find(".analysistype").attr("disabled", false);
+                $('#' + storm_name + '_update_btn').attr("disabled", false);
+            }
+        } else if (layers_checked.length == 2) {
+            if (layers_checked.indexOf("windfield_box scenario_box") > -1 && layers_checked.indexOf("surge_box scenario_box") > -1) {
+                scenario_controls.find(".sealevel").attr("disabled", false);
+                scenario_controls.find(".coastal_protection").attr("disabled", true);
+                scenario_controls.find(".tides").attr("disabled", false);
+                scenario_controls.find(".analysistype").attr("disabled", false);
+                $('#' + storm_name + '_update_btn').attr("disabled", false);
+            } else if ((layers_checked.indexOf("windfield_box scenario_box") > -1 &&
+                    layers_checked.indexOf("runup_box scenario_box") > -1) ||
+                (layers_checked.indexOf("surge_box scenario_box") > -1 &&
+                    layers_checked.indexOf("runup_box scenario_box") > -1)) {
+                scenario_controls.find(".sealevel").attr("disabled", false);
+                scenario_controls.find(".coastal_protection").attr("disabled", false);
+                scenario_controls.find(".tides").attr("disabled", false);
+                scenario_controls.find(".analysistype").attr("disabled", false);
+                $('#' + storm_name + '_update_btn').attr("disabled", false);
+            }
+        } else if (layers_checked.length == 3) {
+            if (layers_checked.indexOf("windfield_box scenario_box") > -1 &&
+                layers_checked.indexOf("surge_box scenario_box") > -1 &&
+                layers_checked.indexOf("runup_box scenario_box") > -1) {
+                scenario_controls.find(".sealevel").attr("disabled", false);
+                scenario_controls.find(".coastal_protection").attr("disabled", false);
+                scenario_controls.find(".tides").attr("disabled", false);
+                scenario_controls.find(".analysistype").attr("disabled", false);
+                $('#' + storm_name + '_update_btn').attr("disabled", false);
+            }
+        }
+    }
+
+    /*
+    Function called when the Update Map button is clicked in an the Explore Scenarios box of an active followed storm
+     */
     function updateMapClick(storm_name) {
         console.log("UPDATING " + storm_name);
 
+        var sea_level = $("input[id='" + storm_name + "_input_slr").val();
+        var coastal_protection = $("input[name='" + storm_name + "_dunes']:checked").val();
+        var tides = $("input[name='" + storm_name + "_tides']:checked").val();
+        var analysis_type = $("input[name='" + storm_name + "_analysis']:checked").val();
+
+        var scenario_parameters = {
+            storm: storm_name,
+            sea_level_rise: sea_level,
+            coastal_protection: coastal_protection,
+            tides: tides,
+            analysis_type: analysis_type
+        };
+
+        console.log(scenario_parameters);
+
+        // Get the layer taking into account the parameters
+        // load heatmap data
+        //TODO: Will need to update the url here with real url
+            var addressPoints = (function () {
+                var json = null;
+                jQuery.ajax({
+                    'async': false,
+                    'global': false,
+                    'url': "{% static 'NJ-coast-heatmap/heatmap.json' %}",
+                    'data': {
+                        storm: storm_name,
+                        sea_level_rise: sea_level,
+                        coastal_protection: coastal_protection,
+                        tides: tides,
+                        analysis_type: analysis_type
+                    },
+                    'dataType': "json",
+                    'success': function (data) {
+                        json = data;
+                    }
+                });
+                return json;
+            })();
+
+            var heatmap = L.heatLayer(addressPoints.runup, {
+                max: 4,
+                radius: 25,
+                gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'},
+                blur: 10
+            }).addTo(mymap);
+
+            // TODO: I don't know how we want to remove these layers, since they aren't really toggleable, but adding them to dictionary for easy access
+            // Currently designed to keep all layers added through Explore Scenarios, Update Map click on map
+            var layer_identification = storm_name + '_' + sea_level.toString() + '_' + coastal_protection + '_' + tides + '_' + analysis_type;
+            update_map_layers[layer_identification] = heatmap;
     }
-
-
-
 
 </script>
