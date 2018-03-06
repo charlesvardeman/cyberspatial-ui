@@ -83,7 +83,7 @@
         function get_layers_from_server() {
             $.ajax({
                 type: "GET",
-                url: "/static/gis_layers.json",
+                url: "/api/my_layers/",
                 data: {},
                 dataType: "json",
                 success: function (result) {
