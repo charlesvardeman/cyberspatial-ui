@@ -53,7 +53,7 @@
         console.log('Requesting RSS Feed......');
         $.ajax({
             type: "GET",
-            url: "/static/rss_feed.json",
+            url: "https://s3.amazonaws.com/simulation.njcoast.us/metadata.json",
             data: {},
             dataType: "json",
             success: function (result) {
@@ -79,6 +79,7 @@
 
             var active_storm_template = $('#activeStorm').clone(true);
             $(active_storm_template).addClass(camelcaseName);
+            $(active_storm_template).data("s3_base_path", item.s3_base_path);
             $(active_storm_template).find('a').attr('href', '#' + camelcaseName).attr('aria-controls', camelcaseName);
             var last_update_date = new Date(item.last_updated);
             $(active_storm_template).find('p#last_updated').text(last_update_date);
@@ -100,9 +101,9 @@
 
             $(active_storm_template).append("<div class=\"collapse active_storm\" id=\"" + camelcaseName + "\">\n" +
                 "<ul class=\"map-layers\">\n" +
-                "<li><input type=\"checkbox\" id=\"" + camelcaseName + "_wind_field_box\" class=\"windfield_box scenario_box\" onchange=\"storm_vis_check($(this), '" + camelcaseName + "')\"> Wind Field</li>\n" +
+                "<li><input type=\"checkbox\" id=\"" + camelcaseName + "_wind_field_box\" class=\"windfield_box scenario_box\" disabled onchange=\"storm_vis_check($(this), '" + camelcaseName + "')\"> Wind Field</li>\n" +
                 "<li><input type=\"checkbox\" id=\"" + camelcaseName + "_surge_box\" class=\"surge_box scenario_box\" onchange=\"storm_vis_check($(this), '" + camelcaseName + "')\"> Surge</li>\n" +
-                "<li><input type=\"checkbox\" id=\"" + camelcaseName + "_total_run_up_box\" class=\"runup_box scenario_box\" onchange=\"storm_vis_check($(this), '" + camelcaseName + "')\"> Total Run Up</li></ul>" +
+                "<li><input type=\"checkbox\" id=\"" + camelcaseName + "_total_run_up_box\" class=\"runup_box scenario_box\" disabled onchange=\"storm_vis_check($(this), '" + camelcaseName + "')\"> Total Run Up</li></ul>" +
                 "<div class=\"well plain orange scenarios\">\n" +
                 "                  <h5>Explore Scenarios</h5>\n" +
                 "                  <ul class=\"map-layers\">\n" +
@@ -132,9 +133,9 @@
                 "                    <li class=\"explore-scenario-controls\" controls-" + camelcaseName +">\n" +
                 "                      <p>Analysis Type</p>\n" +
                 "                      <ul class=\"" + camelcaseName + "_analysis_radios\">\n" +
-                "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_analysis\" value=\"det\" class=\"analysistype\" checked> Deterministic</li>\n" +
-                "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_analysis\" value=\"prob-exp\" class=\"analysistype\"> Probabilistic <span>expected</span></li>\n" +
-                "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_analysis\" value=\"prob-ext\" class=\"analysistype\"> Probabilistic <span>extreme</span></li>\n" +
+                "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_analysis\" value=\"deterministic\" class=\"analysistype\" checked> Deterministic</li>\n" +
+                "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_analysis\" value=\"expected\" class=\"analysistype\"> Probabilistic <span>expected</span></li>\n" +
+                "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_analysis\" value=\"extreme\" class=\"analysistype\"> Probabilistic <span>extreme</span></li>\n" +
                 "                      </ul>\n" +
                 "                    </li>\n" +
                 "                  </ul>\n" +
@@ -217,7 +218,8 @@
                 jQuery.ajax({
                     'async': false,
                     'global': false,
-                    'url': "{% static 'NJ-coast-heatmap/heatmap.json' %}",
+                    //'url': "{% static 'NJ-coast-heatmap/heatmap.json' %}",
+                    'url': "https://s3.amazonaws.com/simulation.njcoast.us/Sandy/2012-10-22/heatmap__slr_00__tide_zero__analysis_deterministic.json",
                     'dataType': "json",
                     'success': function (data) {
                         json = data;
@@ -232,6 +234,7 @@
                 gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'},
                 blur: 10
             }).addTo(mymap);
+            
 
             storm_layer_dict[layer_checkbox.attr('id')] = heat;
 
@@ -327,6 +330,7 @@
         var coastal_protection = $("input[name='" + storm_name + "_dunes']:checked").val();
         var tides = $("input[name='" + storm_name + "_tides']:checked").val();
         var analysis_type = $("input[name='" + storm_name + "_analysis']:checked").val();
+        var s3_path = $("."+ storm_name).data("s3_base_path")
 
         var scenario_parameters = {
             storm: storm_name,
@@ -341,12 +345,13 @@
         // Get the layer taking into account the parameters
         // load heatmap data
         //TODO: Will need to update the url here with real url
+        heatmap_url = s3_path + "heatmap__slr_" + parseInt(sea_level*10) + "__tide_" + tides + "__analysis_" + analysis_type + ".json"
             var addressPoints = (function () {
                 var json = null;
                 jQuery.ajax({
                     'async': false,
                     'global': false,
-                    'url': "{% static 'NJ-coast-heatmap/heatmap.json' %}",
+                    'url': heatmap_url,
                     'data': {
                         storm: storm_name,
                         sea_level_rise: sea_level,
@@ -362,17 +367,21 @@
                 return json;
             })();
 
+            // TODO: I don't know how we want to remove these layers, since they aren't really toggleable, but adding them to dictionary for easy access
+            // Currently designed to keep all layers added through Explore Scenarios, Update Map click on map
+            var layer_identification = storm_name + '_explore_scenario_layer';
+            if( layer_identification in update_map_layers) {
+                mymap.removeLayer(update_map_layers[layer_identification]);
+            }
+
             var heatmap = L.heatLayer(addressPoints.runup, {
                 max: 4,
                 radius: 25,
                 gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'},
                 blur: 10
             }).addTo(mymap);
-
-            // TODO: I don't know how we want to remove these layers, since they aren't really toggleable, but adding them to dictionary for easy access
-            // Currently designed to keep all layers added through Explore Scenarios, Update Map click on map
-            var layer_identification = storm_name + '_' + sea_level.toString() + '_' + coastal_protection + '_' + tides + '_' + analysis_type;
             update_map_layers[layer_identification] = heatmap;
+
     }
 
 </script>

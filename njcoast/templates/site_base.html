@@ -276,7 +276,7 @@
             <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
             <h4 class="modal-title" id="myModalLabel">{% trans "Sign in" %}</h4>
           </div>
-          <form class="form-signin" role="form" action="{% url "account_login" %}?next={{ request.path }}" method="post">
+          <form class="form-signin" role="form" action="{% url "account_login" %}?next={% url 'maps_browse' %}" method="post">
             <div class="modal-body">
               {% csrf_token %}
               <div class="form-group">
