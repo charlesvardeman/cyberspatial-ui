@@ -13,14 +13,19 @@ def my_gis_layers(request):
 
     layers_dictionary = {"layers":[]}
     for object in permitted_layers:
-        layers_dictionary["layers"].append(
-        {"id": "layer__" + str(object.layer.id),
-         "name": object.layer.title,
-         "group": object.layer.category.description,
-         "layer_link": settings.GEOSERVER_PUBLIC_LOCATION + "wms?",
-         "layer": object.layer.typename
-        }
-        )
+        try:
+            layers_dictionary["layers"].append(
+            {"id": "layer__" + str(object.layer.id),
+             "name": object.layer.title,
+             "group": object.layer.category.gn_description,
+             "layer_link": settings.GEOSERVER_PUBLIC_LOCATION + "wms?",
+             "layer": object.layer.typename
+            }
+            )
+        except:
+            # simply ignore layers without categories assigned and continue on with the loop
+            pass
+
 
     return JsonResponse(layers_dictionary)
         
