@@ -326,13 +326,32 @@
 {% endif %}
 <!-- End of Modal -->
 
-
+{% if DEBUG_STATIC %}
+<script src="{{ STATIC_URL }}lib/js/jquery.min.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/jquery.dataTables.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/jquery.timeago.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/jquery.ajaxprogress.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/jquery.ajaxQueue.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/jquery-ui.custom.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/jquery.raty.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/bootstrap.min.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/moment-with-locales.min.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/bootstrap-datetimepicker.min.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/json2.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/select2.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/waypoints.js?v={{ VERSION }}"></script>
+{% else %}
+<script src="{{ STATIC_URL }}lib/js/assets.min.js?v={{ VERSION }}"></script>
+{% endif %}
+<script src="{{ STATIC_URL }}geonode/js/utils/utils.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}geonode/js/base/base.js?v={{ VERSION }}"></script>
+<!-- 
 {#<script src="{% static 'js/jquery.min.js' %}"></script>#}
 <script src="{% static 'js/bootstrap.min.js' %}"></script>
 <script src="{% static 'lib/js/assets.min.js' %}"></script>
 
 <script src="{% static 'js/utils.js' %}"></script>
-<script src="{% static 'js/base.js' %}"></script>
+<script src="{% static 'js/base.js' %}"></script> -->
 
 
 <script type="text/javascript">
