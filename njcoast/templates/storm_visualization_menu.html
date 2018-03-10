@@ -32,7 +32,7 @@
 <a class="btn btn-secondary btn-md btn-block" href="explore-shp.html" style="margin-bottom: 20px">Explore
     Simulations</a>
 
-
+<script src="{% static 'js/jquery.min.js'%}"></script>
 <script src="{% static 'js/utilities.js' %}"></script>
 <script src="{% static 'js/leaflet-heat.js' %}"></script>
 <script src="{% static 'NJ-coast-heatmap/nj-coast.js' %}"></script>
@@ -234,7 +234,7 @@
                 gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'},
                 blur: 10
             }).addTo(mymap);
-            
+
 
             storm_layer_dict[layer_checkbox.attr('id')] = heat;
 
