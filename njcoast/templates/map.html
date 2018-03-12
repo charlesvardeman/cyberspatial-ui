@@ -131,7 +131,7 @@
               downloadable-data-collection-national-geospatial-/resource/f55f881d-9de8-471f-9b6b-22cd7a98025d
         XML: https://services.nationalmap.gov/arcgis/services/nhd/MapServer/WMSServer?request=GetCapabilities&service=WMS
          */
-        var mymap = L.map('mapid').setView([40.4417743, -74.1298643], 12);
+        var mymap = L.map('mapid').setView([{{ home_latitude }}, {{ home_longitude }}], {{ zoom_level }});
         var layer_list = [];
         var layer_groups = [];
 
