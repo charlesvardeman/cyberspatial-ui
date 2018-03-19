@@ -6,29 +6,39 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
+
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Map - Planners</title>
+    <title>Map - Planners</title>    {% block head %}
+          {% if DEBUG_STATIC %}
+              <link href="{{ STATIC_URL }}lib/css/jquery.dataTables.css?v={{ VERSION }}" rel="stylesheet" />
+              <link href="{{ STATIC_URL }}lib/css/select2.css?v={{ VERSION }}" rel="stylesheet"/>
+              <link href="{{ STATIC_URL }}lib/css/bootstrap.min.css?v={{ VERSION }}" rel="stylesheet"/>
+              <link href="{{ STATIC_URL }}lib/css/jquery-ui.css?v={{ VERSION }}" rel="stylesheet"/>
+          {% else %}
+            <link href="{{ STATIC_URL }}lib/css/assets.min.css?v={{ VERSION }}" rel="stylesheet"/>
+          {% endif %}
+
+          <link href="{{ STATIC_URL }}geonode/css/ext-compatibility.css?v={{ VERSION }}" rel="stylesheet" />
+          <link href="{{ STATIC_URL }}geonode/css/base.css?v={{ VERSION }}" rel="stylesheet" />
+          <link href="{{ STATIC_URL }}css/site-base.css" rel="stylesheet"/>
+          <style type="text/css">[ng\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}</style>
+
+          {% block extra_head %}
+              <link href="{% static 'css/njcoast-style.css' %}" rel="stylesheet"/>
+          {% endblock %}
+        {% endblock %}
 
     <script src="{% static 'js/jquery.min.js' %}"></script>
 
-    <link href="{% static 'css/assets.min.css' %}" rel="stylesheet"/>
-
-    <link href="{% static 'css/ext-compatibility.css' %}" rel="stylesheet"/>
-    <link href="{% static 'css/base.css' %}" rel="stylesheet"/>
-    <style type="text/css">[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak, .ng-hide:not(.ng-hide-animate) {
-        display: none !important;
-    }</style>
-
-    <link href="{% static 'css/site_base.css' %}" rel="stylesheet"/>
-    <link href="{% static 'css/njcoast-style.css' %}" rel="stylesheet"/>
 
     <!-- Font Awesome -->
     <script src="https://use.fontawesome.com/1506e8c7e9.js"></script>
-    <link rel="stylesheet" href="{% static 'css/font-awesome-4.7.0/css/font-awesome.min.css' %}">
 
 
     <!--[if IE]>
@@ -75,7 +85,7 @@
 	    <div id="navbar" class="navbar-collapse collapse">
 	      <ul class="nav navbar-nav toolbar">
               {% block tabs %}
-              {% if user.is_authenticated %}
+              {% if user.is_superuser %}
                   <li id="nav_layers">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Data" %}<i class="fa fa-angle-down fa-lg"></i></a>
                         <ul class="dropdown-menu">
@@ -92,7 +102,7 @@
                         </ul>
                   </li>
               {% endif %}
-              {% if user.is_authenticated %}
+              {% if user.is_superuser %}
                   <li id="nav_maps">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Maps" %}<i class="fa fa-angle-down fa-lg"></i></a>
                         <ul class="dropdown-menu">
@@ -100,9 +110,13 @@
                               <li> <a href="{% url "new_map" %}">{% trans "Create Map" %}</a></li>
                         </ul>
                   </li>
+              {% elif user.is_authenticated %}
+                  <li id="nav_maps">
+                        <a href="{% url "maps_browse" %}" role="button">{% trans "Map" %}</a>
+                  </li>
               {% endif %}
             <li>
-            {% if user.is_authenticated %}
+            {% if user.is_superuser %}
 	            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "About" %}<i class="fa fa-angle-down fa-lg"></i></a>
                   <ul class="dropdown-menu">
                         <li><a href="{% url "profile_browse" %}">{% trans "People" %}</a></li>
@@ -157,6 +171,7 @@
                 <i class="fa fa-angle-down fa-lg"></i>
               </a>
               <ul class="dropdown-menu">
+                {% if user.is_superuser %}
                 <li><a href="{{ user.get_absolute_url }}">{% trans "Profile" %}</a></li>
                 <li><a href="{% url "recent-activity" %}">{% trans "Recent Activity" %}</a></li>
                 <li><a href="{% url "messages_inbox" %}">{% trans "Inbox" %}</a></li>
@@ -172,6 +187,7 @@
                 <li role="separator" class="divider"></li>
                 <li><a href="{% url "help" %}">{% trans "Help" %}</a></li>
                 <li role="separator" class="divider"></li>
+                {% endif %}
                 <li><a href="/account/logout/">Logout</a></li>
                 </ul>
               </li>
@@ -199,7 +215,7 @@
     <div class="container-fluid">
         <div class="page-header map-header">
             <p>keansburg <span>|</span> planning</p>
-            <div id="leaflet-map-menu">
+            <!-- <div id="leaflet-map-menu">
                 <div class="dropdown show title-drop pull-right">
                     <a class="btn btn-title dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown"
                        aria-haspopup="true" aria-expanded="false">
@@ -215,7 +231,7 @@
                     </div>
                 </div>
                 <img class="img-responsive" src="{% static 'images/map-page-icons.png' %}"/>
-            </div>
+            </div>-->
         </div>
         <div class="row">
 
@@ -310,14 +326,32 @@
 {% endif %}
 <!-- End of Modal -->
 
-
+{% if DEBUG_STATIC %}
+<script src="{{ STATIC_URL }}lib/js/jquery.min.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/jquery.dataTables.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/jquery.timeago.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/jquery.ajaxprogress.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/jquery.ajaxQueue.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/jquery-ui.custom.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/jquery.raty.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/bootstrap.min.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/moment-with-locales.min.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/bootstrap-datetimepicker.min.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/json2.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/select2.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}lib/js/waypoints.js?v={{ VERSION }}"></script>
+{% else %}
+<script src="{{ STATIC_URL }}lib/js/assets.min.js?v={{ VERSION }}"></script>
+{% endif %}
+<script src="{{ STATIC_URL }}geonode/js/utils/utils.js?v={{ VERSION }}"></script>
+<script src="{{ STATIC_URL }}geonode/js/base/base.js?v={{ VERSION }}"></script>
+<!-- 
 {#<script src="{% static 'js/jquery.min.js' %}"></script>#}
 <script src="{% static 'js/bootstrap.min.js' %}"></script>
-<script src="{% static 'js/assets.min.js' %}"></script>
+<script src="{% static 'lib/js/assets.min.js' %}"></script>
 
 <script src="{% static 'js/utils.js' %}"></script>
-<script src="{% static 'js/base.js' %}"></script>
-<script src="{% static 'js/base/base.js?v=2.6.3' %}"></script>
+<script src="{% static 'js/base.js' %}"></script> -->
 
 
 <script type="text/javascript">

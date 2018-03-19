@@ -1,7 +1,11 @@
-{% extends 'base.html' %}
+{% extends 'site_base.html' %}
+{% load i18n %}
 {% load staticfiles %}
+{% load base_tags %}
 
-{% block extra-headers %}
+{% block body_class %}home{% endblock %}
+
+{% block extra_head %}
 
     <!-- Load Leaflet from CDN -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
@@ -16,18 +20,44 @@
     <script src="https://unpkg.com/esri-leaflet@2.1.1/dist/esri-leaflet.js"
             integrity="sha512-ECQqaYZke9cSdqlFG08zSkudgrdF6I1d8ViSa7I3VIszJyVqw4ng1G8sehEXlumdMnFYfzY0tMgdQa4WCs9IUw=="
             crossorigin=""></script>
-{% endblock extra-headers %}
+
+{% endblock extra_head %}
 
 
-{% block map %}
+{% block middle %}
 
-    <div id="mapid" class="col-sm-8 col-lg-9 col-xl-10" style="width: 100%; height: 100%;"></div>
+<div class="jumbotron njcoast-image slimmer"></div>
 
-{% endblock map %}
+<div class="container-fluid">
+    <div class="page-header map-header">
+        <!--<p>keansburg <span>|</span> planning</p> -->
+        <!-- <div id="leaflet-map-menu">
+            <div class="dropdown show title-drop pull-right">
+                <a class="btn btn-title dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    Standard Planning Map <i class="fa fa-caret-down" style="margin-left: 10px"
+                                             aria-hidden="true"></i>
+                </a>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="#">My Custom Map #1</a>
+                    <a class="dropdown-item" href="#">Smith's Planning Map</a>
+                    <a class="dropdown-item" href="#">Hurricane Jose Map - Annotated</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#">Browse All Maps</a>
+                </div>
+            </div>
+            <img class="img-responsive" src="{% static 'images/map-page-icons.png' %}"/>
+        </div>-->
+    </div>
+    <div class="row">
 
+        <div class="col-sm-8 col-lg-9 col-xl-10 leaflet-map">
+            <div id="mapid" class="col-sm-8 col-lg-9 col-xl-10" style="width: 100%; height: 100%;"></div>
+        </div>
+        <div class="col-sm-4 col-lg-3 col-xl-2" id="map-control-panel">
+            <div class="map-control-item">
 
-{% block gis-map-controls-block %}
-    <a data-toggle="collapse in" href="#gisLayers" aria-expanded="false" aria-controls="gisLayers">
+    <a data-toggle="collapse" href="#gisLayers" aria-expanded="false" aria-controls="gisLayers">
         <h4 class="map-control-item-heading">GIS Layers
             <i class="fa fa-chevron-down pull-right" aria-hidden="true"></i></h4>
         <p class="qualifier" style="margin-bottom: 0">for Planning role</p>
@@ -44,12 +74,55 @@
             <ul class="collapse map-layers" id=""></ul>
     </div>
     </div>
-{% endblock gis-map-controls-block %}
+                    </div>
+                    <div class="map-control-item">
+                        {% include 'storm_visualization_menu.html' %}
+                    </div>
+
+                    <div class="map-control-item">
+                        <a data-toggle="collapse" href="#annotations" aria-expanded="false" aria-controls="annotations">
+                            <h4 class="map-control-item-heading">Annotations<i class="fa fa-chevron-down pull-right"
+                                                                               aria-hidden="true"></i></h4>
+                            <p class="qualifier" style="margin-bottom: 0">write or draw on the map</p>
+                        </a>
+                        <div class="collapse" id="annotations">
+                            <div class="beta-feature-not-available"><p style="margin-top: 15px"><input type="checkbox" name="gender" value="female"
+                               data-toggle="popover" data-placement="right"> Annotation layer</p></div>
+                            <div class="beta-feature-not-available"><a class="btn btn-secondary btn-md btn-block" data-toggle="popover" href="#annotationTools"
+                               aria-expanded="false" aria-controls="annotationTools">Edit Annotations</a></div>
+                            <div class="collapse" id="annotationTools">
+                                <div class="placeholder-box">
+                                    <p>Text and drawing tools go here</p>
+                                </div>
+                                <button class="btn btn-primary btn-md btn-block" style="margin-top: 20px">Save Changes
+                                </button>
+                                <button class="btn btn-secondary btn-md btn-block">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="map-control-item">
+                        <p class="qualifier" style="margin-top: 10px">Save current map configuration (e.g. active layers and
+                            annotations), copy the map and save with a new name, or download the map.</p>
+                        <div class="beta-feature-not-available"><button disabled class="btn btn-primary btn-md btn-block" data-toggle="popover" data-target="">Save Map
+                        </button></div>
+                        <div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Copy Map
+                        </button></div>
+                        <div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Download Map
+                        </button></div>
+                        <div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Share Map
+                        </button></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+                    {% endblock middle %}
 
 
-{% block extra_js_bottom %}
+{% block extra_script %}
 <script src="{% static 'js/utilities.js' %}"></script>
-    <script>
+    <script type=text/javascript>
         /*
         Base Map -- Centered on Keansburg, NJ
         WMS Tile Layers
@@ -58,7 +131,7 @@
               downloadable-data-collection-national-geospatial-/resource/f55f881d-9de8-471f-9b6b-22cd7a98025d
         XML: https://services.nationalmap.gov/arcgis/services/nhd/MapServer/WMSServer?request=GetCapabilities&service=WMS
          */
-        var mymap = L.map('mapid').setView([40.4417743, -74.1298643], 12);
+        var mymap = L.map('mapid').setView([{{ home_latitude }}, {{ home_longitude }}], {{ zoom_level }});
         var layer_list = [];
         var layer_groups = [];
 
@@ -83,7 +156,7 @@
         function get_layers_from_server() {
             $.ajax({
                 type: "GET",
-                url: "/static/gis_layers.json",
+                url: "/api/my_layers/",
                 data: {},
                 dataType: "json",
                 success: function (result) {
@@ -175,5 +248,15 @@
                 }
             });
         }
+
+      $(function () {
+        $('.beta-feature-not-available').tooltip(
+          {
+            title: "Feature not available at this time",
+            placement: "top",
+            width: '300px'
+          });
+      });
+
     </script>
-{% endblock extra_js_bottom %}
+{% endblock extra_script %}

@@ -27,11 +27,19 @@ from geonode.settings import *
 
 SITENAME = 'njcoast'
 
+#DEBUG=False
+
 # Defines the directory that contains the settings file as the LOCAL_ROOT
 # It is used for relative settings elsewhere.
 LOCAL_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 WSGI_APPLICATION = "njcoast.wsgi.application"
+
+PROXY_ALLOWED_HOSTS = ('192.168.33.10',)
+
+MAX_DOCUMENT_SIZE = 512
+
+MODIFY_TOPICCATEGORY = True
 
 DATABASES = {
     'default': {
