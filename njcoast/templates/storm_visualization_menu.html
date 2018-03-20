@@ -118,7 +118,7 @@
                 "                    </li>\n" +
                 "                    <li class=\"explore-scenario-controls controls-" + camelcaseName +"\">\n" +
                 "                      <p>Coastal Protection (e.g. dunes)</p>\n" +
-                "                      <ul class=\"one-line " + camelcaseName + "_dunes_radios\">\n" +
+                "                      <ul class=\"beta-feature-not-available one-line " + camelcaseName + "_dunes_radios\">\n" +
                 "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_dunes\" value=\"current\" class=\"coastal_protection\" checked> Current</li>\n" +
                 "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_dunes\" value=\"degraded\" class=\"coastal_protection\"> Degraded</li>\n" +
                 "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_dunes\" value=\"compromised\" class=\"coastal_protection\"> Compromised</li>\n" +
@@ -134,7 +134,7 @@
                 "                    </li>\n" +
                 "                    <li class=\"explore-scenario-controls controls-" + camelcaseName +"\">\n" +
                 "                      <p>Analysis Type</p>\n" +
-                "                      <ul class=\"" + camelcaseName + "_analysis_radios\">\n" +
+                "                      <ul class=\"beta-feature-not-available " + camelcaseName + "_analysis_radios\">\n" +
                 "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_analysis\" value=\"deterministic\" class=\"analysistype\" checked> Deterministic</li>\n" +
                 "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_analysis\" value=\"expected\" class=\"analysistype\"> Probabilistic <span>expected</span></li>\n" +
                 "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_analysis\" value=\"extreme\" class=\"analysistype\"> Probabilistic <span>extreme</span></li>\n" +
@@ -264,7 +264,7 @@
                 scenario_controls.find(".sealevel").attr("disabled", false);
                 scenario_controls.find(".coastal_protection").attr("disabled", true);
                 scenario_controls.find(".tides").attr("disabled", false);
-                scenario_controls.find(".analysistype").attr("disabled", false);
+                scenario_controls.find(".analysistype").attr("disabled", true);
                 $('#' + storm_name + '_update_btn').attr("disabled", false);
             } else if (layers_checked.indexOf("runup_box scenario_box") > -1) {
                 scenario_controls.find(".sealevel").attr("disabled", false);
