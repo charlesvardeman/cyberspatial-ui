@@ -145,6 +145,47 @@
                 id: 'mapbox.streets'
             }).addTo(mymap);
 
+            // Note that the path doesn't matter right now; any WebSocket
+            // connection gets bumped over to WebSocket consumers
+            {% if map_id %}
+              socket = new WebSocket("ws://" + window.location.host + "/map-socket/{{map_id}}/");
+              socket.onmessage = function(e) {
+                  //onMapClick(e.data);
+                  // alert('received socket');
+                  console.log(e)
+                  socket_object = JSON.parse(e.data)
+                  console.log(socket_object)
+                  var marker = L.marker([socket_object.data.latitude,socket_object.data.longitude]).addTo(mymap);
+
+              }
+              socket.onopen = function() {
+                  socket.send("joining map annotation for map {{map_id}}");
+              }
+              // Call onopen directly if socket is already open
+              if (socket.readyState == WebSocket.OPEN) socket.onopen();
+
+
+
+              function onMapClick(e) {
+              var marker = L.marker(e.latlng).addTo(mymap);
+                  // marker
+                  //     .setLatLng(e.latlng)
+                  //     .setContent("You clicked the map at " + e.latlng.toString())
+                  //     .openOn(mymap);
+                  //
+                  socket_frame = {
+                    type: 'marker',
+                    data: {
+                      latitude: e.latlng.lat,
+                      longitude: e.latlng.lng
+                    }
+                  }
+                  socket.send(JSON.stringify(socket_frame));
+              }
+
+              mymap.on('click', onMapClick);
+              {% endif %}
+
             get_layers_from_server();
 
         });

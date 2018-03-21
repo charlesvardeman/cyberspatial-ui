@@ -27,7 +27,9 @@ from geonode.settings import *
 
 SITENAME = 'njcoast'
 
-#DEBUG=False
+DEBUG=True
+
+ALLOWED_HOSTS = ('192.168.33.10',)
 
 # Defines the directory that contains the settings file as the LOCAL_ROOT
 # It is used for relative settings elsewhere.
@@ -40,6 +42,9 @@ PROXY_ALLOWED_HOSTS = ('192.168.33.10',)
 MAX_DOCUMENT_SIZE = 512
 
 MODIFY_TOPICCATEGORY = True
+
+INSTALLED_APPS += ('channels',)
+
 
 DATABASES = {
     'default': {
@@ -58,6 +63,15 @@ DATABASES = {
         'HOST': os.getenv('DATABASE_HOST'),
         'PORT': os.getenv('DATABASE_PORT'),
     }
+}
+
+# Basic Channels setup
+# TODO: Change to REDIS or better backend
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgiref.inmemory.ChannelLayer",
+        "ROUTING": "njcoast.routing.channel_routing",
+    },
 }
 
 # Load more settings from a file called local_settings.py if it exists
