@@ -6,7 +6,6 @@
 {% block body_class %}home{% endblock %}
 
 {% block extra_head %}
-
     <!-- Load Leaflet from CDN -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
           integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
@@ -86,11 +85,16 @@
                             <p class="qualifier" style="margin-bottom: 0">write or draw on the map</p>
                         </a>
                         <div class="collapse" id="annotations">
-                            <div class="beta-feature-not-available"><p style="margin-top: 15px"><input type="checkbox" name="gender" value="female"
-                               data-toggle="popover" data-placement="right"> Annotation layer</p></div>
-                            <div class="beta-feature-not-available"><a class="btn btn-secondary btn-md btn-block" data-toggle="popover" href="#annotationTools"
-                               aria-expanded="false" aria-controls="annotationTools">Edit Annotations</a></div>
-                            <div class="collapse" id="annotationTools">
+                            <!--Checkbox to toggle annotation layer and functions-->
+                            <p style="margin-top: 15px"><input type="checkbox" name="annotations" value="on"
+                               data-toggle="popover" data-placement="right" onclick="toggle_annotation_layer(this.checked)"> Annotation layer</p>
+                               <a class="btn btn-primary btn-md btn-block" data-toggle="popover" href="#annotationTools"
+                                  aria-expanded="false" aria-controls="annotationTools" onclick="add_marker()">Add Marker</a>
+                                  <!--<button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Open Modal</button>-->
+
+                                  <div class="beta-feature-not-available"><a class="btn btn-secondary btn-md btn-block" data-toggle="popover" href="#annotationTools"
+                                      aria-expanded="false" aria-controls="annotationTools">Edit Annotations</a></div>
+                                      <div class="collapse" id="annotationTools">
                                 <div class="placeholder-box">
                                     <p>Text and drawing tools go here</p>
                                 </div>
@@ -117,6 +121,27 @@
 
             </div>
         </div>
+
+        <!-- Modal box for marker input-->
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Please input text for Marker</h4>
+                    </div>
+                    <div class="modal-body">
+                        <textarea class="form-control" placeholder="Input text here..."></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Create Marker</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
                     {% endblock middle %}
 
 
@@ -135,6 +160,9 @@
         var layer_list = [];
         var layer_groups = [];
 
+        //create layer group to add marker
+        var annotationLayer = new L.LayerGroup();
+
         $(document).ready(function () {
 
             L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
@@ -144,6 +172,9 @@
                 'Imagery © <a href="http://mapbox.com">Mapbox</a>',
                 id: 'mapbox.streets'
             }).addTo(mymap);
+
+            //add annotation layer
+            annotationLayer.addTo(mymap);
 
             // Note that the path doesn't matter right now; any WebSocket
             // connection gets bumped over to WebSocket consumers
@@ -155,7 +186,7 @@
                   console.log(e)
                   socket_object = JSON.parse(e.data)
                   console.log(socket_object)
-                  var marker = L.marker([socket_object.data.latitude,socket_object.data.longitude]).addTo(mymap);
+                  var marker = annotationLayer.addLayer(L.marker([socket_object.data.latitude,socket_object.data.longitude]));//.addTo(mymap);
 
               }
               socket.onopen = function() {
@@ -164,23 +195,25 @@
               // Call onopen directly if socket is already open
               if (socket.readyState == WebSocket.OPEN) socket.onopen();
 
-
-
+              //If map clicked
               function onMapClick(e) {
-              var marker = L.marker(e.latlng).addTo(mymap);
-                  // marker
-                  //     .setLatLng(e.latlng)
-                  //     .setContent("You clicked the map at " + e.latlng.toString())
-                  //     .openOn(mymap);
-                  //
-                  socket_frame = {
-                    type: 'marker',
-                    data: {
-                      latitude: e.latlng.lat,
-                      longitude: e.latlng.lng
-                    }
+                  //check the annotation is on #TODO dont need check if controls are off!
+                  if(mymap.hasLayer(annotationLayer)){
+                      var marker = annotationLayer.addLayer(L.marker(e.latlng));//.addTo(mymap);
+                      // marker
+                      //     .setLatLng(e.latlng)
+                      //     .setContent("You clicked the map at " + e.latlng.toString())
+                      //     .openOn(mymap);
+                      //
+                      socket_frame = {
+                        type: 'marker',
+                        data: {
+                          latitude: e.latlng.lat,
+                          longitude: e.latlng.lng
+                        }
+                      }
+                      socket.send(JSON.stringify(socket_frame));
                   }
-                  socket.send(JSON.stringify(socket_frame));
               }
 
               mymap.on('click', onMapClick);
@@ -298,6 +331,24 @@
             width: '300px'
           });
       });
+
+      //map annotation section
+      //toggle layer
+      function toggle_annotation_layer(onOff) {
+
+          if(onOff){
+              annotationLayer.addTo(mymap);
+          }else{
+              mymap.removeLayer(annotationLayer);
+          }
+          console.log(onOff);
+      }
+
+      //add marker
+      function add_marker() {
+
+          console.log("Add marker");
+      }
 
     </script>
 {% endblock extra_script %}
