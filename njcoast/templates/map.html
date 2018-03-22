@@ -282,31 +282,8 @@
 
             mymap.on('editable:editing', function(e) {
                 //polygon
-                if (e.layer instanceof L.Polygon){
-                    LatLngs = e.layer.getLatLngs();
-                    console.log("Polygon," + e.layer.myCustomID + "," + LatLngs[0][0]);
-
-                    var lldata = [];
-                    for(i=0; i<LatLngs[0].length; i++){
-                        //console.log("Data " + i + ", " + LatLngs[0][i].lat);
-                        localdata = new Array(LatLngs[0][i].lat, LatLngs[0][i].lng);
-                        lldata.push(localdata);
-                    }
-
-                    console.log("JSON " + JSON.stringify(lldata));
-
-                    socket_frame = {
-                      type: 'polygon',
-                      data: {
-                        id: e.layer.myCustomID,
-                        points: JSON.stringify(lldata)
-                      }
-                    }
-                    socket.send(JSON.stringify(socket_frame));
-                }
+                polygon_update(e);
                 console.log("editing");
-                    //this.calculateArea(e.layer);
-                    //this.mapState = MAP_STATE.NONE;
             });
 
             //object creation end point, #TODO send object to listeners
@@ -314,42 +291,10 @@
                 {% if map_id %}
 
                 //polygon
-                if (e.layer instanceof L.Polygon){
-                    LatLngs = e.layer.getLatLngs();
-                    console.log("Polygon," + e.layer.myCustomID + "," + LatLngs[0][0]);
-
-                    var lldata = [];
-                    for(i=0; i<LatLngs[0].length; i++){
-                        //console.log("Data " + i + ", " + LatLngs[0][i].lat);
-                        localdata = new Array(LatLngs[0][i].lat, LatLngs[0][i].lng);
-                        lldata.push(localdata);
-                    }
-
-                    console.log("JSON " + JSON.stringify(lldata));
-
-                    socket_frame = {
-                      type: 'polygon',
-                      data: {
-                        id: e.layer.myCustomID,
-                        points: JSON.stringify(lldata)
-                      }
-                    }
-                    socket.send(JSON.stringify(socket_frame));
-                }
+                polygon_update(e);
 
                 //marker
-                if (e.layer instanceof L.Marker){
-                    console.log("Marker," + e.layer.myCustomID);
-                    socket_frame = {
-                      type: 'marker',
-                      data: {
-                        id: e.layer.myCustomID,
-                        latitude: e.layer.getLatLng().lat,
-                        longitude: e.layer.getLatLng().lng
-                      }
-                    }
-                    socket.send(JSON.stringify(socket_frame));
-                }
+                marker_update(e);
                 {% endif %}
                 console.log("editable:drawing:end, edited");
             });
@@ -359,6 +304,24 @@
                 {% if map_id %}
 
                 //polygon
+                polygon_update(e);
+
+                //marker
+                marker_update(e);
+                {% endif %}
+                console.log("editable:drag");
+            });
+
+            mymap.on('editable:disable', function (e) {
+                //if (e.layer instanceof L.Marker) e.layer.isDirty = true;
+                console.log("editable:disable");
+            });
+
+            //update polygon
+            function polygon_update(e) {
+                {% if map_id %}
+
+                //polygon
                 if (e.layer instanceof L.Polygon){
                     LatLngs = e.layer.getLatLngs();
                     console.log("Polygon," + e.layer.myCustomID + "," + LatLngs[0][0]);
@@ -381,8 +344,12 @@
                     }
                     socket.send(JSON.stringify(socket_frame));
                 }
+                {% endif %}
+            }
 
-                //marker
+            //update marker
+            function marker_update(e) {
+                {% if map_id %}
                 if (e.layer instanceof L.Marker){
                     console.log("Drag marker," + e.layer.myCustomID);
                     socket_frame = {
@@ -396,13 +363,7 @@
                     socket.send(JSON.stringify(socket_frame));
                 }
                 {% endif %}
-                console.log("editable:drag");
-            });
-
-            mymap.on('editable:disable', function (e) {
-                //if (e.layer instanceof L.Marker) e.layer.isDirty = true;
-                console.log("editable:disable");
-            });
+            }
 
         $(document).ready(function () {
 
