@@ -335,6 +335,31 @@
             mymap.on('editable:drag', function (e) {
                 {% if map_id %}
 
+                //polygon
+                if (e.layer instanceof L.Polygon){
+                    LatLngs = e.layer.getLatLngs();
+                    console.log("Polygon," + e.layer.myCustomID + "," + LatLngs[0][0]);
+
+                    var lldata = [];
+                    for(i=0; i<LatLngs[0].length; i++){
+                        //console.log("Data " + i + ", " + LatLngs[0][i].lat);
+                        localdata = new Array(LatLngs[0][i].lat, LatLngs[0][i].lng);
+                        lldata.push(localdata);
+                    }
+
+                    console.log("JSON " + JSON.stringify(lldata));
+
+                    socket_frame = {
+                      type: 'polygon',
+                      data: {
+                        id: e.layer.myCustomID,
+                        points: JSON.stringify(lldata)
+                      }
+                    }
+                    socket.send(JSON.stringify(socket_frame));
+                }
+
+                //marker
                 if (e.layer instanceof L.Marker){
                     console.log("Drag marker," + e.layer.myCustomID);
                     socket_frame = {
@@ -348,6 +373,7 @@
                     socket.send(JSON.stringify(socket_frame));
                 }
                 {% endif %}
+                console.log("editable:drag");
             });
 
             mymap.on('editable:disable', function (e) {
@@ -412,6 +438,9 @@
                           //modify
                           if(socket_object.type == 'marker'){
                               object.setLatLng([socket_object.data.latitude,socket_object.data.longitude]);
+                          }else if(socket_object.type == 'polygon'){
+                              var points = JSON.parse(socket_object.data.points);
+                              object.setLatLngs(points);
                           }
                       }
 
