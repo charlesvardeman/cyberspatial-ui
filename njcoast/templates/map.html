@@ -281,7 +281,30 @@
             });
 
             mymap.on('editable:editing', function(e) {
-                    console.log("editing");
+                //polygon
+                if (e.layer instanceof L.Polygon){
+                    LatLngs = e.layer.getLatLngs();
+                    console.log("Polygon," + e.layer.myCustomID + "," + LatLngs[0][0]);
+
+                    var lldata = [];
+                    for(i=0; i<LatLngs[0].length; i++){
+                        //console.log("Data " + i + ", " + LatLngs[0][i].lat);
+                        localdata = new Array(LatLngs[0][i].lat, LatLngs[0][i].lng);
+                        lldata.push(localdata);
+                    }
+
+                    console.log("JSON " + JSON.stringify(lldata));
+
+                    socket_frame = {
+                      type: 'polygon',
+                      data: {
+                        id: e.layer.myCustomID,
+                        points: JSON.stringify(lldata)
+                      }
+                    }
+                    socket.send(JSON.stringify(socket_frame));
+                }
+                console.log("editing");
                     //this.calculateArea(e.layer);
                     //this.mapState = MAP_STATE.NONE;
             });
