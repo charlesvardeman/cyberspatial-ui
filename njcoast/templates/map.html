@@ -281,6 +281,9 @@
             });
 
             mymap.on('editable:editing', function(e) {
+                //polyline_update
+                polyline_update(e);
+
                 //polygon
                 polygon_update(e);
 
@@ -293,6 +296,9 @@
             //object creation end point, #TODO send object to listeners
             mymap.on('editable:drawing:end', function (e) {
                 {% if map_id %}
+
+                //polyline_update
+                polyline_update(e);
 
                 //polygon
                 polygon_update(e);
@@ -310,6 +316,9 @@
             //object creation end point, #TODO send object to listeners
             mymap.on('editable:drag', function (e) {
                 {% if map_id %}
+
+                //polyline_update
+                polyline_update(e);
 
                 //polygon
                 polygon_update(e);
@@ -336,7 +345,7 @@
                 //polygon
                 if (e.layer instanceof L.Polygon){
                     LatLngs = e.layer.getLatLngs();
-                    console.log("Polygon," + e.layer.myCustomID + "," + LatLngs[0][0]);
+                    console.log("Polygon," + e.layer.myCustomID + "," + LatLngs[0]);
 
                     var lldata = [];
                     for(i=0; i<LatLngs[0].length; i++){
@@ -349,6 +358,36 @@
 
                     socket_frame = {
                       type: 'polygon',
+                      data: {
+                        id: e.layer.myCustomID,
+                        points: JSON.stringify(lldata)
+                      }
+                    }
+                    socket.send(JSON.stringify(socket_frame));
+                }
+                {% endif %}
+            }
+
+            //update polyline
+            function polyline_update(e) {
+                {% if map_id %}
+
+                //polygon
+                if (e.layer instanceof L.Polygon || e.layer instanceof L.Polyline){
+                    LatLngs = e.layer.getLatLngs();
+                    console.log("Polyline," + e.layer.myCustomID + "," + LatLngs[0]);
+
+                    var lldata = [];
+                    for(i=0; i<LatLngs.length; i++){
+                        //console.log("Data " + i + ", " + LatLngs[0][i].lat);
+                        localdata = new Array(LatLngs[i].lat, LatLngs[i].lng);
+                        lldata.push(localdata);
+                    }
+
+                    console.log("JSON " + JSON.stringify(lldata));
+
+                    socket_frame = {
+                      type: 'polyline',
                       data: {
                         id: e.layer.myCustomID,
                         points: JSON.stringify(lldata)
@@ -438,10 +477,14 @@
                           //create
                           if(socket_object.type == 'marker'){
                               newobject = L.marker([socket_object.data.latitude,socket_object.data.longitude]);
-                          }else if(socket_object.type == 'polygon'){
+                          }else if(socket_object.type == 'polygon' || socket_object.type == 'polyline'){
                               var points = JSON.parse(socket_object.data.points);
                               console.log("Points " + points.length + "," + points[0][0]);
-                              newobject = L.polygon(points);
+                              if(socket_object.type == 'polyline'){
+                                  newobject = L.polyline(points);
+                              }else{
+                                  newobject = L.polygon(points);
+                              }
                           }else if(socket_object.type == 'circle'){
                               newobject = L.circle([socket_object.data.latitude,socket_object.data.longitude], socket_object.data.radius);
                           }
@@ -455,7 +498,7 @@
                           //modify
                           if(socket_object.type == 'marker'){
                               object.setLatLng([socket_object.data.latitude,socket_object.data.longitude]);
-                          }else if(socket_object.type == 'polygon'){
+                          }else if(socket_object.type == 'polygon' || socket_object.type == 'polyline'){
                               var points = JSON.parse(socket_object.data.points);
                               object.setLatLngs(points);
                           }else if(socket_object.type == 'circle'){
@@ -606,7 +649,7 @@
 
           if(onOff){
             mymap.addControl(marker_control);
-            //mymap.addControl(line_control);
+            mymap.addControl(line_control);
             mymap.addControl(polygon_control);
             //mymap.addControl(rectangle_control);
             mymap.addControl(circle_control);
@@ -614,7 +657,7 @@
               //annotationLayer.addTo(mymap);
           }else{
               mymap.removeControl(marker_control);
-              //mymap.removeControl(line_control);
+              mymap.removeControl(line_control);
               mymap.removeControl(polygon_control);
               //mymap.removeControl(rectangle_control);
               mymap.removeControl(circle_control);
