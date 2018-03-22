@@ -93,8 +93,8 @@
                         <div class="collapse" id="annotations">
                             <!--Checkbox to toggle annotation layer and functions-->
                             <p style="margin-top: 15px"><input type="checkbox" name="annotations" value="on"
-                               data-toggle="popover" data-placement="right" onclick="toggle_annotation_layer(this.checked)"> Annotation layer</p>
-                               <p style="margin-top: 15px"><input type="checkbox" name="annotations" value="on"
+                               data-toggle="popover" data-placement="right" onclick="toggle_annotation_layer(this.checked)" checked> Annotation layer</p>
+                               <p style="margin-top: 15px"><input type="checkbox" name="annotate" id="annotate" value="on"
                                   data-toggle="popover" data-placement="right" onclick="toggle_annotate(this.checked)"> Annotate</p>
                                <a class="btn btn-primary btn-md btn-block" data-toggle="popover" href="#annotationTools"
                                   aria-expanded="false" aria-controls="annotationTools" onclick="add_marker()">Add Marker</a>
@@ -172,6 +172,7 @@
 
         //create layer group to add marker
         var annotationLayer = new L.LayerGroup();
+        mymap.editTools.featuresLayer = annotationLayer;
 
         //annotate controls
         L.EditControl = L.Control.extend({
@@ -279,6 +280,7 @@
                     //this.mapState = MAP_STATE.NONE;
             });
 
+            //object creation end point, #TODO send object to listeners
             mymap.on('editable:drawing:end', function (e) {
                 //if (e.layer instanceof L.Marker) e.layer.isDirty = true;
                 console.log("edited");
@@ -465,6 +467,8 @@
           if(onOff){
               annotationLayer.addTo(mymap);
           }else{
+              document.getElementById("annotate").checked = false;
+              toggle_annotate(false);
               mymap.removeLayer(annotationLayer);
           }
           console.log(onOff);
