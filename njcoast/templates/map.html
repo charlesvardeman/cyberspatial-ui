@@ -265,7 +265,11 @@
 
             mymap.on('editable:created', function(e) {
                 //e.layer.setStyle({color: 'DarkRed'});
-                    console.log("created");
+                if (e.layer instanceof L.Marker){
+                    e.layer.myCustomID = Math.random().toString(36).substr(2, 9);
+                    console.log("Its a Marker, " + e.layer.myCustomID);
+                }
+                console.log("created");
                     //this.calculateArea(e.layer);
                     //this.mapState = MAP_STATE.NONE;
             });
@@ -287,10 +291,11 @@
                 {% if map_id %}
 
                 if (e.layer instanceof L.Marker){
-                    console.log("Marker," + e.layer.getLatLng().lat);
+                    console.log("Marker," + e.layer.myCustomID);
                     socket_frame = {
                       type: 'marker',
                       data: {
+                        id: e.layer.myCustomID,
                         latitude: e.layer.getLatLng().lat,
                         longitude: e.layer.getLatLng().lng
                       }
@@ -299,6 +304,25 @@
                 }
                 {% endif %}
                 console.log("editable:drawing:end, edited");
+            });
+
+            //object creation end point, #TODO send object to listeners
+            mymap.on('editable:drag', function (e) {
+                {% if map_id %}
+
+                if (e.layer instanceof L.Marker){
+                    console.log("Drag marker," + e.layer.myCustomID);
+                    socket_frame = {
+                      type: 'marker',
+                      data: {
+                        id: e.layer.myCustomID,
+                        latitude: e.layer.getLatLng().lat,
+                        longitude: e.layer.getLatLng().lng
+                      }
+                    }
+                    socket.send(JSON.stringify(socket_frame));
+                }
+                {% endif %}
             });
 
             mymap.on('editable:disable', function (e) {
@@ -330,7 +354,31 @@
                   socket_object = JSON.parse(e.data)
                   console.log(socket_object)
                   if(document.getElementById("annotate").checked == false){
-                      var marker = annotationLayer.addLayer(L.marker([socket_object.data.latitude,socket_object.data.longitude]));//.addTo(mymap);
+                      console.log("Do annotation, " + socket_object.data.id);
+
+                      //get id of sent object
+                      var id = socket_object.data.id;
+
+                      //find if adding or modifying objects
+                      var object = null;
+                      annotationLayer.eachLayer(function (layer) {
+                          // layer.feature is probably defined, to create marker, do something like this
+                          if(layer.myCustomID == id){
+                              console.log("Found " + layer.myCustomID);
+                              object = layer;
+                          }
+                      });
+                      if(object == null){
+                          //create
+                          var marker = L.marker([socket_object.data.latitude,socket_object.data.longitude]);
+                          marker.myCustomID = socket_object.data.id;
+
+                          annotationLayer.addLayer(marker);
+                      }else{
+                          //modify
+                          object.setLatLng([socket_object.data.latitude,socket_object.data.longitude]);
+                      }
+
                   }
               }
               socket.onopen = function() {
@@ -339,28 +387,6 @@
               // Call onopen directly if socket is already open
               if (socket.readyState == WebSocket.OPEN) socket.onopen();
 
-              //If map clicked
-              /*function onMapClick(e) {
-                  //check the annotation is on #TODO dont need check if controls are off!
-                  if(mymap.hasLayer(annotationLayer)){
-                      //var marker = annotationLayer.addLayer(L.marker(e.latlng));//.addTo(mymap);
-                      // marker
-                      //     .setLatLng(e.latlng)
-                      //     .setContent("You clicked the map at " + e.latlng.toString())
-                      //     .openOn(mymap);
-                      //
-                      socket_frame = {
-                        type: 'marker',
-                        data: {
-                          latitude: e.latlng.lat,
-                          longitude: e.latlng.lng
-                        }
-                      }
-                      socket.send(JSON.stringify(socket_frame));
-                  }
-              }*/
-
-              //mymap.on('click', onMapClick);
               {% endif %}
 
             get_layers_from_server();
