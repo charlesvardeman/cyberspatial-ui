@@ -157,6 +157,7 @@
 <script src="{% static 'js/utilities.js' %}"></script>
     <script type=text/javascript>
         var startPoint = [43.1249, 1.254];
+        var socket;
 
         /*
         Base Map -- Centered on Keansburg, NJ
@@ -263,6 +264,7 @@
             var circle_control = new L.NewCircleControl();
 
             mymap.on('editable:created', function(e) {
+                //e.layer.setStyle({color: 'DarkRed'});
                     console.log("created");
                     //this.calculateArea(e.layer);
                     //this.mapState = MAP_STATE.NONE;
@@ -282,8 +284,21 @@
 
             //object creation end point, #TODO send object to listeners
             mymap.on('editable:drawing:end', function (e) {
-                //if (e.layer instanceof L.Marker) e.layer.isDirty = true;
-                console.log("edited");
+                {% if map_id %}
+
+                if (e.layer instanceof L.Marker){
+                    console.log("Marker," + e.layer.getLatLng().lat);
+                    socket_frame = {
+                      type: 'marker',
+                      data: {
+                        latitude: e.layer.getLatLng().lat,
+                        longitude: e.layer.getLatLng().lng
+                      }
+                    }
+                    socket.send(JSON.stringify(socket_frame));
+                }
+                {% endif %}
+                console.log("editable:drawing:end, edited");
             });
 
             mymap.on('editable:disable', function (e) {
@@ -314,8 +329,9 @@
                   console.log(e)
                   socket_object = JSON.parse(e.data)
                   console.log(socket_object)
-                  //var marker = annotationLayer.addLayer(L.marker([socket_object.data.latitude,socket_object.data.longitude]));//.addTo(mymap);
-
+                  if(document.getElementById("annotate").checked == false){
+                      var marker = annotationLayer.addLayer(L.marker([socket_object.data.latitude,socket_object.data.longitude]));//.addTo(mymap);
+                  }
               }
               socket.onopen = function() {
                   socket.send("joining map annotation for map {{map_id}}");
@@ -324,7 +340,7 @@
               if (socket.readyState == WebSocket.OPEN) socket.onopen();
 
               //If map clicked
-              function onMapClick(e) {
+              /*function onMapClick(e) {
                   //check the annotation is on #TODO dont need check if controls are off!
                   if(mymap.hasLayer(annotationLayer)){
                       //var marker = annotationLayer.addLayer(L.marker(e.latlng));//.addTo(mymap);
@@ -342,7 +358,7 @@
                       }
                       socket.send(JSON.stringify(socket_frame));
                   }
-              }
+              }*/
 
               mymap.on('click', onMapClick);
               {% endif %}
