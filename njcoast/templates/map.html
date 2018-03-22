@@ -20,6 +20,12 @@
             integrity="sha512-ECQqaYZke9cSdqlFG08zSkudgrdF6I1d8ViSa7I3VIszJyVqw4ng1G8sehEXlumdMnFYfzY0tMgdQa4WCs9IUw=="
             crossorigin=""></script>
 
+    <script src="https://npmcdn.com/leaflet.path.drag/src/Path.Drag.js"></script>
+
+    <!-- Load Leaflet Editable code -->
+    <!--<script src="{% static "js/Leaflet.Editable.js" %}"></script>-->
+    <script src="/static/js/Leaflet.Editable.js"></script>
+
 {% endblock extra_head %}
 
 
@@ -88,6 +94,8 @@
                             <!--Checkbox to toggle annotation layer and functions-->
                             <p style="margin-top: 15px"><input type="checkbox" name="annotations" value="on"
                                data-toggle="popover" data-placement="right" onclick="toggle_annotation_layer(this.checked)"> Annotation layer</p>
+                               <p style="margin-top: 15px"><input type="checkbox" name="annotations" value="on"
+                                  data-toggle="popover" data-placement="right" onclick="toggle_annotate(this.checked)"> Annotate</p>
                                <a class="btn btn-primary btn-md btn-block" data-toggle="popover" href="#annotationTools"
                                   aria-expanded="false" aria-controls="annotationTools" onclick="add_marker()">Add Marker</a>
                                   <!--<button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Open Modal</button>-->
@@ -148,6 +156,8 @@
 {% block extra_script %}
 <script src="{% static 'js/utilities.js' %}"></script>
     <script type=text/javascript>
+        var startPoint = [43.1249, 1.254];
+
         /*
         Base Map -- Centered on Keansburg, NJ
         WMS Tile Layers
@@ -156,12 +166,128 @@
               downloadable-data-collection-national-geospatial-/resource/f55f881d-9de8-471f-9b6b-22cd7a98025d
         XML: https://services.nationalmap.gov/arcgis/services/nhd/MapServer/WMSServer?request=GetCapabilities&service=WMS
          */
-        var mymap = L.map('mapid').setView([{{ home_latitude }}, {{ home_longitude }}], {{ zoom_level }});
+        var mymap = L.map('mapid', {editable: true}).setView([{{ home_latitude }}, {{ home_longitude }}], {{ zoom_level }});
         var layer_list = [];
         var layer_groups = [];
 
         //create layer group to add marker
         var annotationLayer = new L.LayerGroup();
+
+        //annotate controls
+        L.EditControl = L.Control.extend({
+
+                options: {
+                    position: 'topleft',
+                    callback: null,
+                    kind: '',
+                    html: ''
+                },
+
+                onAdd: function (map) {
+                    var container = L.DomUtil.create('div', 'leaflet-control leaflet-bar'),
+                        link = L.DomUtil.create('a', '', container);
+
+                    link.href = '#';
+                    link.title = 'Create a new ' + this.options.kind;
+                    link.innerHTML = this.options.html;
+                    L.DomEvent.on(link, 'click', L.DomEvent.stop)
+                              .on(link, 'click', function () {
+                                window.LAYER = this.options.callback.call(map.editTools);
+                              }, this);
+
+                    return container;
+                }
+
+            });
+
+            L.NewLineControl = L.EditControl.extend({
+
+                options: {
+                    position: 'topleft',
+                    callback: mymap.editTools.startPolyline,
+                    kind: 'line',
+                    html: '\\/\\'
+                }
+
+            });
+
+            L.NewPolygonControl = L.EditControl.extend({
+
+                options: {
+                    position: 'topleft',
+                    callback: mymap.editTools.startPolygon,
+                    kind: 'polygon',
+                    html: '▰'
+                }
+
+            });
+
+            L.NewMarkerControl = L.EditControl.extend({
+
+                options: {
+                    position: 'topleft',
+                    callback: mymap.editTools.startMarker,
+                    kind: 'marker',
+                    html: '🖈'
+                }
+
+            });
+
+            L.NewRectangleControl = L.EditControl.extend({
+
+                options: {
+                    position: 'topleft',
+                    callback: mymap.editTools.startRectangle,
+                    kind: 'rectangle',
+                    html: '⬛'
+                }
+
+            });
+
+            L.NewCircleControl = L.EditControl.extend({
+
+                options: {
+                    position: 'topleft',
+                    callback: mymap.editTools.startCircle,
+                    kind: 'circle',
+                    html: '⬤'
+                }
+
+            });
+
+            var marker_control = new L.NewMarkerControl();
+            var line_control = new L.NewLineControl();
+            var polygon_control = new L.NewPolygonControl();
+            var rectangle_control = new L.NewRectangleControl();
+            var circle_control = new L.NewCircleControl();
+
+            mymap.on('editable:created', function(e) {
+                    console.log("created");
+                    //this.calculateArea(e.layer);
+                    //this.mapState = MAP_STATE.NONE;
+            });
+
+            mymap.on('editable:dragend', function(e) {
+                    console.log("dragged");
+                    //this.calculateArea(e.layer);
+                    //this.mapState = MAP_STATE.NONE;
+            });
+
+            mymap.on('editable:editing', function(e) {
+                    console.log("editing");
+                    //this.calculateArea(e.layer);
+                    //this.mapState = MAP_STATE.NONE;
+            });
+
+            mymap.on('editable:drawing:end', function (e) {
+                //if (e.layer instanceof L.Marker) e.layer.isDirty = true;
+                console.log("edited");
+            });
+
+            mymap.on('editable:disable', function (e) {
+                //if (e.layer instanceof L.Marker) e.layer.isDirty = true;
+                console.log("editable:disable");
+            });
 
         $(document).ready(function () {
 
@@ -186,7 +312,7 @@
                   console.log(e)
                   socket_object = JSON.parse(e.data)
                   console.log(socket_object)
-                  var marker = annotationLayer.addLayer(L.marker([socket_object.data.latitude,socket_object.data.longitude]));//.addTo(mymap);
+                  //var marker = annotationLayer.addLayer(L.marker([socket_object.data.latitude,socket_object.data.longitude]));//.addTo(mymap);
 
               }
               socket.onopen = function() {
@@ -199,7 +325,7 @@
               function onMapClick(e) {
                   //check the annotation is on #TODO dont need check if controls are off!
                   if(mymap.hasLayer(annotationLayer)){
-                      var marker = annotationLayer.addLayer(L.marker(e.latlng));//.addTo(mymap);
+                      //var marker = annotationLayer.addLayer(L.marker(e.latlng));//.addTo(mymap);
                       // marker
                       //     .setLatLng(e.latlng)
                       //     .setContent("You clicked the map at " + e.latlng.toString())
@@ -340,6 +466,28 @@
               annotationLayer.addTo(mymap);
           }else{
               mymap.removeLayer(annotationLayer);
+          }
+          console.log(onOff);
+      }
+
+      //toggle annotate controls
+      function toggle_annotate(onOff) {
+
+          if(onOff){
+            mymap.addControl(marker_control);
+            mymap.addControl(line_control);
+            mymap.addControl(polygon_control);
+            mymap.addControl(rectangle_control);
+            mymap.addControl(circle_control);
+
+              //annotationLayer.addTo(mymap);
+          }else{
+              mymap.removeControl(marker_control);
+              mymap.removeControl(line_control);
+              mymap.removeControl(polygon_control);
+              mymap.removeControl(rectangle_control);
+              mymap.removeControl(circle_control);
+              //mymap.removeLayer(annotationLayer);
           }
           console.log(onOff);
       }
