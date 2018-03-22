@@ -264,14 +264,14 @@
             var circle_control = new L.NewCircleControl();
 
             mymap.on('editable:created', function(e) {
-                //e.layer.setStyle({color: 'DarkRed'});
+                //set new objects id
+                e.layer.myCustomID = Math.random().toString(36).substr(2, 9);
+
+                //test if marker
                 if (e.layer instanceof L.Marker){
-                    e.layer.myCustomID = Math.random().toString(36).substr(2, 9);
                     console.log("Its a Marker, " + e.layer.myCustomID);
                 }
                 console.log("created");
-                    //this.calculateArea(e.layer);
-                    //this.mapState = MAP_STATE.NONE;
             });
 
             mymap.on('editable:dragend', function(e) {
@@ -290,6 +290,31 @@
             mymap.on('editable:drawing:end', function (e) {
                 {% if map_id %}
 
+                //polygon
+                if (e.layer instanceof L.Polygon){
+                    LatLngs = e.layer.getLatLngs();
+                    console.log("Polygon," + e.layer.myCustomID + "," + LatLngs[0][0]);
+
+                    var lldata = [];
+                    for(i=0; i<LatLngs[0].length; i++){
+                        //console.log("Data " + i + ", " + LatLngs[0][i].lat);
+                        localdata = new Array(LatLngs[0][i].lat, LatLngs[0][i].lng);
+                        lldata.push(localdata);
+                    }
+
+                    console.log("JSON " + JSON.stringify(lldata));
+
+                    socket_frame = {
+                      type: 'polygon',
+                      data: {
+                        id: e.layer.myCustomID,
+                        points: JSON.stringify(lldata)
+                      }
+                    }
+                    socket.send(JSON.stringify(socket_frame));
+                }
+
+                //marker
                 if (e.layer instanceof L.Marker){
                     console.log("Marker," + e.layer.myCustomID);
                     socket_frame = {
@@ -353,30 +378,41 @@
                   console.log(e)
                   socket_object = JSON.parse(e.data)
                   console.log(socket_object)
-                  if(document.getElementById("annotate").checked == false){
-                      console.log("Do annotation, " + socket_object.data.id);
 
-                      //get id of sent object
-                      var id = socket_object.data.id;
+                  //update if we are not the annotator #TODO how to enforce? Or many to many?
+                  if(document.getElementById("annotate").checked == false){
 
                       //find if adding or modifying objects
                       var object = null;
                       annotationLayer.eachLayer(function (layer) {
                           // layer.feature is probably defined, to create marker, do something like this
-                          if(layer.myCustomID == id){
+                          if(layer.myCustomID == socket_object.data.id){
                               console.log("Found " + layer.myCustomID);
                               object = layer;
                           }
                       });
                       if(object == null){
+                          var newobject = null;
+                          console.log("Objects " + socket_object.type);
                           //create
-                          var marker = L.marker([socket_object.data.latitude,socket_object.data.longitude]);
-                          marker.myCustomID = socket_object.data.id;
+                          if(socket_object.type == 'marker'){
+                              newobject = L.marker([socket_object.data.latitude,socket_object.data.longitude]);
+                          }else if(socket_object.type == 'polygon'){
+                              var points = JSON.parse(socket_object.data.points);
+                              console.log("Points " + points.length + "," + points[0][0]);
+                              newobject = L.polygon(points);
+                          }
 
-                          annotationLayer.addLayer(marker);
+                          //set id and add to layer
+                          if(newobject != null){
+                              newobject.myCustomID = socket_object.data.id;
+                              annotationLayer.addLayer(newobject);
+                          }
                       }else{
                           //modify
-                          object.setLatLng([socket_object.data.latitude,socket_object.data.longitude]);
+                          if(socket_object.type == 'marker'){
+                              object.setLatLng([socket_object.data.latitude,socket_object.data.longitude]);
+                          }
                       }
 
                   }
