@@ -281,6 +281,9 @@
             });
 
             mymap.on('editable:editing', function(e) {
+                //rectangle update
+                rectangle_update(e);
+
                 //polyline_update
                 polyline_update(e);
 
@@ -296,6 +299,9 @@
             //object creation end point, #TODO send object to listeners
             mymap.on('editable:drawing:end', function (e) {
                 {% if map_id %}
+
+                //rectangle update
+                rectangle_update(e);
 
                 //polyline_update
                 polyline_update(e);
@@ -316,6 +322,9 @@
             //object creation end point, #TODO send object to listeners
             mymap.on('editable:drag', function (e) {
                 {% if map_id %}
+
+                //rectangle update
+                rectangle_update(e);
 
                 //polyline_update
                 polyline_update(e);
@@ -346,6 +355,36 @@
                 if (e.layer instanceof L.Polygon){
                     LatLngs = e.layer.getLatLngs();
                     console.log("Polygon," + e.layer.myCustomID + "," + LatLngs[0]);
+
+                    var lldata = [];
+                    for(i=0; i<LatLngs[0].length; i++){
+                        //console.log("Data " + i + ", " + LatLngs[0][i].lat);
+                        localdata = new Array(LatLngs[0][i].lat, LatLngs[0][i].lng);
+                        lldata.push(localdata);
+                    }
+
+                    console.log("JSON " + JSON.stringify(lldata));
+
+                    socket_frame = {
+                      type: 'polygon',
+                      data: {
+                        id: e.layer.myCustomID,
+                        points: JSON.stringify(lldata)
+                      }
+                    }
+                    socket.send(JSON.stringify(socket_frame));
+                }
+                {% endif %}
+            }
+
+            //update rectangle
+            function rectangle_update(e) {
+                {% if map_id %}
+
+                //polygon
+                if (e.layer instanceof L.Rectangle){
+                    LatLngs = e.layer.getLatLngs();
+                    console.log("Rectangle," + e.layer.myCustomID + "," + LatLngs[0]);
 
                     var lldata = [];
                     for(i=0; i<LatLngs[0].length; i++){
@@ -651,7 +690,7 @@
             mymap.addControl(marker_control);
             mymap.addControl(line_control);
             mymap.addControl(polygon_control);
-            //mymap.addControl(rectangle_control);
+            mymap.addControl(rectangle_control);
             mymap.addControl(circle_control);
 
               //annotationLayer.addTo(mymap);
@@ -659,7 +698,7 @@
               mymap.removeControl(marker_control);
               mymap.removeControl(line_control);
               mymap.removeControl(polygon_control);
-              //mymap.removeControl(rectangle_control);
+              mymap.removeControl(rectangle_control);
               mymap.removeControl(circle_control);
               //mymap.removeLayer(annotationLayer);
           }
