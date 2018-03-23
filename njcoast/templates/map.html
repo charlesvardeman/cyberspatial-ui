@@ -288,7 +288,20 @@
                 document.getElementById("txtB").style.display = "none";
                 document.getElementById("txt").style.display = "block";
                 document.getElementById("txt").innerHTML = document.getElementById("txtB").value;
+
+                //force new content
                 current_popup_marker.setPopupContent(html1 + document.getElementById("txtB").value + html2 + document.getElementById("txtB").value + html3);
+
+                {% if map_id %}
+                socket_frame = {
+                  type: 'popup',
+                  data: {
+                      id: current_popup_marker.myCustomID,
+                      text: document.getElementById("txtB").value
+                  }
+                }
+                socket.send(JSON.stringify(socket_frame));
+                {% endif %}
             }
 
             mymap.on('editable:created', function(e) {
@@ -564,6 +577,10 @@
                           if(newobject != null){
                               newobject.myCustomID = socket_object.data.id;
                               annotationLayer.addLayer(newobject);
+                              newobject.bindPopup("Undefined");
+                              newobject.on('mouseover', function (e) {
+                                  this.openPopup();
+                              });
                           }
                       }else{
                           //modify
@@ -575,6 +592,8 @@
                           }else if(socket_object.type == 'circle'){
                               object.setLatLng([socket_object.data.latitude,socket_object.data.longitude]);
                               object.setRadius(socket_object.data.radius);
+                          }else if(socket_object.type == 'popup'){
+                              object.setPopupContent(socket_object.data.text);
                           }
                       }
 
