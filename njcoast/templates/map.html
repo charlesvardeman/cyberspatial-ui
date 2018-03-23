@@ -134,7 +134,6 @@
 {% block extra_script %}
 <script src="{% static 'js/utilities.js' %}"></script>
     <script type=text/javascript>
-        var startPoint = [43.1249, 1.254];
         var socket;
 
         /*
@@ -149,11 +148,11 @@
         var layer_list = [];
         var layer_groups = [];
 
-        //create layer group to add marker
+        //~~~~create layer group to add marker~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         var annotationLayer = new L.LayerGroup();
         mymap.editTools.featuresLayer = annotationLayer;
 
-        //annotate controls
+        //~~~~annotate controls~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         L.EditControl = L.Control.extend({
 
                 options: {
@@ -241,7 +240,7 @@
             var rectangle_control = new L.NewRectangleControl();
             var circle_control = new L.NewCircleControl();
 
-            //popup editor scheme
+            //~~~~popup editor scheme~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             //html for popup
             var html1 = "<span style=\"display:block;\" id=\"txt\">";
             var html2 = "</span><input onchange=\"finishedEdit()\" id=\"txtB\" type=\"text\" value=\"";
@@ -272,7 +271,9 @@
                 document.getElementById("txt").innerHTML = document.getElementById("txtB").value;
 
                 //force new content
-                current_popup_marker.setPopupContent(html1 + document.getElementById("txtB").value + html2 + document.getElementById("txtB").value + html3 + document.getElementById("txtB").value.length + html4);
+                current_popup_marker.setPopupContent(html1 + document.getElementById("txtB").value
+                    + html2 + document.getElementById("txtB").value + html3
+                        + document.getElementById("txtB").value.length + html4);
 
                 {% if map_id %}
                 socket_frame = {
@@ -286,9 +287,14 @@
                 {% endif %}
             }
 
+            //~~~~hooks into the editable module~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            //called on object create
             mymap.on('editable:created', function(e) {
                 //set new objects id
                 e.layer.myCustomID = Math.random().toString(36).substr(2, 9);
+
+                //add popup
                 e.layer.bindPopup(html1 + "Input text ..." + html2 + "Input text ..." + html3 + "8" + html4);
                 e.layer.on('mouseover', function (e) {
                     this.openPopup();
@@ -301,15 +307,15 @@
                 console.log("created");
             });
 
+            //called after object dragged
             mymap.on('editable:dragend', function(e) {
                     console.log("dragged");
-                    //this.calculateArea(e.layer);
-                    //this.mapState = MAP_STATE.NONE;
             });
 
+            // called while object is being edited
             mymap.on('editable:editing', function(e) {
                 //rectangle update
-                rectangle_update(e);
+                //rectangle_update(e);
 
                 //polyline_update
                 polyline_update(e);
@@ -323,7 +329,7 @@
                 console.log("editing");
             });
 
-            //object creation end point, #TODO send object to listeners
+            //called at the end of editing
             mymap.on('editable:drawing:end', function (e) {
                 {% if map_id %}
 
@@ -346,7 +352,7 @@
                 console.log("editable:drawing:end, edited");
             });
 
-            //object creation end point, #TODO send object to listeners
+            //called while object being dragged
             mymap.on('editable:drag', function (e) {
                 {% if map_id %}
 
@@ -369,8 +375,8 @@
                 console.log("editable:drag");
             });
 
+            //called when object disabled
             mymap.on('editable:disable', function (e) {
-                //if (e.layer instanceof L.Marker) e.layer.isDirty = true;
                 console.log("editable:disable");
             });
 
@@ -383,15 +389,16 @@
                     LatLngs = e.layer.getLatLngs();
                     console.log("Polygon," + e.layer.myCustomID + "," + LatLngs[0]);
 
+                    //convert LatLng data so can use stringify
                     var lldata = [];
                     for(i=0; i<LatLngs[0].length; i++){
-                        //console.log("Data " + i + ", " + LatLngs[0][i].lat);
                         localdata = new Array(LatLngs[0][i].lat, LatLngs[0][i].lng);
                         lldata.push(localdata);
                     }
 
                     console.log("JSON " + JSON.stringify(lldata));
 
+                    //craeat JSON package and send
                     socket_frame = {
                       type: 'polygon',
                       data: {
@@ -413,15 +420,16 @@
                     LatLngs = e.layer.getLatLngs();
                     console.log("Rectangle," + e.layer.myCustomID + "," + LatLngs[0]);
 
+                    //convert LatLng data so can use stringify
                     var lldata = [];
                     for(i=0; i<LatLngs[0].length; i++){
-                        //console.log("Data " + i + ", " + LatLngs[0][i].lat);
                         localdata = new Array(LatLngs[0][i].lat, LatLngs[0][i].lng);
                         lldata.push(localdata);
                     }
 
                     console.log("JSON " + JSON.stringify(lldata));
 
+                    //craeat JSON package and send
                     socket_frame = {
                       type: 'polygon',
                       data: {
@@ -434,7 +442,8 @@
                 {% endif %}
             }
 
-            //update polyline
+            //update polyline, note data structure difference to polygon which
+            //inherits polyline
             function polyline_update(e) {
                 {% if map_id %}
 
@@ -443,15 +452,16 @@
                     LatLngs = e.layer.getLatLngs();
                     console.log("Polyline," + e.layer.myCustomID + "," + LatLngs[0]);
 
+                    //convert LatLng data so can use stringify
                     var lldata = [];
                     for(i=0; i<LatLngs.length; i++){
-                        //console.log("Data " + i + ", " + LatLngs[0][i].lat);
                         localdata = new Array(LatLngs[i].lat, LatLngs[i].lng);
                         lldata.push(localdata);
                     }
 
                     console.log("JSON " + JSON.stringify(lldata));
 
+                    //craeat JSON package and send
                     socket_frame = {
                       type: 'polyline',
                       data: {
@@ -469,6 +479,8 @@
                 {% if map_id %}
                 if (e.layer instanceof L.Marker){
                     console.log("Marker," + e.layer.myCustomID);
+
+                    //craeat JSON package and send
                     socket_frame = {
                       type: 'marker',
                       data: {
@@ -487,6 +499,8 @@
                 {% if map_id %}
                 if (e.layer instanceof L.Circle){
                     console.log("Circle," + e.layer.myCustomID);
+
+                    //craeat JSON package and send
                     socket_frame = {
                       type: 'circle',
                       data: {
@@ -501,6 +515,7 @@
                 {% endif %}
             }
 
+        //~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         $(document).ready(function () {
 
             L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
@@ -538,12 +553,14 @@
                           }
                       });
                       if(object == null){
+                          //need to create object here
                           var newobject = null;
                           console.log("Objects " + socket_object.type);
                           //create
                           if(socket_object.type == 'marker'){
                               newobject = L.marker([socket_object.data.latitude,socket_object.data.longitude]);
                           }else if(socket_object.type == 'polygon' || socket_object.type == 'polyline'){
+                              console.log("Points "+socket_object.data.points);
                               var points = JSON.parse(socket_object.data.points);
                               console.log("Points " + points.length + "," + points[0][0]);
                               if(socket_object.type == 'polyline'){
@@ -702,7 +719,7 @@
           });
       });
 
-      //map annotation section
+      //~~~~map annotation section~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
       //toggle layer
       function toggle_annotation_layer(onOff) {
 
