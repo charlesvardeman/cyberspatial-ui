@@ -555,7 +555,8 @@
             // Note that the path doesn't matter right now; any WebSocket
             // connection gets bumped over to WebSocket consumers
             {% if map_id %}
-              socket = new WebSocket("ws://" + window.location.host + "/map-socket/{{map_id}}/");
+              websocket_protocol = window.location.protocol.includes("https") ? "wss://" : "ws://";
+              socket = new WebSocket(websocket_protocol + window.location.host + "/map-socket/{{map_id}}/");
               socket.onmessage = function(e) {
                   //onMapClick(e.data);
                   // alert('received socket');
