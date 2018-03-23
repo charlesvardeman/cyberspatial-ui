@@ -599,7 +599,14 @@
                           if(newobject != null){
                               newobject.myCustomID = socket_object.data.id;
                               annotationLayer.addLayer(newobject);
-                              newobject.bindPopup("Undefined");
+
+                              var popup_text = socket_object.data.text;
+                              if(popup_text == null){
+                                  popup_text = "Undefined";
+                              }
+
+                              //setup popup
+                              newobject.bindPopup(popup_text);
                               newobject.on('mouseover', function (e) {
                                   this.openPopup();
                               });
