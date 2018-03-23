@@ -916,14 +916,15 @@
           console.log(all_json);
 
           //send to the server
-          //send_annotation_to_server(all_json);
+          send_annotation_to_server(all_json);
 
       }
 
+      //AJAX stuff to send JSON to server (as the name implies)
       function send_annotation_to_server(data) {
           $.ajax({
               type: "POST",
-              url: "/maps/annotate/abc/",
+              url: "/maps/annotate/{{map_id}}/",
               data: data,
               dataType: "json",
               success: function (result) {
