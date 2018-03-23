@@ -115,8 +115,7 @@
                         <p class="qualifier" style="margin-top: 10px">Save current map configuration (e.g. active layers and
                             annotations), copy the map and save with a new name, or download the map.</p>
                         <button id="save_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="save_annotation_elements();">Save Map</button>
-                        <div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Copy Map
-                        </button></div>
+                        <button id="load_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="load_annotation_elements();">Load Map</button>
                         <div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Download Map
                         </button></div>
                         <div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Share Map
@@ -843,7 +842,8 @@
               mymap.addControl(circle_control);
 
               //enable map save
-              $("#save_map").removeClass("disabled")
+              $("#save_map").removeClass("disabled");
+              $("#load_map").removeClass("disabled");
           }else{
               mymap.removeControl(marker_control);
               mymap.removeControl(line_control);
@@ -851,7 +851,8 @@
               mymap.removeControl(rectangle_control);
               mymap.removeControl(circle_control);
               //disable map save
-              $("#save_map").addClass("disabled")
+              $("#save_map").addClass("disabled");
+              $("#load_map").addClass("disabled");
           }
           console.log(onOff);
       }
@@ -860,7 +861,7 @@
       function save_annotation_elements(){
           console.log("save");
 
-          var all_json = "{\n\tobjects: [";
+          var all_json = "{\n\t\"objects\": [";
           var add_comma = false;
 
           //loop over the annotation elements
@@ -934,6 +935,49 @@
                   console.log("ERROR:", result)
               }
           });
+      }
+
+      //load JSON version of annotation data into layers
+      function load_annotation_elements(){
+          var json = "{\"objects\": [{\"type\":\"marker\",\"text\":\"Nikolai's lair\",\"data\":{\"id\":\"u2lj6ycim\",\"latitude\":39.894089941326044,\"longitude\":-74.12595748901369}},{\"type\":\"polygon\",\"text\":\"Polygon of fear\",\"data\":{\"id\":\"t8vo6pn5u\",\"points\":\"[[39.91726592255928,-74.12509918212892],[39.904230397797335,-74.12458419799806],[39.91199934253401,-74.13368225097658]]\"}}]}";
+          var parsed = JSON.parse(json);
+
+          console.log(parsed.objects.length);
+
+          //loop over objects
+          for(i=0; i<parsed.objects.length; i++){
+              //get object
+              socket_object = parsed.objects[i];
+
+              //create
+              if(socket_object.type == 'marker'){
+                  newobject = L.marker([socket_object.data.latitude,socket_object.data.longitude]);
+              }else if(socket_object.type == 'polygon' || socket_object.type == 'polyline'){
+                  console.log("Points "+socket_object.data.points);
+                  var points = JSON.parse(socket_object.data.points);
+                  console.log("Points " + points.length + "," + points[0][0]);
+                  if(socket_object.type == 'polyline'){
+                      newobject = L.polyline(points);
+                  }else{
+                      newobject = L.polygon(points);
+                  }
+              }else if(socket_object.type == 'circle'){
+                  newobject = L.circle([socket_object.data.latitude,socket_object.data.longitude], socket_object.data.radius);
+              }
+
+              //set id and add to layer
+              if(newobject != null){
+                  newobject.myCustomID = socket_object.data.id;
+                  annotationLayer.addLayer(newobject);
+
+                  //setup popup
+                  newobject.bindPopup(socket_object.text);
+                  newobject.on('mouseover', function (e) {
+                      this.openPopup();
+                  });
+              }
+
+          }
       }
 
     </script>
