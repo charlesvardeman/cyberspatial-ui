@@ -36,6 +36,7 @@ ALLOWED_HOSTS = ('192.168.33.10',)
 LOCAL_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 WSGI_APPLICATION = "njcoast.wsgi.application"
+ASGI_APPLICATION = "njcoast.asgi.application"
 
 PROXY_ALLOWED_HOSTS = ('192.168.33.10',)
 
