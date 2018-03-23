@@ -29,7 +29,7 @@ SITENAME = 'njcoast'
 
 DEBUG=True
 
-ALLOWED_HOSTS = ('192.168.33.10',)
+ALLOWED_HOSTS = (os.getenv('ALLOWED_HOSTS'),)
 
 # Defines the directory that contains the settings file as the LOCAL_ROOT
 # It is used for relative settings elsewhere.
@@ -38,7 +38,7 @@ LOCAL_ROOT = os.path.abspath(os.path.dirname(__file__))
 WSGI_APPLICATION = "njcoast.wsgi.application"
 ASGI_APPLICATION = "njcoast.asgi.application"
 
-PROXY_ALLOWED_HOSTS = ('192.168.33.10',)
+PROXY_ALLOWED_HOSTS = (os.getenv('ALLOWED_HOSTS'),)
 
 MAX_DOCUMENT_SIZE = 512
 
