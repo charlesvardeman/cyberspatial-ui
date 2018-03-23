@@ -263,9 +263,41 @@
             var rectangle_control = new L.NewRectangleControl();
             var circle_control = new L.NewCircleControl();
 
+            //popup editor scheme
+            //html for popup
+            var html1 = "<span style=\"display:block;\" id=\"txt\">";
+            var html2 = "</span><input onchange=\"finishedEdit()\" id=\"txtB\" type=\"text\" value=\"";
+            var html3 = "\" style=\"display:none;\"/><button onclick=\"myFunction()\">Edit</button>";
+
+            //current marker
+            var current_popup_marker = null;
+
+            //get the current popup for update
+            mymap.on('popupopen', function(e) {
+                console.log("popup open");
+                current_popup_marker = e.popup._source;
+            });
+
+            //functions called from popup html
+            function myFunction(){
+                document.getElementById("txtB").style.display = "block";
+                document.getElementById("txt").style.display = "none";
+            }
+
+            function finishedEdit(){
+                document.getElementById("txtB").style.display = "none";
+                document.getElementById("txt").style.display = "block";
+                document.getElementById("txt").innerHTML = document.getElementById("txtB").value;
+                current_popup_marker.setPopupContent(html1 + document.getElementById("txtB").value + html2 + document.getElementById("txtB").value + html3);
+            }
+
             mymap.on('editable:created', function(e) {
                 //set new objects id
                 e.layer.myCustomID = Math.random().toString(36).substr(2, 9);
+                e.layer.bindPopup(html1 + "Input text..." + html2 + "Input text..." + html3);
+                e.layer.on('mouseover', function (e) {
+                    this.openPopup();
+                });
 
                 //test if marker
                 if (e.layer instanceof L.Marker){
