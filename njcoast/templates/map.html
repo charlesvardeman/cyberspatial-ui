@@ -385,7 +385,7 @@
                 {% if map_id %}
 
                 //polygon
-                if (e.layer instanceof L.Polygon){
+                if (e.layer instanceof L.Polygon && !(e.layer instanceof L.Rectangle)){
                     LatLngs = e.layer.getLatLngs();
                     console.log("Polygon," + e.layer.myCustomID + "," + LatLngs[0]);
 
@@ -448,7 +448,8 @@
                 {% if map_id %}
 
                 //polygon
-                if (e.layer instanceof L.Polygon || e.layer instanceof L.Polyline){
+                if (!(e.layer instanceof L.Polygon) && !(e.layer instanceof L.Rectangle)
+                        && e.layer instanceof L.Polyline){
                     LatLngs = e.layer.getLatLngs();
                     console.log("Polyline," + e.layer.myCustomID + "," + LatLngs[0]);
 
