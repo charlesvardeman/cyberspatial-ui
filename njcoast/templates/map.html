@@ -267,14 +267,17 @@
             //html for popup
             var html1 = "<span style=\"display:block;\" id=\"txt\">";
             var html2 = "</span><input onchange=\"finishedEdit()\" id=\"txtB\" type=\"text\" value=\"";
-            var html3 = "\" style=\"display:none;\"/><button onclick=\"myFunction()\">Edit</button>";
+            var html3 = "\" style=\"display:none;\" size=\"";
+            var html4 = "\"/><button onclick=\"myFunction()\">Edit</button>";
 
             //current marker
             var current_popup_marker = null;
+            var current_popup = null;
 
             //get the current popup for update
             mymap.on('popupopen', function(e) {
                 console.log("popup open");
+                current_popup = e.popup;
                 current_popup_marker = e.popup._source;
             });
 
@@ -282,6 +285,7 @@
             function myFunction(){
                 document.getElementById("txtB").style.display = "block";
                 document.getElementById("txt").style.display = "none";
+                current_popup._updateLayout();
             }
 
             function finishedEdit(){
@@ -290,7 +294,7 @@
                 document.getElementById("txt").innerHTML = document.getElementById("txtB").value;
 
                 //force new content
-                current_popup_marker.setPopupContent(html1 + document.getElementById("txtB").value + html2 + document.getElementById("txtB").value + html3);
+                current_popup_marker.setPopupContent(html1 + document.getElementById("txtB").value + html2 + document.getElementById("txtB").value + html3 + document.getElementById("txtB").value.length + html4);
 
                 {% if map_id %}
                 socket_frame = {
@@ -307,7 +311,7 @@
             mymap.on('editable:created', function(e) {
                 //set new objects id
                 e.layer.myCustomID = Math.random().toString(36).substr(2, 9);
-                e.layer.bindPopup(html1 + "Input text..." + html2 + "Input text..." + html3);
+                e.layer.bindPopup(html1 + "Input text ..." + html2 + "Input text ..." + html3 + "8" + html4);
                 e.layer.on('mouseover', function (e) {
                     this.openPopup();
                 });
