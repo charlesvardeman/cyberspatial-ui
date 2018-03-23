@@ -23,8 +23,10 @@
     <script src="https://npmcdn.com/leaflet.path.drag/src/Path.Drag.js"></script>
 
     <!-- Load Leaflet Editable code -->
-    <!--<script src="{% static "js/Leaflet.Editable.js" %}"></script>-->
-    <script src="/static/js/Leaflet.Editable.js"></script>
+    <script src="{% static "js/Leaflet.Editable.js" %}"></script>-->
+
+    <!-- load mods to leaflet for rectangular popups -->
+    <link rel="stylesheet" type="text/css" href="{% static "css/crc_leaflet.css" %}" media="screen" />
 
 {% endblock extra_head %}
 
