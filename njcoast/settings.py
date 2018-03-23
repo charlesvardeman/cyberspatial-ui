@@ -41,6 +41,9 @@ MAX_DOCUMENT_SIZE = 512
 
 MODIFY_TOPICCATEGORY = True
 
+CELERY_SEND_EVENTS = False 
+CELERY_RESULT_BACKEND = None
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
