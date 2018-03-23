@@ -245,7 +245,8 @@
             var html1 = "<span style=\"display:block;\" id=\"txt\">";
             var html2 = "</span><input onchange=\"finishedEdit()\" id=\"txtB\" type=\"text\" value=\"";
             var html3 = "\" style=\"display:none;\" size=\"";
-            var html4 = "\"/><button class=\"btn btn-primary btn-xs btn-block\" onclick=\"myFunction()\">Edit</button>";
+            var html4 = "\"/><button class=\"btn btn-primary btn-xs btn-block\" onclick=\"startEdit()\">Edit</button>";
+            var html_delete = "<button class=\"btn btn-primary btn-xs btn-block\" onclick=\"deleteObject()\">Delete</button>";
 
             //current marker
             var current_popup_marker = null;
@@ -259,7 +260,27 @@
             });
 
             //functions called from popup html
-            function myFunction(){
+
+            //remove object
+            function deleteObject(){
+                //local
+                annotationLayer.removeLayer(current_popup_marker);
+
+                //remote
+                {% if map_id %}
+                socket_frame = {
+                  type: 'delete',
+                  data: {
+                      id: current_popup_marker.myCustomID
+                  }
+                }
+                socket.send(JSON.stringify(socket_frame));
+                {% endif %}
+
+                console.log("Delete " + current_popup_marker.myCustomID);
+            }
+
+            function startEdit(){
                 document.getElementById("txtB").style.display = "block";
                 document.getElementById("txt").style.display = "none";
                 current_popup._updateLayout();
@@ -273,7 +294,7 @@
                 //force new content
                 current_popup_marker.setPopupContent(html1 + document.getElementById("txtB").value
                     + html2 + document.getElementById("txtB").value + html3
-                        + document.getElementById("txtB").value.length + html4);
+                        + document.getElementById("txtB").value.length + html4 + html_delete);
 
                 {% if map_id %}
                 socket_frame = {
@@ -295,7 +316,8 @@
                 e.layer.myCustomID = Math.random().toString(36).substr(2, 9);
 
                 //add popup
-                e.layer.bindPopup(html1 + "Input text ..." + html2 + "Input text ..." + html3 + "8" + html4);
+                e.layer.bindPopup(html1 + "Input text ..." + html2 + "Input text ..."
+                    + html3 + "8" + html4 + html_delete);
                 e.layer.on('mouseover', function (e) {
                     this.openPopup();
                 });
@@ -583,8 +605,10 @@
                               });
                           }
                       }else{
-                          //modify
-                          if(socket_object.type == 'marker'){
+                          //modify or delete
+                          if(socket_object.type == 'delete'){
+                              annotationLayer.removeLayer(object);
+                          }else if(socket_object.type == 'marker'){
                               object.setLatLng([socket_object.data.latitude,socket_object.data.longitude]);
                           }else if(socket_object.type == 'polygon' || socket_object.type == 'polyline'){
                               var points = JSON.parse(socket_object.data.points);
