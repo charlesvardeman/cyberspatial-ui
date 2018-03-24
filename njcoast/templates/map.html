@@ -656,18 +656,18 @@
                           console.log("Objects " + socket_object.type);
                           //create
                           if(socket_object.type == 'marker'){
-                              newobject = L.marker([socket_object.data.latitude,socket_object.data.longitude]);
+                              newobject = L.marker([socket_object.data.latitude,socket_object.data.longitude], {icon: redIcon});
                           }else if(socket_object.type == 'polygon' || socket_object.type == 'polyline'){
                               console.log("Points "+socket_object.data.points);
                               var points = JSON.parse(socket_object.data.points);
                               console.log("Points " + points.length + "," + points[0][0]);
                               if(socket_object.type == 'polyline'){
-                                  newobject = L.polyline(points);
+                                  newobject = L.polyline(points, {color: '#C92D40'});
                               }else{
-                                  newobject = L.polygon(points);
+                                  newobject = L.polygon(points, {color: '#C92D40'});
                               }
                           }else if(socket_object.type == 'circle'){
-                              newobject = L.circle([socket_object.data.latitude,socket_object.data.longitude], socket_object.data.radius);
+                              newobject = L.circle([socket_object.data.latitude,socket_object.data.longitude], socket_object.data.radius, {color: '#C92D40'});
                           }
 
                           //set id and add to layer
@@ -1008,6 +1008,16 @@
               }
           });
       }
+
+      //additional leaflet marker icon
+      var redIcon = new L.Icon({
+      	iconUrl: "{% static "images/marker-icon-2x-red.png" %}",
+      	shadowUrl: "{% static "images/marker-shadow.png" %}",
+      	iconSize: [25, 41],
+      	iconAnchor: [12, 41],
+      	popupAnchor: [1, -34],
+      	shadowSize: [41, 41]
+      });
 
     </script>
 {% endblock extra_script %}
