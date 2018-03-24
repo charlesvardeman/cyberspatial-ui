@@ -28,8 +28,8 @@
     <!-- load mods to leaflet for rectangular popups -->
     <link rel="stylesheet" type="text/css" href="{% static "css/crc_leaflet.css" %}" media="screen" />
 
-    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
 {% endblock extra_head %}
 
@@ -250,8 +250,8 @@
             var html1 = "<span style=\"display:block;\" id=\"txt\">";
             var html2 = "</span><input onchange=\"finishedEdit()\" id=\"txtB\" type=\"text\" value=\"";
             var html3 = "\" style=\"display:none;\" size=\"";
-            var html4 = "\"/><button class=\"btn btn-primary btn-xs btn-block\" onclick=\"startEdit()\">Edit</button>";
-            var html_delete = "<button class=\"btn btn-primary btn-xs btn-block\" onclick=\"deleteObject()\">Delete</button>";
+            var html4 = "\"/><button type=\"button\" class=\"btn btn-default btn-xs\" onclick=\"startEdit()\"><span class=\"glyphicon glyphicon-pencil\"></span></button>";
+            var html_delete = "<button type=\"button\" class=\"btn btn-default btn-xs\" onclick=\"deleteObject()\"><span class=\"glyphicon glyphicon-trash\"></span></button>";
 
             //current marker
             var current_popup_marker = null;
