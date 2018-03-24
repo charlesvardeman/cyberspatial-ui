@@ -115,8 +115,8 @@
                         <p class="qualifier" style="margin-top: 10px">Save current map configuration (e.g. active layers and
                             annotations), copy the map and save with a new name, or download the map.</p>
                         <button id="save_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="save_annotation_elements();">Save Map</button>
-                        <!--<button id="load_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="get_annotations_from_server();">Load Map</button>-->
-                        <button id="load_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="load_annotation_elements();">Load Map</button>
+                        <button id="load_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="get_annotations_from_server();">Load Map</button>
+                        <!--<button id="load_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="load_annotation_elements();">Load Map</button>-->
                         <div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Download Map
                         </button></div>
                         <div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Share Map
@@ -941,7 +941,7 @@
       //load JSON version of annotation data into layers
       function load_annotation_elements(json_from_server){
           var json = "{\"objects\": [{\"type\":\"marker\",\"text\":\"Nikolai's lair\",\"data\":{\"id\":\"u2lj6ycim\",\"latitude\":39.894089941326044,\"longitude\":-74.12595748901369}},{\"type\":\"polygon\",\"text\":\"Polygon of fear\",\"data\":{\"id\":\"t8vo6pn5u\",\"points\":\"[[39.91726592255928,-74.12509918212892],[39.904230397797335,-74.12458419799806],[39.91199934253401,-74.13368225097658]]\"}}]}";
-          var parsed = JSON.parse(json);//json_from_server);
+          var parsed = JSON.parse(json_from_server);
 
           console.log(parsed.objects.length);
 
@@ -973,7 +973,8 @@
                   newobject.enableEdit(); //editing
 
                   //setup popup
-                  newobject.bindPopup(socket_object.text);
+                  newobject.bindPopup(html1 + socket_object.text + html2 + socket_object.text
+                      + html3 + socket_object.text.length + html4 + html_delete);
                   newobject.on('mouseover', function (e) {
                       this.openPopup();
                   });
