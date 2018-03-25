@@ -3,6 +3,8 @@ from guardian.shortcuts import get_objects_for_user
 from django.conf import settings
 from geonode.layers.models import Layer
 from django.views.generic import TemplateView
+import json
+from models import NJCMap, NJCMapAnnotation
 
 '''
   This function is used to respond to ajax requests for which layers should be
@@ -38,6 +40,8 @@ def my_gis_layers(request):
 
     return JsonResponse(layers_dictionary)
 
+
+
 '''
   Template View that injects some parameters about starting map position based on user keywords
   This should be reworked at some point to be more elegantly tied to user's Groups
@@ -62,3 +66,39 @@ class MapTemplateView(TemplateView):
             context['home_longitude'] = "-74.1808381"
             context['zoom_level'] = 13
         return context
+
+def map_annotations(request, map_id):
+    if request.method == "GET":
+        # Get all of the annotations for a given map
+        annotations = NJCMapAnnotation.objects.filter(map_id=map_id).values()
+        annotations_dict = {'objects': []}
+
+        for annotation in annotations:
+            data_dict = json.loads(annotation['data'])
+
+            annotations_dict['objects'].append({
+                'myid' : map_id,
+                'text' : annotation['text'],
+                'type' : annotation['type'],
+                'data' : data_dict,
+            })
+        #pop them into a dictionary and send them back to the caller as a JsonResponse
+        return JsonResponse(annotations_dict)
+
+    elif request.method == "POST":
+        annotation_dict = json.loads(request.POST['data'])
+        # print request.POST['data']
+        # print annotation_dict
+        for annotation in annotation_dict['objects']:
+            obj, created = NJCMapAnnotation.objects.update_or_create(
+                leaflet_id = annotation['data']['id'], map_id = map_id,
+                defaults = {
+                    'type' : annotation['type'],
+                    'text' : annotation['text'],
+                    'data' : json.dumps(annotation['data']),
+                    # 'owner' : request.user
+                }
+            )
+
+
+        return JsonResponse({'saved': True, 'annotations' : len(annotation_dict['objects'])})
