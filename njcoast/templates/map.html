@@ -346,28 +346,10 @@
             // called while object is being edited
             mymap.on('editable:editing', function(e) {
                 {% if map_id %}
-                //rectangle update
-                rectangle_jason = rectangle_update(e.layer);
-                if(rectangle_jason != null){
-                    socket.send(rectangle_jason);
-                }
-
-                //polyline_update
-                polyline_jason = polyline_update(e.layer);
-                if(polyline_jason != null){
-                    socket.send(polyline_jason);
-                }
-
-                //polygon
-                polygon_jason = polygon_update(e.layer);
-                if(polygon_jason != null){
-                    socket.send(polygon_jason);
-                }
-
-                //circle
-                circle_jason = circle_update(e.layer);
-                if(circle_jason != null){
-                    socket.send(circle_jason);
+                //test if annotation object and send
+                annotation_jason = annotation_update(e.layer);
+                if(annotation_jason != null){
+                    socket.send(annotation_jason);
                 }
 
                 {% endif %}
@@ -378,34 +360,10 @@
             mymap.on('editable:drawing:end', function (e) {
                 {% if map_id %}
 
-                //rectangle update
-                rectangle_jason = rectangle_update(e.layer);
-                if(rectangle_jason != null){
-                    socket.send(rectangle_jason);
-                }
-
-                //polyline_update
-                polyline_jason = polyline_update(e.layer);
-                if(polyline_jason != null){
-                    socket.send(polyline_jason);
-                }
-
-                //polygon
-                polygon_jason = polygon_update(e.layer);
-                if(polygon_jason != null){
-                    socket.send(polygon_jason);
-                }
-
-                //circle
-                circle_jason = circle_update(e.layer);
-                if(circle_jason != null){
-                    socket.send(circle_jason);
-                }
-
-                //marker
-                marker_jason = marker_update(e.layer);
-                if(marker_jason != null){
-                    socket.send(marker_jason);
+                //test if annotation object and send
+                annotation_jason = annotation_update(e.layer);
+                if(annotation_jason != null){
+                    socket.send(annotation_jason);
                 }
 
                 {% endif %}
@@ -416,34 +374,10 @@
             mymap.on('editable:drag', function (e) {
                 {% if map_id %}
 
-                //rectangle update
-                rectangle_jason = rectangle_update(e.layer);
-                if(rectangle_jason != null){
-                    socket.send(rectangle_jason);
-                }
-
-                //polyline_update
-                polyline_jason = polyline_update(e.layer);
-                if(polyline_jason != null){
-                    socket.send(polyline_jason);
-                }
-
-                //polygon
-                polygon_jason = polygon_update(e.layer);
-                if(polygon_jason != null){
-                    socket.send(polygon_jason);
-                }
-
-                //circle
-                circle_jason = circle_update(e.layer);
-                if(circle_jason != null){
-                    socket.send(circle_jason);
-                }
-
-                //marker
-                marker_jason = marker_update(e.layer);
-                if(marker_jason != null){
-                    socket.send(marker_jason);
+                //test if annotation object and send
+                annotation_jason = annotation_update(e.layer);
+                if(annotation_jason != null){
+                    socket.send(annotation_jason);
                 }
 
                 {% endif %}
@@ -455,10 +389,15 @@
                 console.log("editable:disable");
             });
 
-            //update polygon
-            function polygon_update(e_layer) {
-                //polygon
-                if (e_layer instanceof L.Polygon && !(e_layer instanceof L.Rectangle)){
+            //update annotation objects
+            function annotation_update(e_layer) {
+                var type = null;
+                var data;
+
+                //polygon or rectangle
+                if (e_layer instanceof L.Polygon){
+                    type = 'polygon';
+
                     LatLngs = e_layer.getLatLngs();
                     console.log("Polygon," + e_layer.myCustomID + "," + LatLngs[0]);
 
@@ -469,71 +408,21 @@
                         lldata.push(localdata);
                     }
 
-                    console.log("JSON " + JSON.stringify(lldata));
-
-                    //get popup text
-                    popuptext = e_layer.getPopup().getContent();
-                    pos1 = popuptext.indexOf("id=\"txt\">") + 9;
-                    pos2 = popuptext.indexOf("</span>");
-
-                    //craeat JSON package and send
-                    socket_frame = {
-                      myid: myid,
-                      type: 'polygon',
-                      text: popuptext.substring(pos1, pos2),
-                      data: {
-                        id: e_layer.myCustomID,
-                        points: JSON.stringify(lldata)
-                      }
-                    }
-                    return JSON.stringify(socket_frame);
-                }else{
-                    return null;
-                }
-            }
-
-            //update rectangle
-            function rectangle_update(e_layer) {
-                //polygon
-                if (e_layer instanceof L.Rectangle){
-                    LatLngs = e_layer.getLatLngs();
-                    console.log("Rectangle," + e_layer.myCustomID + "," + LatLngs[0]);
-
-                    //convert LatLng data so can use stringify
-                    var lldata = [];
-                    for(i=0; i<LatLngs[0].length; i++){
-                        localdata = new Array(LatLngs[0][i].lat, LatLngs[0][i].lng);
-                        lldata.push(localdata);
+                    //set data
+                    data = {
+                      id: e_layer.myCustomID,
+                      points: JSON.stringify(lldata)
                     }
 
                     console.log("JSON " + JSON.stringify(lldata));
-                    //get popup text
-                    popuptext = e_layer.getPopup().getContent();
-                    pos1 = popuptext.indexOf("id=\"txt\">") + 9;
-                    pos2 = popuptext.indexOf("</span>");
-
-                    //craeat JSON package and send
-                    socket_frame = {
-                      myid: myid,
-                      type: 'polygon',
-                      text: popuptext.substring(pos1, pos2),
-                      data: {
-                        id: e_layer.myCustomID,
-                        points: JSON.stringify(lldata)
-                      }
-                    }
-                    return JSON.stringify(socket_frame);
-                }else{
-                    return null;
                 }
-            }
 
-            //update polyline, note data structure difference to polygon which
-            //inherits polyline
-            function polyline_update(e_layer) {
-                //polygon
+                //polyline
                 if (!(e_layer instanceof L.Polygon) && !(e_layer instanceof L.Rectangle)
                         && e_layer instanceof L.Polyline){
+                    //type
+                    type = 'polyline';
+
                     LatLngs = e_layer.getLatLngs();
                     console.log("Polyline," + e_layer.myCustomID + "," + LatLngs[0]);
 
@@ -544,79 +433,59 @@
                         lldata.push(localdata);
                     }
 
+                    //set data
+                    data = {
+                      id: e_layer.myCustomID,
+                      points: JSON.stringify(lldata)
+                    }
+
                     console.log("JSON " + JSON.stringify(lldata));
-                    //get popup text
-                    popuptext = e_layer.getPopup().getContent();
-                    pos1 = popuptext.indexOf("id=\"txt\">") + 9;
-                    pos2 = popuptext.indexOf("</span>");
-
-                    //craeat JSON package and send
-                    socket_frame = {
-                      myid: myid,
-                      type: 'polyline',
-                      text: popuptext.substring(pos1, pos2),
-                      data: {
-                        id: e_layer.myCustomID,
-                        points: JSON.stringify(lldata)
-                      }
-                    }
-                    return JSON.stringify(socket_frame);
-                }else{
-                    return null;
                 }
-            }
 
-            //update marker
-            function marker_update(e_layer) {
+                //marker
                 if (e_layer instanceof L.Marker){
-                    console.log("Marker," + e_layer.myCustomID);
-                    //get popup text
-                    popuptext = e_layer.getPopup().getContent();
-                    pos1 = popuptext.indexOf("id=\"txt\">") + 9;
-                    pos2 = popuptext.indexOf("</span>");
+                    //type
+                    type = 'marker';
 
-                    //craeat JSON package and send
-                    socket_frame = {
-                      myid: myid,
-                      type: 'marker',
-                      text: popuptext.substring(pos1, pos2),
-                      data: {
-                        id: e_layer.myCustomID,
-                        latitude: e_layer.getLatLng().lat,
-                        longitude: e_layer.getLatLng().lng
-                      }
+                    //set data
+                    data = {
+                      id: e_layer.myCustomID,
+                      latitude: e_layer.getLatLng().lat,
+                      longitude: e_layer.getLatLng().lng
                     }
-                    return JSON.stringify(socket_frame);
-                }else{
-                    return null;
                 }
-            }
 
-            //update circle
-            function circle_update(e_layer) {
+                //circle
                 if (e_layer instanceof L.Circle){
-                    console.log("Circle," + e_layer.myCustomID);
-                    //get popup text
-                    popuptext = e_layer.getPopup().getContent();
-                    pos1 = popuptext.indexOf("id=\"txt\">") + 9;
-                    pos2 = popuptext.indexOf("</span>");
+                    //type
+                    type = 'circle';
 
-                    //craeat JSON package and send
-                    socket_frame = {
-                      myid: myid,
-                      type: 'circle',
-                      text: popuptext.substring(pos1, pos2),
-                      data: {
+                    //set data
+                    data = {
                         id: e_layer.myCustomID,
                         latitude: e_layer.getLatLng().lat,
                         longitude: e_layer.getLatLng().lng,
                         radius: e_layer.getRadius()
-                      }
                     }
-                    return JSON.stringify(socket_frame);
-                }else{
+                }
+
+                if(type == null){
                     return null;
                 }
+
+                //get popup text
+                popuptext = e_layer.getPopup().getContent();
+                pos1 = popuptext.indexOf("id=\"txt\">") + 9;
+                pos2 = popuptext.indexOf("</span>");
+
+                //craeat JSON package and send
+                socket_frame = {
+                  myid: myid,
+                  type: type,
+                  text: popuptext.substring(pos1, pos2),
+                  data: data
+                }
+                return JSON.stringify(socket_frame);
             }
 
         //~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -894,34 +763,9 @@
               var json_string = "";
 
               //look for objects
-              //rectangle update
-              rectangle_jason = rectangle_update(layer);
-              if(rectangle_jason != null){
-                  json_string += rectangle_jason;
-              }
-
-              //polyline_update
-              polyline_jason = polyline_update(layer);
-              if(polyline_jason != null){
-                  json_string += polyline_jason;
-              }
-
-              //polygon
-              polygon_jason = polygon_update(layer);
-              if(polygon_jason != null){
-                  json_string += polygon_jason;
-              }
-
-              //circle
-              circle_jason = circle_update(layer);
-              if(circle_jason != null){
-                  json_string += circle_jason;
-              }
-
-              //marker
-              marker_jason = marker_update(layer);
-              if(marker_jason != null){
-                  json_string += marker_jason;
+              annotation_jason = annotation_update(layer);
+              if(annotation_jason != null){
+                  json_string += annotation_jason;
               }
 
               console.log(json_string);
