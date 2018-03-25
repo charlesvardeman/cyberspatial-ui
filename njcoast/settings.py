@@ -42,7 +42,10 @@ MAX_DOCUMENT_SIZE = 512
 
 MODIFY_TOPICCATEGORY = True
 
-INSTALLED_APPS += ('channels',)
+INSTALLED_APPS += (
+    'njcoast',
+    'channels',
+    )
 
 
 DATABASES = {
