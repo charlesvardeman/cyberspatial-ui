@@ -320,6 +320,7 @@
             mymap.on('editable:created', function(e) {
                 //set new objects id
                 e.layer.myCustomID = Math.random().toString(36).substr(2, 9);
+                e.layer.owned = true;
 
                 //add popup
                 e.layer.bindPopup(html1 + "Input text ..." + html2 + "Input text ..."
@@ -677,6 +678,8 @@
                           //set id and add to layer
                           if(newobject != null){
                               newobject.myCustomID = socket_object.data.id;
+                              newobject.owned = false;
+
                               annotationLayer.addLayer(newobject);
 
                               var popup_text = socket_object.data.text;
@@ -879,7 +882,7 @@
 
           //loop over the annotation elements
           annotationLayer.eachLayer(function (layer) {
-              console.log("Found " + layer.myCustomID);
+              console.log("Found " + layer.myCustomID + ", " + layer.owned);
 
               if(add_comma){
                   all_json += ",\n\t\t";
