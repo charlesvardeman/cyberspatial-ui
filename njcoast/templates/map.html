@@ -142,6 +142,7 @@
 
         //create unique id to tag socket comms
         var myid = Math.random().toString(36).substr(2, 9);
+        var owner = {{ user.id }};
 
         /*
         Base Map -- Centered on Keansburg, NJ
@@ -480,6 +481,7 @@
 
                 //craeat JSON package and send
                 socket_frame = {
+                  owner: owner,
                   myid: myid,
                   type: type,
                   text: popuptext.substring(pos1, pos2),
@@ -527,20 +529,27 @@
                           }
                       });
                       if(object == null){
+                          //set coloring according to owner
+                          var color_param = {};
+                          var icon_param = {};
+                          if( socket_object.owner != owner){
+                              color_param = {color: '#C92D40'};
+                              icon_param = {icon: redIcon};
+                          }
                           //need to create object here
                           var newobject = null;
                           console.log("Objects " + socket_object.type);
                           //create
                           if(socket_object.type == 'marker'){
-                              newobject = L.marker([socket_object.data.latitude,socket_object.data.longitude], {icon: redIcon});
+                              newobject = L.marker([socket_object.data.latitude,socket_object.data.longitude], icon_param);
                           }else if(socket_object.type == 'polygon' || socket_object.type == 'polyline'){
                               console.log("Points "+socket_object.data.points);
                               var points = JSON.parse(socket_object.data.points);
                               console.log("Points " + points.length + "," + points[0][0]);
                               if(socket_object.type == 'polyline'){
-                                  newobject = L.polyline(points, {color: '#C92D40'});
+                                  newobject = L.polyline(points, color_param);
                               }else{
-                                  newobject = L.polygon(points, {color: '#C92D40'});
+                                  newobject = L.polygon(points, color_param);
                               }
                           }else if(socket_object.type == 'circle'){
                               newobject = L.circle([socket_object.data.latitude,socket_object.data.longitude], socket_object.data.radius, {color: '#C92D40'});
