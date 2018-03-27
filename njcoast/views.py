@@ -6,12 +6,14 @@ from django.views.generic import TemplateView
 import json
 from models import NJCMap, NJCMapAnnotation
 from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import login_required
 
 '''
   This function is used to respond to ajax requests for which layers should be
   visible for a given user. Borrowed a lot of this from the GeoNode base code
   for the layer list view page that is provided by Geonode
 '''
+@login_required
 def my_gis_layers(request):
 
     # get all object (django-guardian) that the user is allowed to see
@@ -83,6 +85,7 @@ class MapTemplateView(TemplateView):
   Function view that simply creates a new object and then redirects the user to
   the proper map template view based on that new map object
 '''
+@login_required
 def new_njc_map_view(request):
     # TODO: The user should have the option to name the map when they create it
     next_user_map_count = len(NJCMap.objects.filter(owner = request.user)) + 1
@@ -96,6 +99,7 @@ def new_njc_map_view(request):
 '''
   API-ish view for annotation ajax calls from the map page.
 '''
+@login_required
 def map_annotations(request, map_id):
     if request.method == "GET":
         # Get all of the annotations for a given map
