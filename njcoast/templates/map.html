@@ -306,6 +306,7 @@
 
                 {% if map_id %}
                 socket_frame = {
+                  owner: owner,
                   myid: myid,
                   type: 'popup',
                   data: {
@@ -602,7 +603,13 @@
                               object.setLatLng([socket_object.data.latitude,socket_object.data.longitude]);
                               object.setRadius(socket_object.data.radius);
                           }else if(socket_object.type == 'popup'){
-                              object.setPopupContent(socket_object.data.text);
+                              //add editing if I own it!
+                              if( socket_object.owner != owner){
+                                  object.setPopupContent(socket_object.data.text);
+                              }else{
+                                  object.setPopupContent(html1 + socket_object.data.text + html2 + socket_object.data.text
+                                      + html3 + socket_object.data.text.length + html4 + html_delete);
+                              }
                           }
                       }
 
