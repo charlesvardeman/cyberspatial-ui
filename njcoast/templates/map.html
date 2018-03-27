@@ -27,7 +27,8 @@
 
     <!-- load mods to leaflet for rectangular popups -->
     <link rel="stylesheet" type="text/css" href="{% static "css/crc_leaflet.css" %}" media="screen" />
-    <link rel="stylesheet" type="text/css" href="{% static "css/custom_bootstrap.min.css" %}" media="screen" />
+    <!--<link rel="stylesheet" type="text/css" href="{% static "css/custom_bootstrap.min.css" %}" media="screen" />-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css" integrity="sha384-3AB7yXWz4OeoZcPbieVW64vVXEwADiYyAEhwilzWsLw+9FgqpyjjStpPnpBO8o8S" crossorigin="anonymous">
     <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
 {% endblock extra_head %}
@@ -214,7 +215,7 @@
                     position: 'topleft',
                     callback: mymap.editTools.startMarker,
                     kind: 'marker',
-                    html: '<span class="glyphicon glyphicon-map-marker"></span>'
+                    html: '<span class="fas fa-map-marker-alt"></span>'
                 }
 
             });
@@ -252,8 +253,8 @@
             var html1 = "<span style=\"display:block;\" id=\"txt\">";
             var html2 = "</span><input onchange=\"finishedEdit()\" id=\"txtB\" type=\"text\" value=\"";
             var html3 = "\" style=\"display:none;\" size=\"";
-            var html4 = "\"/><button type=\"button\" class=\"btn btn-default btn-xs\" onclick=\"startEdit()\"><span class=\"glyphicon glyphicon-pencil\"></span></button>";
-            var html_delete = "<button type=\"button\" class=\"btn btn-default btn-xs\" onclick=\"deleteObject()\"><span class=\"glyphicon glyphicon-trash\"></span></button>";
+            var html4 = "\"/><button type=\"button\" class=\"btn btn-default btn-xs\" onclick=\"startEdit()\"><span class=\"fas fa-pencil-alt fa-fw\"></span></button>";
+            var html_delete = "<button type=\"button\" class=\"btn btn-default btn-xs\" onclick=\"deleteObject()\"><span class=\"fas fa-trash-alt\"></span></button>";
 
             //current marker
             var current_popup_marker = null;
@@ -559,9 +560,25 @@
                               newobject.myCustomID = socket_object.data.id;
                               newobject.owned = false;
 
+                              //add to layer
                               annotationLayer.addLayer(newobject);
 
                               var popup_text = socket_object.data.text;
+
+                              //do I own it? if so editable
+                              if( socket_object.owner == owner){
+                                  //setup popup for editing
+                                  if(popup_text == null){
+                                      popup_text = "Input text ...";
+                                  }
+
+                                  var popup_text = html1 + popup_text + html2 + popup_text
+                                      + html3 + popup_text.length + html4 + html_delete;
+
+                                  newobject.enableEdit(); //editing
+                                  newobject.owned = true;
+                              }
+
                               if(popup_text == null){
                                   popup_text = "Undefined";
                               }
