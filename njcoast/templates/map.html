@@ -796,7 +796,7 @@
       function send_annotation_to_server(data) {
           $.ajax({
               type: "POST",
-              url: "/maps/annotate/{{map_id}}/annotations/",
+              url: "/map/{{map_id}}/annotations/",
               data: {'data': data},
               dataType: "json",
               success: function (result) {
@@ -860,7 +860,7 @@
       function get_annotations_from_server() {
           $.ajax({
               type: "GET",
-              url: "/maps/annotate/{{map_id}}/annotations/",
+              url: "/map/{{map_id}}/annotations/",
               data: {},
               dataType: "json",
               success: function (result) {

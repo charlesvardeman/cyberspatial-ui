@@ -61,6 +61,11 @@
 	    <div id="navbar" class="navbar-collapse collapse">
 	      <ul class="nav navbar-nav toolbar">
               {% block tabs %}
+              {% if user.is_authenticated %}
+                  <li id="nav_dashboard">
+                        <a href="{% url "dashboard" %}" role="button">{% trans "Dashboard" %}</a>
+                  </li>
+              {% endif %}
               {% if user.is_superuser %}
                   <li id="nav_layers">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Data" %}<i class="fa fa-angle-down fa-lg"></i></a>
@@ -285,7 +290,7 @@
             <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
             <h4 class="modal-title" id="myModalLabel">{% trans "Sign in" %}</h4>
           </div>
-          <form class="form-signin" role="form" action="{% url "account_login" %}?next={% url 'maps_browse' %}" method="post">
+          <form class="form-signin" role="form" action="{% url "account_login" %}?next={% url 'dashboard' %}" method="post">
             <div class="modal-body">
               {% csrf_token %}
               <div class="form-group">

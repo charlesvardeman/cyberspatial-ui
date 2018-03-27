@@ -1,10 +1,11 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from guardian.shortcuts import get_objects_for_user
 from django.conf import settings
 from geonode.layers.models import Layer
 from django.views.generic import TemplateView
 import json
 from models import NJCMap, NJCMapAnnotation
+from django.core.urlresolvers import reverse
 
 '''
   This function is used to respond to ajax requests for which layers should be
@@ -78,6 +79,23 @@ class MapTemplateView(TemplateView):
             context['zoom_level'] = 13
         return context
 
+'''
+  Function view that simply creates a new object and then redirects the user to
+  the proper map template view based on that new map object
+'''
+def new_njc_map_view(request):
+    # TODO: The user should have the option to name the map when they create it
+    next_user_map_count = len(NJCMap.objects.filter(owner = request.user)) + 1
+    map_object = NJCMap.objects.create(
+        owner = request.user,
+        name = "%s's Map #%d" % (request.user, next_user_map_count),
+        description = 'NJ Coast auto-generated map for %s' % request.user
+    )
+    return HttpResponseRedirect(reverse('map_annotate', args=[map_object.id]))
+
+'''
+  API-ish view for annotation ajax calls from the map page.
+'''
 def map_annotations(request, map_id):
     if request.method == "GET":
         # Get all of the annotations for a given map
@@ -112,15 +130,24 @@ def map_annotations(request, map_id):
                     'owner' : request.user
                 }
             )
-            if not created:
-                if obj.owner is request.user:
+            if created:
+                annotations_updated += 1
+            else:
+                if obj.owner == request.user:
                     #only update if the owner is the USER
                     obj.text = annotation['text']
                     obj.data = json.dumps(annotation['data'])
                     obj.save()
                     annotations_updated += 1
-            else:
-                annotations_updated += 1
 
 
         return JsonResponse({'saved': True, 'annotations' : annotations_updated})
+
+
+class DashboardTemplateView(TemplateView):
+    template_name = 'dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(DashboardTemplateView, self).get_context_data(**kwargs)
+        context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+        return context

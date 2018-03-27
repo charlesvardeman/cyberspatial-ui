@@ -10,7 +10,7 @@
 {% block middle %}
   {{ block.super }}
   {% block hero %}
-  <a name="page-top"></a> 
+  <a name="page-top"></a>
   <div class="jumbotron njcoast-image">
     <div class="container">
       <div class="row">
@@ -22,7 +22,11 @@
             <div class="action-box">
               <p style="margin-bottom:5px">Get started</p>
               <p style="font-size: 17px; margin-bottom:20px">Explore NJcoast’s public geospatial datasets and simulate a landfalling hurricane</p>
+              {% if user.is_authenticated %}
+              <p><a class="btn btn-primary btn-lg btn-block" href="{% url 'dashboard' %}" role="button">Explore NJcoast &raquo;</a></p>
+              {% else %}
               <p><a class="btn btn-primary btn-lg btn-block" href="" role="button" data-toggle="modal" data-target="#SigninModal">Explore NJcoast &raquo;</a></p>
+              {% endif %}
               <p class="qualifier">To access all of NJcoast’s features, import your own geospatial data, and conduct extensive hurricane simulations, you will need to <a href="{% url 'account_signup' %}">request a user account</a></p>
             </div>
         </div>
