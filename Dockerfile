@@ -30,22 +30,19 @@ RUN pip install GDAL==1.10 --global-option=build_ext --global-option="-I/usr/inc
 # Requirements have to be pulled and installed here, otherwise caching won't work
 # COPY ./requirements /requirements
 
-RUN mkdir /app
-
-# Main work directory will be app
-WORKDIR /app
-COPY . /app
-
-RUN pip install --no-cache-dir -r /app/requirements.txt --src /usr/local/src
-
 COPY ./start.sh /start.sh
 COPY ./celary.sh /celary.sh
 COPY ./entrypoint.sh /entrypoint.sh
-RUN sed -i 's/\r//' /entrypoint.sh \
-    && sed -i 's/\r//' /celary.sh \
-    && sed -i 's/\r//' /start.sh \
-    && chmod +x /entrypoint.sh \
-    && chmod +x /celary.sh \
-    && chmod +x /start.sh
+RUN sed -i 's/\r//' /entrypoint.sh && chmod +x /entrypoint.sh \
+    && sed -i 's/\r//' /celary.sh && chmod +x /celary.sh \
+    && sed -i 's/\r//' /start.sh && chmod +x /start.sh
+
+RUN mkdir /app
+WORKDIR /app
+
+COPY requirements.txt /app
+RUN pip install --no-cache-dir -r /app/requirements.txt --src /usr/local/src
+
+COPY . /app
 
 ENTRYPOINT ["/entrypoint.sh"]
