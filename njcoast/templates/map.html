@@ -251,7 +251,7 @@
             });
 
             // Create the HTML <li> for each layer and append to the <ul>
-            var layer_html = '<li><input id="' + $.trim(layer.id) + '" type="checkbox">' + $.trim(layer.name) + '</li>';
+            var layer_html = '<li id=' + $.trim(layer.id) + '><input id="' + $.trim(layer.id) + '" type="checkbox">' + $.trim(layer.name) + '</li>';
             $(ul_id).append(layer_html);
             layer.maplayer = L.tileLayer.wms(layer.layer_link, {layers: layer.layer, transparent: true, format: 'image/png'});
             layer_list.push(layer);
