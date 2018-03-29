@@ -21,6 +21,8 @@
             integrity="sha512-ECQqaYZke9cSdqlFG08zSkudgrdF6I1d8ViSa7I3VIszJyVqw4ng1G8sehEXlumdMnFYfzY0tMgdQa4WCs9IUw=="
             crossorigin=""></script>
 
+    <!--- Load OpenLayers from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/4.6.5/ol-debug.js"  crossorigin=""></script>
 {% endblock extra_head %}
 
 
@@ -223,6 +225,30 @@
                 ul_id - the id of the unordered list in which to append the layer.
          */
         function add_layer_to_menu(layer, ul_id) {
+            // Get Layer Style
+            OpenLayers.Request.GET({
+                url: layer.layer_link.replace("?", ""),
+                params: {
+                    request: "GetStyles",
+                    layers: $.trim(layer.name),
+                    service: "wms",
+                    version: "1.1.1"
+                },
+                success: function (data, statut, xhr) {
+                    var format = new OpenLayers.Format.SLD();
+                    //Trick is to clean line break
+                    var obj = format.read(data.responseText.replace(/(\r\n|\n|\r)/gm, ""));
+                    //Js object
+                    console.log(obj);
+                    var json = new OpenLayers.Format.JSON();
+                    // Object converted to json for readability but not really useful at js level
+                    console.log(json.write(obj, true));
+                }
+            });
+
+            // Generate Style Thumbnail
+
+            // layer.layer_link+REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&STRICT=false&style=hsip_firesta
             // Create the HTML <li> for each layer and append to the <ul>
             var layer_html = '<li><input id="' + $.trim(layer.id) + '" type="checkbox"> ' + $.trim(layer.name) + '</li>';
             $(ul_id).append(layer_html);
