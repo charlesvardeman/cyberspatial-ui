@@ -235,7 +235,6 @@
          */
         function add_layer_to_menu(layer, ul_id) {
             // Get Layer Style
-            var styleName = ""
             $.ajax({
                 type: "GET",
                 url: encodeURI(layer.layer_link+"REQUEST=GetStyles&SERVICE=wms&VERSION=1.1.1&LAYERS="+layer.layer),
@@ -243,7 +242,8 @@
                 dataType: "xml",
                 success: function (result) {
                     var data = evaluateXPath(result, '//sld:UserStyle/sld:Name');
-					styleName = $(data[0]).text();
+					var styleName = $(data[0]).text();
+                    $("li#"+$.trim(layer.id)).prepend('<img style="padding-right: 10px;" src="'+layer.layer_link+'wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&STRICT=false&style='+encodeURI(styleName)+'"/>')
                 },
                 error: function (result) {
                     console.log("ERROR:", result)
@@ -251,7 +251,7 @@
             });
 
             // Create the HTML <li> for each layer and append to the <ul>
-            var layer_html = '<li><img style="padding-right: 10px;" src="'+layer.layer_link+'wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&STRICT=false&style='+encodeURI(styleName)+'"/><input id="' + $.trim(layer.id) + '" type="checkbox">' + $.trim(layer.name) + '</li>';
+            var layer_html = '<li><input id="' + $.trim(layer.id) + '" type="checkbox">' + $.trim(layer.name) + '</li>';
             $(ul_id).append(layer_html);
             layer.maplayer = L.tileLayer.wms(layer.layer_link, {layers: layer.layer, transparent: true, format: 'image/png'});
             layer_list.push(layer);
