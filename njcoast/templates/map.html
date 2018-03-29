@@ -20,9 +20,6 @@
     <script src="https://unpkg.com/esri-leaflet@2.1.1/dist/esri-leaflet.js"
             integrity="sha512-ECQqaYZke9cSdqlFG08zSkudgrdF6I1d8ViSa7I3VIszJyVqw4ng1G8sehEXlumdMnFYfzY0tMgdQa4WCs9IUw=="
             crossorigin=""></script>
-
-    <!--- Load OpenLayers from CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/openlayers/4.6.5/ol-debug.js"  crossorigin=""></script>
 {% endblock extra_head %}
 
 
@@ -219,6 +216,18 @@
             $("#gisLayers").append(group_template);
         }
 
+        function evaluateXPath(aNode, aExpr) {
+            var xpe = new XPathEvaluator();
+            var nsResolver = xpe.createNSResolver(aNode.ownerDocument == null ?
+                aNode.documentElement : aNode.ownerDocument.documentElement);
+            var result = xpe.evaluate(aExpr, aNode, nsResolver, 0, null);
+            var found = [];
+            var res;
+            while (res = result.iterateNext())
+                found.push(res);
+            return found;
+        }
+                
         /*
         Add the individual layers to the menu under the appropriate layer category group.
         Params: layer - the layer to add to the menu (complete layer object)
@@ -226,31 +235,23 @@
          */
         function add_layer_to_menu(layer, ul_id) {
             // Get Layer Style
-            OpenLayers.Request.GET({
-                url: layer.layer_link.replace("?", ""),
-                params: {
-                    request: "GetStyles",
-                    layers: $.trim(layer.name),
-                    service: "wms",
-                    version: "1.1.1"
+            var styleName = ""
+            $.ajax({
+                type: "GET",
+                url: encodeURI(layer.layer_link+"REQUEST=GetStyles&SERVICE=wms&VERSION=1.1.1&LAYERS="+$.trim(layer.name)),
+                data: {},
+                dataType: "xml",
+                success: function (result) {
+                    var data = evaluateXPath(result, '//sld:UserStyle/sld:Name');
+					styleName = $(data[0]).text();
                 },
-                success: function (data, statut, xhr) {
-                    var format = new OpenLayers.Format.SLD();
-                    //Trick is to clean line break
-                    var obj = format.read(data.responseText.replace(/(\r\n|\n|\r)/gm, ""));
-                    //Js object
-                    console.log(obj);
-                    var json = new OpenLayers.Format.JSON();
-                    // Object converted to json for readability but not really useful at js level
-                    console.log(json.write(obj, true));
+                error: function (result) {
+                    console.log("ERROR:", result)
                 }
             });
 
-            // Generate Style Thumbnail
-
-            // layer.layer_link+REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&STRICT=false&style=hsip_firesta
             // Create the HTML <li> for each layer and append to the <ul>
-            var layer_html = '<li><input id="' + $.trim(layer.id) + '" type="checkbox"> ' + $.trim(layer.name) + '</li>';
+            var layer_html = '<li><img src="'+layer.layer_link+'wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&STRICT=false&style='+styleName+'"/><input id="' + $.trim(layer.id) + '" type="checkbox">' + $.trim(layer.name) + '</li>';
             $(ul_id).append(layer_html);
             layer.maplayer = L.tileLayer.wms(layer.layer_link, {layers: layer.layer, transparent: true, format: 'image/png'});
             layer_list.push(layer);
