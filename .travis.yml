@@ -15,7 +15,7 @@ before_install:
 - mkdir -p $HOME/.kube/ && mv kube.config $HOME/.kube/config
 script:
 - docker pull 234514569215.dkr.ecr.us-east-1.amazonaws.com/njcoast:$TRAVIS_BRANCH
-- docker build -t 234514569215.dkr.ecr.us-east-1.amazonaws.com/njcoast:$TRAVIS_BRANCH-$TRAVIS_COMMIT .
+- docker build --cache-from 234514569215.dkr.ecr.us-east-1.amazonaws.com/njcoast:$TRAVIS_BRANCH -t 234514569215.dkr.ecr.us-east-1.amazonaws.com/njcoast:$TRAVIS_BRANCH-$TRAVIS_COMMIT .
 - docker tag 234514569215.dkr.ecr.us-east-1.amazonaws.com/njcoast:$TRAVIS_BRANCH-$TRAVIS_COMMIT 234514569215.dkr.ecr.us-east-1.amazonaws.com/njcoast:$TRAVIS_BRANCH
 - docker push 234514569215.dkr.ecr.us-east-1.amazonaws.com/njcoast:$TRAVIS_BRANCH-$TRAVIS_COMMIT
 - docker push 234514569215.dkr.ecr.us-east-1.amazonaws.com/njcoast:$TRAVIS_BRANCH
