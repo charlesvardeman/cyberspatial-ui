@@ -1,0 +1,326 @@
+{% extends 'site_base.html' %}
+{% load i18n %}
+{% load staticfiles %}
+{% load base_tags %}
+
+{% block body_class %}home{% endblock %}
+
+{% block extra_head %}
+    <!-- Load Leaflet from CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
+          integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
+          crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
+            integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
+            crossorigin=""></script>
+
+
+    <!-- Load Esri Leaflet from CDN -->
+    <script src="https://unpkg.com/esri-leaflet@2.1.1/dist/esri-leaflet.js"
+            integrity="sha512-ECQqaYZke9cSdqlFG08zSkudgrdF6I1d8ViSa7I3VIszJyVqw4ng1G8sehEXlumdMnFYfzY0tMgdQa4WCs9IUw=="
+            crossorigin=""></script>
+
+    <script src="https://npmcdn.com/leaflet.path.drag/src/Path.Drag.js"></script>
+
+    <!-- Load Leaflet Editable code -->
+    <script src="{% static "js/Leaflet.Editable.js" %}"></script>-->
+
+    <!-- load mods to leaflet for rectangular popups/map icons -->
+    <link rel="stylesheet" type="text/css" href="{% static "css/crc_leaflet.css" %}" media="screen" />
+    <link rel="stylesheet" type="text/css" href="{% static "css/fontawesome-all.min.css" %}" media="screen" />
+
+{% endblock extra_head %}
+
+
+{% block middle %}
+
+<div class="jumbotron njcoast-image slimmer"></div>
+
+<div class="container-fluid">
+    <div class="page-header map-header"></div>
+    <div class="row">
+
+    <!-- Map area ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <div class="col-sm-8 col-lg-9 col-xl-10 leaflet-map">
+      <div id="mapid" class="col-sm-8 col-lg-9 col-xl-10" style="width: 100%; height: 100%;"></div>
+    </div>
+    <!-- End map area ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+    <div class="col-sm-4 col-lg-3 col-xl-2" id="tool-control-panel">
+        <div class="map-control-item">
+          <p class="tool-heading">1. select storm type</p>
+          <div class="dropdown show">
+            <button class="btn btn-secondary btn-title btn-block dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+               <div class="h-badge what-if">H</div>Hurricane
+            </button>
+            <div class="dropdown-menu choose-storm" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item" href="shp-tool-hurricane.html"><div class="h-badge what-if">H</div>Hurricane</a>
+              <a class="dropdown-item" href="#"><div class="n-badge what-if">N</div>Nor'easter</a>
+            </div>
+          </div>
+        </div>
+        <div class="map-control-item">
+          <p class="tool-heading">2. set storm characteristics</p>
+          <div class="well plain">
+          <button class="btn btn-primary btn-sm btn-block" data-toggle="modal" data-target="">Draw Storm Track on Map</button>
+          <table class="table shp-table">
+            <tr>
+              <th>Latitude</th>
+              <td><input type="text" class="form-control" placeholder="40.442" aria-label="Username" aria-describedby="basic-addon1"></td>
+              <td>&deg;</td>
+            </tr>
+            <tr>
+              <th>Longitude</th>
+              <td><input type="text" class="form-control" placeholder="74.130" aria-label="Username" aria-describedby="basic-addon1"></td>
+              <td>&deg;</td>
+            </tr>
+          </table>
+          </div>
+
+          <ul class="nav nav-tabs nav-justified shp-settings">
+            <li class="nav-item active">
+              <a class="nav-link" href="">Basic</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="shp-tool-hurricane_advanced.html">Advanced</a>
+            </li>
+          </ul>
+
+          <p class="slider-label">Storm Intensity</p>
+          <ul class="shp-tool-radios one-line" style="margin-bottom: 30px">
+            <li><input type="radio" name="intensity" value="current" checked> Cat 1</li>
+            <li><input type="radio" name="intensity" value="degraded"> Cat 2</li>
+            <li><input type="radio" name="intensity" value="compromised"> Cat 3</li>
+            <li><input type="radio" name="intensity" value="degraded"> Cat 4</li>
+            <li><input type="radio" name="intensity" value="compromised"> Cat 5</li>
+          </ul>
+
+        </div>
+        <div class="map-control-item">
+          <p class="tool-heading">3. describe scenario</p>
+          <p class="slider-label" style="margin-top:0">Time to Landfall</p>
+          <div class="shp-controls">
+            <input class="range-input" data-target="ttl" min="0" max="72" step="1" value="48" type="range">
+            <input id="input_ttl" class="num-input job-input" name="ttl" value="48" type="text">
+            hr
+          </div>
+          <p class="slider-label">Sea Level Rise</p>
+          <div class="shp-controls">
+            <input class="range-input" data-target="rm" min="0" max="1.5" step="0.1" value="0" type="range">
+            <input id="input_slr" class="num-input job-input" name="slr" value="0" type="text">
+            ft
+          </div>
+          <p class="slider-label">Coastal Protection <span class="qualifier">e.g. dunes</span></p>
+          <ul class="shp-tool-radios one-line" >
+            <li><input type="radio" name="protection" value="current" checked> Current</li>
+            <li><input type="radio" name="protection" value="degraded"> Degraded</li>
+            <li><input type="radio" name="protection" value="compromised"> Compromised</li>
+          </ul>
+          <p class="slider-label">Tides</p>
+          <ul class="shp-tool-radios one-line">
+            <li><input type="radio" name="tide" value="high"> High</li>
+            <li><input type="radio" name="tide" value="current" checked> Zero</li>
+            <li><input type="radio" name="tide" value="low"> Low</li>
+          </ul>
+          <p class="slider-label">Analysis Type</p>
+          <ul class="shp-tool-radios" >
+            <li><input type="radio" name="type" value="high" checked> Deterministic</li>
+            <li><input type="radio" name="analysis" value="current"> Probabilistic&nbsp;<span class="qualifier">expected</span></li>
+            <li><input type="radio" name="analysis" value="current"> Probabilistic&nbsp;<span class="qualifier">extreme</span></li>
+          </ul>
+        </div>
+        <div class="map-control-item">
+
+          <button class="btn btn-disabled btn-md btn-block" style="margin-top: 10px">Perform Calculation</button>
+        </div>
+
+        <a id="vis-results"></a>
+        <div class="map-control-item">
+          <p class="tool-heading">4. View Results on Map</p>
+          <ul class="map-layers">
+            <li><input type="checkbox" name="gender" value="female"> Wind Field</li>
+            <li><input type="checkbox" name="gender" value="female"> Surge</li>
+            <li><input type="checkbox" name="gender" value="female" checked> Total Run Up</li>
+          </ul>
+        </div>
+        <div class="map-control-item">
+          <button href="" class="btn btn-primary btn-md btn-block" style="margin-top: 10px">Save Results</button>
+            <div class="dropup show">
+              <button class="btn btn-block btn-secondary dropdown-toggle" style="margin-top: 5px" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Add Results to Map ... <i class="fa fa-caret-up" style="margin-left: 10px" aria-hidden="true"></i>
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="map-p.html">Standard Planning Map</a>
+                <a class="dropdown-item" href="#">My Custom Map #4</a>
+                <a class="dropdown-item" href="#">Hurricane Jose Map - Annotated</a>
+                <a class="dropdown-item" href="#">Jones Planning Map</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="explore-maps.html">Browse All Maps</a>
+              </div>
+            </div>
+        </div>
+
+    </div> <!-- close column -->
+
+
+  </div>
+</div>
+
+{% endblock middle %}
+
+
+{% block extra_script %}
+<script src="{% static 'js/utilities.js' %}"></script>
+<script src="{% static 'js/notify.min.js' %}"></script>
+
+    <script type=text/javascript>
+        //fix for callable js
+        //var annotate_map_id = {{ map_id }};
+        var marker_icon_image = "{% static "images/marker-icon-2x-red.png" %}";
+        var marker_icon_shadow = "{% static "images/marker-shadow.png" %}";
+
+        //
+        var owner = {{ user.id }};
+
+        /*
+        Base Map -- Centered on Keansburg, NJ
+        WMS Tile Layers
+        Data: Watershed Boundary Dataset - National Hydrography Overlay Map Service
+              https://catalog.data.gov/dataset/usgs-national-watershed-boundary-dataset-wbd-
+              downloadable-data-collection-national-geospatial-/resource/f55f881d-9de8-471f-9b6b-22cd7a98025d
+        XML: https://services.nationalmap.gov/arcgis/services/nhd/MapServer/WMSServer?request=GetCapabilities&service=WMS
+         */
+        var mymap = L.map('mapid', {editable: true}).setView([{{ home_latitude }}, {{ home_longitude }}], {{ zoom_level }});
+        var layer_list = [];
+        var layer_groups = [];
+
+        //~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        $(document).ready(function () {
+
+            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                maxZoom: 18,
+                attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+                '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+                id: 'mapbox.streets'
+            }).addTo(mymap);
+
+            get_layers_from_server();
+
+        });
+
+        /*
+        Ajax call to the server. Returns JSON with layers in it.
+        TODO: Will need to update url to GeoServer eventually
+         */
+        function get_layers_from_server() {
+            $.ajax({
+                type: "GET",
+                url: "/api/my_layers/",
+                data: {},
+                dataType: "json",
+                success: function (result) {
+                    console.log("GIS LAYERS -- SUCCESS!");
+                    console.log(result.layers);
+                    process_layers(result.layers);
+                },
+                error: function (result) {
+                    console.log("ERROR:", result)
+                }
+            });
+        }
+
+        /*
+        Function to pull the layer groups out and call the appropriate function
+        for layer group or layer to be added to the menu.
+         */
+        function process_layers(layers) {
+
+            layers.forEach(function (item) {
+                // Get layer groups
+                layer_groups.push(item.group);
+
+            });
+            layer_groups = layer_groups.unique();
+            console.log(layer_groups);
+
+            layer_groups.forEach(function (group) {
+                // Add the layer category group to the menu
+               add_layer_group_to_menu(group);
+
+               // For each layer in the layers list, if the group matches the current group
+                // add that layer to the unordered list
+               layers.forEach(function (layer){
+                  if(layer.group == group) {
+                      var ul_object = '#' + camelize(layer.group.toLowerCase());
+                      add_layer_to_menu(layer, ul_object)
+                  }
+               });
+            });
+
+        }
+
+        /*
+        The base #layerGroup template is hidden by default. Cloning the template and
+        it's children allows us to edit the attributes of each #layerGroup individually.
+
+        Attributes are formatted in the exact same way as Kristina's mockups to retain functionality.
+        Could likely be simplified, but camelizing the lowercase strings wasn't too difficult.
+         */
+        function add_layer_group_to_menu(layerGroup) {
+            var group_template = $('#layerGroup').clone(true);
+            $(group_template).find('span').html(layerGroup);
+            $(group_template).find('a').attr('href', '#' +
+                camelize(layerGroup.toLowerCase())).attr('aria-controls', camelize(layerGroup.toLowerCase()));
+            $(group_template).find('ul').attr('id', camelize(layerGroup.toLowerCase()));
+            $(group_template).removeClass('hidden');
+            $("#gisLayers").append(group_template);
+        }
+
+        /*
+        Add the individual layers to the menu under the appropriate layer category group.
+        Params: layer - the layer to add to the menu (complete layer object)
+                ul_id - the id of the unordered list in which to append the layer.
+         */
+        function add_layer_to_menu(layer, ul_id) {
+            // Create the HTML <li> for each layer and append to the <ul>
+            var layer_html = '<li><input id="' + $.trim(layer.id) + '" type="checkbox"> ' + $.trim(layer.name) + '</li>';
+            $(ul_id).append(layer_html);
+            layer.maplayer = L.tileLayer.wms(layer.layer_link, {layers: layer.layer, transparent: true, format: 'image/png'});
+            layer_list.push(layer);
+
+            $('#' + $.trim(layer.id)).click(function () {
+                {#var link = layer.layer_link;#}
+                if ($(this).is(':checked')) {
+                    for(var i=0; i<layer_list.length; i++) {
+                        if (layer_list[i].id == this.id){
+                            console.log("found matching layer: " + this.id);
+                            layer_list[i].maplayer.addTo(mymap);
+                        }
+                    }
+                } else {
+                    for(var i=0; i<layer_list.length; i++) {
+                        if (layer_list[i].id == this.id){
+                            console.log("found matching layer: " + this.id);
+                            mymap.removeLayer(layer_list[i].maplayer);
+                        }
+                    }
+                }
+            });
+        }
+
+      $(function () {
+        $('.beta-feature-not-available').tooltip(
+          {
+            title: "Feature not available at this time",
+            placement: "top",
+            width: '300px'
+          });
+      });
+
+
+    </script>
+
+    <!--<script src="{% static 'js/template_js/annotate_maps.js' %}"></script>-->
+
+{% endblock extra_script %}

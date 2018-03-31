@@ -32,3 +32,16 @@ class NJCMapAnnotation(models.Model):
 
     def __str__(self):
         return "%s - %s - %s" % (self.map, self.type, self.text)
+
+class NJCMapExpert(models.Model):
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+    name = models.CharField(max_length=50)
+    description = models.TextField(blank=True)
+    # layers = models.ManyToManyField(Layer, blank=True)
+    is_default = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name

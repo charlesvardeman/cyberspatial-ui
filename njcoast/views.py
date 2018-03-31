@@ -4,7 +4,7 @@ from django.conf import settings
 from geonode.layers.models import Layer
 from django.views.generic import TemplateView
 import json
-from models import NJCMap, NJCMapAnnotation
+from models import NJCMap, NJCMapAnnotation, NJCMapExpert
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 
@@ -68,6 +68,35 @@ class MapTemplateView(TemplateView):
         # context['map_id'] = map_object.id
 
 
+
+        # no keywords assigned OR both Keansburg + Berkeley will start the user
+        # at Keansburg, as well as the obvious case of just having keansburg
+        if keywords.filter(name="keansburg").exists() or len(keywords.all()) == 0:
+            context['home_latitude'] = "40.4417743"
+            context['home_longitude'] = "-74.1298643"
+            context['zoom_level'] = 14
+        elif keywords.filter(name="berkeley").exists():
+            context['home_latitude'] = "39.9051846"
+            context['home_longitude'] = "-74.1808381"
+            context['zoom_level'] = 13
+        return context
+
+class MapExpertTemplateView(TemplateView):
+    template_name = 'map_expert.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(MapExpertTemplateView, self).get_context_data(**kwargs)
+
+        keywords = self.request.user.keywords
+
+        # map_object, created = NJCMap.objects.get_or_create(
+        #         owner = request.user, is_default=True,
+        #         defaults = {
+        #             'name' : "%s's Default Map" % request.user,
+        #             'description' : 'NJ Coast auto-generated starter map for %s' % request.user
+        #         }
+        # )
+        # context['map_id'] = map_object.id
 
         # no keywords assigned OR both Keansburg + Berkeley will start the user
         # at Keansburg, as well as the obvious case of just having keansburg
