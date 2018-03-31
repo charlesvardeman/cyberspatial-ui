@@ -1,3 +1,10 @@
+/**
+ * @author Chris Sweet/Caleb Reinking <csweet1@nd.edu>
+ *
+ * @description Utilizes Leatlet Edit tools and DJango Chennels to implement map annotations and sharing.
+ *
+ */
+
 //create socket variable for comms
 var socket;
 
