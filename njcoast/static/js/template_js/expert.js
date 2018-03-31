@@ -33,11 +33,11 @@ function send_expert_data_to_server(data) {
         contentType: 'application/json',
         success: function (result) {
             console.log("EXPERT SIMULATION -- SUCCESS!", result);
-            //$.notify( result.annotations + " annotations saved", "success");
+            $.notify( "Calculation running", "success");
         },
         error: function (result) {
             console.log("EXPERT SIMULATION -- ERROR:", result)
-            //$.notify("Error saving map annotations", "error");
+            $.notify("Error running calculation!", "error");
         }
     });
 }
