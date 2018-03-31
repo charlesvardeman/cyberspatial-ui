@@ -44,8 +44,9 @@
     <div class="col-sm-8 col-lg-9 col-xl-10 leaflet-map">
       <div id="mapid" class="col-sm-8 col-lg-9 col-xl-10" style="width: 100%; height: 100%;"></div>
     </div>
-    <!-- End map area ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+    <!-- End map area ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
+    <!-- Tools RHS menu ------------------------------------------------------->
     <div class="col-sm-4 col-lg-3 col-xl-2" id="tool-control-panel">
         <div class="map-control-item">
           <p class="tool-heading">1. select storm type</p>
@@ -190,7 +191,7 @@
         </div>
 
     </div> <!-- close column -->
-
+    <!-- Enf tools RHS menu --------------------------------------------------->
 
   </div>
 </div>
@@ -201,6 +202,9 @@
 {% block extra_script %}
 <script src="{% static 'js/utilities.js' %}"></script>
 <script src="{% static 'js/notify.min.js' %}"></script>
+
+<!-- Load expert javascript -->
+<script src="{% static 'js/template_js/expert.js' %}"></script>
 
     <script type=text/javascript>
         //fix for callable js
