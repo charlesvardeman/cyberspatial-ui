@@ -1,6 +1,11 @@
 function start_expert_simulation(){
     console.log("start sim");
 
+    //disable button
+    //document.getElementById("calculate").classList.remove("btn-primary");
+    document.getElementById("calculate").classList.add("disabled");
+    document.getElementById("spinner").style.display = "block";
+
     data = {
       "index_SLT": [1,1],
       "index_W": 0,

@@ -167,7 +167,11 @@
         </div>
         <div class="map-control-item">
 
-          <button class="btn btn-primary btn-md btn-block" style="margin-top: 10px" onclick="send_expert_data_to_server();">Perform Calculation</button>
+          <button id="calculate" class="btn btn-primary btn-md btn-block" style="margin-top: 10px" onclick="start_expert_simulation();">Perform Calculation</button>
+          <div id="spinner" style="display: none;">
+              <p></p>
+              <center><i class="fa fa-refresh fa-spin" style="font-size:24px"></i></center>
+          </div>
         </div>
 
         <a id="vis-results"></a>
