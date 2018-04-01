@@ -5,6 +5,9 @@
  *
  */
 
+ //unique id for this simulation
+ var sim_id = 0;
+
 //counter for sim seconds
 var seconds_running = 0;
 
@@ -20,6 +23,9 @@ function start_expert_simulation(){
     //disable button
     document.getElementById("calculate").classList.add("disabled");
     document.getElementById("spinner").style.display = "block";
+
+    //create unique id to tag socket comms
+    sim_id = Math.random().toString(36).substr(2, 9);
 
     data = {
       "index_SLT": [1,1],
@@ -47,7 +53,7 @@ function start_expert_simulation(){
 function send_expert_data_to_server(data) {
     $.ajax({
         type: "POST",
-        url: "http://127.0.0.1:9090/single?name=chris&id=123",
+        url: "http://127.0.0.1:9090/single?name=" + owner.toString() + "&id=" + sim_id,
         data: JSON.stringify(data),
         //dataType: "json",
         contentType: 'application/json',
@@ -75,7 +81,7 @@ function send_expert_data_to_server(data) {
 function get_expert_data_to_server() {
     $.ajax({
         type: "GET",
-        url: "http://127.0.0.1:9090/status?name=chris&id=123",
+        url: "http://127.0.0.1:9090/status?name=" + owner.toString() + "&id=" + sim_id,
         //data: data,
         dataType: "json",
         //contentType: 'application/json',
@@ -116,7 +122,7 @@ function get_expert_data_to_server() {
 function load_expert_data_to_server() {
     $.ajax({
         type: "GET",
-        url: "https://s3.amazonaws.com/simulation.njcoast.us/simulation/chris/123/heatmap.json",
+        url: "https://s3.amazonaws.com/simulation.njcoast.us/simulation/" + owner.toString() + "/" + sim_id + "/heatmap.json",
         //data: data,
         dataType: "json",
         //contentType: 'application/json',
@@ -128,11 +134,11 @@ function load_expert_data_to_server() {
 
             //add to map
             heatmap = L.heatLayer(addressPoints.runup, {max: 4, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
-            //$.notify( result.annotations + " annotations saved", "success");
+            $.notify( "Heatmap loaded", "success");
         },
         error: function (data) {
             console.log("EXPERT SIMULATION LOAD -- ERROR:", data)
-            //$.notify("Error running calculation.", "error");
+            $.notify("Failed to load heatmap.", "error");
         }
     });
 }

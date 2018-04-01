@@ -222,9 +222,6 @@
 <script src="{% static 'js/utilities.js' %}"></script>
 <script src="{% static 'js/notify.min.js' %}"></script>
 
-<!-- Load expert javascript -->
-<script src="{% static 'js/template_js/expert.js' %}"></script>
-
     <script type=text/javascript>
         //fix for callable js
         //var annotate_map_id = {{ map_id }};
@@ -394,6 +391,7 @@
 
     </script>
 
-    <!--<script src="{% static 'js/template_js/annotate_maps.js' %}"></script>-->
+    <!-- Load expert javascript -->
+    <script src="{% static 'js/template_js/expert.js' %}"></script>
 
 {% endblock extra_script %}
