@@ -19,7 +19,8 @@ var heatmap = null;
 
 //function to start simulation, POSTs input data to the server
 function start_expert_simulation(){
-    console.log("start sim");
+    var longitude = parseFloat(document.getElementById("longitude").value);
+    console.log("start sim with long "+longitude.toString() +"," + document.getElementById("longitude").value);
 
     //disable button
     document.getElementById("calculate").classList.add("disabled");
