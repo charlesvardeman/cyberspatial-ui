@@ -8,6 +8,12 @@
 //counter for sim seconds
 var seconds_running = 0;
 
+//heatmap data
+var addressPoints = null;
+
+//heatmap layer
+var heatmap = null;
+
 function start_expert_simulation(){
     console.log("start sim");
 
@@ -41,7 +47,7 @@ function start_expert_simulation(){
 function send_expert_data_to_server(data) {
     $.ajax({
         type: "POST",
-        url: "http://127.0.0.1:9090/single?name=chris&id=1234",
+        url: "http://127.0.0.1:9090/single?name=chris&id=123",
         data: JSON.stringify(data),
         //dataType: "json",
         contentType: 'application/json',
@@ -69,7 +75,7 @@ function send_expert_data_to_server(data) {
 function get_expert_data_to_server() {
     $.ajax({
         type: "GET",
-        url: "http://127.0.0.1:9090/status?name=chris&id=1234",
+        url: "http://127.0.0.1:9090/status?name=chris&id=123",
         //data: data,
         dataType: "json",
         //contentType: 'application/json',
@@ -92,6 +98,8 @@ function get_expert_data_to_server() {
                 document.getElementById("spinner").style.display = "none";
                 $.notify( "Calculation complete!", "success");
 
+                //load data via Ajax
+                load_expert_data_to_server();
             }
         },
         error: function (result) {
@@ -101,6 +109,30 @@ function get_expert_data_to_server() {
             //re-enable if error
             document.getElementById("calculate").classList.remove("disabled");
             document.getElementById("spinner").style.display = "none";
+        }
+    });
+}
+
+function load_expert_data_to_server() {
+    $.ajax({
+        type: "GET",
+        url: "https://s3.amazonaws.com/simulation.njcoast.us/simulation/chris/123/heatmap.json",
+        //data: data,
+        dataType: "json",
+        //contentType: 'application/json',
+        success: function (data) {
+            console.log("EXPERT SIMULATION LOAD -- SUCCESS.", data);
+
+            //save data
+            addressPoints = data;
+
+            //add to map
+            heatmap = L.heatLayer(addressPoints.runup, {max: 4, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
+            //$.notify( result.annotations + " annotations saved", "success");
+        },
+        error: function (data) {
+            console.log("EXPERT SIMULATION LOAD -- ERROR:", data)
+            //$.notify("Error running calculation.", "error");
         }
     });
 }
