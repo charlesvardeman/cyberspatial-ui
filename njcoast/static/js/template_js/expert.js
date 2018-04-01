@@ -5,8 +5,8 @@
  *
  */
 
- //unique id for this simulation
- var sim_id = 0;
+//unique id for this simulation
+var sim_id = 0;
 
 //counter for sim seconds
 var seconds_running = 0;
@@ -143,4 +143,13 @@ function load_expert_data_to_server() {
             $.notify("Failed to load heatmap.", "error");
         }
     });
+}
+
+//auxiliary functions to link html input devices
+
+//slider text box updates
+function updateInput(e){
+    var sibling = e.previousElementSibling || e.nextElementSibling;
+    sibling.value = e.value;
+    e.value = sibling.value;
 }
