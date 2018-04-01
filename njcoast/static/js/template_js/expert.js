@@ -1,8 +1,17 @@
+/**
+ * @author Chris Sweet <csweet1@nd.edu>
+ *
+ * @description Runs simulations on James' backend with expert choice of input parameters.
+ *
+ */
+
+//counter for sim seconds
+var seconds_running = 0;
+
 function start_expert_simulation(){
     console.log("start sim");
 
     //disable button
-    //document.getElementById("calculate").classList.remove("btn-primary");
     document.getElementById("calculate").classList.add("disabled");
     document.getElementById("spinner").style.display = "block";
 
@@ -32,17 +41,25 @@ function start_expert_simulation(){
 function send_expert_data_to_server(data) {
     $.ajax({
         type: "POST",
-        url: "http://127.0.0.1:9090/single?name=chris&id=123",
+        url: "http://127.0.0.1:9090/single?name=chris&id=1234",
         data: JSON.stringify(data),
         //dataType: "json",
         contentType: 'application/json',
         success: function (result) {
             console.log("EXPERT SIMULATION -- SUCCESS!", result);
             $.notify( "Calculation running", "success");
+
+            //start checking
+            setTimeout(get_expert_data_to_server, 1000);
+            seconds_running = 0;
         },
         error: function (result) {
             console.log("EXPERT SIMULATION -- ERROR:", result)
             $.notify("Error running calculation!", "error");
+
+            //re-enable if error
+            document.getElementById("calculate").classList.remove("disabled");
+            document.getElementById("spinner").style.display = "none";
         }
     });
 }
@@ -52,17 +69,38 @@ function send_expert_data_to_server(data) {
 function get_expert_data_to_server() {
     $.ajax({
         type: "GET",
-        url: "http://127.0.0.1:9090/status?name=chris&id=123",
+        url: "http://127.0.0.1:9090/status?name=chris&id=1234",
         //data: data,
         dataType: "json",
         //contentType: 'application/json',
         success: function (result) {
-            console.log("EXPERT SIMULATION -- SUCCESS!", result);
+            console.log("EXPERT SIMULATION -- SUCCESS.", result);
             //$.notify( result.annotations + " annotations saved", "success");
+            //data = JSON.parse(result);
+            if(result.complete == false){
+                console.log("Complete FALSE, time "+seconds_running+" seconds.");
+
+                //re-run if still waiting
+                setTimeout(get_expert_data_to_server, 1000);
+                seconds_running += 1;
+
+            }else if(result.complete == true){
+                console.log("Complete TRUE, time "+seconds_running+" seconds.");
+
+                //re-enable if complete
+                document.getElementById("calculate").classList.remove("disabled");
+                document.getElementById("spinner").style.display = "none";
+                $.notify( "Calculation complete!", "success");
+
+            }
         },
         error: function (result) {
             console.log("EXPERT SIMULATION -- ERROR:", result)
-            //$.notify("Error saving map annotations", "error");
+            $.notify("Error running calculation.", "error");
+
+            //re-enable if error
+            document.getElementById("calculate").classList.remove("disabled");
+            document.getElementById("spinner").style.display = "none";
         }
     });
 }
