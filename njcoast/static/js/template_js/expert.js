@@ -17,6 +17,7 @@ var addressPoints = null;
 //heatmap layer
 var heatmap = null;
 
+//function to start simulation, POSTs input data to the server
 function start_expert_simulation(){
     console.log("start sim");
 
@@ -49,7 +50,7 @@ function start_expert_simulation(){
 
 }
 
-//AJAX stuff to send JSON to server (as the name implies)
+//function to start simulation, POSTs input data to the server. Actual AJAX call
 function send_expert_data_to_server(data) {
     $.ajax({
         type: "POST",
@@ -76,8 +77,7 @@ function send_expert_data_to_server(data) {
     });
 }
 
-//AJAX stuff to send JSON to server (as the name implies)
-//https://s3.amazonaws.com/simulation.njcoast.us/simulation/chris/123/heatmap.json
+//function to check status of simulation, GETs status (AJAX)
 function get_expert_data_to_server() {
     $.ajax({
         type: "GET",
@@ -119,6 +119,8 @@ function get_expert_data_to_server() {
     });
 }
 
+//AJAX function to get heatmap from S3 bucket, example:
+//https://s3.amazonaws.com/simulation.njcoast.us/simulation/chris/123/heatmap.json
 function load_expert_data_to_server() {
     $.ajax({
         type: "GET",
