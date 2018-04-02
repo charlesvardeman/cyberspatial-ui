@@ -20,7 +20,7 @@ var heatmap = null;
 //function to start simulation, POSTs input data to the server
 function start_expert_simulation(){
 
-    //load Latitude
+    //load Latitude/Longitude
     var latitude = parseFloat(document.getElementById("latitude").value);
     var longitude = parseFloat(document.getElementById("longitude").value);
 
@@ -187,16 +187,23 @@ function updateInput(e){
 
 //create storm track icons
 function create_storm_track(){
-    //disable button etc.
+    //load Latitude/Longitude and angle
+    var latitude = parseFloat(document.getElementById("latitude").value);
+    var longitude = parseFloat(document.getElementById("longitude").value);
+    var angle = parseFloat(document.getElementById("angle").value) / 180 * Math.PI;
+
+    //test current inputs
+    if (isNaN(latitude) || isNaN(longitude) || isNaN(angle)) {
+        alert("Please enter correct value for Latitude/Longitude.");
+        return;
+    }
+
+    //disable button etc. if inputs OK
     document.getElementById("cst").classList.add("disabled");
     document.getElementById("latitude").disabled = true;
     document.getElementById("longitude").disabled = true;
     document.getElementById("angle").disabled = true;
     document.getElementById("angleslider").disabled = true;
-
-    //load Latitude
-    var latitude = parseFloat(document.getElementById("latitude").value);
-    var longitude = parseFloat(document.getElementById("longitude").value);
 
     // Add in a crosshair for the map
     var crosshairIcon = L.icon({
@@ -213,13 +220,14 @@ function create_storm_track(){
     });
 
     //create markers
-    var sat_offset_y = 0;
-    var sat_offset_x = 0.01;
+    //set offsets to current angle
+    var sat_offset_y = Math.cos(angle) * 0.0075;
+    var sat_offset_x = Math.sin(angle) * 0.01;
 
     // create a polyline between markers
     var latlngs = [
         [latitude, longitude],
-        [latitude, longitude+0.01]
+        [latitude + sat_offset_y, longitude + sat_offset_x]
     ];
     var polyline = L.polyline(latlngs, {color: 'black', weight: 2, opacity: 0.5 }).addTo(mymap);
 
@@ -241,7 +249,7 @@ function create_storm_track(){
     mymap.addLayer(marker);
 
     //create direction marker
-    var sat_marker = new L.marker([latitude,longitude+0.01], {draggable:'true', rotationAngle: 90, icon: arrowIcon});
+    var sat_marker = new L.marker([latitude + sat_offset_y, longitude + sat_offset_x], {draggable:'true', rotationAngle: angle, icon: arrowIcon});
     sat_marker.on('drag', function(event){
         //get pos
         var position = marker.getLatLng();
@@ -249,7 +257,7 @@ function create_storm_track(){
 
         //find angle
         var angle = Math.atan2(sat_pos.lng - position.lng, sat_pos.lat - position.lat);
-        sat_offset_y = Math.cos(angle) * 0.008;
+        sat_offset_y = Math.cos(angle) * 0.0075;
         sat_offset_x = Math.sin(angle) * 0.01;
 
         //constrain to circle
