@@ -46,180 +46,175 @@
     <div class="page-header map-header"></div>
     <div class="row">
 
-    <!-- Map area ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-    <div class="col-sm-8 col-lg-9 col-xl-10 leaflet-map">
-      <div id="mapid" class="col-sm-8 col-lg-9 col-xl-10" style="width: 100%; height: 100%;"></div>
-    </div>
-    <!-- End map area ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+        <!-- Map area ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+        <div class="col-sm-8 col-lg-9 col-xl-10 leaflet-map">
+            <div id="mapid" class="col-sm-8 col-lg-9 col-xl-10" style="width: 100%; height: 100%;"></div>
+        </div>
+        <!-- End map area ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
-    <!-- Tools RHS menu ------------------------------------------------------->
-    <div class="col-sm-4 col-lg-3 col-xl-2" id="tool-control-panel">
-        <div class="map-control-item">
-          <p class="tool-heading">1. select storm type</p>
-          <div class="dropdown show">
-            <button class="btn btn-secondary btn-title btn-block dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <!-- Tools RHS menu ------------------------------------------------------->
+        <div class="col-sm-4 col-lg-3 col-xl-2" id="tool-control-panel">
+            <div class="map-control-item">
+                <p class="tool-heading">1. select storm type</p>
+                <div class="dropdown show">
+                    <button class="btn btn-secondary btn-title btn-block dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                <div class="h-badge what-if">H</div>Hurricane
             </button>
-            <div class="dropdown-menu choose-storm" aria-labelledby="dropdownMenuButton">
-              <a class="dropdown-item" href="shp-tool-hurricane.html"><div class="h-badge what-if">H</div>Hurricane</a>
-              <a class="dropdown-item" href="#"><div class="n-badge what-if">N</div>Nor'easter</a>
+                    <div class="dropdown-menu choose-storm" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="shp-tool-hurricane.html">
+                            <div class="h-badge what-if">H</div>Hurricane</a>
+                        <a class="dropdown-item" href="#">
+                            <div class="n-badge what-if">N</div>Nor'easter</a>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-        <div class="map-control-item">
-          <p class="tool-heading">2. set storm characteristics</p>
-          <div class="well plain">
-          <p style="margin-top: 15px"><input type="checkbox" value="off"
-                 data-toggle="popover" data-placement="right" onclick="create_storm_track(this.checked);"> Draw Storm Track on Map</p>
-          <!--<button id="cst" class="btn btn-primary btn-sm btn-block" data-toggle="modal" data-target="" onclick="create_storm_track();">Draw Storm Track on Map</button>-->
-          <table class="table shp-table">
-            <tr>
-              <th>Latitude</th>
-              <td><input type="text" id="latitude" class="form-control" value={{ home_latitude }} aria-label="Username" aria-describedby="basic-addon1"></td>
-              <td>&deg;</td>
-            </tr>
-            <tr>
-              <th>Longitude</th>
-              <td><input type="text" id="longitude" class="form-control" value={{ home_longitude }} aria-label="Username" aria-describedby="basic-addon1"></td>
-              <td>&deg;</td>
-            </tr>
-          </table>
-          <p class="slider-label">Storm Track Angle</p>
-          <div class="shp-controls" style="margin-bottom: 30px">
-            <input id="angleslider" class="range-input" data-target="rm" min="-180" max="180" step="5" value="0" type="range" oninput="updateInput(this)" onchange="updateInput(this)">
-            <input id="angle" class="num-input job-input" name="rm" value="0" type="text" onchange="updateInput(this)">
-            &deg;
-          </div>
-          </div>
+            <div class="map-control-item">
+                <p class="tool-heading">2. set storm characteristics</p>
+                <div class="well plain">
+                    <p style="margin-top: 15px"><input type="checkbox" value="off" data-toggle="popover" data-placement="right" onclick="create_storm_track(this.checked);"> Draw Storm Track on Map</p>
+                    <!--<button id="cst" class="btn btn-primary btn-sm btn-block" data-toggle="modal" data-target="" onclick="create_storm_track();">Draw Storm Track on Map</button>-->
+                    <table class="table shp-table">
+                        <tr>
+                            <th>Latitude</th>
+                            <td><input type="text" id="latitude" class="form-control" value={{ home_latitude }} aria-label="Username" aria-describedby="basic-addon1"></td>
+                            <td>&deg;</td>
+                        </tr>
+                        <tr>
+                            <th>Longitude</th>
+                            <td><input type="text" id="longitude" class="form-control" value={{ home_longitude }} aria-label="Username" aria-describedby="basic-addon1"></td>
+                            <td>&deg;</td>
+                        </tr>
+                    </table>
+                    <p class="slider-label">Storm Track Angle</p>
+                    <div class="shp-controls" style="margin-bottom: 30px">
+                        <input id="angleslider" class="range-input" data-target="rm" min="-180" max="180" step="5" value="0" type="range" oninput="updateInput(this)" onchange="updateInput(this)">
+                        <input id="angle" class="num-input job-input" name="rm" value="0" type="text" onchange="updateInput(this)"> &deg;
+                    </div>
+                </div>
 
-          <!-- tabs for basic/advanced tools -->
-          <ul class="nav nav-tabs nav-justified shp-settings">
-            <li id="basic" class="nav-item">
-              <a class="nav-link" href="#" onclick="tab_flip_tools(true);">Basic</a>
-            </li>
-            <li id="advanced" class="nav-item active">
-              <a class="nav-link" href="#" onclick="tab_flip_tools(false);">Advanced</a>
-            </li>
-          </ul>
+                <!-- tabs for basic/advanced tools -->
+                <ul class="nav nav-tabs nav-justified shp-settings">
+                    <li id="basic" class="nav-item">
+                        <a class="nav-link" href="#" onclick="tab_flip_tools(true);">Basic</a>
+                    </li>
+                    <li id="advanced" class="nav-item active">
+                        <a class="nav-link" href="#" onclick="tab_flip_tools(false);">Advanced</a>
+                    </li>
+                </ul>
 
-          <!-- basic tools -->
-          <div id="basic_tools" style="display: none;" >
-          <p class="slider-label">Storm Intensity</p>
-          <ul class="shp-tool-radios one-line" style="margin-bottom: 30px">
-            <li><input type="radio" name="intensity" value="current" checked> Cat 1</li>
-            <li><input type="radio" name="intensity" value="degraded"> Cat 2</li>
-            <li><input type="radio" name="intensity" value="compromised"> Cat 3</li>
-            <li><input type="radio" name="intensity" value="degraded"> Cat 4</li>
-            <li><input type="radio" name="intensity" value="compromised"> Cat 5</li>
-          </ul>
-          </div>
-          <!-- end Basic tools -->
+                <!-- basic tools -->
+                <div id="basic_tools" style="display: none;">
+                    <p class="slider-label">Storm Intensity</p>
+                    <ul class="shp-tool-radios one-line" style="margin-bottom: 30px">
+                        <li><input type="radio" name="intensity" value="current" checked> Cat 1</li>
+                        <li><input type="radio" name="intensity" value="degraded"> Cat 2</li>
+                        <li><input type="radio" name="intensity" value="compromised"> Cat 3</li>
+                        <li><input type="radio" name="intensity" value="degraded"> Cat 4</li>
+                        <li><input type="radio" name="intensity" value="compromised"> Cat 5</li>
+                    </ul>
+                </div>
+                <!-- end Basic tools -->
 
-          <!--Advanced tools -->
-          <div id="advanced_tools" style="display: block;" >
+                <!--Advanced tools -->
+                <div id="advanced_tools" style="display: block;">
 
-            <p class="slider-label">Forward Speed</p>
-            <div class="shp-controls">
-              <input class="range-input" data-target="vf" min="5" max="25" step="1" value="16" type="range" oninput="updateInput(this)" onchange="updateInput(this)">
-              <input id="input_vf" class="num-input job-input" name="vf" value="16" type="text" onchange="updateInput(this)">
-              kt
+                    <p class="slider-label">Forward Speed</p>
+                    <div class="shp-controls">
+                        <input class="range-input" data-target="vf" min="5" max="25" step="1" value="16" type="range" oninput="updateInput(this)" onchange="updateInput(this)">
+                        <input id="input_vf" class="num-input job-input" name="vf" value="16" type="text" onchange="updateInput(this)"> kt
+                    </div>
+                    <p class="slider-label">Pressure Differential</p>
+                    <div class="shp-controls">
+                        <input class="range-input" data-target="cp" min="930" max="980" step="1" value="950" type="range" oninput="updateInput(this)" onchange="updateInput(this)">
+                        <input id="input_cp" class="num-input job-input" name="vf" value="950" type="text" onchange="updateInput(this)"> mbar
+                    </div>
+                    <p class="slider-label">Radius of Max Winds</p>
+                    <div class="shp-controls">
+                        <input class="range-input" data-target="rm" min="25" max="65" step="1" value="45" type="range" oninput="updateInput(this)" onchange="updateInput(this)">
+                        <input id="input_rm" class="num-input job-input" name="rm" value="45" type="text" onchange="updateInput(this)"> mi
+                    </div>
+                    <!--<p class="slider-label">Storm Track Angle</p>
+                    <div class="shp-controls" style="margin-bottom: 30px">
+                      <input class="range-input" data-target="rm" min="0" max="180" step="10" value="40" type="range">
+                      <input id="input_rm" class="num-input job-input" name="rm" value="40" type="text">
+                      &deg;
+                    </div>-->
+                </div>
+                <!--End Advanced tools -->
+
             </div>
-            <p class="slider-label">Pressure Differential</p>
-            <div class="shp-controls">
-              <input class="range-input" data-target="cp" min="930" max="980" step="1" value="950" type="range" oninput="updateInput(this)" onchange="updateInput(this)">
-              <input id="input_cp" class="num-input job-input" name="vf" value="950" type="text" onchange="updateInput(this)">
-              mbar
+            <div class="map-control-item">
+                <p class="tool-heading">3. describe scenario</p>
+                <p class="slider-label" style="margin-top:0">Time to Landfall</p>
+                <div class="shp-controls">
+                    <input class="range-input" data-target="ttl" min="0" max="72" step="1" value="48" type="range" oninput="updateInput(this)" onchange="updateInput(this)">
+                    <input id="input_ttl" class="num-input job-input" name="ttl" value="48" type="text" onchange="updateInput(this)"> hr
+                </div>
+                <p class="slider-label">Sea Level Rise</p>
+                <div class="shp-controls">
+                    <input class="range-input" data-target="rm" min="0" max="1.5" step="0.1" value="0" type="range" oninput="updateInput(this)" onchange="updateInput(this)">
+                    <input id="input_slr" class="num-input job-input" name="slr" value="0" type="text" onchange="updateInput(this)"> ft
+                </div>
+                <p class="slider-label">Coastal Protection <span class="qualifier">e.g. dunes</span></p>
+                <ul class="shp-tool-radios one-line">
+                    <li><input type="radio" name="protection" value="current" checked> Current</li>
+                    <li><input type="radio" name="protection" value="degraded"> Degraded</li>
+                    <li><input type="radio" name="protection" value="compromised"> Compromised</li>
+                </ul>
+                <p class="slider-label">Tides</p>
+                <ul class="shp-tool-radios one-line">
+                    <li><input type="radio" name="tide" value="high"> High</li>
+                    <li><input type="radio" name="tide" value="current" checked> Zero</li>
+                    <li><input type="radio" name="tide" value="low"> Low</li>
+                </ul>
+                <p class="slider-label">Analysis Type</p>
+                <ul class="shp-tool-radios">
+                    <li><input type="radio" name="type" value="high" checked> Deterministic</li>
+                    <li><input type="radio" name="analysis" value="current"> Probabilistic&nbsp;<span class="qualifier">expected</span></li>
+                    <li><input type="radio" name="analysis" value="current"> Probabilistic&nbsp;<span class="qualifier">extreme</span></li>
+                </ul>
             </div>
-            <p class="slider-label">Radius of Max Winds</p>
-            <div class="shp-controls">
-              <input class="range-input" data-target="rm" min="25" max="65" step="1" value="45" type="range" oninput="updateInput(this)" onchange="updateInput(this)">
-              <input id="input_rm" class="num-input job-input" name="rm" value="45" type="text" onchange="updateInput(this)">
-              mi
+            <div class="map-control-item">
+
+                <button id="calculate" class="btn btn-primary btn-md btn-block" style="margin-top: 10px" onclick="start_expert_simulation();">Perform Calculation</button>
+                <div id="spinner" style="display: none;">
+                    <p></p>
+                    <center><i class="fa fa-refresh fa-spin" style="font-size:24px"></i></center>
+                </div>
             </div>
-            <!--<p class="slider-label">Storm Track Angle</p>
-            <div class="shp-controls" style="margin-bottom: 30px">
-              <input class="range-input" data-target="rm" min="0" max="180" step="10" value="40" type="range">
-              <input id="input_rm" class="num-input job-input" name="rm" value="40" type="text">
-              &deg;
-          </div>-->
-          </div>
-          <!--End Advanced tools -->
 
-        </div>
-        <div class="map-control-item">
-          <p class="tool-heading">3. describe scenario</p>
-          <p class="slider-label" style="margin-top:0">Time to Landfall</p>
-          <div class="shp-controls">
-            <input class="range-input" data-target="ttl" min="0" max="72" step="1" value="48" type="range" oninput="updateInput(this)" onchange="updateInput(this)">
-            <input id="input_ttl" class="num-input job-input" name="ttl" value="48" type="text" onchange="updateInput(this)">
-            hr
-          </div>
-          <p class="slider-label">Sea Level Rise</p>
-          <div class="shp-controls">
-            <input class="range-input" data-target="rm" min="0" max="1.5" step="0.1" value="0" type="range" oninput="updateInput(this)" onchange="updateInput(this)">
-            <input id="input_slr" class="num-input job-input" name="slr" value="0" type="text" onchange="updateInput(this)">
-            ft
-          </div>
-          <p class="slider-label">Coastal Protection <span class="qualifier">e.g. dunes</span></p>
-          <ul class="shp-tool-radios one-line" >
-            <li><input type="radio" name="protection" value="current" checked> Current</li>
-            <li><input type="radio" name="protection" value="degraded"> Degraded</li>
-            <li><input type="radio" name="protection" value="compromised"> Compromised</li>
-          </ul>
-          <p class="slider-label">Tides</p>
-          <ul class="shp-tool-radios one-line">
-            <li><input type="radio" name="tide" value="high"> High</li>
-            <li><input type="radio" name="tide" value="current" checked> Zero</li>
-            <li><input type="radio" name="tide" value="low"> Low</li>
-          </ul>
-          <p class="slider-label">Analysis Type</p>
-          <ul class="shp-tool-radios" >
-            <li><input type="radio" name="type" value="high" checked> Deterministic</li>
-            <li><input type="radio" name="analysis" value="current"> Probabilistic&nbsp;<span class="qualifier">expected</span></li>
-            <li><input type="radio" name="analysis" value="current"> Probabilistic&nbsp;<span class="qualifier">extreme</span></li>
-          </ul>
-        </div>
-        <div class="map-control-item">
-
-          <button id="calculate" class="btn btn-primary btn-md btn-block" style="margin-top: 10px" onclick="start_expert_simulation();">Perform Calculation</button>
-          <div id="spinner" style="display: none;">
-              <p></p>
-              <center><i class="fa fa-refresh fa-spin" style="font-size:24px"></i></center>
-          </div>
-        </div>
-
-        <a id="vis-results"></a>
-        <div class="map-control-item">
-          <p class="tool-heading">4. View Results on Map</p>
-          <ul class="map-layers">
-            <li><input type="checkbox" name="gender" value="female"> Wind Field</li>
-            <li><input type="checkbox" name="gender" value="female"> Surge</li>
-            <li><input type="checkbox" name="gender" value="female" checked> Total Run Up</li>
-          </ul>
-        </div>
-        <div class="map-control-item">
-          <button href="" class="btn btn-primary btn-md btn-block" style="margin-top: 10px">Save Results</button>
-            <div class="dropup show">
-              <button class="btn btn-block btn-secondary dropdown-toggle" style="margin-top: 5px" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a id="vis-results"></a>
+            <div class="map-control-item">
+                <p class="tool-heading">4. View Results on Map</p>
+                <ul class="map-layers">
+                    <li><input type="checkbox" name="gender" value="female"> Wind Field</li>
+                    <li><input type="checkbox" name="gender" value="female"> Surge</li>
+                    <li><input type="checkbox" name="gender" value="female" checked> Total Run Up</li>
+                </ul>
+            </div>
+            <div class="map-control-item">
+                <button href="" class="btn btn-primary btn-md btn-block" style="margin-top: 10px">Save Results</button>
+                <div class="dropup show">
+                    <button class="btn btn-block btn-secondary dropdown-toggle" style="margin-top: 5px" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Add Results to Map ... <i class="fa fa-caret-up" style="margin-left: 10px" aria-hidden="true"></i>
               </button>
-              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" href="map-p.html">Standard Planning Map</a>
-                <a class="dropdown-item" href="#">My Custom Map #4</a>
-                <a class="dropdown-item" href="#">Hurricane Jose Map - Annotated</a>
-                <a class="dropdown-item" href="#">Jones Planning Map</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="explore-maps.html">Browse All Maps</a>
-              </div>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="map-p.html">Standard Planning Map</a>
+                        <a class="dropdown-item" href="#">My Custom Map #4</a>
+                        <a class="dropdown-item" href="#">Hurricane Jose Map - Annotated</a>
+                        <a class="dropdown-item" href="#">Jones Planning Map</a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="explore-maps.html">Browse All Maps</a>
+                    </div>
+                </div>
             </div>
+
         </div>
+        <!-- close column -->
+        <!-- Enf tools RHS menu --------------------------------------------------->
 
-    </div> <!-- close column -->
-    <!-- Enf tools RHS menu --------------------------------------------------->
-
-  </div>
+    </div>
 </div>
-
 {% endblock middle %}
 
 
