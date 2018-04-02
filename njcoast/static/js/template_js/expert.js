@@ -83,7 +83,8 @@ function start_expert_simulation(){
 function send_expert_data_to_server(data) {
     $.ajax({
         type: "POST",
-        url: "http://127.0.0.1:9090/single?name=" + owner.toString() + "&id=" + sim_id,
+        url: "http://dev.njcoast.us:9090/single?name=" + owner.toString() + "&id=" + sim_id,
+        //url: "http://127.0.0.1:9090/single?name=" + owner.toString() + "&id=" + sim_id,
         data: JSON.stringify(data),
         //dataType: "json",
         contentType: 'application/json',
@@ -110,7 +111,8 @@ function send_expert_data_to_server(data) {
 function get_expert_data_to_server() {
     $.ajax({
         type: "GET",
-        url: "http://127.0.0.1:9090/status?name=" + owner.toString() + "&id=" + sim_id,
+        url: "http://dev.njcoast.us:9090/status?name=" + owner.toString() + "&id=" + sim_id,
+        //url: "http://127.0.0.1:9090/status?name=" + owner.toString() + "&id=" + sim_id,
         //data: data,
         dataType: "json",
         //contentType: 'application/json',
