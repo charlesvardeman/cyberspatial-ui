@@ -194,19 +194,33 @@ function create_storm_track(){
     var latitude = parseFloat(document.getElementById("latitude").value);
     var longitude = parseFloat(document.getElementById("longitude").value);
 
+    // Add in a crosshair for the map
+    var crosshairIcon = L.icon({
+        iconUrl: '/static/images/crosshair.png',
+        iconSize:     [20, 20], // size of the icon
+        iconAnchor:   [10, 10], // point of the icon which will correspond to marker's location
+    });
+
+    // Add in a crosshair for the map
+    var arrowIcon = L.icon({
+        iconUrl: '/static/images/arrow.png',
+        iconSize:     [24, 24], // size of the icon
+        iconAnchor:   [12, 22], // point of the icon which will correspond to marker's location
+    });
+
     //create markers
     var sat_offset_y = 0;
     var sat_offset_x = 0.01;
 
-    // create a blue polyline between markers
+    // create a polyline between markers
     var latlngs = [
         [latitude, longitude],
         [latitude, longitude+0.01]
     ];
-    var polyline = L.polyline(latlngs, {color: 'blue'}).addTo(mymap);
+    var polyline = L.polyline(latlngs, {color: 'black', weight: 2, opacity: 0.5 }).addTo(mymap);
 
     //create landfall marker
-    var marker = new L.marker([latitude,longitude], {draggable:'true'});
+    var marker = new L.marker([latitude,longitude], {draggable:'true', icon: crosshairIcon});
     marker.on('drag', function(event){
         //get pos
         var marker = event.target;
@@ -223,7 +237,7 @@ function create_storm_track(){
     mymap.addLayer(marker);
 
     //create direction marker
-    var sat_marker = new L.marker([latitude,longitude+0.01], {draggable:'true', rotationAngle: 90});
+    var sat_marker = new L.marker([latitude,longitude+0.01], {draggable:'true', rotationAngle: 90, icon: arrowIcon});
     sat_marker.on('drag', function(event){
         //get pos
         var position = marker.getLatLng();
