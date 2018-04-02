@@ -19,8 +19,36 @@ var heatmap = null;
 
 //function to start simulation, POSTs input data to the server
 function start_expert_simulation(){
+
+    //load Latitude
+    var latitude = parseFloat(document.getElementById("latitude").value);
     var longitude = parseFloat(document.getElementById("longitude").value);
-    console.log("start sim with long "+longitude.toString() +"," + document.getElementById("longitude").value);
+
+    //test
+    if (isNaN(latitude) || isNaN(longitude)) {
+        alert("Please enter correct value for Latitude/Longitude.");
+        return;
+    }
+
+    //load Angle
+    var angle = parseFloat(document.getElementById("angle").value);
+
+    //load time to landfall
+    var input_ttl = parseFloat(document.getElementById("input_ttl").value);
+
+    //load pressure
+    var input_cp = parseFloat(document.getElementById("input_cp").value);
+
+    //load speed
+    var input_vf = parseFloat(document.getElementById("input_vf").value);
+
+    //load radius
+    var input_rm = parseFloat(document.getElementById("input_rm").value);
+
+    //load SLR
+    var input_slr = parseFloat(document.getElementById("input_slr").value);
+
+    console.log("start sim with lat " + latitude.toString() + "long " + longitude.toString());
 
     //disable button
     document.getElementById("calculate").classList.add("disabled");
@@ -34,11 +62,11 @@ function start_expert_simulation(){
       "index_W": 0,
       "index_prob": 1,
       "indicator": 1,
-      "param": [40.317410, -73.987433, -27.361499, 50.000000, 45.000000, 70.000000],
-      "timeMC": 19.949732,
+      "param": [latitude, longitude, angle, input_cp, input_vf, input_rm],
+      "timeMC": input_ttl,
       "lat_track": 41.000493,
       "long_track": -72.610756,
-      "SLR": 0.1,
+      "SLR": input_slr,
       "tide": 0,
       "runup_file": "heatmap.json",
       "workspace_file": ""
