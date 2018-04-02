@@ -187,8 +187,12 @@ function updateInput(e){
 
 //create storm track icons
 function create_storm_track(){
-    //disable button
+    //disable button etc.
     document.getElementById("cst").classList.add("disabled");
+    document.getElementById("latitude").disabled = true;
+    document.getElementById("longitude").disabled = true;
+    document.getElementById("angle").disabled = true;
+    document.getElementById("angleslider").disabled = true;
 
     //load Latitude
     var latitude = parseFloat(document.getElementById("latitude").value);
@@ -231,8 +235,8 @@ function create_storm_track(){
         polyline.setLatLngs([[position.lat, position.lng],[position.lat + sat_offset_y, position.lng+sat_offset_x]]);
 
         //update text boxes
-        document.getElementById("latitude").value = position.lat.toString();
-        document.getElementById("longitude").value = position.lng.toString();
+        document.getElementById("latitude").value = position.lat.toFixed(7).toString();
+        document.getElementById("longitude").value = position.lng.toFixed(7).toString();
     });
     mymap.addLayer(marker);
 
@@ -258,7 +262,7 @@ function create_storm_track(){
         polyline.setLatLngs([[position.lat, position.lng],[position.lat + sat_offset_y, position.lng+sat_offset_x]]);
 
         //update angle box
-        document.getElementById("angle").value = angle * 180/Math.PI;
+        document.getElementById("angle").value = Math.round(angle * 180/Math.PI);
     });
     mymap.addLayer(sat_marker);
 
