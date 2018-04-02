@@ -17,6 +17,9 @@ var addressPoints = null;
 //heatmap layer
 var heatmap = null;
 
+//persistant store for cst
+var sat_marker, marker, polyline;
+
 //function to start simulation, POSTs input data to the server
 function start_expert_simulation(){
 
@@ -186,92 +189,109 @@ function updateInput(e){
 }
 
 //create storm track icons
-function create_storm_track(){
-    //load Latitude/Longitude and angle
-    var latitude = parseFloat(document.getElementById("latitude").value);
-    var longitude = parseFloat(document.getElementById("longitude").value);
-    var angle = parseFloat(document.getElementById("angle").value) / 180 * Math.PI;
+function create_storm_track(onOff){
 
-    //test current inputs
-    if (isNaN(latitude) || isNaN(longitude) || isNaN(angle)) {
-        alert("Please enter correct value for Latitude/Longitude.");
-        return;
+    if (onOff) {
+        //load Latitude/Longitude and angle
+        var latitude = parseFloat(document.getElementById("latitude").value);
+        var longitude = parseFloat(document.getElementById("longitude").value);
+        var angle = parseFloat(document.getElementById("angle").value) / 180 * Math.PI;
+
+        //test current inputs
+        if (isNaN(latitude) || isNaN(longitude) || isNaN(angle)) {
+            alert("Please enter correct value for Latitude/Longitude.");
+            return;
+        }
+
+        console.log("Angle "+angle);
+        //disable button etc. if inputs OK
+        //document.getElementById("cst").classList.add("disabled");
+        document.getElementById("latitude").disabled = true;
+        document.getElementById("longitude").disabled = true;
+        document.getElementById("angle").disabled = true;
+        document.getElementById("angleslider").disabled = true;
+
+        // Add in a crosshair for the map
+        var crosshairIcon = L.icon({
+            iconUrl: '/static/images/crosshair.png',
+            iconSize:     [20, 20], // size of the icon
+            iconAnchor:   [10, 10], // point of the icon which will correspond to marker's location
+        });
+
+        // Add in a crosshair for the map
+        var arrowIcon = L.icon({
+            iconUrl: '/static/images/arrow.png',
+            iconSize:     [24, 24], // size of the icon
+            iconAnchor:   [12, 22], // point of the icon which will correspond to marker's location
+        });
+
+        //create markers
+        //set offsets to current angle
+        var sat_offset_y = Math.cos(angle) * 0.0075;
+        var sat_offset_x = Math.sin(angle) * 0.01;
+
+        // create a polyline between markers
+        var latlngs = [
+            [latitude, longitude],
+            [latitude + sat_offset_y, longitude + sat_offset_x]
+        ];
+        polyline = L.polyline(latlngs, {color: 'black', weight: 2, opacity: 0.5 }).addTo(mymap);
+
+        //create landfall marker
+        marker = new L.marker([latitude,longitude], {draggable:'true', icon: crosshairIcon});
+        marker.on('drag', function(event){
+            //get pos
+            var marker = event.target;
+            var position = marker.getLatLng();
+
+            //fix sat/line pos
+            sat_marker.setLatLng(new L.LatLng(position.lat + sat_offset_y, position.lng+sat_offset_x),{draggable:'true'});
+            polyline.setLatLngs([[position.lat, position.lng],[position.lat + sat_offset_y, position.lng+sat_offset_x]]);
+
+            //update text boxes
+            document.getElementById("latitude").value = position.lat.toFixed(7).toString();
+            document.getElementById("longitude").value = position.lng.toFixed(7).toString();
+        });
+        mymap.addLayer(marker);
+
+        //create direction marker
+        sat_marker = new L.marker([latitude + sat_offset_y, longitude + sat_offset_x], {draggable:'true', rotationAngle: angle * 180 / Math.PI, icon: arrowIcon});
+        sat_marker.on('drag', function(event){
+            //get pos
+            var position = marker.getLatLng();
+            var sat_pos = sat_marker.getLatLng();
+
+            //find angle
+            var angle = Math.atan2(sat_pos.lng - position.lng, sat_pos.lat - position.lat);
+            sat_offset_y = Math.cos(angle) * 0.0075;
+            sat_offset_x = Math.sin(angle) * 0.01;
+
+            //constrain to circle
+            sat_marker.setLatLng(new L.LatLng(position.lat + sat_offset_y, position.lng+sat_offset_x),{draggable:'true'});
+
+            //rotate icon
+            sat_marker.setRotationAngle(angle * 180/Math.PI);
+
+            //and line
+            polyline.setLatLngs([[position.lat, position.lng],[position.lat + sat_offset_y, position.lng+sat_offset_x]]);
+
+            //update angle box
+            document.getElementById("angle").value = Math.round(angle * 180/Math.PI);
+            document.getElementById("angleslider").value = Math.round(angle * 180/Math.PI);
+
+        });
+        mymap.addLayer(sat_marker);
+    }else{
+        //if unchecked then remove and re-enable
+        document.getElementById("latitude").disabled = false;
+        document.getElementById("longitude").disabled = false;
+        document.getElementById("angle").disabled = false;
+        document.getElementById("angleslider").disabled = false;
+
+        //remove storm tract
+        mymap.removeLayer(sat_marker);
+        mymap.removeLayer(marker);
+        mymap.removeLayer(polyline);
     }
-
-    //disable button etc. if inputs OK
-    document.getElementById("cst").classList.add("disabled");
-    document.getElementById("latitude").disabled = true;
-    document.getElementById("longitude").disabled = true;
-    document.getElementById("angle").disabled = true;
-    document.getElementById("angleslider").disabled = true;
-
-    // Add in a crosshair for the map
-    var crosshairIcon = L.icon({
-        iconUrl: '/static/images/crosshair.png',
-        iconSize:     [20, 20], // size of the icon
-        iconAnchor:   [10, 10], // point of the icon which will correspond to marker's location
-    });
-
-    // Add in a crosshair for the map
-    var arrowIcon = L.icon({
-        iconUrl: '/static/images/arrow.png',
-        iconSize:     [24, 24], // size of the icon
-        iconAnchor:   [12, 22], // point of the icon which will correspond to marker's location
-    });
-
-    //create markers
-    //set offsets to current angle
-    var sat_offset_y = Math.cos(angle) * 0.0075;
-    var sat_offset_x = Math.sin(angle) * 0.01;
-
-    // create a polyline between markers
-    var latlngs = [
-        [latitude, longitude],
-        [latitude + sat_offset_y, longitude + sat_offset_x]
-    ];
-    var polyline = L.polyline(latlngs, {color: 'black', weight: 2, opacity: 0.5 }).addTo(mymap);
-
-    //create landfall marker
-    var marker = new L.marker([latitude,longitude], {draggable:'true', icon: crosshairIcon});
-    marker.on('drag', function(event){
-        //get pos
-        var marker = event.target;
-        var position = marker.getLatLng();
-
-        //fix sat/line pos
-        sat_marker.setLatLng(new L.LatLng(position.lat + sat_offset_y, position.lng+sat_offset_x),{draggable:'true'});
-        polyline.setLatLngs([[position.lat, position.lng],[position.lat + sat_offset_y, position.lng+sat_offset_x]]);
-
-        //update text boxes
-        document.getElementById("latitude").value = position.lat.toFixed(7).toString();
-        document.getElementById("longitude").value = position.lng.toFixed(7).toString();
-    });
-    mymap.addLayer(marker);
-
-    //create direction marker
-    var sat_marker = new L.marker([latitude + sat_offset_y, longitude + sat_offset_x], {draggable:'true', rotationAngle: angle, icon: arrowIcon});
-    sat_marker.on('drag', function(event){
-        //get pos
-        var position = marker.getLatLng();
-        var sat_pos = sat_marker.getLatLng();
-
-        //find angle
-        var angle = Math.atan2(sat_pos.lng - position.lng, sat_pos.lat - position.lat);
-        sat_offset_y = Math.cos(angle) * 0.0075;
-        sat_offset_x = Math.sin(angle) * 0.01;
-
-        //constrain to circle
-        sat_marker.setLatLng(new L.LatLng(position.lat + sat_offset_y, position.lng+sat_offset_x),{draggable:'true'});
-
-        //rotate icon
-        sat_marker.setRotationAngle(angle * 180/Math.PI);
-
-        //and line
-        polyline.setLatLngs([[position.lat, position.lng],[position.lat + sat_offset_y, position.lng+sat_offset_x]]);
-
-        //update angle box
-        document.getElementById("angle").value = Math.round(angle * 180/Math.PI);
-    });
-    mymap.addLayer(sat_marker);
 
 }

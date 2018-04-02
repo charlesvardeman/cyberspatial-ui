@@ -69,7 +69,9 @@
         <div class="map-control-item">
           <p class="tool-heading">2. set storm characteristics</p>
           <div class="well plain">
-          <button id="cst" class="btn btn-primary btn-sm btn-block" data-toggle="modal" data-target="" onclick="create_storm_track();">Draw Storm Track on Map</button>
+          <p style="margin-top: 15px"><input type="checkbox" value="off"
+                 data-toggle="popover" data-placement="right" onclick="create_storm_track(this.checked);"> Draw Storm Track on Map</p>
+          <!--<button id="cst" class="btn btn-primary btn-sm btn-block" data-toggle="modal" data-target="" onclick="create_storm_track();">Draw Storm Track on Map</button>-->
           <table class="table shp-table">
             <tr>
               <th>Latitude</th>
@@ -92,16 +94,16 @@
 
           <!-- tabs for basic/advanced tools -->
           <ul class="nav nav-tabs nav-justified shp-settings">
-            <li id="basic" class="nav-item active">
+            <li id="basic" class="nav-item">
               <a class="nav-link" href="#" onclick="tab_flip_tools(true);">Basic</a>
             </li>
-            <li id="advanced" class="nav-item">
+            <li id="advanced" class="nav-item active">
               <a class="nav-link" href="#" onclick="tab_flip_tools(false);">Advanced</a>
             </li>
           </ul>
 
           <!-- basic tools -->
-          <div id="basic_tools" style="display: block;" >
+          <div id="basic_tools" style="display: none;" >
           <p class="slider-label">Storm Intensity</p>
           <ul class="shp-tool-radios one-line" style="margin-bottom: 30px">
             <li><input type="radio" name="intensity" value="current" checked> Cat 1</li>
@@ -114,7 +116,7 @@
           <!-- end Basic tools -->
 
           <!--Advanced tools -->
-          <div id="advanced_tools" style="display: none;" >
+          <div id="advanced_tools" style="display: block;" >
 
             <p class="slider-label">Forward Speed</p>
             <div class="shp-controls">
