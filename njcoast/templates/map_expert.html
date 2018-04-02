@@ -32,6 +32,9 @@
     <link rel="stylesheet" type="text/css" href="{% static "css/crc_leaflet.css" %}" media="screen" />
     <link rel="stylesheet" type="text/css" href="{% static "css/fontawesome-all.min.css" %}" media="screen" />
 
+    <!-- Load Leaflet rotatedMarker code -->
+    <script src="{% static "js/leaflet.rotatedMarker.js" %}"></script>-->
+
 {% endblock extra_head %}
 
 
@@ -66,7 +69,7 @@
         <div class="map-control-item">
           <p class="tool-heading">2. set storm characteristics</p>
           <div class="well plain">
-          <button class="btn btn-primary btn-sm btn-block" data-toggle="modal" data-target="">Draw Storm Track on Map</button>
+          <button id="cst" class="btn btn-primary btn-sm btn-block" data-toggle="modal" data-target="" onclick="create_storm_track();">Draw Storm Track on Map</button>
           <table class="table shp-table">
             <tr>
               <th>Latitude</th>

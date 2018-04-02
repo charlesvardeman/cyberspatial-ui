@@ -83,8 +83,8 @@ function start_expert_simulation(){
 function send_expert_data_to_server(data) {
     $.ajax({
         type: "POST",
-        url: "http://dev.njcoast.us:9090/single?name=" + owner.toString() + "&id=" + sim_id,
-        //url: "http://127.0.0.1:9090/single?name=" + owner.toString() + "&id=" + sim_id,
+        //url: "http://dev.njcoast.us:9090/single?name=" + owner.toString() + "&id=" + sim_id,
+        url: "http://127.0.0.1:9090/single?name=" + owner.toString() + "&id=" + sim_id,
         data: JSON.stringify(data),
         //dataType: "json",
         contentType: 'application/json',
@@ -111,8 +111,8 @@ function send_expert_data_to_server(data) {
 function get_expert_data_to_server() {
     $.ajax({
         type: "GET",
-        url: "http://dev.njcoast.us:9090/status?name=" + owner.toString() + "&id=" + sim_id,
-        //url: "http://127.0.0.1:9090/status?name=" + owner.toString() + "&id=" + sim_id,
+        //url: "http://dev.njcoast.us:9090/status?name=" + owner.toString() + "&id=" + sim_id,
+        url: "http://127.0.0.1:9090/status?name=" + owner.toString() + "&id=" + sim_id,
         //data: data,
         dataType: "json",
         //contentType: 'application/json',
@@ -183,4 +183,69 @@ function updateInput(e){
     var sibling = e.previousElementSibling || e.nextElementSibling;
     sibling.value = e.value;
     e.value = sibling.value;
+}
+
+//create storm track icons
+function create_storm_track(){
+    //disable button
+    document.getElementById("cst").classList.add("disabled");
+
+    //load Latitude
+    var latitude = parseFloat(document.getElementById("latitude").value);
+    var longitude = parseFloat(document.getElementById("longitude").value);
+
+    //create markers
+    var sat_offset_y = 0;
+    var sat_offset_x = 0.01;
+
+    // create a blue polyline between markers
+    var latlngs = [
+        [latitude, longitude],
+        [latitude, longitude+0.01]
+    ];
+    var polyline = L.polyline(latlngs, {color: 'blue'}).addTo(mymap);
+
+    //create landfall marker
+    var marker = new L.marker([latitude,longitude], {draggable:'true'});
+    marker.on('drag', function(event){
+        //get pos
+        var marker = event.target;
+        var position = marker.getLatLng();
+
+        //fix sat/line pos
+        sat_marker.setLatLng(new L.LatLng(position.lat + sat_offset_y, position.lng+sat_offset_x),{draggable:'true'});
+        polyline.setLatLngs([[position.lat, position.lng],[position.lat + sat_offset_y, position.lng+sat_offset_x]]);
+
+        //update text boxes
+        document.getElementById("latitude").value = position.lat.toString();
+        document.getElementById("longitude").value = position.lng.toString();
+    });
+    mymap.addLayer(marker);
+
+    //create direction marker
+    var sat_marker = new L.marker([latitude,longitude+0.01], {draggable:'true', rotationAngle: 90});
+    sat_marker.on('drag', function(event){
+        //get pos
+        var position = marker.getLatLng();
+        var sat_pos = sat_marker.getLatLng();
+
+        //find angle
+        var angle = Math.atan2(sat_pos.lng - position.lng, sat_pos.lat - position.lat);
+        sat_offset_y = Math.cos(angle) * 0.008;
+        sat_offset_x = Math.sin(angle) * 0.01;
+
+        //constrain to circle
+        sat_marker.setLatLng(new L.LatLng(position.lat + sat_offset_y, position.lng+sat_offset_x),{draggable:'true'});
+
+        //rotate icon
+        sat_marker.setRotationAngle(angle * 180/Math.PI);
+
+        //and line
+        polyline.setLatLngs([[position.lat, position.lng],[position.lat + sat_offset_y, position.lng+sat_offset_x]]);
+
+        //update angle box
+        document.getElementById("angle").value = angle * 180/Math.PI;
+    });
+    mymap.addLayer(sat_marker);
+
 }
