@@ -227,7 +227,13 @@ function create_storm_track(onOff){
 
         //create markers
         //set offsets to current angle
-        var sat_offset_y = Math.cos(angle) * 0.0075;
+        //note 1 degree is different for Lat/Long so need to correct
+        //Latitude is fixed at around 69 miles/degree
+        //Longitude is cosine(Latitude) * miles/degree at equator
+        //so here cosine(40') * 69.172
+        //ratio is around 0.78
+        //Explaination: https://gis.stackexchange.com/questions/142326/calculating-longitude-length-in-miles
+        var sat_offset_y = Math.cos(angle) * 0.0078; //
         var sat_offset_x = Math.sin(angle) * 0.01;
 
         // create a polyline between markers
@@ -263,7 +269,7 @@ function create_storm_track(onOff){
 
             //find angle
             var angle = Math.atan2(sat_pos.lng - position.lng, sat_pos.lat - position.lat);
-            sat_offset_y = Math.cos(angle) * 0.0075;
+            sat_offset_y = Math.cos(angle) * 0.0078;
             sat_offset_x = Math.sin(angle) * 0.01;
 
             //constrain to circle
