@@ -203,7 +203,6 @@ function create_storm_track(onOff){
             return;
         }
 
-        console.log("Angle "+angle);
         //disable button etc. if inputs OK
         //document.getElementById("cst").classList.add("disabled");
         document.getElementById("latitude").disabled = true;

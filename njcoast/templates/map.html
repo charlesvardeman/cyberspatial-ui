@@ -65,71 +65,64 @@
         <div class="col-sm-4 col-lg-3 col-xl-2" id="map-control-panel">
             <div class="map-control-item">
 
-    <a data-toggle="collapse" href="#gisLayers" aria-expanded="false" aria-controls="gisLayers">
-        <h4 class="map-control-item-heading">GIS Layers
+                <a data-toggle="collapse" href="#gisLayers" aria-expanded="false" aria-controls="gisLayers">
+                    <h4 class="map-control-item-heading">GIS Layers
             <i class="fa fa-chevron-down pull-right" aria-hidden="true"></i></h4>
-        <p class="qualifier" style="margin-bottom: 0">for Planning role</p>
-    </a>
-    <div class="collapse in" id="gisLayers">
-        <div id="layerGroup" class="hidden">
-            <p class="map-layer-group-heading">
-                <a data-toggle="collapse" href="" aria-expanded="false"
-                   aria-controls="">
-                    <i class="fa fa-chevron-right" aria-hidden="true"></i>
-                    <span></span>
+                    <p class="qualifier" style="margin-bottom: 0">for Planning role</p>
                 </a>
-            </p>
-            <ul class="collapse map-layers" id=""></ul>
-    </div>
-    </div>
-                    </div>
-                    <div class="map-control-item">
-                        {% include 'storm_visualization_menu.html' %}
-                    </div>
-
-                    <div class="map-control-item">
-                        <a data-toggle="collapse" href="#annotations" aria-expanded="false" aria-controls="annotations">
-                            <h4 class="map-control-item-heading">Annotations<i class="fa fa-chevron-down pull-right"
-                                                                               aria-hidden="true"></i></h4>
-                            <p class="qualifier" style="margin-bottom: 0">write or draw on the map</p>
-                        </a>
-                        <div class="collapse" id="annotations">
-                            <!--Checkbox to toggle annotation layer and functions-->
-                            <p style="margin-top: 15px"><input type="checkbox" name="annotations" value="on"
-                               data-toggle="popover" data-placement="right" onclick="toggle_annotation_layer(this.checked)" checked> Annotation layer</p>
-                               <p style="margin-top: 15px"><input type="checkbox" name="annotate" id="annotate" value="on"
-                                  data-toggle="popover" data-placement="right" onclick="toggle_annotate(this.checked)"> Annotate</p>
-                                  <div class="beta-feature-not-available"><a class="btn btn-secondary btn-md btn-block" data-toggle="popover" href="#annotationTools"
-                                      aria-expanded="false" aria-controls="annotationTools">Edit Annotations</a></div>
-                                      <div class="collapse" id="annotationTools">
-                                <div class="placeholder-box">
-                                    <p>Text and drawing tools go here</p>
-                                </div>
-                                <button class="btn btn-primary btn-md btn-block" style="margin-top: 20px">Save Changes
-                                </button>
-                                <button class="btn btn-secondary btn-md btn-block">Clear</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="map-control-item">
-                        <p class="qualifier" style="margin-top: 10px">Save current map configuration (e.g. active layers and
-                            annotations), copy the map and save with a new name, or download the map.</p>
-                        <button id="save_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="save_annotation_elements();">Save Map</button>
-                        <button id="load_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="get_annotations_from_server();">Load Map</button>
-                        <!--<button id="load_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="load_annotation_elements();">Load Map</button>-->
-                        <div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Download Map
-                        </button></div>
-                        <div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Share Map
-                        </button></div>
+                <div class="collapse in" id="gisLayers">
+                    <div id="layerGroup" class="hidden">
+                        <p class="map-layer-group-heading">
+                            <a data-toggle="collapse" href="" aria-expanded="false" aria-controls="">
+                                <i class="fa fa-chevron-right" aria-hidden="true"></i>
+                                <span></span>
+                            </a>
+                        </p>
+                        <ul class="collapse map-layers" id=""></ul>
                     </div>
                 </div>
+            </div>
+            <div class="map-control-item">
+                {% include 'storm_visualization_menu.html' %}
+            </div>
 
+            <div class="map-control-item">
+                <a data-toggle="collapse" href="#annotations" aria-expanded="false" aria-controls="annotations">
+                    <h4 class="map-control-item-heading">Annotations<i class="fa fa-chevron-down pull-right"
+                                                                               aria-hidden="true"></i></h4>
+                    <p class="qualifier" style="margin-bottom: 0">write or draw on the map</p>
+                </a>
+                <div class="collapse" id="annotations">
+                    <!--Checkbox to toggle annotation layer and functions-->
+                    <p style="margin-top: 15px"><input type="checkbox" name="annotations" value="on" data-toggle="popover" data-placement="right" onclick="toggle_annotation_layer(this.checked)" checked> Annotation layer</p>
+                    <p style="margin-top: 15px"><input type="checkbox" name="annotate" id="annotate" value="on" data-toggle="popover" data-placement="right" onclick="toggle_annotate(this.checked)"> Annotate</p>
+                    <div class="beta-feature-not-available"><a class="btn btn-secondary btn-md btn-block" data-toggle="popover" href="#annotationTools" aria-expanded="false" aria-controls="annotationTools">Edit Annotations</a></div>
+                    <div class="collapse" id="annotationTools">
+                        <div class="placeholder-box">
+                            <p>Text and drawing tools go here</p>
+                        </div>
+                        <button class="btn btn-primary btn-md btn-block" style="margin-top: 20px">Save Changes
+                                </button>
+                        <button class="btn btn-secondary btn-md btn-block">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="map-control-item">
+                <p class="qualifier" style="margin-top: 10px">Save current map configuration (e.g. active layers and annotations), copy the map and save with a new name, or download the map.</p>
+                <button id="save_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="save_annotation_elements();">Save Map</button>
+                <button id="load_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="get_annotations_from_server();">Load Map</button>
+                <!--<button id="load_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="load_annotation_elements();">Load Map</button>-->
+                <div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Download Map
+                        </button></div>
+                <div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Share Map
+                        </button></div>
             </div>
         </div>
 
-                    {% endblock middle %}
-
+    </div>
+</div>
+{% endblock middle %}
 
 {% block extra_script %}
 <script src="{% static 'js/utilities.js' %}"></script>
