@@ -38,10 +38,10 @@ class NJCMapExpert(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
-    name = models.CharField(max_length=50)
+    sim_id = models.CharField(max_length=20)
+    user_id = models.CharField(max_length=10)
     description = models.TextField(blank=True)
-    # layers = models.ManyToManyField(Layer, blank=True)
-    is_default = models.BooleanField(default=False)
+    data = models.TextField(blank=True)
 
     def __str__(self):
-        return self.name
+        return self.sim_id

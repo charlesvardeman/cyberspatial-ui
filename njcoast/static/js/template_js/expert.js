@@ -5,8 +5,9 @@
  *
  */
 
-//unique id for this simulation
+//unique id for this simulation, and storage for data
 var sim_id = 0;
+var data = null;
 
 //counter for sim seconds
 var seconds_running = 0;
@@ -73,13 +74,12 @@ function start_expert_simulation(){
       "tide": 0,
       "runup_file": "heatmap.json",
       "workspace_file": ""
-  };
+    };
 
-  console.log(JSON.stringify(data));
+    console.log(JSON.stringify(data));
 
-  //do Ajax
-  send_expert_data_to_server(data);
-
+    //do Ajax
+    send_expert_data_to_server(data);
 }
 
 //function to start simulation, POSTs input data to the server. Actual AJAX call
@@ -298,5 +298,62 @@ function create_storm_track(onOff){
         mymap.removeLayer(marker);
         mymap.removeLayer(polyline);
     }
+}
+
+var data1 = {
+  "index_SLT": [1,1],
+  "index_W": 0,
+  "index_prob": 1,
+  "indicator": 1,
+  "param": [40.4417743, -74.1298643, 3, 75, 22, 5],
+  "timeMC": 23,
+  "lat_track": 41.000493,
+  "long_track": -72.610756,
+  "SLR": 1.0,
+  "tide": 0,
+  "runup_file": "heatmap.json",
+  "workspace_file": ""
+};
+
+//save expert simulation data
+function save_simulation(){
+    //create unique id to tag socket comms
+    sim_id = Math.random().toString(36).substr(2, 9);
+
+    //preset data
+    data = {
+      "index_SLT": [1,1],
+      "index_W": 0,
+      "index_prob": 1,
+      "indicator": 1,
+      "param": [40.4417743, -74.1298643, 3, 75, 22, 5],
+      "timeMC": 23,
+      "lat_track": 41.000493,
+      "long_track": -72.610756,
+      "SLR": 1.0,
+      "tide": 0,
+      "runup_file": "heatmap.json",
+      "workspace_file": ""
+    };
+
+    $.ajax({
+        type: "POST",
+        url: "/store/",
+        data: {
+            'data': JSON.stringify(data),
+            'user_id': owner.toString(),
+            'sim_id': sim_id,
+            'description': "Simulation"
+        },
+        //dataType: "json",
+        success: function(result) {
+            console.log("SIMULATION STORE -- SUCCESS!");
+            //$.notify(result.annotations + " annotations saved", "success");
+        },
+        error: function(result) {
+            console.log("SIMULATION STORE ERROR:", result)
+            //$.notify("Error saving map annotations", "error");
+        }
+    });
 
 }

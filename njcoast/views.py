@@ -176,6 +176,34 @@ def map_annotations(request, map_id):
 
         return JsonResponse({'saved': True, 'annotations' : annotations_updated})
 
+'''
+  API-ish view for expert simulation ajax calls from the map_expert page.
+'''
+@login_required
+def map_expert_simulations(request):
+    if request.method == "POST":
+        expert_dict = json.loads(request.POST['data'])
+        print request.POST['data']
+        print request.POST['sim_id'], request.user
+        obj, created = NJCMapExpert.objects.get_or_create(
+            sim_id = request.POST['sim_id'], owner = request.user,
+            defaults = {
+                'data' : request.POST['data'],
+                'description' : request.POST['description'],
+                'user_id': request.POST['user_id']
+            }
+        )
+        if created:
+            print "Created"
+        else:
+            if obj.owner == request.user:
+                #only update if the owner is the USER
+                obj.data = request.POST['data']
+                obj.description = request.POST['description']
+                obj.user_id = request.POST['user_id']
+                obj.save()
+
+        return JsonResponse({'saved': True})
 
 class DashboardTemplateView(TemplateView):
     template_name = 'dashboard.html'
