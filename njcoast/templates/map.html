@@ -130,7 +130,11 @@
 
     <script type=text/javascript>
         //fix for callable js
-        var annotate_map_id = {{ map_id }};
+        var annotate_map_id = null;
+        {% if map_id %}
+            var annotate_map_id = {{ map_id }};
+        {% endif %}
+        
         var marker_icon_image = "{% static "images/marker-icon-2x-red.png" %}";
         var marker_icon_shadow = "{% static "images/marker-shadow.png" %}";
 

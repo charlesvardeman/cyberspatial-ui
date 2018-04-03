@@ -519,7 +519,7 @@ function annotation_update(e_layer) {
                 //toggle button message
                 document.getElementById("show_annotate").innerHTML = "Show Annotation Tools";
             }
-            console.log(onOff);
+            //console.log(onOff);
 
             //stop button href
             return false;
