@@ -490,9 +490,9 @@ function annotation_update(e_layer) {
         }
 
         //toggle annotate controls
-        function toggle_annotate(onOff) {
+        function toggle_annotate() {
 
-            if (onOff) {
+            if (document.getElementById("show_annotate").innerHTML == "Show Annotation Tools") {
                 mymap.addControl(marker_control);
                 mymap.addControl(line_control);
                 mymap.addControl(polygon_control);
@@ -502,17 +502,27 @@ function annotation_update(e_layer) {
                 //enable map save
                 $("#save_map").removeClass("disabled");
                 $("#load_map").removeClass("disabled");
+
+                //toggle button message
+                document.getElementById("show_annotate").innerHTML = "Hide Annotation Tools";
             } else {
                 mymap.removeControl(marker_control);
                 mymap.removeControl(line_control);
                 mymap.removeControl(polygon_control);
                 mymap.removeControl(rectangle_control);
                 mymap.removeControl(circle_control);
+
                 //disable map save
                 $("#save_map").addClass("disabled");
                 $("#load_map").addClass("disabled");
+
+                //toggle button message
+                document.getElementById("show_annotate").innerHTML = "Show Annotation Tools";
             }
             console.log(onOff);
+
+            //stop button href
+            return false;
         }
 
         //save annotation
