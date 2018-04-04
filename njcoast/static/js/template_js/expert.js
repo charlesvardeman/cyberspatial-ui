@@ -180,6 +180,9 @@ function load_expert_data_to_server() {
             //add to map
             heatmap = L.heatLayer(addressPoints.runup, {max: 4, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
             $.notify( "Heatmap loaded", "success");
+
+            //enable save button? #TODO And Add to map?
+            document.getElementById("save_button").classList.remove("disabled");
         },
         error: function (data) {
             console.log("EXPERT SIMULATION LOAD -- ERROR:", data)
@@ -308,21 +311,6 @@ function create_storm_track(onOff){
         mymap.removeLayer(polyline);
     }
 }
-
-var data1 = {
-  "index_SLT": [1,1],
-  "index_W": 0,
-  "index_prob": 1,
-  "indicator": 1,
-  "param": [40.4417743, -74.1298643, 3, 75, 22, 5],
-  "timeMC": 23,
-  "lat_track": 41.000493,
-  "long_track": -72.610756,
-  "SLR": 1.0,
-  "tide": 0,
-  "runup_file": "heatmap.json",
-  "workspace_file": ""
-};
 
 //save expert simulation data
 function save_simulation(){
