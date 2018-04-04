@@ -3,7 +3,6 @@ from django.db import models
 from django.conf import settings
 from geonode.layers.models import Layer
 
-
 class NJCMap(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -42,6 +41,7 @@ class NJCMapExpert(models.Model):
     user_id = models.CharField(max_length=10)
     description = models.TextField(blank=True)
     data = models.TextField(blank=True)
+    modified    = models.DateTimeField()
 
     def __str__(self):
         return self.sim_id

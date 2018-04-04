@@ -7,6 +7,7 @@ import json
 from models import NJCMap, NJCMapAnnotation, NJCMapExpert
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
 '''
   This function is used to respond to ajax requests for which layers should be
@@ -190,7 +191,8 @@ def map_expert_simulations(request):
             defaults = {
                 'data' : request.POST['data'],
                 'description' : request.POST['description'],
-                'user_id': request.POST['user_id']
+                'user_id': request.POST['user_id'],
+                'modified': timezone.now()
             }
         )
         if created:
@@ -201,6 +203,7 @@ def map_expert_simulations(request):
                 obj.data = request.POST['data']
                 obj.description = request.POST['description']
                 obj.user_id = request.POST['user_id']
+                obj.modified = timezone.now()
                 obj.save()
 
         return JsonResponse({'saved': True})
