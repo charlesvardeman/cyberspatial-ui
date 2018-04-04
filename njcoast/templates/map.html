@@ -243,7 +243,7 @@
                 success: function (result) {
                     var data = evaluateXPath(result, '//sld:UserStyle/sld:Name');
 					var styleName = $(data[0]).text();
-                    $("li#"+$.trim(layer.id)).prepend('<img style="padding-right: 10px;" src="'+layer.layer_link+'REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&STRICT=false&style='+encodeURI(styleName)+'"/>')
+                    $("li#"+$.trim(layer.id)).prepend('<img style="padding-right: 10px; visibility:hidden;" src="'+layer.layer_link+'REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&STRICT=false&style='+encodeURI(styleName)+'"/>')
                 },
                 error: function (result) {
                     console.log("ERROR:", result)
