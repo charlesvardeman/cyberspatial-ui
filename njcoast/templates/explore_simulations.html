@@ -1,0 +1,205 @@
+{% extends 'site_base.html' %}
+{% load i18n %}
+{% load staticfiles %}
+{% load base_tags %}
+
+{% block body_class %}home{% endblock %}
+
+{% block extra_head %}
+    <!-- Load Leaflet from CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
+          integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
+          crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
+            integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
+            crossorigin=""></script>
+
+
+    <!-- Load Esri Leaflet from CDN -->
+    <script src="https://unpkg.com/esri-leaflet@2.1.1/dist/esri-leaflet.js"
+            integrity="sha512-ECQqaYZke9cSdqlFG08zSkudgrdF6I1d8ViSa7I3VIszJyVqw4ng1G8sehEXlumdMnFYfzY0tMgdQa4WCs9IUw=="
+            crossorigin=""></script>
+
+    <script src="https://npmcdn.com/leaflet.path.drag/src/Path.Drag.js"></script>
+
+    <!-- Load Leaflet Editable code -->
+    <script src="{% static "js/Leaflet.Editable.js" %}"></script>-->
+
+    <!-- load mods to leaflet for rectangular popups/map icons -->
+    <link rel="stylesheet" type="text/css" href="{% static "css/crc_leaflet.css" %}" media="screen" />
+    <link rel="stylesheet" type="text/css" href="{% static "css/fontawesome-all.min.css" %}" media="screen" />
+
+{% endblock extra_head %}
+
+
+{% block middle %}
+
+    <div class="jumbotron njcoast-image slimmer"></div>
+
+    <div class="container">
+        <div class="page-header map-header">
+            <a href="shp-tool.html" class="btn btn-primary btn-md pull-right">Run New Simulation</a>
+            <h3>Explore Simulations</h3>
+        </div>
+        <div class="row">
+
+            <div class="col-md-3">
+                <div class="selections">
+                    Your selections
+                    <a href="" id="clear-search" class="pull-right">Clear</a>
+                </div>
+                <nav class="filter">
+
+                    <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-down"></i>Text</a></h4>
+                    <ul class="nav open" id="text">
+                        <li>
+                            <div class="input-group">
+                                <input name="text_search_input" id="text_search_input" ng-model="text_query" type="text" placeholder="Search by text" class="form-control">
+                                <span class="input-group-btn">
+              <button class="btn btn-primary" type="submit" id="text_search_btn"><i class="fa fa-search"></i></button>
+          </span>
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+
+                <div id="slide-pane">
+
+
+                    <nav class="filter">
+                        <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-down"></i>Categories</a></h4>
+                        <ul class="nav open" id="categories">
+
+                            <li>
+                                <a>
+        Archived Storms
+        <span class="badge pull-right">56</span>
+      </a>
+                            </li>
+                            <li>
+                                <a class="active">
+        My What-if Scenarios
+        <span class="badge pull-right">2</span>
+      </a>
+                            </li>
+                            <li>
+                                <a>
+        Shared with Me
+        <span class="badge pull-right">6</span>
+      </a>
+                            </li>
+                            <li>
+                                <a>
+                                    <div class="h-badge">H</div>Hurricanes
+                                    <span class="badge pull-right">38</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a>
+                                    <div class="n-badge">N</div>Nor'easters
+                                    <span class="badge pull-right">18</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+
+
+
+                    <nav class="filter">
+                        <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-down"></i>Date</a></h4>
+                        <ul class="nav open" id="date_start">
+                            <label>Date begins after:</label>
+                            <li><input value="yyyy-mm-dd" data-date-format="YYYY-MM-DD" type="text" class="datepicker" placeholder="yyyy-mm-dd" ng-model="date_query.date__gte" /></li>
+                        </ul>
+                        <ul class="nav open" id="date_end">
+                            <label>Date ends before:</label>
+                            <li><input value="yyyy-mm-dd" data-date-format="YYYY-MM-DD" type="text" class="datepicker" placeholder="yyyy-mm-dd" ng-model="date_query.date__lte" /></li>
+                        </ul>
+                    </nav>
+
+
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="row" style="margin-top:1em">
+                    <div class="col-md-3">
+                        <span>Total: </span>
+                        <span ng-bind="total_counts">4</span>
+                    </div>
+
+                    <div class="col-md-9">
+                        <ul class="list-inline pull-left" id="sort">
+                            <li><a data-value="-date" data-filter="order_by" class="selected" ng-click="single_choice_listener($event)">Most recent</a></li>
+                            <li><a data-value="date" data-filter="order_by" ng-click="single_choice_listener($event)">Less recent</a></li>
+                            <li><a data-value="title" data-filter="order_by" ng-click="single_choice_listener($event)">A - Z</a></li>
+                            <li><a data-value="-title" data-filter="order_by" ng-click="single_choice_listener($event)">Z - A</a></li>
+                            <li><a data-value="-popular_count" data-filter="order_by" ng-click="single_choice_listener($event)">Most popular</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <article>
+                    <div class="row items-list">
+                        <div class="col-xs-12 item-info shp-info">
+
+                            <h4><a href=""><div class="h-badge what-if">H</div>Hurricane Run #5</a></h4>
+                            <p>Hurricanes, My What-if Scenarios <span class="owner">by <a href="">j.marquette</a></span></p>
+                            <p class="shp-scenario"><span>Sea Level Rise:</span> 1.1ft, <span>Coastal Protection:</span> Current, <span>Tides:</span> Zero, <span>Analysis type:</span> Deterministic</p>
+                            <p class="abstract">Optional additonal comments added by user.</p>
+                            <p class="actions">
+                                <a href=""><i class="fa fa-calendar-o"></i>5 Jan 2018</a> |
+                                <a href=""><i class="fa fa-eye"></i>0</a> |
+                                <a href=""><i class="fa fa-share"></i>0</a> |
+                                <a href=""><i class="fa fa-star"></i>0</a>
+                                <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" style="margin-left: 10px" href="map-p.html">
+                                    <i class="fa fa-plus"></i>Add to Map</a>
+                                <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="shp-tool-hurricane.html">
+                                    <i class="fa fa-map-marker"></i>View on Map</a>
+                            </p>
+                        </div>
+                    </div>
+                </article>
+
+                <article>
+                    <div class="row items-list">
+                        <div class="col-xs-12 item-info shp-info">
+
+                            <h4><a href=""><div class="n-badge what-if">N</div>Nor'easter Run #2</a></h4>
+                            <p>Nor'easters, My What-if Scenarios <span class="owner">by <a href="">j.marquette</a></span></p>
+                            <p class="shp-scenario"><span>Sea Level Rise:</span> 0ft, <span>Coastal Protection:</span> Degraded, <span>Tides:</span> High, <span>Analysis type:</span> Probabilistic (Extreme)</p>
+                            <p class="abstract">Optional additonal comments added by user.</p>
+                            <p class="actions">
+                                <a href=""><i class="fa fa-calendar-o"></i>20 Dec 2017</a> |
+                                <a href=""><i class="fa fa-eye"></i>0</a> |
+                                <a href=""><i class="fa fa-share"></i>0</a> |
+                                <a href=""><i class="fa fa-star"></i>0</a>
+                                <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" style="margin-left: 10px" href="map-p.html">
+                                    <i class="fa fa-plus"></i>Add to Map</a>
+                                <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="shp-tool-hurricane.html">
+                                    <i class="fa fa-map-marker"></i>View on Map</a>
+                            </p>
+                        </div>
+                    </div>
+                </article>
+
+
+                <div class="row" style="margin-bottom: 300px">
+                    <nav>
+                        <ul class="pagination pull-right">
+                            <li ng-click="paginate_down()"><a href><strong><i class="fa fa-angle-left"></i></strong></a></li>
+                            <li><a href>page <span ng-model="page" ng-bind="page">1</span> of <span ng-bind="numpages">1</span></a>
+                            </li>
+                            <li ng-click="paginate_up()"><a href><strong><i class="fa fa-angle-right"></i></strong></a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- close right col
+</div>
+</div>
+</div>-->
+<!-- close #wrap -->
+
+{% endblock middle %}
