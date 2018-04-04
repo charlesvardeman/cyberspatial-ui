@@ -96,8 +96,12 @@ function send_expert_data_to_server(data) {
             $.notify( "Calculation running", "success");
 
             //start checking
-            setTimeout(get_expert_data_to_server, 1000);
+            setTimeout(get_expert_data_to_server, 5000);
             seconds_running = 0;
+
+            //disable save button? #TODO And Add to map?
+            document.getElementById("save_button").classList.add("disabled");
+
         },
         error: function (result) {
             console.log("EXPERT SIMULATION -- ERROR:", result)
@@ -124,10 +128,11 @@ function get_expert_data_to_server() {
             //$.notify( result.annotations + " annotations saved", "success");
             //data = JSON.parse(result);
             if(result.complete == false){
-                console.log("Complete FALSE, time "+seconds_running+" seconds.");
+                //update time
+                seconds_running += 1;
+                console.log("Complete FALSE, time "+seconds_running * 5+" seconds.");
 
                 //timeout? Set to 3 minutes
-                seconds_running += 1;
                 if(seconds_running > 180){
                     $.notify("Calculation timed out.", "error");
 
@@ -136,7 +141,7 @@ function get_expert_data_to_server() {
                     document.getElementById("spinner").style.display = "none";
                 }else{
                     //re-run if still waiting
-                    setTimeout(get_expert_data_to_server, 1000);
+                    setTimeout(get_expert_data_to_server, 5000);
                 }
 
             }else if(result.complete == true){
