@@ -87,7 +87,7 @@ function send_expert_data_to_server(data) {
     $.ajax({
         type: "POST",
         //url: "http://dev.njcoast.us:9090/single?name=" + owner.toString() + "&id=" + sim_id,
-        url: "http://127.0.0.1:9090/single?name=" + owner.toString() + "&id=" + sim_id,
+        url: "https://staging.njcoast.us/queue/single?name=" + owner.toString() + "&id=" + sim_id,
         data: JSON.stringify(data),
         //dataType: "json",
         contentType: 'application/json',
@@ -115,7 +115,7 @@ function get_expert_data_to_server() {
     $.ajax({
         type: "GET",
         //url: "http://dev.njcoast.us:9090/status?name=" + owner.toString() + "&id=" + sim_id,
-        url: "http://127.0.0.1:9090/status?name=" + owner.toString() + "&id=" + sim_id,
+        url: "https://staging.njcoast.us/queue/status?name=" + owner.toString() + "&id=" + sim_id,
         //data: data,
         dataType: "json",
         //contentType: 'application/json',
@@ -126,9 +126,18 @@ function get_expert_data_to_server() {
             if(result.complete == false){
                 console.log("Complete FALSE, time "+seconds_running+" seconds.");
 
-                //re-run if still waiting
-                setTimeout(get_expert_data_to_server, 1000);
+                //timeout? Set to 3 minutes
                 seconds_running += 1;
+                if(seconds_running > 180){
+                    $.notify("Calculation timed out.", "error");
+
+                    //re-enable button and remove spinner
+                    document.getElementById("calculate").classList.remove("disabled");
+                    document.getElementById("spinner").style.display = "none";
+                }else{
+                    //re-run if still waiting
+                    setTimeout(get_expert_data_to_server, 1000);
+                }
 
             }else if(result.complete == true){
                 console.log("Complete TRUE, time "+seconds_running+" seconds.");
@@ -317,6 +326,14 @@ var data1 = {
 
 //save expert simulation data
 function save_simulation(){
+
+    //normal code, has simulation run?
+    if(data == null || heatmap == null){
+        alert("Plase run a sumulation before saving!");
+        return;
+    }
+
+    /*//test
     //create unique id to tag socket comms
     sim_id = Math.random().toString(36).substr(2, 9);
 
@@ -334,8 +351,9 @@ function save_simulation(){
       "tide": 0,
       "runup_file": "heatmap.json",
       "workspace_file": ""
-    };
+    };*/
 
+    //store data
     $.ajax({
         type: "POST",
         url: "/store/",
@@ -348,11 +366,11 @@ function save_simulation(){
         //dataType: "json",
         success: function(result) {
             console.log("SIMULATION STORE -- SUCCESS!");
-            //$.notify(result.annotations + " annotations saved", "success");
+            $.notify("Simulation data saved", "success");
         },
         error: function(result) {
             console.log("SIMULATION STORE ERROR:", result)
-            //$.notify("Error saving map annotations", "error");
+            $.notify("Simulation data was not saved", "error");
         }
     });
 
