@@ -115,7 +115,7 @@
                 <!--<button id="load_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="load_annotation_elements();">Load Map</button>-->
                 <div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Download Map
                         </button></div>
-                <button class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Share Map
+                <button id="share_map" class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Share Map
                         </button>
             </div>
         </div>
@@ -133,6 +133,11 @@
         var annotate_map_id = null;
         {% if map_id %}
             var annotate_map_id = {{ map_id }};
+        {% else %}
+            //disable load/save
+            $("#save_map").addClass("disabled");
+            $("#load_map").addClass("disabled");
+            $("#share_map").addClass("disabled");
         {% endif %}
 
         var marker_icon_image = "{% static "images/marker-icon-2x-red.png" %}";
@@ -200,7 +205,9 @@
                     process_layers(result.layers);
 
                     //load map settings after layers loaded #TODO maybe this should be elsewhere?
-                    load_map();
+                    {% if map_id %}
+                        load_map();
+                    {% endif %}
                 },
                 error: function (result) {
                     console.log("ERROR:", result)
