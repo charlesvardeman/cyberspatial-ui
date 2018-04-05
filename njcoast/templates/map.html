@@ -111,7 +111,7 @@
             <div class="map-control-item">
                 <p class="qualifier" style="margin-top: 10px">Save current map configuration (e.g. active layers and annotations), copy the map and save with a new name, or download the map.</p>
                 <button id="save_map" class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="" onclick="save_map();">Save Map</button>
-                <button id="load_map" class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Load Map</button>
+                <button id="load_map" class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="" onclick="load_map();">Load Map</button>
                 <!--<button id="load_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="load_annotation_elements();">Load Map</button>-->
                 <div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Download Map
                         </button></div>
@@ -179,6 +179,7 @@
                 id: 'mapbox.streets'
             }).addTo(mymap);
 
+            //get layers
             get_layers_from_server();
 
         });
@@ -197,6 +198,9 @@
                     console.log("GIS LAYERS -- SUCCESS!");
                     console.log(result.layers);
                     process_layers(result.layers);
+
+                    //load map settings after layers loaded #TODO maybe this should be elsewhere?
+                    load_map();
                 },
                 error: function (result) {
                     console.log("ERROR:", result)
@@ -278,7 +282,8 @@
                         if (layer_list[i].id == this.id){
                             console.log("found matching layer: " + this.id);
                             mymap.removeLayer(layer_list[i].maplayer);
-                            layers_selected.splice( $.inArray(this.id, layers_selected), 1 );
+                            var index = layers_selected.indexOf(this.id);
+                            if (index !== -1) layers_selected.splice(index, 1);
                         }
                     }
                 }
@@ -293,6 +298,43 @@
             width: '300px'
           });
       });
+
+      //load map
+      function load_map(){
+
+          $.ajax({
+              type: "GET",
+              url: "/map/" + annotate_map_id + "/settings/",
+              data: {},
+              dataType: "json",
+              success: function(result) {
+                  console.log("LOADING SETTINGS -- SUCCESS!");
+
+                  //apply settings
+                  apply_settings(result);
+              },
+              error: function(result) {
+                  console.log("ERROR:", result)
+                  $.notify("Error loading map settings", "error");
+              }
+          });
+      }
+
+      //apply stored settings to current map
+      function apply_settings(data){
+          console.log("Layers selected length " + data.layers_selected.length);
+
+          //setup selected layers
+          for(i=0; i<data.layers_selected.length; i++){
+              //find by id
+              document.getElementById(data.layers_selected[i]).checked = true;
+          }
+
+          //set map parameters
+          mymap.setView([data.latitude, data.longitude], data.zoom);
+
+          //#TODO load simulations
+      }
 
       //save current map
       function save_map(){
