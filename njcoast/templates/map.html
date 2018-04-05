@@ -67,7 +67,7 @@
 
                 <a data-toggle="collapse" href="#gisLayers" aria-expanded="false" aria-controls="gisLayers">
                     <h4 class="map-control-item-heading">GIS Layers
-            <i class="fa fa-chevron-down pull-right" aria-hidden="true"></i></h4>
+                        <i class="fa fa-chevron-down pull-right" aria-hidden="true"></i></h4>
                     <p class="qualifier" style="margin-bottom: 0">for Planning role</p>
                 </a>
                 <div class="collapse in" id="gisLayers">
@@ -110,13 +110,13 @@
 
             <div class="map-control-item">
                 <p class="qualifier" style="margin-top: 10px">Save current map configuration (e.g. active layers and annotations), copy the map and save with a new name, or download the map.</p>
-                <button id="save_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="save_annotation_elements();">Save Map</button>
-                <button id="load_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="get_annotations_from_server();">Load Map</button>
+                <button id="save_map" class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="" onclick="save_map();">Save Map</button>
+                <button id="load_map" class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Load Map</button>
                 <!--<button id="load_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="load_annotation_elements();">Load Map</button>-->
                 <div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Download Map
                         </button></div>
-                <div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Share Map
-                        </button></div>
+                <button class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Share Map
+                        </button>
             </div>
         </div>
 
@@ -134,12 +134,15 @@
         {% if map_id %}
             var annotate_map_id = {{ map_id }};
         {% endif %}
-        
+
         var marker_icon_image = "{% static "images/marker-icon-2x-red.png" %}";
         var marker_icon_shadow = "{% static "images/marker-shadow.png" %}";
 
         //
         var owner = {{ user.id }};
+
+        //disctionary of selected layers
+        var layers_selected = new Array();
 
         /*
         Base Map -- Centered on Keansburg, NJ
@@ -267,6 +270,7 @@
                         if (layer_list[i].id == this.id){
                             console.log("found matching layer: " + this.id);
                             layer_list[i].maplayer.addTo(mymap);
+                            layers_selected.push(this.id);
                         }
                     }
                 } else {
@@ -274,6 +278,7 @@
                         if (layer_list[i].id == this.id){
                             console.log("found matching layer: " + this.id);
                             mymap.removeLayer(layer_list[i].maplayer);
+                            layers_selected.splice( $.inArray(this.id, layers_selected), 1 );
                         }
                     }
                 }
@@ -289,6 +294,40 @@
           });
       });
 
+      //save current map
+      function save_map(){
+          //save map state
+          map_data = {
+              'latitude': mymap.getCenter().lat,
+              'longitude': mymap.getCenter().lng,
+              'zoom': mymap.getZoom(),
+              'layers_selected': layers_selected,
+              'simulations': ['go2ihs8fo', 'aimo2wqdb', '5yf1y7003']
+          };
+
+          {% if map_id %}
+              map_data['map_id'] = {{ map_id }};
+          {% endif %}
+
+          console.log("Layers "+JSON.stringify(map_data));
+
+          $.ajax({
+              type: "POST",
+              url: "/map/" + annotate_map_id + "/settings/",
+              data: JSON.stringify(map_data),
+              dataType: "json",
+              success: function(result) {
+                  console.log("SETTING STORE -- SUCCESS!" + result.saved);
+                  //now auto save so dont flag
+                  $.notify("Settings saved", "success");
+              },
+              error: function(result) {
+                  console.log("ERROR:", result)
+                  $.notify("Error saving map settings", "error");
+              }
+          });
+
+      }
 
     </script>
 

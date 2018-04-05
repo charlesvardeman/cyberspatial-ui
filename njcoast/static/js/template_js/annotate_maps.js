@@ -519,8 +519,8 @@ function annotation_update(e_layer) {
                 mymap.addControl(circle_control);
 
                 //enable map save
-                $("#save_map").removeClass("disabled");
-                $("#load_map").removeClass("disabled");
+                //$("#save_map").removeClass("disabled");
+                //$("#load_map").removeClass("disabled");
 
                 //toggle button message
                 document.getElementById("show_annotate").innerHTML = "Hide Annotation Tools";
@@ -532,8 +532,8 @@ function annotation_update(e_layer) {
                 mymap.removeControl(circle_control);
 
                 //disable map save
-                $("#save_map").addClass("disabled");
-                $("#load_map").addClass("disabled");
+                //$("#save_map").addClass("disabled");
+                //$("#load_map").addClass("disabled");
 
                 //toggle button message
                 document.getElementById("show_annotate").innerHTML = "Show Annotation Tools";

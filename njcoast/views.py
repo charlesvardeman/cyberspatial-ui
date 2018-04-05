@@ -178,6 +178,27 @@ def map_annotations(request, map_id):
         return JsonResponse({'saved': True, 'annotations' : annotations_updated})
 
 '''
+  API-ish view for annotation ajax calls from the map page.
+'''
+@login_required
+def map_settings(request, map_id):
+    ret_val = False
+    if request.method == "POST":
+        #get matching object
+        map_objs = NJCMap.objects.filter(owner = request.user, id=map_id)
+
+        #get objects and update (should be unique)
+        for map_obj in map_objs:
+            print "ID ", map_obj.name, map_obj.id, map_id
+            map_obj.settings = request.body
+            map_obj.save()
+
+            #flag if actually updated
+            ret_val = True
+
+    return JsonResponse({'saved': ret_val})
+
+'''
   API-ish view for expert simulation ajax calls from the map_expert page.
 '''
 @login_required
