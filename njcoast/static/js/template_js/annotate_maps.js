@@ -351,6 +351,9 @@ function annotation_update(e_layer) {
             //add annotation layer
             annotationLayer.addTo(mymap);
 
+            //load current annotations
+            get_annotations_from_server();
+
             // Note that the path doesn't matter right now; any WebSocket
             // connection gets bumped over to WebSocket consumers
             if(annotate_map_id) {
@@ -627,7 +630,11 @@ function annotation_update(e_layer) {
                 }
 
             }
-            $.notify(parsed.objects.length + " annotations loaded", "success");
+
+            //notify?
+            if(parsed.objects.length > 0){
+                $.notify(parsed.objects.length + " annotations loaded", "success");
+            }
         }
 
         //AJAX to get annotation layers
