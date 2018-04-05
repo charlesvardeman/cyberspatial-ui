@@ -215,3 +215,20 @@ class DashboardTemplateView(TemplateView):
         context = super(DashboardTemplateView, self).get_context_data(**kwargs)
         context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
         return context
+
+class ExploreTemplateView(TemplateView):
+    template_name = 'explore_simulations.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ExploreTemplateView, self).get_context_data(**kwargs)
+
+        #get data from db
+        db_data = NJCMapExpert.objects.filter(owner = self.request.user)
+
+        #expand json data to dictionary
+        for dat in db_data:
+            dat.data = json.loads(dat.data)
+
+        #put into context
+        context['simulations_for_user'] = db_data
+        return context

@@ -56,8 +56,8 @@
                             <div class="input-group">
                                 <input name="text_search_input" id="text_search_input" ng-model="text_query" type="text" placeholder="Search by text" class="form-control">
                                 <span class="input-group-btn">
-              <button class="btn btn-primary" type="submit" id="text_search_btn"><i class="fa fa-search"></i></button>
-          </span>
+                                    <button class="btn btn-primary" type="submit" id="text_search_btn"><i class="fa fa-search"></i></button>
+                                </span>
                             </div>
                         </li>
                     </ul>
@@ -71,22 +71,19 @@
                         <ul class="nav open" id="categories">
 
                             <li>
-                                <a>
-        Archived Storms
-        <span class="badge pull-right">56</span>
-      </a>
+                                <a>Archived Storms
+                                    <span class="badge pull-right">56</span>
+                                </a>
                             </li>
                             <li>
-                                <a class="active">
-        My What-if Scenarios
-        <span class="badge pull-right">2</span>
-      </a>
+                                <a class="active">My What-if Scenarios
+                                    <span class="badge pull-right">2</span>
+                                </a>
                             </li>
                             <li>
-                                <a>
-        Shared with Me
-        <span class="badge pull-right">6</span>
-      </a>
+                                <a>Shared with Me
+                                    <span class="badge pull-right">6</span>
+                                </a>
                             </li>
                             <li>
                                 <a>
@@ -137,7 +134,16 @@
                         </ul>
                     </div>
                 </div>
-                <article>
+                <ul class="dashboard-list">
+                    {% for simulation in simulations_for_user %}
+                    <li>
+                        <p>{{ simulation.description }} <span class="owner">by <a href="">{{ simulation.owner }}</a></span></p>
+                        <p class="shp-scenario"><span>Sea Level Rise:</span> {{ simulation.data.timeMC }}, <span>Coastal Protection:</span> Current, <span>Tides:</span> Zero, <span>Analysis type:</span> Deterministic</p>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                <!--<article>
                     <div class="row items-list">
                         <div class="col-xs-12 item-info shp-info">
 
@@ -179,7 +185,7 @@
                             </p>
                         </div>
                     </div>
-                </article>
+                </article>-->
 
 
                 <div class="row" style="margin-bottom: 300px">
