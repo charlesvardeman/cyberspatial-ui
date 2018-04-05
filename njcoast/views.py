@@ -190,7 +190,10 @@ def map_settings(request, map_id):
         #get objects and update (should be unique so grab the first)
         #for map_obj in map_objs:
         if len(map_objs) > 0:
-            data_dict = json.loads(map_objs[0]['settings'])
+            if len(map_objs[0]['settings']) > 0:
+                data_dict = json.loads(map_objs[0]['settings'])
+            else:
+                data_dict = {}
 
             #pop them into a dictionary and send them back to the caller as a JsonResponse
             return JsonResponse(data_dict)

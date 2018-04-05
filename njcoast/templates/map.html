@@ -329,16 +329,23 @@
 
       //apply stored settings to current map
       function apply_settings(data){
-          console.log("Layers selected length " + data.layers_selected.length);
 
-          //setup selected layers
-          for(i=0; i<data.layers_selected.length; i++){
-              //find by id
-              document.getElementById(data.layers_selected[i]).checked = true;
+          //if layers the set them
+          if("layers_selected" in data){
+              console.log("Layers selected length " + data.layers_selected.length);
+
+              //setup selected layers
+              for(i=0; i<data.layers_selected.length; i++){
+                  //find by id
+                  document.getElementById(data.layers_selected[i]).checked = true;
+              }
           }
 
-          //set map parameters
-          mymap.setView([data.latitude, data.longitude], data.zoom);
+          //if map view then apply
+          if("latitude" in data && "longitude" in data && "zoom" in data){
+              //set map parameters
+              mymap.setView([data.latitude, data.longitude], data.zoom);
+          }
 
           //#TODO load simulations
       }
