@@ -75,7 +75,7 @@ function add_layer_to_menu(layer, ul_id) {
     // Create the HTML <li> for each layer and append to the <ul>
     var layer_html = '<li><input id="' + $.trim(layer.id) + '" type="checkbox"> ' + $.trim(layer.name) + '</li>';
     $(ul_id).append(layer_html);
-    layer.maplayer = L.tileLayer.wms(layer.layer_link, {layers: layer.layer, transparent: true, format: 'image/png'});
+    layer.maplayer = L.tileLayer.betterWms(layer.layer_link, {layers: layer.layer, transparent: true, format: 'image/png'});
     layer_list.push(layer);
 
     $('#' + $.trim(layer.id)).click(function () {
