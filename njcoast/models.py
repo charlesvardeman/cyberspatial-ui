@@ -11,6 +11,7 @@ class NJCMap(models.Model):
     name = models.CharField(max_length=50)
     description = models.TextField(blank=True)
     settings = models.TextField(blank=True)
+    shared_with = models.TextField(blank=True)
     # layers = models.ManyToManyField(Layer, blank=True)
     is_default = models.BooleanField(default=False)
 

@@ -116,22 +116,24 @@
                 <div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Download Map
                         </button></div>
 
+                {% if map_id %}
                 <a data-toggle="collapse" href="#users" aria-expanded="false" aria-controls="users">
                     <h4 class="map-control-item-heading">Sharing<i class="fa fa-chevron-down pull-right"
                                                                                aria-hidden="true"></i></h4>
                     <p class="qualifier" style="margin-bottom: 0">Share maps with other users</p>
                 </a>
                 <div class="collapse" id="users">
-                    <p style="margin-top: 10px"><button id="share_map" class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Share Map</button></p>
+                    <p style="margin-top: 10px"><button id="share_map" class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="" onclick="save_shared_with();">Share Map</button></p>
                     <p class="qualifier" style="margin-top: 10px">Select users in my group to share with</p>
                     <ul class="dashboard-list">
                       {% for user in users_in_group %}
                       <li>
-                        <p><input type="checkbox" value="on" data-toggle="popover" data-placement="right"> {{ user }}</p>
+                        <p><input id="share-{{ forloop.counter }}" name="{{ user }}" type="checkbox" value="on" data-toggle="popover" data-placement="right"> {{ user }}</p>
                       </li>
                       {% endfor %}
                     </ul>
                 </div>
+                {% endif %}
             </div>
         </div>
 
@@ -146,8 +148,9 @@
     <script type=text/javascript>
         //fix for callable js
         var annotate_map_id = null;
+
         {% if map_id %}
-            var annotate_map_id = {{ map_id }};
+            annotate_map_id = {{ map_id }};
         {% else %}
             //disable load/save
             $("#save_map").addClass("disabled");
@@ -295,17 +298,17 @@
                     for(var i=0; i<layer_list.length; i++) {
                         if (layer_list[i].id == this.id){
                             console.log("found matching layer: " + this.id);
-                            layer_list[i].maplayer.addTo(mymap);
                             layers_selected.push(this.id);
+                            layer_list[i].maplayer.addTo(mymap);
                         }
                     }
                 } else {
                     for(var i=0; i<layer_list.length; i++) {
                         if (layer_list[i].id == this.id){
                             console.log("found matching layer: " + this.id);
-                            mymap.removeLayer(layer_list[i].maplayer);
                             var index = layers_selected.indexOf(this.id);
                             if (index !== -1) layers_selected.splice(index, 1);
+                            mymap.removeLayer(layer_list[i].maplayer);
                         }
                     }
                 }
@@ -395,6 +398,47 @@
               error: function(result) {
                   console.log("ERROR:", result)
                   $.notify("Error saving map settings", "error");
+              }
+          });
+
+      }
+
+      //save map sharing users
+      function save_shared_with(){
+          //get list of users
+          var more_elmts;
+          var counter = 1;
+
+          data = new Array();
+
+          //loop until end of list
+          do{
+              more_elmts = document.getElementById('share-'+counter++);
+
+              //if exists and checked then save
+              if(more_elmts){
+                  if(more_elmts.checked){
+                      data.push(more_elmts.name);
+                  }
+              }
+          }while(more_elmts)
+
+          console.log("Data "+JSON.stringify(data));
+
+          //send to backend
+          $.ajax({
+              type: "POST",
+              url: "/map/" + annotate_map_id + "/settings/",
+              data: JSON.stringify(data),
+              dataType: "json",
+              success: function(result) {
+                  console.log("SETTING SHARES -- SUCCESS!" + result.saved);
+                  //now auto save so dont flag
+                  $.notify("Shares saved", "success");
+              },
+              error: function(result) {
+                  console.log("ERROR:", result)
+                  $.notify("Error saving shares", "error");
               }
           });
 

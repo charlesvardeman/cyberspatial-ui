@@ -96,6 +96,11 @@
                   <a href="{% url 'map_annotate' map.id %}"><span class="status">private</span>{{ map.name }}</a>
                 </li>
                 {% endfor %}
+                {% for map in shared_maps_for_user %}
+                <li>
+                  <a href="{% url 'map_annotate' map.id %}"><span class="status">shared</span>{{ map.name }}</a>
+                </li>
+                {% endfor %}
               </ul>
             </li>
           </ul>

@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django import template
 from django.contrib.auth.models import Group
+from django.db.models import Q
 
 '''
   This function is used to respond to ajax requests for which layers should be
@@ -84,6 +85,7 @@ class MapTemplateView(TemplateView):
             context['zoom_level'] = 13
 
         #get users
+        #TODO need to find groups I am in!
         group = Group.objects.get(name='keansburg-eom')
         usersList = group.user_set.all()
         for user in usersList:
@@ -216,9 +218,15 @@ def map_settings(request, map_id):
 
         #get objects and update (should be unique so grab the first)
         if len(map_objs) > 0:
-            print "ID ", map_objs[0].name, map_objs[0].id, map_id
-            map_objs[0].settings = request.body
-            map_objs[0].save()
+            #settings? or sharing?
+            if 'latitude' in request.body:
+                print "Settings ", map_objs[0].name, map_objs[0].id, map_id
+                map_objs[0].settings = request.body
+                map_objs[0].save()
+            else:
+                print "Shared ", map_objs[0].name, map_objs[0].id, map_id
+                map_objs[0].shared_with = request.body
+                map_objs[0].save()
 
             #flag if actually updated
             ret_val = True
@@ -261,7 +269,12 @@ class DashboardTemplateView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(DashboardTemplateView, self).get_context_data(**kwargs)
+
+        #quiery, select if I am the owner
         context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+
+        #quiery, select if I an in the list of shared_with__contains
+        context['shared_maps_for_user'] = NJCMap.objects.filter(shared_with__contains = self.request.user)
         return context
 
 class ExploreTemplateView(TemplateView):
