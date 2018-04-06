@@ -124,6 +124,10 @@ class MapExpertTemplateView(TemplateView):
             context['home_latitude'] = "39.9051846"
             context['home_longitude'] = "-74.1808381"
             context['zoom_level'] = 13
+
+        #quiery, select if I am the owner
+        context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+
         return context
 
 '''
