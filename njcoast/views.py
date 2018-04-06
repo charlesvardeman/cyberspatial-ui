@@ -90,6 +90,7 @@ class MapTemplateView(TemplateView):
         usersList = group.user_set.all()
         for user in usersList:
             print user.get_full_name()
+            #print self.request.user.get_full_name()
 
         #send to client
         context['users_in_group'] = usersList
