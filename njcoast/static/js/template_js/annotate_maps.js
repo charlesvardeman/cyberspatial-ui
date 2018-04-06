@@ -189,7 +189,7 @@ mymap.on('editable:created', function(e) {
     //add popup
     e.layer.bindPopup(html1 + "Input text ..." + html2 + "Input text ..." +
         html3 + "8" + html4 + html_delete);
-    e.layer.on('mouseover', function(e) {
+    e.layer.on('click', function(e) {
         this.openPopup();
     });
 
@@ -457,7 +457,7 @@ function annotation_update(e_layer) {
 
                                 //setup popup
                                 newobject.bindPopup(popup_text);
-                                newobject.on('mouseover', function(e) {
+                                newobject.on('click', function(e) {
                                     this.openPopup();
                                 });
                             }
@@ -670,7 +670,7 @@ function annotation_update(e_layer) {
                     //setup popup
                     newobject.bindPopup(html1 + socket_object.text + html2 + socket_object.text +
                         html3 + socket_object.text.length + html4 + html_delete);
-                    newobject.on('mouseover', function(e) {
+                    newobject.on('click', function(e) {
                         this.openPopup();
                     });
                 }
