@@ -8,6 +8,8 @@ from models import NJCMap, NJCMapAnnotation, NJCMapExpert
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django import template
+from django.contrib.auth.models import Group
 
 '''
   This function is used to respond to ajax requests for which layers should be
@@ -80,6 +82,16 @@ class MapTemplateView(TemplateView):
             context['home_latitude'] = "39.9051846"
             context['home_longitude'] = "-74.1808381"
             context['zoom_level'] = 13
+
+        #get users
+        group = Group.objects.get(name='keansburg-eom')
+        usersList = group.user_set.all()
+        for user in usersList:
+            print user.get_full_name()
+
+        #send to client
+        context['users_in_group'] = usersList
+
         return context
 
 class MapExpertTemplateView(TemplateView):

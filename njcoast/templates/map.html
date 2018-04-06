@@ -115,8 +115,18 @@
                 <!--<button id="load_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="load_annotation_elements();">Load Map</button>-->
                 <div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Download Map
                         </button></div>
-                <button id="share_map" class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Share Map
-                        </button>
+
+                <div class="collapse in" id="users">
+                    <p style="margin-top: 10px"><button id="share_map" class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Share Map</button></p>
+                    <p class="qualifier" style="margin-top: 10px">Select users in my group to share with</p>
+                    <ul class="dashboard-list">
+                      {% for user in users_in_group %}
+                      <li>
+                        <p><input type="checkbox" value="on" data-toggle="popover" data-placement="right"> {{ user }}</p>
+                      </li>
+                      {% endfor %}
+                    </ul>
+                </div>
             </div>
         </div>
 
