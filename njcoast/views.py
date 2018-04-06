@@ -8,6 +8,9 @@ from models import NJCMap, NJCMapAnnotation, NJCMapExpert
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django import template
+from django.contrib.auth.models import Group
+from django.db.models import Q
 
 '''
   This function is used to respond to ajax requests for which layers should be
@@ -80,6 +83,17 @@ class MapTemplateView(TemplateView):
             context['home_latitude'] = "39.9051846"
             context['home_longitude'] = "-74.1808381"
             context['zoom_level'] = 13
+
+        #get users
+        #TODO need to find groups I am in!
+        group = Group.objects.get(name='keansburg-eom')
+        usersList = group.user_set.all()
+        for user in usersList:
+            print user.get_full_name()
+
+        #send to client
+        context['users_in_group'] = usersList
+
         return context
 
 class MapExpertTemplateView(TemplateView):
@@ -178,6 +192,48 @@ def map_annotations(request, map_id):
         return JsonResponse({'saved': True, 'annotations' : annotations_updated})
 
 '''
+  API-ish view for map data ajax calls from the map page.
+'''
+@login_required
+def map_settings(request, map_id):
+    ret_val = False
+    if request.method == "GET":
+        #get matching object
+        map_objs = NJCMap.objects.filter(owner = request.user, id=map_id).values()
+
+        #get objects and update (should be unique so grab the first)
+        #for map_obj in map_objs:
+        if len(map_objs) > 0:
+            if len(map_objs[0]['settings']) > 0:
+                data_dict = json.loads(map_objs[0]['settings'])
+            else:
+                data_dict = {}
+
+            #pop them into a dictionary and send them back to the caller as a JsonResponse
+            return JsonResponse(data_dict)
+
+    elif request.method == "POST":
+        #get matching object
+        map_objs = NJCMap.objects.filter(owner = request.user, id=map_id)
+
+        #get objects and update (should be unique so grab the first)
+        if len(map_objs) > 0:
+            #settings? or sharing?
+            if 'latitude' in request.body:
+                print "Settings ", map_objs[0].name, map_objs[0].id, map_id
+                map_objs[0].settings = request.body
+                map_objs[0].save()
+            else:
+                print "Shared ", map_objs[0].name, map_objs[0].id, map_id
+                map_objs[0].shared_with = request.body
+                map_objs[0].save()
+
+            #flag if actually updated
+            ret_val = True
+
+    return JsonResponse({'saved': ret_val})
+
+'''
   API-ish view for expert simulation ajax calls from the map_expert page.
 '''
 @login_required
@@ -213,7 +269,12 @@ class DashboardTemplateView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(DashboardTemplateView, self).get_context_data(**kwargs)
+
+        #quiery, select if I am the owner
         context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+
+        #quiery, select if I an in the list of shared_with__contains
+        context['shared_maps_for_user'] = NJCMap.objects.filter(shared_with__contains = self.request.user)
         return context
 
 class ExploreTemplateView(TemplateView):

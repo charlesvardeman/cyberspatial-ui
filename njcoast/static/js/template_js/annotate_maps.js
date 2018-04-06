@@ -140,6 +140,8 @@ function deleteObject() {
         socket.send(JSON.stringify(socket_frame));
     }
 
+    //#TODO need to delete this object from the database!
+
     console.log("Delete " + current_popup_marker.myCustomID);
 }
 
@@ -170,6 +172,9 @@ function finishedEdit() {
             }
         }
         socket.send(JSON.stringify(socket_frame));
+
+        //save updated text
+        save_annotation_element(current_popup_marker);
     }
 }
 
@@ -197,6 +202,10 @@ mymap.on('editable:created', function(e) {
 
 //called after object dragged
 mymap.on('editable:dragend', function(e) {
+    //auto save?
+    if(annotate_map_id) {
+        save_annotation_element(e.layer);
+    }
     console.log("dragged");
 });
 
@@ -207,6 +216,9 @@ mymap.on('editable:editing', function(e) {
         annotation_jason = annotation_update(e.layer);
         if (annotation_jason != null) {
             socket.send(annotation_jason);
+
+            //auto save
+            save_annotation_element(e.layer);
         }
     }
 
@@ -221,8 +233,10 @@ mymap.on('editable:drawing:end', function(e) {
         annotation_jason = annotation_update(e.layer);
         if (annotation_jason != null) {
             socket.send(annotation_jason);
-        }
 
+            //auto save
+            save_annotation_element(e.layer);
+        }
     }
     console.log("editable:drawing:end, edited");
 });
@@ -350,6 +364,11 @@ function annotation_update(e_layer) {
     $(document).ready(function() {
             //add annotation layer
             annotationLayer.addTo(mymap);
+
+            //load current annotations
+            if(annotate_map_id){
+                get_annotations_from_server();
+            }
 
             // Note that the path doesn't matter right now; any WebSocket
             // connection gets bumped over to WebSocket consumers
@@ -500,8 +519,8 @@ function annotation_update(e_layer) {
                 mymap.addControl(circle_control);
 
                 //enable map save
-                $("#save_map").removeClass("disabled");
-                $("#load_map").removeClass("disabled");
+                //$("#save_map").removeClass("disabled");
+                //$("#load_map").removeClass("disabled");
 
                 //toggle button message
                 document.getElementById("show_annotate").innerHTML = "Hide Annotation Tools";
@@ -513,8 +532,8 @@ function annotation_update(e_layer) {
                 mymap.removeControl(circle_control);
 
                 //disable map save
-                $("#save_map").addClass("disabled");
-                $("#load_map").addClass("disabled");
+                //$("#save_map").addClass("disabled");
+                //$("#load_map").addClass("disabled");
 
                 //toggle button message
                 document.getElementById("show_annotate").innerHTML = "Show Annotation Tools";
@@ -523,6 +542,36 @@ function annotation_update(e_layer) {
 
             //stop button href
             return false;
+        }
+
+        //save single annotation object
+        function save_annotation_element(layer) {
+            console.log("save single");
+
+            var all_json = "{\n\t\"objects\": [";
+            var add_comma = false;
+
+            //annotation elements add
+            //container for JSON
+            var json_string = "";
+
+            //look for objects
+            annotation_jason = annotation_update(layer);
+            if (annotation_jason != null) {
+                json_string += annotation_jason;
+            }
+
+            console.log(json_string);
+            if (json_string.length > 1) {
+                all_json += json_string;
+                add_comma = true;
+            }
+
+            all_json += "\n\t]\n}";
+            console.log(all_json);
+
+            //send to the server
+            send_annotation_to_server(all_json);
         }
 
         //save annotation
@@ -561,7 +610,6 @@ function annotation_update(e_layer) {
 
             //send to the server
             send_annotation_to_server(all_json);
-
         }
 
         //AJAX stuff to send JSON to server (as the name implies)
@@ -575,7 +623,8 @@ function annotation_update(e_layer) {
                 dataType: "json",
                 success: function(result) {
                     console.log("ANNOTATION STORE -- SUCCESS!");
-                    $.notify(result.annotations + " annotations saved", "success");
+                    //now auto save so dont flag
+                    //$.notify(result.annotations + " annotations saved", "success");
                 },
                 error: function(result) {
                     console.log("ERROR:", result)
@@ -627,7 +676,11 @@ function annotation_update(e_layer) {
                 }
 
             }
-            $.notify(parsed.objects.length + " annotations loaded", "success");
+
+            //notify?
+            if(parsed.objects.length > 0){
+                $.notify(parsed.objects.length + " annotations loaded", "success");
+            }
         }
 
         //AJAX to get annotation layers
