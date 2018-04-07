@@ -11,6 +11,8 @@ from django.utils import timezone
 from django import template
 from django.contrib.auth.models import Group
 from django.db.models import Q
+from django.contrib.auth.models import User
+from itertools import chain
 
 '''
   This function is used to respond to ajax requests for which layers should be
@@ -85,12 +87,21 @@ class MapTemplateView(TemplateView):
             context['zoom_level'] = 13
 
         #get users
-        #TODO need to find groups I am in!
-        group = Group.objects.get(name='keansburg-eom')
-        usersList = group.user_set.all()
+        #find groups I am in!
+        groups = Group.objects.filter(user=self.request.user).exclude(name='anonymous')
+
+        #get unique users in groups but exclude myself
+        first_pass = True
+        for group in groups:
+            tempList = group.user_set.exclude(pk=self.request.user.pk)
+            if not first_pass:
+                usersList = (usersList | tempList).distinct()
+            else:
+                first_pass = False
+                usersList = tempList
+
         for user in usersList:
             print user.get_full_name()
-            #print self.request.user.get_full_name()
 
         #send to client
         context['users_in_group'] = usersList
@@ -124,6 +135,10 @@ class MapExpertTemplateView(TemplateView):
             context['home_latitude'] = "39.9051846"
             context['home_longitude'] = "-74.1808381"
             context['zoom_level'] = 13
+
+        #quiery, select if I am the owner
+        context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+
         return context
 
 '''
@@ -200,7 +215,10 @@ def map_settings(request, map_id):
     ret_val = False
     if request.method == "GET":
         #get matching object
-        map_objs = NJCMap.objects.filter(owner = request.user, id=map_id).values()
+        map_objs = NJCMap.objects.filter(id=map_id).values() #removed owner = request.user,
+
+        #TODO horrible hack to determine ownership
+        map_test = NJCMap.objects.filter(owner = request.user, id=map_id).values()
 
         #get objects and update (should be unique so grab the first)
         #for map_obj in map_objs:
@@ -209,6 +227,12 @@ def map_settings(request, map_id):
                 data_dict = json.loads(map_objs[0]['settings'])
             else:
                 data_dict = {}
+
+            #TODO horrible hack to determine ownership
+            if len(map_test) == 0:
+                data_dict['owner'] = 'other'
+            else:
+                data_dict['owner'] = 'me'
 
             #pop them into a dictionary and send them back to the caller as a JsonResponse
             return JsonResponse(data_dict)
@@ -219,12 +243,31 @@ def map_settings(request, map_id):
 
         #get objects and update (should be unique so grab the first)
         if len(map_objs) > 0:
-            #settings? or sharing?
+            #settings?
             if 'latitude' in request.body:
                 print "Settings ", map_objs[0].name, map_objs[0].id, map_id
                 map_objs[0].settings = request.body
                 map_objs[0].save()
-            else:
+
+            elif 'sim_id' in request.body: #or simulation to add
+                #test if it is already there
+                if request.POST['sim_id'] not in map_objs[0].settings:
+                    #get settings
+                    settings = json.loads(map_objs[0].settings)
+
+                    #append new simulation to simulations
+                    settings.setdefault('simulations', []).append(request.POST['sim_id'])
+
+                    #save it
+                    map_objs[0].settings = json.dumps(settings)
+                    map_objs[0].save()
+
+                    #print for posterity
+                    print "Settings ", map_objs[0].name, request.POST['sim_id'], json.dumps(settings)
+                else:
+                    print request.POST['sim_id'], "already exists!"
+
+            else: #or sharing?
                 print "Shared ", map_objs[0].name, map_objs[0].id, map_id
                 map_objs[0].shared_with = request.body
                 map_objs[0].save()

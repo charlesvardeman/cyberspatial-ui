@@ -6,7 +6,7 @@
  */
 
 //unique id for this simulation, and storage for data
-var sim_id = 0;
+var sim_id = 'aimo2wqdb';
 var data = null;
 
 //counter for sim seconds

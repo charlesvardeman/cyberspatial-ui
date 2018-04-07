@@ -501,8 +501,10 @@ function annotation_update(e_layer) {
             if (onOff) {
                 annotationLayer.addTo(mymap);
             } else {
-                document.getElementById("annotate").checked = false;
-                toggle_annotate(false);
+                //lose annotation tools if we turn off the layer
+                if(document.getElementById("show_annotate").innerHTML == "Hide Annotation Tools"){
+                    toggle_annotate();
+                }
                 mymap.removeLayer(annotationLayer);
             }
             console.log(onOff);
@@ -644,32 +646,66 @@ function annotation_update(e_layer) {
             for (i = 0; i < parsed.objects.length; i++) {
                 //get object
                 socket_object = parsed.objects[i];
+                console.log("IDs "+socket_object.owner+","+owner);
+
+                //set coloring according to owner
+                var color_param = {};
+                var icon_param = {};
+                if (socket_object.owner != owner) {
+                    color_param = {
+                        color: '#C92D40'
+                    };
+                    icon_param = {
+                        icon: redIcon
+                    };
+                }
 
                 //create
                 if (socket_object.type == 'marker') {
-                    newobject = L.marker([socket_object.data.latitude, socket_object.data.longitude]);
+                    newobject = L.marker([socket_object.data.latitude, socket_object.data.longitude], icon_param);
                 } else if (socket_object.type == 'polygon' || socket_object.type == 'polyline') {
                     console.log("Points " + socket_object.data.points);
                     var points = JSON.parse(socket_object.data.points);
                     console.log("Points " + points.length + "," + points[0][0]);
                     if (socket_object.type == 'polyline') {
-                        newobject = L.polyline(points);
+                        newobject = L.polyline(points, color_param);
                     } else {
-                        newobject = L.polygon(points);
+                        newobject = L.polygon(points, color_param);
                     }
                 } else if (socket_object.type == 'circle') {
-                    newobject = L.circle([socket_object.data.latitude, socket_object.data.longitude], socket_object.data.radius);
+                    newobject = L.circle([socket_object.data.latitude, socket_object.data.longitude], socket_object.data.radius, color_param);
                 }
 
                 //set id and add to layer
                 if (newobject != null) {
                     newobject.myCustomID = socket_object.data.id;
                     annotationLayer.addLayer(newobject);
-                    newobject.enableEdit(); //editing
+
+                    var popup_text = socket_object.data.text;
+
+                    //do I own it? if so editable
+                    if (socket_object.owner == owner) {
+                        //setup popup for editing
+                        if (popup_text == null) {
+                            popup_text = "Input text ...";
+                        }
+
+                        var popup_text = html1 + popup_text + html2 + popup_text +
+                            html3 + popup_text.length + html4 + html_delete;
+
+                        newobject.enableEdit(); //editing
+                        newobject.owned = true;
+                    }
+
+                    if (popup_text == null) {
+                        popup_text = "Undefined";
+                    }
+
+                    //newobject.enableEdit(); //editing
 
                     //setup popup
-                    newobject.bindPopup(html1 + socket_object.text + html2 + socket_object.text +
-                        html3 + socket_object.text.length + html4 + html_delete);
+                    newobject.bindPopup(popup_text);//html1 + socket_object.text + html2 + socket_object.text +
+                    //    html3 + socket_object.text.length + html4 + html_delete);
                     newobject.on('click', function(e) {
                         this.openPopup();
                     });

@@ -164,6 +164,9 @@
         //
         var owner = {{ user.id }};
 
+        //for heatmap
+        var heatmap;
+
         //disctionary of selected layers
         var layers_selected = new Array();
 
@@ -199,14 +202,14 @@
                 L.TileLayer.WMS.prototype.onAdd.call(this, map);
                 map.on('click', this.getFeatureInfo, this);
             },
-            
+
             onRemove: function (map) {
                 // Triggered when the layer is removed from a map.
                 //   Unregister a click listener, then do all the upstream WMS things
                 L.TileLayer.WMS.prototype.onRemove.call(this, map);
                 map.off('click', this.getFeatureInfo, this);
             },
-            
+
             getFeatureInfo: function (evt) {
                 // Make an AJAX request to the server and hope for the best
                 var url = this.getFeatureInfoUrl(evt.latlng), showResults = L.Util.bind(this.showGetFeatureInfo, this);
@@ -215,7 +218,7 @@
                     success: function (data, status, xhr) {
                         var err = typeof data === 'string' ? null : data;
                         //Fix for blank popup window
-                        var doc = (new DOMParser()).parseFromString(data, "text/html"); 
+                        var doc = (new DOMParser()).parseFromString(data, "text/html");
                         if (doc.body.innerHTML.trim().length > 0)
                             showResults(err, evt.latlng, data);
                     },
@@ -224,19 +227,19 @@
                     }
                 });
             },
-            
+
             getFeatureInfoUrl: function (latlng) {
                 // Construct a GetFeatureInfo request URL given a point
                 var point = this._map.latLngToContainerPoint(latlng, this._map.getZoom()),
                 size = this._map.getSize(),
-                
+
                 params = {
                     request: 'GetFeatureInfo',
                     service: 'WMS',
                     srs: 'EPSG:4326',
                     styles: this.wmsParams.styles,
                     transparent: this.wmsParams.transparent,
-                    version: this.wmsParams.version,      
+                    version: this.wmsParams.version,
                     format: this.wmsParams.format,
                     bbox: this._map.getBounds().toBBoxString(),
                     height: size.y,
@@ -245,16 +248,16 @@
                     query_layers: this.wmsParams.layers,
                     info_format: 'text/html'
                 };
-                
+
                 params[params.version === '1.3.0' ? 'i' : 'x'] = point.x;
                 params[params.version === '1.3.0' ? 'j' : 'y'] = point.y;
-                
+
                 return this._url + L.Util.getParamString(params, this._url, true);
             },
-            
+
             showGetFeatureInfo: function (err, latlng, content) {
                 if (err) { console.log(err); return; } // do nothing if there's an error
-                
+
                 // Otherwise show the content in a popup, or something.
                 L.popup({ maxWidth: 800})
                 .setLatLng(latlng)
@@ -264,7 +267,7 @@
         });
 
         L.tileLayer.betterWms = function (url, options) {
-            return new L.TileLayer.BetterWMS(url, options);  
+            return new L.TileLayer.BetterWMS(url, options);
         };
 
         //~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -424,14 +427,26 @@
       //apply stored settings to current map
       function apply_settings(data){
 
+          //test if I own the map
+          if(data.owner == 'other'){
+              console.log("not mine");
+              //diasble save map and share
+              document.getElementById("save_map").classList.add("disabled");
+              document.getElementById("share_map").classList.add("disabled");
+          }
+
           //if layers the set them
           if("layers_selected" in data){
               console.log("Layers selected length " + data.layers_selected.length);
 
               //setup selected layers
               for(i=0; i<data.layers_selected.length; i++){
-                  //find by id
-                  document.getElementById(data.layers_selected[i]).checked = true;
+                  //find by id, click if not checked
+                  if(document.getElementById(data.layers_selected[i])){
+                      if(!document.getElementById(data.layers_selected[i]).checked){
+                        document.getElementById(data.layers_selected[i]).click();//checked = true;
+                      }
+                  }
               }
           }
 
@@ -441,7 +456,58 @@
               mymap.setView([data.latitude, data.longitude], data.zoom);
           }
 
-          //#TODO load simulations
+          //#load simulations
+          //<li>
+          //<p><input id="simulation-1" name="abcdef" type="checkbox" value="on" data-toggle="popover" data-placement="right"> abcdef</p>
+          //</li>
+          for(i=0; i<data.simulations.length; i++){
+              console.log("sim "+data.simulations[i]);
+              //create li element
+              var li = document.createElement("LI");
+              li.innerHTML = "<p><input id=\"simulation-" + i + "\" name=\"" + data.simulations[i]
+                    + "\" type=\"checkbox\" value=\"on\" data-toggle=\"popover\" data-placement=\"right\" onchange=\"load_simulation(this);\"> "
+                        + data.simulations[i] + "</p>";
+              document.getElementById("currentsimulationslist").appendChild(li);
+          }
+
+      }
+
+      //load simulation heatmap if clicked
+      function load_simulation(object){
+          console.log("Sim "+object.name+","+object.checked+","+owner);
+
+          //if clicked, load
+          if(object.checked){
+
+              //get heatmap from S3
+              $.ajax({
+                  type: "GET",
+                  url: "https://s3.amazonaws.com/simulation.njcoast.us/simulation/" + owner.toString() + "/" + object.name + "/heatmap.json",
+                  //data: data,
+                  dataType: "json",
+                  //contentType: 'application/json',
+                  success: function (data) {
+                      console.log("EXPERT SIMULATION LOAD -- SUCCESS.", data);
+
+                      //save data
+                      addressPoints = data;
+
+                      //add to map
+                      heatmap = L.heatLayer(addressPoints.runup, {max: 4, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
+                      $.notify( "Heatmap loaded", "success");
+
+                      //enable save button? #TODO And Add to map?
+                      document.getElementById("save_button").classList.remove("disabled");
+                  },
+                  error: function (data) {
+                      console.log("EXPERT SIMULATION LOAD -- ERROR:", data)
+                      $.notify("Failed to load heatmap.", "error");
+                  }
+              });
+          }else{
+              //#TODO remove
+              mymap.removeLayer(heatmap);
+          }
       }
 
       //save current map

@@ -199,12 +199,11 @@
                 Add Results to Map ... <i class="fa fa-caret-up" style="margin-left: 10px" aria-hidden="true"></i>
               </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" href="map-p.html">Standard Planning Map</a>
-                        <a class="dropdown-item" href="#">My Custom Map #4</a>
-                        <a class="dropdown-item" href="#">Hurricane Jose Map - Annotated</a>
-                        <a class="dropdown-item" href="#">Jones Planning Map</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="explore-maps.html">Browse All Maps</a>
+                    {% for map in maps_for_user %}
+                        <a class="dropdown-item" name="{{ map.id }}" href="#" onclick="add_expert_to_map(this);">{{ map.name }}</a>
+                        <!--<div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="explore-maps.html">Browse All Maps</a>-->
+                    {% endfor %}
                     </div>
                 </div>
             </div>
@@ -387,6 +386,36 @@
               document.getElementById("advanced_tools").style.display = "block";
               document.getElementById("basic_tools").style.display = "none";
           }
+      }
+
+      //add the current simulation to a map
+      function add_expert_to_map(object){
+          //save map and sim data
+          map_data = {
+              'sim_id': sim_id,
+          };
+
+          console.log("Map clicked "+JSON.stringify(map_data)+","+object.innerHTML);
+
+          //Do ajax
+          $.ajax({
+              type: "POST",
+              url: "/map/" + object.name + "/settings/",
+              data: {
+                  'sim_id': sim_id
+              },
+              dataType: "json",
+              success: function(result) {
+                  console.log("SAVING TO MAP -- SUCCESS!" + result.saved);
+                  //now auto save so dont flag
+                  $.notify("Simulation saved to map " + object.innerHTML, "success");
+              },
+              error: function(result) {
+                  console.log("ERROR:", result)
+                  $.notify("Error saving simulation to map", "error");
+              }
+          });
+
       }
 
     </script>
