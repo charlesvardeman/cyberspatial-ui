@@ -223,12 +223,31 @@ def map_settings(request, map_id):
 
         #get objects and update (should be unique so grab the first)
         if len(map_objs) > 0:
-            #settings? or sharing?
+            #settings?
             if 'latitude' in request.body:
                 print "Settings ", map_objs[0].name, map_objs[0].id, map_id
                 map_objs[0].settings = request.body
                 map_objs[0].save()
-            else:
+
+            elif 'sim_id' in request.body: #or simulation to add
+                #test if it is already there
+                if request.POST['sim_id'] not in map_objs[0].settings:
+                    #get settings
+                    settings = json.loads(map_objs[0].settings)
+
+                    #append new simulation to simulations
+                    settings.setdefault('simulations', []).append(request.POST['sim_id'])
+
+                    #save it
+                    map_objs[0].settings = json.dumps(settings)
+                    map_objs[0].save()
+
+                    #print for posterity
+                    print "Settings ", map_objs[0].name, request.POST['sim_id'], json.dumps(settings)
+                else:
+                    print request.POST['sim_id'], "already exists!"
+
+            else: #or sharing?
                 print "Shared ", map_objs[0].name, map_objs[0].id, map_id
                 map_objs[0].shared_with = request.body
                 map_objs[0].save()
