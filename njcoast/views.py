@@ -11,6 +11,8 @@ from django.utils import timezone
 from django import template
 from django.contrib.auth.models import Group
 from django.db.models import Q
+from django.contrib.auth.models import User
+from itertools import chain
 
 '''
   This function is used to respond to ajax requests for which layers should be
@@ -85,12 +87,21 @@ class MapTemplateView(TemplateView):
             context['zoom_level'] = 13
 
         #get users
-        #TODO need to find groups I am in!
-        group = Group.objects.get(name='keansburg-eom')
-        usersList = group.user_set.all()
+        #find groups I am in!
+        groups = Group.objects.filter(user=self.request.user).exclude(name='anonymous')
+
+        #get unique users in groups but exclude myself
+        first_pass = True
+        for group in groups:
+            tempList = group.user_set.exclude(pk=self.request.user.pk)
+            if not first_pass:
+                usersList = (usersList | tempList).distinct()
+            else:
+                first_pass = False
+                usersList = tempList
+
         for user in usersList:
             print user.get_full_name()
-            #print self.request.user.get_full_name()
 
         #send to client
         context['users_in_group'] = usersList
