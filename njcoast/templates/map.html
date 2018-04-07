@@ -424,6 +424,14 @@
       //apply stored settings to current map
       function apply_settings(data){
 
+          //test if I own the map
+          if(data.owner == 'other'){
+              console.log("not mine");
+              //diasble save map and share
+              document.getElementById("save_map").classList.add("disabled");
+              document.getElementById("share_map").classList.add("disabled");
+          }
+
           //if layers the set them
           if("layers_selected" in data){
               console.log("Layers selected length " + data.layers_selected.length);

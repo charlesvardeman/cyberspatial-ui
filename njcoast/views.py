@@ -215,7 +215,10 @@ def map_settings(request, map_id):
     ret_val = False
     if request.method == "GET":
         #get matching object
-        map_objs = NJCMap.objects.filter(id=map_id).values() #removed owner = request.user, 
+        map_objs = NJCMap.objects.filter(id=map_id).values() #removed owner = request.user,
+
+        #TODO horrible hack to determine ownership
+        map_test = NJCMap.objects.filter(owner = request.user, id=map_id).values()
 
         #get objects and update (should be unique so grab the first)
         #for map_obj in map_objs:
@@ -224,6 +227,12 @@ def map_settings(request, map_id):
                 data_dict = json.loads(map_objs[0]['settings'])
             else:
                 data_dict = {}
+
+            #TODO horrible hack to determine ownership
+            if len(map_test) == 0:
+                data_dict['owner'] = 'other'
+            else:
+                data_dict['owner'] = 'me'
 
             #pop them into a dictionary and send them back to the caller as a JsonResponse
             return JsonResponse(data_dict)
