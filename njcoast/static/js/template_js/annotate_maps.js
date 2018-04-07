@@ -501,8 +501,10 @@ function annotation_update(e_layer) {
             if (onOff) {
                 annotationLayer.addTo(mymap);
             } else {
-                document.getElementById("annotate").checked = false;
-                toggle_annotate(false);
+                //lose annotation tools if we turn off the layer
+                if(document.getElementById("show_annotate").innerHTML == "Hide Annotation Tools"){
+                    toggle_annotate();
+                }
                 mymap.removeLayer(annotationLayer);
             }
             console.log(onOff);
