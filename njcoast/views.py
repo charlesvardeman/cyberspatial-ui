@@ -215,7 +215,7 @@ def map_settings(request, map_id):
     ret_val = False
     if request.method == "GET":
         #get matching object
-        map_objs = NJCMap.objects.filter(owner = request.user, id=map_id).values()
+        map_objs = NJCMap.objects.filter(id=map_id).values() #removed owner = request.user, 
 
         #get objects and update (should be unique so grab the first)
         #for map_obj in map_objs:

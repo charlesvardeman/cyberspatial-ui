@@ -431,8 +431,10 @@
               //setup selected layers
               for(i=0; i<data.layers_selected.length; i++){
                   //find by id, click if not checked
-                  if(!document.getElementById(data.layers_selected[i]).checked){
-                    document.getElementById(data.layers_selected[i]).click();//checked = true;
+                  if(document.getElementById(data.layers_selected[i])){
+                      if(!document.getElementById(data.layers_selected[i]).checked){
+                        document.getElementById(data.layers_selected[i]).click();//checked = true;
+                      }
                   }
               }
           }
