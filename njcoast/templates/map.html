@@ -460,14 +460,16 @@
           //<li>
           //<p><input id="simulation-1" name="abcdef" type="checkbox" value="on" data-toggle="popover" data-placement="right"> abcdef</p>
           //</li>
-          for(i=0; i<data.simulations.length; i++){
-              console.log("sim "+data.simulations[i]);
-              //create li element
-              var li = document.createElement("LI");
-              li.innerHTML = "<p><input id=\"simulation-" + i + "\" name=\"" + data.simulations[i]
-                    + "\" type=\"checkbox\" value=\"on\" data-toggle=\"popover\" data-placement=\"right\" onchange=\"load_simulation(this);\"> "
-                        + data.simulations[i] + "</p>";
-              document.getElementById("currentsimulationslist").appendChild(li);
+          if("simulations" in data){
+              for(i=0; i<data.simulations.length; i++){
+                  console.log("sim "+data.simulations[i]);
+                  //create li element
+                  var li = document.createElement("LI");
+                  li.innerHTML = "<p><input id=\"simulation-" + i + "\" name=\"" + data.simulations[i]
+                        + "\" type=\"checkbox\" value=\"on\" data-toggle=\"popover\" data-placement=\"right\" onchange=\"load_simulation(this);\"> "
+                            + data.simulations[i] + "</p>";
+                  document.getElementById("currentsimulationslist").appendChild(li);
+              }
           }
 
       }
