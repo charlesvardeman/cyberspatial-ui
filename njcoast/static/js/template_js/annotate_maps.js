@@ -701,7 +701,7 @@ function annotation_update(e_layer) {
                         popup_text = "Undefined";
                     }
 
-                    newobject.enableEdit(); //editing
+                    //newobject.enableEdit(); //editing
 
                     //setup popup
                     newobject.bindPopup(popup_text);//html1 + socket_object.text + html2 + socket_object.text +
