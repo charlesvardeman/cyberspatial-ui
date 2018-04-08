@@ -165,7 +165,7 @@
         var owner = {{ user.id }};
 
         //for heatmap
-        var heatmap;
+        var heatmap = {};
 
         //disctionary of selected layers
         var layers_selected = new Array();
@@ -479,7 +479,7 @@
           console.log("Sim "+object.name+","+object.checked+","+owner);
 
           //if clicked, load
-          if(object.checked){
+          if(object.checked && !(object.name in heatmap)){
 
               //get heatmap from S3
               $.ajax({
@@ -495,11 +495,8 @@
                       addressPoints = data;
 
                       //add to map
-                      heatmap = L.heatLayer(addressPoints.runup, {max: 4, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
+                      heatmap[object.name] = L.heatLayer(addressPoints.runup, {max: 4, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
                       $.notify( "Heatmap loaded", "success");
-
-                      //enable save button? #TODO And Add to map?
-                      document.getElementById("save_button").classList.remove("disabled");
                   },
                   error: function (data) {
                       console.log("EXPERT SIMULATION LOAD -- ERROR:", data)
@@ -508,7 +505,10 @@
               });
           }else{
               //#TODO remove
-              mymap.removeLayer(heatmap);
+              if(object.name in heatmap){
+                  mymap.removeLayer(heatmap[object.name]);
+                  delete heatmap[object.name];
+              }
           }
       }
 
