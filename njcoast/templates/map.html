@@ -481,28 +481,28 @@
           //if clicked, load
           if(object.checked && !(object.name in heatmap)){
 
-              //get heatmap from S3
               $.ajax({
                   type: "GET",
-                  url: "https://s3.amazonaws.com/simulation.njcoast.us/simulation/" + owner.toString() + "/" + object.name + "/heatmap.json",
-                  //data: data,
-                  dataType: "json",
-                  //contentType: 'application/json',
-                  success: function (data) {
-                      console.log("EXPERT SIMULATION LOAD -- SUCCESS.", data);
-
-                      //save data
-                      addressPoints = data;
-
-                      //add to map
-                      heatmap[object.name] = L.heatLayer(addressPoints.runup, {max: 4, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
-                      $.notify( "Heatmap loaded", "success");
+                  url: "/store",
+                  data: {
+                      data: object.name
                   },
-                  error: function (data) {
-                      console.log("EXPERT SIMULATION LOAD -- ERROR:", data)
-                      $.notify("Failed to load heatmap.", "error");
+                  dataType: "json",
+                  success: function(result) {
+
+                      console.log("GETTING SIMULATION -- SUCCESS! ");
+
+                      //get heatmap from S3
+                      if(result.status){
+                          load_heatmap_from_s3(result.user_id, object.name)
+                      }
+                  },
+                  error: function(result) {
+                      console.log("ERROR:", result)
+                      $.notify("Error loading simulation", "error");
                   }
               });
+
           }else{
               //#TODO remove
               if(object.name in heatmap){
@@ -510,6 +510,31 @@
                   delete heatmap[object.name];
               }
           }
+      }
+
+      //get heatmap from S3
+      function load_heatmap_from_s3(owner, simulation){
+          $.ajax({
+              type: "GET",
+              url: "https://s3.amazonaws.com/simulation.njcoast.us/simulation/" + owner + "/" + simulation + "/heatmap.json",
+              //data: data,
+              dataType: "json",
+              //contentType: 'application/json',
+              success: function (data) {
+                  console.log("EXPERT SIMULATION LOAD -- SUCCESS.", data);
+
+                  //save data
+                  addressPoints = data;
+
+                  //add to map
+                  heatmap[simulation] = L.heatLayer(addressPoints.runup, {max: 4, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
+                  $.notify( "Heatmap loaded", "success");
+              },
+              error: function (data) {
+                  console.log("EXPERT SIMULATION LOAD -- ERROR:", data)
+                  $.notify("Failed to load heatmap.", "error");
+              }
+          });
       }
 
       //save current map
