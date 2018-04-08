@@ -73,7 +73,13 @@ function start_expert_simulation(){
     //get analysis
     var analysis = document.querySelector('input[name="analysis"]:checked').value;
 
-    console.log("tide "+tide+", protection "+protection+", analysis "+analysis);
+    //get storm type
+    var storm_type = "noreaster";
+    if(document.getElementById('stormbadge').innerHTML.indexOf("Hurricane") >= 0){
+        storm_type = "hurricane";
+    }
+
+    console.log("tide "+tide+", protection "+protection+", analysis "+analysis+", storm "+storm_type);
 
     data = {
       "index_SLT": [1,1],
@@ -89,6 +95,7 @@ function start_expert_simulation(){
       "tide_td": tide,
       "protection": protection,
       "analysis": analysis,
+      "storm_type": storm_type,
       "runup_file": "heatmap.json",
       "workspace_file": ""
     };

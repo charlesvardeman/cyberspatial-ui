@@ -58,12 +58,12 @@
                 <p class="tool-heading">1. select storm type</p>
                 <div class="dropdown show">
                     <button class="btn btn-secondary btn-title btn-block dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-               <div class="h-badge what-if">H</div>Hurricane
-            </button>
+                        <span id="stormbadge"><div class="h-badge what-if">H</div>Hurricane</span>
+                    </button>
                     <div class="dropdown-menu choose-storm" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" href="shp-tool-hurricane.html">
+                        <a class="dropdown-item" href="#" onclick="document.getElementById('stormbadge').innerHTML=this.innerHTML;">
                             <div class="h-badge what-if">H</div>Hurricane</a>
-                        <a class="dropdown-item" href="#">
+                        <a class="dropdown-item" href="#" onclick="document.getElementById('stormbadge').innerHTML=this.innerHTML;">
                             <div class="n-badge what-if">N</div>Nor'easter</a>
                     </div>
                 </div>
