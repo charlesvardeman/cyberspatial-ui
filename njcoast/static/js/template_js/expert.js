@@ -64,6 +64,17 @@ function start_expert_simulation(){
     //create unique id to tag socket comms
     sim_id = Math.random().toString(36).substr(2, 9);
 
+    //get tide
+    var tide = document.querySelector('input[name="tide"]:checked').value;
+
+    //get protection
+    var protection = document.querySelector('input[name="protection"]:checked').value;
+
+    //get analysis
+    var analysis = document.querySelector('input[name="analysis"]:checked').value;
+
+    console.log("tide "+tide+", protection "+protection+", analysis "+analysis);
+
     data = {
       "index_SLT": [1,1],
       "index_W": 0,
@@ -75,6 +86,9 @@ function start_expert_simulation(){
       "long_track": -72.610756,
       "SLR": input_slr,
       "tide": 0,
+      "tide_td": tide,
+      "protection": protection,
+      "analysis": analysis,
       "runup_file": "heatmap.json",
       "workspace_file": ""
     };
