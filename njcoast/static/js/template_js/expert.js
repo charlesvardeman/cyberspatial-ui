@@ -74,9 +74,9 @@ function start_expert_simulation(){
     var analysis = document.querySelector('input[name="analysis"]:checked').value;
 
     //get storm type
-    var storm_type = "noreaster";
+    var storm_type = "Nor'easter";
     if(document.getElementById('stormbadge').innerHTML.indexOf("Hurricane") >= 0){
-        storm_type = "hurricane";
+        storm_type = "Hurricane";
     }
 
     console.log("tide "+tide+", protection "+protection+", analysis "+analysis+", storm "+storm_type);

@@ -88,13 +88,13 @@
                             <li>
                                 <a>
                                     <div class="h-badge">H</div>Hurricanes
-                                    <span class="badge pull-right">38</span>
+                                    <span id="hurricanes" class="badge pull-right">38</span>
                                 </a>
                             </li>
                             <li>
                                 <a>
                                     <div class="n-badge">N</div>Nor'easters
-                                    <span class="badge pull-right">18</span>
+                                    <span id="noreasters" class="badge pull-right">18</span>
                                 </a>
                             </li>
                         </ul>
@@ -121,7 +121,7 @@
                 <div class="row" style="margin-top:1em">
                     <div class="col-md-3">
                         <span>Total: </span>
-                        <span ng-bind="total_counts">4</span>
+                        <span id="total" ng-bind="total_counts">4</span>
                     </div>
 
                     <div class="col-md-9">
@@ -134,11 +134,22 @@
                         </ul>
                     </div>
                 </div>
-                <ul class="dashboard-list">
+                <ul id="dashboard-list" class="dashboard-list">
                     {% for simulation in simulations_for_user %}
-                    <li>
-                        <p>{{ simulation.description }} <span class="owner">by <a href="">{{ simulation.owner }}</a></span></p>
-                        <p class="shp-scenario"><span>Sea Level Rise:</span> {{ simulation.data.SLR }}, <span>Coastal Protection:</span> {{ simulation.data.protection }}, <span>Tides:</span> {{ simulation.data.tide_td }}, <span>Analysis type:</span> {{ simulation.data.analysis }}</p>
+                    <li {% if forloop.counter > 4 %}class="hidden"{% endif %}>
+                        <article>
+                            <div class="row items-list">
+                                <div class="col-xs-12 item-info shp-info">
+                                    <h4><div id="badge-{{ forloop.counter }}" class="h-badge what-if">H</div><span id="storm-{{ forloop.counter }}">{{ simulation.data.storm_type }} Run</span></h4>
+                                    <p>{{ simulation.description }} <span class="owner">by <a href="">{{ simulation.owner }}</a></span></p>
+                                    <p class="shp-scenario"><span>Sea Level Rise:</span> {{ simulation.data.SLR }}, <span>Coastal Protection:</span> {{ simulation.data.protection }}, <span>Tides:</span> {{ simulation.data.tide_td }}, <span>Analysis type:</span> {{ simulation.data.analysis }}, <span>Simulation id:</span> {{ simulation.sim_id }}</p>
+                                    <br/>
+                                    <p class="actions">
+                                        <i class="fa fa-calendar-o"></i>{{ simulation.modified }} |
+                                    </p>
+                                </div>
+                            </div>
+                        </article>
                     </li>
                     {% endfor %}
                 </ul>
@@ -191,10 +202,10 @@
                 <div class="row" style="margin-bottom: 300px">
                     <nav>
                         <ul class="pagination pull-right">
-                            <li ng-click="paginate_down()"><a href><strong><i class="fa fa-angle-left"></i></strong></a></li>
-                            <li><a href>page <span ng-model="page" ng-bind="page">1</span> of <span ng-bind="numpages">1</span></a>
+                            <li ng-click="paginate_down()"><a id="pageBackwards" href="#"><strong><i class="fa fa-angle-left"></i></strong></a></li>
+                            <li><span>page <span id="page" ng-model="page" ng-bind="page">1</span> of <span id="pagetotal" ng-bind="numpages">1</span></span>
                             </li>
-                            <li ng-click="paginate_up()"><a href><strong><i class="fa fa-angle-right"></i></strong></a></li>
+                            <li ng-click="paginate_up()"><a id="pageForward" href="#"><strong><i class="fa fa-angle-right"></i></strong></a></li>
                         </ul>
                     </nav>
                 </div>
@@ -209,3 +220,101 @@
 <!-- close #wrap -->
 
 {% endblock middle %}
+
+{% block extra_script %}
+<script type=text/javascript>
+//total sims
+var counter = 1;
+var page = 1;
+
+var shownItems = 0;
+
+$("#pageBackwards").on("click", function() {
+    var items = $("#dashboard-list li");
+    //var shownItems = items.filter(":visible").length;
+    console.log("Clicked "+items.length+","+shownItems);
+
+    //remove old ones
+    items.slice(shownItems, shownItems + 4).addClass("hidden");
+
+    //add new ones
+    shownItems -= 4;
+    if(shownItems < 0){
+        shownItems = 0;
+    }else{
+        page--;
+    }
+    items.slice(shownItems, shownItems + 4).removeClass("hidden");
+
+    //update page
+    document.getElementById('page').innerHTML = page;
+});
+
+$("#pageForward").on("click", function() {
+    var items = $("#dashboard-list li");
+    //var shownItems = items.filter(":visible").length;
+    console.log("Clicked "+items.length+","+shownItems);
+
+    //remove old ones
+    items.slice(shownItems, shownItems + 4).addClass("hidden");
+
+    //add new ones
+    shownItems += 4;
+    if((shownItems + 4) > counter){
+        shownItems = counter - 4;
+    }else{
+        page++;
+    }
+    items.slice(shownItems, shownItems + 4).removeClass("hidden");
+
+    //update page
+    document.getElementById('page').innerHTML = page;
+});
+
+//~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$(document).ready(function () {
+
+    //loop until end of data list
+    hurricanes = 0;
+    noreasters = 0;
+
+    do{
+        more_elmts = document.getElementById('badge-'+counter);
+
+        //if exists and checked then save
+        if(more_elmts){
+            //change badge if Nor'easter
+            if(document.getElementById('storm-'+counter).innerHTML.indexOf("Nor'easter") >= 0){
+                more_elmts.innerHTML = "N";
+                more_elmts.classList.remove("h-badge");
+                more_elmts.classList.add("n-badge");
+                noreasters++;
+            }else{
+                hurricanes++;
+            }
+
+            //increment
+            counter++;
+        }
+
+    }while(more_elmts)
+
+    //fix last increment
+    counter--;
+
+    //update total
+    document.getElementById('total').innerHTML = counter;
+
+    //update hurricanes
+    document.getElementById('hurricanes').innerHTML = hurricanes;
+
+    //update total
+    document.getElementById('noreasters').innerHTML = noreasters;
+
+    //update total
+    document.getElementById('pagetotal').innerHTML = Math.ceil(counter / 4);
+
+});
+
+</script>
+{% endblock extra_script %}
