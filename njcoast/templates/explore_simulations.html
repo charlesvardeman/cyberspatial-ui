@@ -138,7 +138,7 @@
                     {% for simulation in simulations_for_user %}
                     <li>
                         <p>{{ simulation.description }} <span class="owner">by <a href="">{{ simulation.owner }}</a></span></p>
-                        <p class="shp-scenario"><span>Sea Level Rise:</span> {{ simulation.data.timeMC }}, <span>Coastal Protection:</span> Current, <span>Tides:</span> Zero, <span>Analysis type:</span> Deterministic</p>
+                        <p class="shp-scenario"><span>Sea Level Rise:</span> {{ simulation.data.SLR }}, <span>Coastal Protection:</span> {{ simulation.data.protection }}, <span>Tides:</span> {{ simulation.data.tide_td }}, <span>Analysis type:</span> {{ simulation.data.analysis }}</p>
                     </li>
                     {% endfor %}
                 </ul>
