@@ -64,6 +64,10 @@
         </div>
         <div class="col-sm-4 col-lg-3 col-xl-2" id="map-control-panel">
             <div class="map-control-item">
+                <h4 id="map_name" class="map-control-item-heading"></h4>
+                <p id="map_description" class="qualifier" style="margin-bottom: 0"></p>
+            </div>
+            <div class="map-control-item">
 
                 <a data-toggle="collapse" href="#gisLayers" aria-expanded="false" aria-controls="gisLayers">
                     <h4 class="map-control-item-heading">GIS Layers
@@ -470,6 +474,12 @@
                             + data.simulations[i] + "</p>";
                   document.getElementById("currentsimulationslist").appendChild(li);
               }
+          }
+
+          //load map descriptions
+          if("name" in data && "description" in data){
+              document.getElementById("map_name").innerHTML = data.name;
+              document.getElementById("map_description").innerHTML = data.description;
           }
 
       }

@@ -225,6 +225,8 @@ def map_settings(request, map_id):
         if len(map_objs) > 0:
             if len(map_objs[0]['settings']) > 0:
                 data_dict = json.loads(map_objs[0]['settings'])
+                data_dict['description'] = map_objs[0]['description']
+                data_dict['name'] = map_objs[0]['name']
             else:
                 data_dict = {}
 

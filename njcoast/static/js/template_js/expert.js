@@ -21,6 +21,9 @@ var heatmap = null;
 //persistant store for cst
 var sat_marker, marker, polyline;
 
+//saved flag
+var sim_saved = false;
+
 //function to start simulation, POSTs input data to the server
 function start_expert_simulation(){
 
@@ -102,6 +105,9 @@ function send_expert_data_to_server(data) {
             //disable save button? #TODO And Add to map?
             document.getElementById("save_button").classList.add("disabled");
             document.getElementById("dropdownMenuAddToMap").classList.add("disabled");
+
+            //flag that not saved
+            sim_saved = false;
 
         },
         error: function (result) {
@@ -321,10 +327,22 @@ function create_storm_track(onOff){
 
 //save expert simulation data
 function save_simulation(){
-
     //normal code, has simulation run?
     if(data == null || heatmap == null){
         alert("Plase run a sumulation before saving!");
+        return;
+    }
+
+    //check if sim saved
+    if(sim_saved){
+        alert("This simulation has been saved!");
+        return;
+    }
+
+    var sim_desc = prompt("Please enter a simulation description", "Simulation " + sim_id);
+
+    if (sim_desc == null || sim_desc == "") {
+        console.log("User cancelled the prompt.");
         return;
     }
 
@@ -356,12 +374,15 @@ function save_simulation(){
             'data': JSON.stringify(data),
             'user_id': owner.toString(),
             'sim_id': sim_id,
-            'description': "Simulation"
+            'description': sim_desc
         },
         //dataType: "json",
         success: function(result) {
             console.log("SIMULATION STORE -- SUCCESS!");
             $.notify("Simulation data saved", "success");
+
+            //flag saved
+            sim_saved = true
         },
         error: function(result) {
             console.log("SIMULATION STORE ERROR:", result)

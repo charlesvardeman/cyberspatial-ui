@@ -391,7 +391,9 @@
       //add the current simulation to a map
       function add_expert_to_map(object){
           //need to save first!
-          save_simulation();
+          if(!sim_saved){
+              save_simulation();
+          }
           
           //save map and sim data
           map_data = {
