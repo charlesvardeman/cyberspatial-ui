@@ -282,7 +282,20 @@ def map_settings(request, map_id):
 '''
 @login_required
 def map_expert_simulations(request):
-    if request.method == "POST":
+    if request.method == "GET":
+        #get matching object
+        sim_objs = NJCMapExpert.objects.filter(sim_id=request.GET['data']).values()
+
+        #get objects and update (should be unique so grab the first)
+        #for map_obj in map_objs:
+        if len(sim_objs) > 0:
+            print "user", sim_objs[0]['user_id'], request.GET['data']
+
+            return JsonResponse({'user_id': sim_objs[0]['user_id'], 'status': True})
+
+        return JsonResponse({'user_id': 0,'status': False})
+
+    elif request.method == "POST":
         expert_dict = json.loads(request.POST['data'])
         print request.POST['data']
         print request.POST['sim_id'], request.user

@@ -195,10 +195,10 @@
             <div class="map-control-item">
                 <button id="save_button" href="" class="btn btn-primary btn-md btn-block disabled" style="margin-top: 10px" onclick="save_simulation();">Save Results</button>
                 <div class="dropup show">
-                    <button class="btn btn-block btn-secondary dropdown-toggle" style="margin-top: 5px" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button class="btn btn-block btn-secondary dropdown-toggle disabled" style="margin-top: 5px" id="dropdownMenuAddToMap" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Add Results to Map ... <i class="fa fa-caret-up" style="margin-left: 10px" aria-hidden="true"></i>
               </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuAddToMap">
                     {% for map in maps_for_user %}
                         <a class="dropdown-item" name="{{ map.id }}" href="#" onclick="add_expert_to_map(this);">{{ map.name }}</a>
                         <!--<div class="dropdown-divider"></div>
@@ -390,6 +390,9 @@
 
       //add the current simulation to a map
       function add_expert_to_map(object){
+          //need to save first!
+          save_simulation();
+          
           //save map and sim data
           map_data = {
               'sim_id': sim_id,

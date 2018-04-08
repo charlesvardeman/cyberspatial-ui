@@ -165,7 +165,7 @@
         var owner = {{ user.id }};
 
         //for heatmap
-        var heatmap;
+        var heatmap = {};
 
         //disctionary of selected layers
         var layers_selected = new Array();
@@ -460,14 +460,16 @@
           //<li>
           //<p><input id="simulation-1" name="abcdef" type="checkbox" value="on" data-toggle="popover" data-placement="right"> abcdef</p>
           //</li>
-          for(i=0; i<data.simulations.length; i++){
-              console.log("sim "+data.simulations[i]);
-              //create li element
-              var li = document.createElement("LI");
-              li.innerHTML = "<p><input id=\"simulation-" + i + "\" name=\"" + data.simulations[i]
-                    + "\" type=\"checkbox\" value=\"on\" data-toggle=\"popover\" data-placement=\"right\" onchange=\"load_simulation(this);\"> "
-                        + data.simulations[i] + "</p>";
-              document.getElementById("currentsimulationslist").appendChild(li);
+          if("simulations" in data){
+              for(i=0; i<data.simulations.length; i++){
+                  console.log("sim "+data.simulations[i]);
+                  //create li element
+                  var li = document.createElement("LI");
+                  li.innerHTML = "<p><input id=\"simulation-" + i + "\" name=\"" + data.simulations[i]
+                        + "\" type=\"checkbox\" value=\"on\" data-toggle=\"popover\" data-placement=\"right\" onchange=\"load_simulation(this);\"> "
+                            + data.simulations[i] + "</p>";
+                  document.getElementById("currentsimulationslist").appendChild(li);
+              }
           }
 
       }
@@ -477,37 +479,62 @@
           console.log("Sim "+object.name+","+object.checked+","+owner);
 
           //if clicked, load
-          if(object.checked){
+          if(object.checked && !(object.name in heatmap)){
 
-              //get heatmap from S3
               $.ajax({
                   type: "GET",
-                  url: "https://s3.amazonaws.com/simulation.njcoast.us/simulation/" + owner.toString() + "/" + object.name + "/heatmap.json",
-                  //data: data,
-                  dataType: "json",
-                  //contentType: 'application/json',
-                  success: function (data) {
-                      console.log("EXPERT SIMULATION LOAD -- SUCCESS.", data);
-
-                      //save data
-                      addressPoints = data;
-
-                      //add to map
-                      heatmap = L.heatLayer(addressPoints.runup, {max: 4, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
-                      $.notify( "Heatmap loaded", "success");
-
-                      //enable save button? #TODO And Add to map?
-                      document.getElementById("save_button").classList.remove("disabled");
+                  url: "/store",
+                  data: {
+                      data: object.name
                   },
-                  error: function (data) {
-                      console.log("EXPERT SIMULATION LOAD -- ERROR:", data)
-                      $.notify("Failed to load heatmap.", "error");
+                  dataType: "json",
+                  success: function(result) {
+
+                      console.log("GETTING SIMULATION -- SUCCESS! ");
+
+                      //get heatmap from S3
+                      if(result.status){
+                          load_heatmap_from_s3(result.user_id, object.name)
+                      }
+                  },
+                  error: function(result) {
+                      console.log("ERROR:", result)
+                      $.notify("Error loading simulation", "error");
                   }
               });
+
           }else{
               //#TODO remove
-              mymap.removeLayer(heatmap);
+              if(object.name in heatmap){
+                  mymap.removeLayer(heatmap[object.name]);
+                  delete heatmap[object.name];
+              }
           }
+      }
+
+      //get heatmap from S3
+      function load_heatmap_from_s3(owner, simulation){
+          $.ajax({
+              type: "GET",
+              url: "https://s3.amazonaws.com/simulation.njcoast.us/simulation/" + owner + "/" + simulation + "/heatmap.json",
+              //data: data,
+              dataType: "json",
+              //contentType: 'application/json',
+              success: function (data) {
+                  console.log("EXPERT SIMULATION LOAD -- SUCCESS.", data);
+
+                  //save data
+                  addressPoints = data;
+
+                  //add to map
+                  heatmap[simulation] = L.heatLayer(addressPoints.runup, {max: 4, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
+                  $.notify( "Heatmap loaded", "success");
+              },
+              error: function (data) {
+                  console.log("EXPERT SIMULATION LOAD -- ERROR:", data)
+                  $.notify("Failed to load heatmap.", "error");
+              }
+          });
       }
 
       //save current map
@@ -518,7 +545,7 @@
               'longitude': mymap.getCenter().lng,
               'zoom': mymap.getZoom(),
               'layers_selected': layers_selected,
-              'simulations': ['go2ihs8fo', 'aimo2wqdb', '5yf1y7003']
+              'simulations': []
           };
 
           {% if map_id %}
