@@ -101,6 +101,7 @@ function send_expert_data_to_server(data) {
 
             //disable save button? #TODO And Add to map?
             document.getElementById("save_button").classList.add("disabled");
+            document.getElementById("dropdownMenuAddToMap").classList.add("disabled");
 
         },
         error: function (result) {
@@ -188,6 +189,7 @@ function load_expert_data_to_server() {
 
             //enable save button? #TODO And Add to map?
             document.getElementById("save_button").classList.remove("disabled");
+            document.getElementById("dropdownMenuAddToMap").classList.remove("disabled");
         },
         error: function (data) {
             console.log("EXPERT SIMULATION LOAD -- ERROR:", data)
