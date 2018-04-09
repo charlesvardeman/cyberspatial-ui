@@ -621,10 +621,11 @@
                       var sim_heading = data.storm_type + " Run #" + result.data.id;
 
                       var badge = 'n-badge';
-                      if(data.storm_type == "Hurricane"){
+                      if(data.storm_type.toLowerCase() == "hurricane"){
                           badge = 'h-badge';
                       }
 
+                      //files available to enable checkboxes
                       var surge = "disabled";
                       if(data.surge_file){
                           surge = "";
@@ -642,7 +643,7 @@
                       var html =  `<div id='${sim_id}'>
                               <div class="map-layer-group-heading what-if">
                                 <a data-toggle="collapse" href="#storm-${sim_id}" aria-expanded="false" aria-controls="storm-${sim_id}">
-                                  <i class="fa fa-chevron-right" aria-hidden="true"></i> <div class="${badge}">H</div>${sim_heading}<span><i class="fa fa-close" aria-hidden="true" onclick="remove_simulation('${sim_id}');"></i></span>
+                                  <i class="fa fa-chevron-right" aria-hidden="true"></i> <div class="${badge}">${sim_heading.charAt(0)}</div>${sim_heading}<span><i class="fa fa-close" aria-hidden="true" onclick="remove_simulation('${sim_id}');"></i></span>
                                 </a>
                               </div>
                               <p class="follow-unfollow">by TODO • ${result.data.modified}</p>
