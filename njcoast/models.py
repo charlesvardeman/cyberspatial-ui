@@ -38,6 +38,8 @@ class NJCMapExpert(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        blank=True,
+        null=True
     )
     sim_id = models.CharField(max_length=20)
     user_id = models.CharField(max_length=10)

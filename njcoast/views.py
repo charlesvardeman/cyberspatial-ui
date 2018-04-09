@@ -311,7 +311,7 @@ def map_expert_simulations(request):
         if len(sim_objs) > 0:
             print "user", sim_objs[0]['user_id'], request.GET['data']
 
-            return JsonResponse({'user_id': sim_objs[0]['user_id'], 'status': True})
+            return JsonResponse({'user_id': sim_objs[0]['user_id'], 'status': True, 'data': sim_objs[0]})
 
         return JsonResponse({'user_id': 0,'status': False})
 
