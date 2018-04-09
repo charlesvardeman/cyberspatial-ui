@@ -180,30 +180,48 @@ def map_annotations(request, map_id):
         return JsonResponse(annotations_dict)
 
     elif request.method == "POST":
+        print "Action", request.POST['action']
         annotations_updated = 0
-        annotation_dict = json.loads(request.POST['data'])
-        # print request.POST['data']
-        # print annotation_dict
-        for annotation in annotation_dict['objects']:
-            obj, created = NJCMapAnnotation.objects.get_or_create(
-                leaflet_id = annotation['data']['id'], map_id = map_id,
-                defaults = {
-                    'type' : annotation['type'],
-                    'text' : annotation['text'],
-                    'data' : json.dumps(annotation['data']),
-                    'owner' : request.user
-                }
-            )
-            if created:
-                annotations_updated += 1
-            else:
-                if obj.owner == request.user:
-                    #only update if the owner is the USER
-                    obj.text = annotation['text']
-                    obj.data = json.dumps(annotation['data'])
-                    obj.save()
-                    annotations_updated += 1
 
+        #test action
+        #save?
+        if request.POST['action'] == 'save':
+            annotation_dict = json.loads(request.POST['data'])
+            # print request.POST['data']
+            # print annotation_dict
+            for annotation in annotation_dict['objects']:
+                obj, created = NJCMapAnnotation.objects.get_or_create(
+                    leaflet_id = annotation['data']['id'], map_id = map_id,
+                    defaults = {
+                        'type' : annotation['type'],
+                        'text' : annotation['text'],
+                        'data' : json.dumps(annotation['data']),
+                        'owner' : request.user
+                    }
+                )
+                if created:
+                    annotations_updated += 1
+                else:
+                    if obj.owner == request.user:
+                        #only update if the owner is the USER
+                        obj.text = annotation['text']
+                        obj.data = json.dumps(annotation['data'])
+                        obj.save()
+                        annotations_updated += 1
+
+        #delete?
+        elif request.POST['action'] == 'delete':
+            print "In delete mode", request.POST['action']
+            annotation_dict = json.loads(request.POST['data'])
+            for annotation in annotation_dict['objects']:
+                #delete object
+                object_to_delete = NJCMapAnnotation.objects.get(leaflet_id = annotation['data']['id'], map_id = map_id)
+                object_to_delete.delete()
+                print "Deleted", annotation['data']['id']
+
+        #unknown
+        else:
+            print "Action not recognized", request.POST['action']
 
         return JsonResponse({'saved': True, 'annotations' : annotations_updated})
 
