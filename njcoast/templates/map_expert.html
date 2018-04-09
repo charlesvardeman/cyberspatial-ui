@@ -58,12 +58,12 @@
                 <p class="tool-heading">1. select storm type</p>
                 <div class="dropdown show">
                     <button class="btn btn-secondary btn-title btn-block dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-               <div class="h-badge what-if">H</div>Hurricane
-            </button>
+                        <span id="stormbadge"><div class="h-badge what-if">H</div>Hurricane</span>
+                    </button>
                     <div class="dropdown-menu choose-storm" aria-labelledby="dropdownMenuButton">
-                        <a class="dropdown-item" href="shp-tool-hurricane.html">
+                        <a class="dropdown-item" href="#" onclick="document.getElementById('stormbadge').innerHTML=this.innerHTML;">
                             <div class="h-badge what-if">H</div>Hurricane</a>
-                        <a class="dropdown-item" href="#">
+                        <a class="dropdown-item" href="#" onclick="document.getElementById('stormbadge').innerHTML=this.innerHTML;">
                             <div class="n-badge what-if">N</div>Nor'easter</a>
                     </div>
                 </div>
@@ -169,9 +169,9 @@
                 </ul>
                 <p class="slider-label">Analysis Type</p>
                 <ul class="shp-tool-radios">
-                    <li><input type="radio" name="type" value="high" checked> Deterministic</li>
-                    <li><input type="radio" name="analysis" value="current"> Probabilistic&nbsp;<span class="qualifier">expected</span></li>
-                    <li><input type="radio" name="analysis" value="current"> Probabilistic&nbsp;<span class="qualifier">extreme</span></li>
+                    <li><input type="radio" name="analysis" value="deterministic" checked> Deterministic</li>
+                    <li><input type="radio" name="analysis" value="probabilistic expected"> Probabilistic&nbsp;<span class="qualifier">expected</span></li>
+                    <li><input type="radio" name="analysis" value="probabilistic extreme"> Probabilistic&nbsp;<span class="qualifier">extreme</span></li>
                 </ul>
             </div>
             <div class="map-control-item">
@@ -391,8 +391,10 @@
       //add the current simulation to a map
       function add_expert_to_map(object){
           //need to save first!
-          save_simulation();
-          
+          if(!sim_saved){
+              save_simulation();
+          }
+
           //save map and sim data
           map_data = {
               'sim_id': sim_id,
