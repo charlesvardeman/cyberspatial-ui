@@ -106,10 +106,22 @@ var circle_control = new L.NewCircleControl();
 //~~~~popup editor scheme~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //html for popup
 function load_popup_html(text, length){
-    return `<span style="display:block;" id="txt">${text}</span>
-    <input onchange="finishedEdit()" id="txtB" type="text" value="${text}" style="display:none;" size="${length}"/>
-    <button type="button" class="btn btn-default btn-xs" onclick="startEdit()"><span class="fas fa-pencil-alt fa-fw"></span></button>
-    <button type="button" class="btn btn-default btn-xs" onclick="deleteObject()"><span class="fas fa-trash-alt"></span></button>`;
+    return `<table>
+                <tr>
+                    <th>
+                        <span style="display:block;outline:none;border:none;padding: 2px 2px 10px 2px;" id="txt">${text}</span>
+                        <textarea id="txtB" style="display:none;" >${text}</textarea>
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        <button id="edit_text" type="button" class="btn btn-default btn-xs" onclick="startEdit()"><span class="fas fa-pencil-alt fa-fw"></span></button>
+                        <button id="trash_text" type="button" class="btn btn-default btn-xs" onclick="deleteObject()"><span class="fas fa-trash-alt"></span></button>
+                        <button id="save_text" type="button" class="btn btn-default btn-xs disabled" onclick="finishedEdit()"><span class="fas fa-save"></span></button>
+                        <button id="cancel_text" type="button" class="btn btn-default btn-xs disabled" onclick="canceledEdit()"><span class="fas fa-ban"></span></button>
+                    </th>
+                </tr>
+            </table>`;
 }
 
 //current marker
@@ -156,9 +168,39 @@ function deleteObject() {
 }
 
 function startEdit() {
+    //fix edit box size
+    var element = document.getElementById("txt");
+    var positionInfo = element.getBoundingClientRect();
+    var height = positionInfo.height;
+    var width = positionInfo.width;
+
     document.getElementById("txtB").style.display = "block";
+    document.getElementById("txtB").style.width = width+"px";
+    document.getElementById("txtB").style.height = height+"px";
     document.getElementById("txt").style.display = "none";
+
+    //enable save and cancel
+    document.getElementById("save_text").classList.remove("disabled");
+    document.getElementById("cancel_text").classList.remove("disabled");
+
+    //disable edit/trash
+    document.getElementById("edit_text").classList.add("disabled");
+    document.getElementById("trash_text").classList.add("disabled");
     current_popup._updateLayout();
+}
+
+function canceledEdit(){
+    //flip texts back
+    document.getElementById("txtB").style.display = "none";
+    document.getElementById("txt").style.display = "block";
+
+    //disable save and cancel
+    document.getElementById("save_text").classList.add("disabled");
+    document.getElementById("cancel_text").classList.add("disabled");
+
+    //enable edit/trash
+    document.getElementById("edit_text").classList.remove("disabled");
+    document.getElementById("trash_text").classList.remove("disabled");
 }
 
 function finishedEdit() {
@@ -168,6 +210,14 @@ function finishedEdit() {
 
     //force new content
     current_popup_marker.setPopupContent(load_popup_html(document.getElementById("txtB").value, document.getElementById("txtB").value.length));
+
+    //disable save and cancel
+    document.getElementById("save_text").classList.add("disabled");
+    document.getElementById("cancel_text").classList.add("disabled");
+
+    //enable edit/trash
+    document.getElementById("edit_text").classList.remove("disabled");
+    document.getElementById("trash_text").classList.remove("disabled");
 
     if(annotate_map_id) {
         socket_frame = {
