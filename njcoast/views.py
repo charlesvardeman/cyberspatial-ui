@@ -361,7 +361,7 @@ class ExploreTemplateView(TemplateView):
         context = super(ExploreTemplateView, self).get_context_data(**kwargs)
 
         #get data from db
-        db_data = NJCMapExpert.objects.filter(owner = self.request.user)
+        db_data = NJCMapExpert.objects.filter(owner = self.request.user).order_by('-modified')
 
         #expand json data to dictionary
         for dat in db_data:

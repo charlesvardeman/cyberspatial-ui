@@ -259,10 +259,15 @@ $("#pageForward").on("click", function() {
     items.slice(shownItems, shownItems + 4).addClass("hidden");
 
     //add new ones
-    shownItems += 4;
-    if((shownItems + 4) > counter){
-        shownItems = counter - 4;
+    oldshownItems = shownItems;
+
+    if((shownItems + 8) > counter){
+        shownItems = counter - counter%4;
     }else{
+        shownItems += 4;
+    }
+
+    if(oldshownItems != shownItems){
         page++;
     }
     items.slice(shownItems, shownItems + 4).removeClass("hidden");
