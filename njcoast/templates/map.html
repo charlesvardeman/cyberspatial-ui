@@ -646,7 +646,7 @@
                                   <i class="fa fa-chevron-right" aria-hidden="true"></i> <div class="${badge}">${sim_heading.charAt(0)}</div>${sim_heading}<span><i class="fa fa-close" aria-hidden="true" onclick="remove_simulation('${sim_id}');"></i></span>
                                 </a>
                               </div>
-                              <p class="follow-unfollow">by TODO • ${result.data.modified}</p>
+                              <p class="follow-unfollow">by ${result.data.user_name} • ${result.data.modified}</p>
                               <ul class="collapse map-layers" id="storm-${sim_id}">
                                   <li><input name="${sim_id}" type="checkbox" name="gender" value="female" onchange="load_simulation(${result.user_id}, this);" ${wind}> Wind Field</li>
                                   <li><input name="${sim_id}" type="checkbox" name="gender" value="female" onchange="load_simulation(${result.user_id}, this);" ${surge}> Surge</li>

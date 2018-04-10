@@ -309,7 +309,7 @@ def map_expert_simulations(request):
         #get objects and update (should be unique so grab the first)
         #for map_obj in map_objs:
         if len(sim_objs) > 0:
-            print "user", sim_objs[0]['user_id'], request.GET['data']
+            print "user", sim_objs[0]['user_id'], request.GET['data'], request.user.get_full_name()
 
             return JsonResponse({'user_id': sim_objs[0]['user_id'], 'status': True, 'data': sim_objs[0]})
 
@@ -325,6 +325,7 @@ def map_expert_simulations(request):
                 'data' : request.POST['data'],
                 'description' : request.POST['description'],
                 'user_id': request.POST['user_id'],
+                'user_name': request.user.get_full_name(),
                 'modified': timezone.now()
             }
         )
