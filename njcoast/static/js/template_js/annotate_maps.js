@@ -112,12 +112,6 @@ function load_popup_html(text, length){
     <button type="button" class="btn btn-default btn-xs" onclick="deleteObject()"><span class="fas fa-trash-alt"></span></button>`;
 }
 
-var html1 = "<span style=\"display:block;\" id=\"txt\">";
-var html2 = "</span><input onchange=\"finishedEdit()\" id=\"txtB\" type=\"text\" value=\"";
-var html3 = "\" style=\"display:none;\" size=\"";
-var html4 = "\"/><button type=\"button\" class=\"btn btn-default btn-xs\" onclick=\"startEdit()\"><span class=\"fas fa-pencil-alt fa-fw\"></span></button>";
-var html_delete = "<button type=\"button\" class=\"btn btn-default btn-xs\" onclick=\"deleteObject()\"><span class=\"fas fa-trash-alt\"></span></button>";
-
 //current marker
 var current_popup_marker = null;
 var current_popup = null;
@@ -391,7 +385,7 @@ function annotation_update(e_layer) {
                 socket.onmessage = function(e) {
                     //onMapClick(e.data);
                     // alert('received socket');
-                    console.log(e)
+                    console.log(e.data)
                     socket_object = JSON.parse(e.data)
                     console.log(socket_object)
 
@@ -498,7 +492,7 @@ function annotation_update(e_layer) {
                     }
                 }
                 socket.onopen = function() {
-                    socket.send("joining map annotation for map " + annotate_map_id);
+                    //socket.send("joining map annotation for map " + annotate_map_id);
                 }
                 // Call onopen directly if socket is already open
                 if (socket.readyState == WebSocket.OPEN) socket.onopen();
