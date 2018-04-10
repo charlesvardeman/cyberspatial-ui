@@ -109,16 +109,16 @@ function load_popup_html(text, length){
     return `<table>
                 <tr>
                     <th>
-                        <span style="display:block;outline:none;border:none;padding: 2px 2px 10px 2px;" id="txt">${text}</span>
+                        <span style="display:block;outline:none;border:none;padding: 2px 2px 5px 2px;" id="txt">${text}</span>
                         <textarea id="txtB" style="display:none;" >${text}</textarea>
                     </th>
                 </tr>
                 <tr>
-                    <th>
-                        <button id="edit_text" type="button" class="btn btn-default btn-xs" onclick="startEdit()"><span class="fas fa-pencil-alt fa-fw"></span></button>
-                        <button id="trash_text" type="button" class="btn btn-default btn-xs" onclick="deleteObject()"><span class="fas fa-trash-alt"></span></button>
-                        <button id="save_text" type="button" class="btn btn-default btn-xs disabled" onclick="finishedEdit()"><span class="fas fa-save"></span></button>
-                        <button id="cancel_text" type="button" class="btn btn-default btn-xs disabled" onclick="canceledEdit()"><span class="fas fa-ban"></span></button>
+                    <th style="text-align: right;padding-top: 3px;">
+                        <button id="edit_text" type="button" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title="Edit" onclick="startEdit()"><span class="fas fa-pencil-alt fa-fw"></span></button>
+                        <button id="trash_text" type="button" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title="Delete" onclick="deleteObject()"><span class="fas fa-trash-alt"></span></button>
+                        <button id="save_text" type="button" class="btn btn-default btn-xs disabled" data-toggle="tooltip" data-placement="top" title="Save" onclick="finishedEdit()"><span class="fas fa-save"></span></button>
+                        <button id="cancel_text" type="button" class="btn btn-default btn-xs disabled" data-toggle="tooltip" data-placement="top" title="Cancel" onclick="canceledEdit()"><span class="fas fa-ban"></span></button>
                     </th>
                 </tr>
             </table>`;
