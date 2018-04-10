@@ -105,6 +105,13 @@ var circle_control = new L.NewCircleControl();
 
 //~~~~popup editor scheme~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //html for popup
+function load_popup_html(text, length){
+    return `<span style="display:block;" id="txt">${text}</span>
+    <input onchange="finishedEdit()" id="txtB" type="text" value="${text}" style="display:none;" size="${length}"/>
+    <button type="button" class="btn btn-default btn-xs" onclick="startEdit()"><span class="fas fa-pencil-alt fa-fw"></span></button>
+    <button type="button" class="btn btn-default btn-xs" onclick="deleteObject()"><span class="fas fa-trash-alt"></span></button>`;
+}
+
 var html1 = "<span style=\"display:block;\" id=\"txt\">";
 var html2 = "</span><input onchange=\"finishedEdit()\" id=\"txtB\" type=\"text\" value=\"";
 var html3 = "\" style=\"display:none;\" size=\"";
@@ -166,9 +173,7 @@ function finishedEdit() {
     document.getElementById("txt").innerHTML = document.getElementById("txtB").value;
 
     //force new content
-    current_popup_marker.setPopupContent(html1 + document.getElementById("txtB").value +
-        html2 + document.getElementById("txtB").value + html3 +
-        document.getElementById("txtB").value.length + html4 + html_delete);
+    current_popup_marker.setPopupContent(load_popup_html(document.getElementById("txtB").value, document.getElementById("txtB").value.length));
 
     if(annotate_map_id) {
         socket_frame = {
@@ -196,8 +201,7 @@ mymap.on('editable:created', function(e) {
     e.layer.owned = true;
 
     //add popup
-    e.layer.bindPopup(html1 + "Input text ..." + html2 + "Input text ..." +
-        html3 + "8" + html4 + html_delete);
+    e.layer.bindPopup(load_popup_html("Input text ...", "8"));
     e.layer.on('click', function(e) {
         this.openPopup();
     });
@@ -453,8 +457,7 @@ function annotation_update(e_layer) {
                                         popup_text = "Input text ...";
                                     }
 
-                                    var popup_text = html1 + popup_text + html2 + popup_text +
-                                        html3 + popup_text.length + html4 + html_delete;
+                                    var popup_text = load_popup_html(popup_text, popup_text.length);
 
                                     newobject.enableEdit(); //editing
                                     newobject.owned = true;
@@ -487,8 +490,7 @@ function annotation_update(e_layer) {
                                 if (socket_object.owner != owner) {
                                     object.setPopupContent(socket_object.data.text);
                                 } else {
-                                    object.setPopupContent(html1 + socket_object.data.text + html2 + socket_object.data.text +
-                                        html3 + socket_object.data.text.length + html4 + html_delete);
+                                    object.setPopupContent(load_popup_html(socket_object.data.text, socket_object.data.text.length));
                                 }
                             }
                         }
@@ -691,7 +693,7 @@ function annotation_update(e_layer) {
                     newobject.myCustomID = socket_object.data.id;
                     annotationLayer.addLayer(newobject);
 
-                    var popup_text = socket_object.data.text;
+                    var popup_text = socket_object.text;
 
                     //do I own it? if so editable
                     if (socket_object.owner == owner) {
@@ -700,8 +702,7 @@ function annotation_update(e_layer) {
                             popup_text = "Input text ...";
                         }
 
-                        var popup_text = html1 + popup_text + html2 + popup_text +
-                            html3 + popup_text.length + html4 + html_delete;
+                        var popup_text = load_popup_html(popup_text, popup_text.length);
 
                         newobject.enableEdit(); //editing
                         newobject.owned = true;
@@ -714,8 +715,7 @@ function annotation_update(e_layer) {
                     //newobject.enableEdit(); //editing
 
                     //setup popup
-                    newobject.bindPopup(popup_text);//html1 + socket_object.text + html2 + socket_object.text +
-                    //    html3 + socket_object.text.length + html4 + html_delete);
+                    newobject.bindPopup(popup_text);
                     newobject.on('click', function(e) {
                         this.openPopup();
                     });
