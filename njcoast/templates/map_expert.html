@@ -242,6 +242,18 @@
         var layer_list = [];
         var layer_groups = [];
 
+        // Setup Scale View
+        var scale_options = { metric: false, imperial: false, maxWidth: 200 };
+
+        var language = window.navigator.userLanguage || window.navigator.language;
+        if( language == "en-US" ){
+            scale_options.imperial = true;
+        }else{
+            scale_options.metric = true;
+        }
+
+        L.control.scale(scale_options).addTo(mymap);
+
         //~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         $(document).ready(function () {
 
