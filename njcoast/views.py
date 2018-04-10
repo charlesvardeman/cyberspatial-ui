@@ -180,30 +180,48 @@ def map_annotations(request, map_id):
         return JsonResponse(annotations_dict)
 
     elif request.method == "POST":
+        print "Action", request.POST['action']
         annotations_updated = 0
-        annotation_dict = json.loads(request.POST['data'])
-        # print request.POST['data']
-        # print annotation_dict
-        for annotation in annotation_dict['objects']:
-            obj, created = NJCMapAnnotation.objects.get_or_create(
-                leaflet_id = annotation['data']['id'], map_id = map_id,
-                defaults = {
-                    'type' : annotation['type'],
-                    'text' : annotation['text'],
-                    'data' : json.dumps(annotation['data']),
-                    'owner' : request.user
-                }
-            )
-            if created:
-                annotations_updated += 1
-            else:
-                if obj.owner == request.user:
-                    #only update if the owner is the USER
-                    obj.text = annotation['text']
-                    obj.data = json.dumps(annotation['data'])
-                    obj.save()
-                    annotations_updated += 1
 
+        #test action
+        #save?
+        if request.POST['action'] == 'save':
+            annotation_dict = json.loads(request.POST['data'])
+            # print request.POST['data']
+            # print annotation_dict
+            for annotation in annotation_dict['objects']:
+                obj, created = NJCMapAnnotation.objects.get_or_create(
+                    leaflet_id = annotation['data']['id'], map_id = map_id,
+                    defaults = {
+                        'type' : annotation['type'],
+                        'text' : annotation['text'],
+                        'data' : json.dumps(annotation['data']),
+                        'owner' : request.user
+                    }
+                )
+                if created:
+                    annotations_updated += 1
+                else:
+                    if obj.owner == request.user:
+                        #only update if the owner is the USER
+                        obj.text = annotation['text']
+                        obj.data = json.dumps(annotation['data'])
+                        obj.save()
+                        annotations_updated += 1
+
+        #delete?
+        elif request.POST['action'] == 'delete':
+            print "In delete mode", request.POST['action']
+            annotation_dict = json.loads(request.POST['data'])
+            for annotation in annotation_dict['objects']:
+                #delete object
+                object_to_delete = NJCMapAnnotation.objects.get(leaflet_id = annotation['data']['id'], map_id = map_id)
+                object_to_delete.delete()
+                print "Deleted", annotation['data']['id']
+
+        #unknown
+        else:
+            print "Action not recognized", request.POST['action']
 
         return JsonResponse({'saved': True, 'annotations' : annotations_updated})
 
@@ -291,9 +309,9 @@ def map_expert_simulations(request):
         #get objects and update (should be unique so grab the first)
         #for map_obj in map_objs:
         if len(sim_objs) > 0:
-            print "user", sim_objs[0]['user_id'], request.GET['data']
+            print "user", sim_objs[0]['user_id'], request.GET['data'], request.user.get_full_name()
 
-            return JsonResponse({'user_id': sim_objs[0]['user_id'], 'status': True})
+            return JsonResponse({'user_id': sim_objs[0]['user_id'], 'status': True, 'data': sim_objs[0]})
 
         return JsonResponse({'user_id': 0,'status': False})
 
@@ -307,6 +325,7 @@ def map_expert_simulations(request):
                 'data' : request.POST['data'],
                 'description' : request.POST['description'],
                 'user_id': request.POST['user_id'],
+                'user_name': request.user.get_full_name(),
                 'modified': timezone.now()
             }
         )
@@ -343,7 +362,7 @@ class ExploreTemplateView(TemplateView):
         context = super(ExploreTemplateView, self).get_context_data(**kwargs)
 
         #get data from db
-        db_data = NJCMapExpert.objects.filter(owner = self.request.user)
+        db_data = NJCMapExpert.objects.filter(owner = self.request.user).order_by('-modified')
 
         #expand json data to dictionary
         for dat in db_data:

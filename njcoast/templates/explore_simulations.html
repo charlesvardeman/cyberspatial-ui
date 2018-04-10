@@ -141,7 +141,7 @@
                             <div class="row items-list">
                                 <div class="col-xs-12 item-info shp-info">
                                     <h4><div id="badge-{{ forloop.counter }}" class="h-badge what-if">H</div><span id="storm-{{ forloop.counter }}">{{ simulation.data.storm_type }} Run</span></h4>
-                                    <p>{{ simulation.description }} <span class="owner">by <a href="">{{ simulation.owner }}</a></span></p>
+                                    <p>{{ simulation.description }} <span class="owner">by <a href="">{{ simulation.user_name }}</a></span></p>
                                     <p class="shp-scenario"><span>Sea Level Rise:</span> {{ simulation.data.SLR }}, <span>Coastal Protection:</span> {{ simulation.data.protection }}, <span>Tides:</span> {{ simulation.data.tide_td }}, <span>Analysis type:</span> {{ simulation.data.analysis }}, <span>Simulation id:</span> {{ simulation.sim_id }}</p>
                                     <br/>
                                     <p class="actions">
@@ -259,10 +259,15 @@ $("#pageForward").on("click", function() {
     items.slice(shownItems, shownItems + 4).addClass("hidden");
 
     //add new ones
-    shownItems += 4;
-    if((shownItems + 4) > counter){
-        shownItems = counter - 4;
+    oldshownItems = shownItems;
+
+    if((shownItems + 8) > counter){
+        shownItems = counter - counter%4;
     }else{
+        shownItems += 4;
+    }
+
+    if(oldshownItems != shownItems){
         page++;
     }
     items.slice(shownItems, shownItems + 4).removeClass("hidden");

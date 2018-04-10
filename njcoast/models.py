@@ -38,9 +38,14 @@ class NJCMapExpert(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        blank=True,
+        null=True
     )
     sim_id = models.CharField(max_length=20)
     user_id = models.CharField(max_length=10)
+    catagory = models.CharField(max_length=20, blank=True)
+    type = models.CharField(max_length=20, blank=True)
+    user_name = models.TextField(blank=True)
     description = models.TextField(blank=True)
     data = models.TextField(blank=True)
     modified    = models.DateTimeField()

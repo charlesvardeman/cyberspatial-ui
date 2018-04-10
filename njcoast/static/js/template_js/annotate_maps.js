@@ -138,9 +138,18 @@ function deleteObject() {
             }
         }
         socket.send(JSON.stringify(socket_frame));
-    }
 
-    //#TODO need to delete this object from the database!
+        //#TODO need to delete this object from the database!
+        var all_json = "{\n\t\"objects\": [";
+        all_json += JSON.stringify(socket_frame);
+        all_json += "\n\t]\n}";
+
+        console.log("Send for delete"+all_json);
+
+        //send to the server to delete
+        send_annotation_to_server(all_json, 'delete');
+
+    }
 
     console.log("Delete " + current_popup_marker.myCustomID);
 }
@@ -415,7 +424,7 @@ function annotation_update(e_layer) {
                             } else if (socket_object.type == 'polygon' || socket_object.type == 'polyline') {
                                 console.log("Points " + socket_object.data.points);
                                 var points = JSON.parse(socket_object.data.points);
-                                console.log("Points " + points.length + "," + points[0][0]);
+                                //console.log("Points " + points.length + "," + points[0][0]);
                                 if (socket_object.type == 'polyline') {
                                     newobject = L.polyline(points, color_param);
                                 } else {
@@ -573,7 +582,7 @@ function annotation_update(e_layer) {
             console.log(all_json);
 
             //send to the server
-            send_annotation_to_server(all_json);
+            send_annotation_to_server(all_json, 'save');
         }
 
         //save annotation
@@ -611,16 +620,17 @@ function annotation_update(e_layer) {
             console.log(all_json);
 
             //send to the server
-            send_annotation_to_server(all_json);
+            send_annotation_to_server(all_json, 'save');
         }
 
         //AJAX stuff to send JSON to server (as the name implies)
-        function send_annotation_to_server(data) {
+        function send_annotation_to_server(data, action) {
             $.ajax({
                 type: "POST",
                 url: "/map/" + annotate_map_id + "/annotations/",
                 data: {
-                    'data': data
+                    'data': data,
+                    'action': action
                 },
                 dataType: "json",
                 success: function(result) {
@@ -666,7 +676,7 @@ function annotation_update(e_layer) {
                 } else if (socket_object.type == 'polygon' || socket_object.type == 'polyline') {
                     console.log("Points " + socket_object.data.points);
                     var points = JSON.parse(socket_object.data.points);
-                    console.log("Points " + points.length + "," + points[0][0]);
+                    //console.log("Points " + points.length + "," + points[0][0]);
                     if (socket_object.type == 'polyline') {
                         newobject = L.polyline(points, color_param);
                     } else {
