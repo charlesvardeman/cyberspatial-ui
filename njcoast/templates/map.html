@@ -206,7 +206,7 @@
             },
 
             _zoomHome: function (e) {
-                map.setView([{{ home_latitude }}, {{ home_longitude }}], {{ zoom_level }});
+                this._map.setView([{{ home_latitude }}, {{ home_longitude }}], {{ zoom_level }});
             },
 
             _createButton: function (html, title, className, container, fn) {
