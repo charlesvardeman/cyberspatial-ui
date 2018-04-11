@@ -419,7 +419,8 @@
               type: "POST",
               url: "/map/" + object.name + "/settings/",
               data: {
-                  'sim_id': sim_id
+                  'sim_id': sim_id,
+                  'action': 'add_simulation'
               },
               dataType: "json",
               success: function(result) {

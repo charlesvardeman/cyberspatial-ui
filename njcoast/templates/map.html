@@ -524,7 +524,10 @@
           $.ajax({
               type: "POST",
               url: "/map/" + annotate_map_id + "/settings/",
-              data: JSON.stringify(map_data),
+              data: {
+                  'settings': JSON.stringify(map_data),
+                  'action': 'save'
+              },
               dataType: "json",
               success: function(result) {
                   console.log("SETTING STORE -- SUCCESS!" + result.saved);
@@ -565,7 +568,10 @@
           $.ajax({
               type: "POST",
               url: "/map/" + annotate_map_id + "/settings/",
-              data: JSON.stringify(data),
+              data: {
+                  'shares': JSON.stringify(data),
+                  'action': 'share'
+              },
               dataType: "json",
               success: function(result) {
                   console.log("SETTING SHARES -- SUCCESS!" + result.saved);
