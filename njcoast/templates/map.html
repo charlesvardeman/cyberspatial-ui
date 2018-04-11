@@ -462,6 +462,27 @@
               document.getElementById("map_description").innerHTML = data.description;
           }
 
+          //load users shared with
+          if("shared_with" in data){
+              //console.log("Shares "+data.shared_with[0]);
+              for(i=0; i<data.shared_with.length;i++){
+                  //get list of users
+                  var more_elmts;
+                  var counter = 1;
+
+                  //loop until end of list
+                  do{
+                     more_elmts = document.getElementById('share-'+counter++);
+
+                     //if exists and checked then save
+                     if(more_elmts){
+                        if(more_elmts.name == data.shared_with[i]){
+                            more_elmts.checked = true;
+                        }
+                     }
+                  }while(more_elmts)
+              }
+          }
       }
 
       //load simulation heatmap if clicked
@@ -614,16 +635,18 @@
                       }
 
                       //files available to enable checkboxes
+                      //#TODO hack as current sims surge not runup!
                       var surge = "disabled";
-                      if(data.surge_file){
+                      if(data.runup_file){
                           surge = "";
                       }
                       var wind = "disabled";
                       if(data.wind_file){
                           wind = "";
                       }
+                      //#TODO hack as current sims surge not runup!
                       var runup = "disabled";
-                      if(data.runup_file){
+                      if(data.surge_file){
                           runup = "";
                       }
 

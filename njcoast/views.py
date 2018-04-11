@@ -245,6 +245,7 @@ def map_settings(request, map_id):
                 data_dict = json.loads(map_objs[0]['settings'])
                 data_dict['description'] = map_objs[0]['description']
                 data_dict['name'] = map_objs[0]['name']
+                data_dict['shared_with'] = json.loads(map_objs[0]['shared_with'])
             else:
                 data_dict = {}
 
