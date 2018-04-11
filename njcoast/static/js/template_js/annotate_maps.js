@@ -105,11 +105,24 @@ var circle_control = new L.NewCircleControl();
 
 //~~~~popup editor scheme~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //html for popup
-var html1 = "<span style=\"display:block;\" id=\"txt\">";
-var html2 = "</span><input onchange=\"finishedEdit()\" id=\"txtB\" type=\"text\" value=\"";
-var html3 = "\" style=\"display:none;\" size=\"";
-var html4 = "\"/><button type=\"button\" class=\"btn btn-default btn-xs\" onclick=\"startEdit()\"><span class=\"fas fa-pencil-alt fa-fw\"></span></button>";
-var html_delete = "<button type=\"button\" class=\"btn btn-default btn-xs\" onclick=\"deleteObject()\"><span class=\"fas fa-trash-alt\"></span></button>";
+function load_popup_html(text, length){
+    return `<table>
+                <tr>
+                    <th>
+                        <span style="display:block;outline:none;border:none;padding: 2px 2px 5px 2px;" id="txt">${text}</span>
+                        <textarea id="txtB" style="display:none;" >${text}</textarea>
+                    </th>
+                </tr>
+                <tr>
+                    <th style="text-align: right;padding-top: 3px;">
+                        <button id="edit_text" type="button" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title="Edit" onclick="startEdit()"><span class="fas fa-pencil-alt fa-fw"></span></button>
+                        <button id="trash_text" type="button" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title="Delete" onclick="deleteObject()"><span class="fas fa-trash-alt"></span></button>
+                        <button id="save_text" type="button" class="btn btn-default btn-xs disabled" data-toggle="tooltip" data-placement="top" title="Save" onclick="finishedEdit()"><span class="fas fa-save"></span></button>
+                        <button id="cancel_text" type="button" class="btn btn-default btn-xs disabled" data-toggle="tooltip" data-placement="top" title="Cancel" onclick="canceledEdit()"><span class="fas fa-ban"></span></button>
+                    </th>
+                </tr>
+            </table>`;
+}
 
 //current marker
 var current_popup_marker = null;
@@ -155,9 +168,39 @@ function deleteObject() {
 }
 
 function startEdit() {
+    //fix edit box size
+    var element = document.getElementById("txt");
+    var positionInfo = element.getBoundingClientRect();
+    var height = positionInfo.height;
+    var width = positionInfo.width;
+
     document.getElementById("txtB").style.display = "block";
+    document.getElementById("txtB").style.width = width+"px";
+    document.getElementById("txtB").style.height = height+"px";
     document.getElementById("txt").style.display = "none";
+
+    //enable save and cancel
+    document.getElementById("save_text").classList.remove("disabled");
+    document.getElementById("cancel_text").classList.remove("disabled");
+
+    //disable edit/trash
+    document.getElementById("edit_text").classList.add("disabled");
+    document.getElementById("trash_text").classList.add("disabled");
     current_popup._updateLayout();
+}
+
+function canceledEdit(){
+    //flip texts back
+    document.getElementById("txtB").style.display = "none";
+    document.getElementById("txt").style.display = "block";
+
+    //disable save and cancel
+    document.getElementById("save_text").classList.add("disabled");
+    document.getElementById("cancel_text").classList.add("disabled");
+
+    //enable edit/trash
+    document.getElementById("edit_text").classList.remove("disabled");
+    document.getElementById("trash_text").classList.remove("disabled");
 }
 
 function finishedEdit() {
@@ -166,9 +209,15 @@ function finishedEdit() {
     document.getElementById("txt").innerHTML = document.getElementById("txtB").value;
 
     //force new content
-    current_popup_marker.setPopupContent(html1 + document.getElementById("txtB").value +
-        html2 + document.getElementById("txtB").value + html3 +
-        document.getElementById("txtB").value.length + html4 + html_delete);
+    current_popup_marker.setPopupContent(load_popup_html(document.getElementById("txtB").value, document.getElementById("txtB").value.length));
+
+    //disable save and cancel
+    document.getElementById("save_text").classList.add("disabled");
+    document.getElementById("cancel_text").classList.add("disabled");
+
+    //enable edit/trash
+    document.getElementById("edit_text").classList.remove("disabled");
+    document.getElementById("trash_text").classList.remove("disabled");
 
     if(annotate_map_id) {
         socket_frame = {
@@ -196,8 +245,7 @@ mymap.on('editable:created', function(e) {
     e.layer.owned = true;
 
     //add popup
-    e.layer.bindPopup(html1 + "Input text ..." + html2 + "Input text ..." +
-        html3 + "8" + html4 + html_delete);
+    e.layer.bindPopup(load_popup_html("Input text ...", "8"));
     e.layer.on('click', function(e) {
         this.openPopup();
     });
@@ -387,7 +435,7 @@ function annotation_update(e_layer) {
                 socket.onmessage = function(e) {
                     //onMapClick(e.data);
                     // alert('received socket');
-                    console.log(e)
+                    console.log(e.data)
                     socket_object = JSON.parse(e.data)
                     console.log(socket_object)
 
@@ -453,8 +501,7 @@ function annotation_update(e_layer) {
                                         popup_text = "Input text ...";
                                     }
 
-                                    var popup_text = html1 + popup_text + html2 + popup_text +
-                                        html3 + popup_text.length + html4 + html_delete;
+                                    var popup_text = load_popup_html(popup_text, popup_text.length);
 
                                     newobject.enableEdit(); //editing
                                     newobject.owned = true;
@@ -487,8 +534,7 @@ function annotation_update(e_layer) {
                                 if (socket_object.owner != owner) {
                                     object.setPopupContent(socket_object.data.text);
                                 } else {
-                                    object.setPopupContent(html1 + socket_object.data.text + html2 + socket_object.data.text +
-                                        html3 + socket_object.data.text.length + html4 + html_delete);
+                                    object.setPopupContent(load_popup_html(socket_object.data.text, socket_object.data.text.length));
                                 }
                             }
                         }
@@ -496,7 +542,7 @@ function annotation_update(e_layer) {
                     }
                 }
                 socket.onopen = function() {
-                    socket.send("joining map annotation for map " + annotate_map_id);
+                    //socket.send("joining map annotation for map " + annotate_map_id);
                 }
                 // Call onopen directly if socket is already open
                 if (socket.readyState == WebSocket.OPEN) socket.onopen();
@@ -691,7 +737,7 @@ function annotation_update(e_layer) {
                     newobject.myCustomID = socket_object.data.id;
                     annotationLayer.addLayer(newobject);
 
-                    var popup_text = socket_object.data.text;
+                    var popup_text = socket_object.text;
 
                     //do I own it? if so editable
                     if (socket_object.owner == owner) {
@@ -700,8 +746,7 @@ function annotation_update(e_layer) {
                             popup_text = "Input text ...";
                         }
 
-                        var popup_text = html1 + popup_text + html2 + popup_text +
-                            html3 + popup_text.length + html4 + html_delete;
+                        var popup_text = load_popup_html(popup_text, popup_text.length);
 
                         newobject.enableEdit(); //editing
                         newobject.owned = true;
@@ -714,8 +759,7 @@ function annotation_update(e_layer) {
                     //newobject.enableEdit(); //editing
 
                     //setup popup
-                    newobject.bindPopup(popup_text);//html1 + socket_object.text + html2 + socket_object.text +
-                    //    html3 + socket_object.text.length + html4 + html_delete);
+                    newobject.bindPopup(popup_text);
                     newobject.on('click', function(e) {
                         this.openPopup();
                     });

@@ -21,7 +21,7 @@ class NJCMap(models.Model):
 class NJCMapAnnotation(models.Model):
     leaflet_id = models.CharField(max_length=50)
     type = models.CharField(max_length=50)
-    text = models.CharField(max_length=250, blank=True, null=True)
+    text = models.TextField(blank=True, null=True)
     data = models.TextField()
     map = models.ForeignKey(NJCMap, on_delete=models.CASCADE)
     owner = models.ForeignKey(

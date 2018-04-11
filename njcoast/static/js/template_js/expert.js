@@ -19,7 +19,8 @@ var addressPoints = null;
 var heatmap = null;
 
 //persistant store for cst
-var sat_marker, marker, polyline;
+var sat_marker = null;
+var marker, polyline;
 
 //saved flag
 var sim_saved = false;
@@ -238,6 +239,9 @@ function updateInput(e){
 function create_storm_track(onOff){
 
     if (onOff) {
+        //get zoom
+        var arrow_length = 0.01 * Math.pow(2, 13 - mymap.getZoom());
+
         //load Latitude/Longitude and angle
         var latitude = parseFloat(document.getElementById("latitude").value);
         var longitude = parseFloat(document.getElementById("longitude").value);
@@ -278,8 +282,8 @@ function create_storm_track(onOff){
         //so here cosine(40') * 69.172
         //ratio is around 0.78
         //Explaination: https://gis.stackexchange.com/questions/142326/calculating-longitude-length-in-miles
-        var sat_offset_y = Math.cos(angle) * 0.0078; //
-        var sat_offset_x = Math.sin(angle) * 0.01;
+        var sat_offset_y = Math.cos(angle) * arrow_length;// * 0.78; //
+        var sat_offset_x = Math.sin(angle) * arrow_length;
 
         // create a polyline between markers
         var latlngs = [
@@ -308,14 +312,17 @@ function create_storm_track(onOff){
         //create direction marker
         sat_marker = new L.marker([latitude + sat_offset_y, longitude + sat_offset_x], {draggable:'true', rotationAngle: angle * 180 / Math.PI, icon: arrowIcon});
         sat_marker.on('drag', function(event){
+            //get zoom
+            var arrow_length = 0.01 * Math.pow(2, 13 - mymap.getZoom());
+
             //get pos
             var position = marker.getLatLng();
             var sat_pos = sat_marker.getLatLng();
 
             //find angle
             var angle = Math.atan2(sat_pos.lng - position.lng, sat_pos.lat - position.lat);
-            sat_offset_y = Math.cos(angle) * 0.0078;
-            sat_offset_x = Math.sin(angle) * 0.01;
+            sat_offset_y = Math.cos(angle) * arrow_length;// * 0.78;
+            sat_offset_x = Math.sin(angle) * arrow_length;
 
             //constrain to circle
             sat_marker.setLatLng(new L.LatLng(position.lat + sat_offset_y, position.lng+sat_offset_x),{draggable:'true'});
@@ -343,8 +350,42 @@ function create_storm_track(onOff){
         mymap.removeLayer(sat_marker);
         mymap.removeLayer(marker);
         mymap.removeLayer(polyline);
+        sat_marker = null;
     }
 }
+
+//update marker if valid
+mymap.on('zoomend', function(event) {
+    //console.log("Zoomstart "+mymap.getZoom());
+    //console.log(event.target._animateToCenter.lat);
+
+    //test if marker valid
+    if(sat_marker == null){
+        return;
+    }
+
+    //get zoom
+    var arrow_length = 0.01 * Math.pow(2, 13 - mymap.getZoom());
+
+    //get pos
+    var position = marker.getLatLng();
+    var sat_pos = sat_marker.getLatLng();
+
+    //find angle
+    var angle = Math.atan2(sat_pos.lng - position.lng, sat_pos.lat - position.lat);
+    sat_offset_y = Math.cos(angle) * arrow_length;// * 0.78;
+    sat_offset_x = Math.sin(angle) * arrow_length;
+
+    //constrain to circle
+    sat_marker.setLatLng(new L.LatLng(position.lat + sat_offset_y, position.lng+sat_offset_x),{draggable:'true'});
+
+    //rotate icon
+    sat_marker.setRotationAngle(angle * 180/Math.PI);
+
+    //and line
+    polyline.setLatLngs([[position.lat, position.lng],[position.lat + sat_offset_y, position.lng+sat_offset_x]]);
+//}
+});
 
 //save expert simulation data
 function save_simulation(){
