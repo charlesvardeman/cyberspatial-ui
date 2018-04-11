@@ -177,6 +177,8 @@ function startEdit() {
     document.getElementById("txtB").style.display = "block";
     document.getElementById("txtB").style.width = width+"px";
     document.getElementById("txtB").style.height = height+"px";
+    //document.getElementById("txtB").focus();
+    document.getElementById("txtB").select();
     document.getElementById("txt").style.display = "none";
 
     //enable save and cancel
