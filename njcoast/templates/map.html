@@ -664,6 +664,28 @@
           //remove it
           element.outerHTML = "";
           delete element;
+
+          //now remove from database
+          //Do ajax
+          $.ajax({
+              type: "POST",
+              url: "/map/" + annotate_map_id + "/settings/",
+              data: {
+                  'sim_id': name,
+                  'action': 'remove_simulation'
+              },
+              dataType: "json",
+              success: function(result) {
+                  console.log("REMOVING FROM MAP -- SUCCESS!" + result.saved);
+                  //now auto save so dont flag
+                  $.notify("Simulation removed from map " + name, "success");
+              },
+              error: function(result) {
+                  console.log("ERROR:", result)
+                  $.notify("Error removing simulation from map", "error");
+              }
+          });
+
       }
 
     </script>

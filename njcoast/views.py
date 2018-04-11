@@ -287,6 +287,22 @@ def map_settings(request, map_id):
                 else:
                     print request.POST['sim_id'], "already exists!"
 
+            elif request.POST['action'] == 'remove_simulation': #remove simulation
+                #test if it is already there
+                if request.POST['sim_id'] in map_objs[0].settings:
+                    #get settings
+                    settings = json.loads(map_objs[0].settings)
+
+                    #append new simulation to simulations
+                    settings.setdefault('simulations', []).remove(request.POST['sim_id'])
+
+                    #save it
+                    map_objs[0].settings = json.dumps(settings)
+                    map_objs[0].save()
+
+                    #print for posterity
+                    print "Removed ", map_objs[0].name, request.POST['sim_id'], json.dumps(settings)
+
             elif request.POST['action'] == 'share': #or sharing?
                 print "Shared ", map_objs[0].name, map_objs[0].id, map_id
                 map_objs[0].shared_with = request.POST['shares']
@@ -294,7 +310,7 @@ def map_settings(request, map_id):
 
             else:
                 print "Action not defined!"
-                
+
             #flag if actually updated
             ret_val = True
 
