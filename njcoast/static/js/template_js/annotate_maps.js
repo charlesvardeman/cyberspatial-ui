@@ -109,7 +109,7 @@ function load_popup_html(text, length){
     return `<table>
                 <tr>
                     <th>
-                        <span style="display:block;outline:none;border:none;padding: 2px 2px 5px 2px;" id="txt">${text}</span>
+                        <span style="display:block;outline:none;border:none;padding: 2px 2px 5px 2px;max-width:300px;word-wrap: break-word;" id="txt">${text}</span>
                         <textarea id="txtB" style="display:none;" >${text}</textarea>
                     </th>
                 </tr>
