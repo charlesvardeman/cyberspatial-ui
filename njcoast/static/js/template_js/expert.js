@@ -432,7 +432,7 @@ mymap.on('zoomend', function(event) {
 //save expert simulation data
 function save_simulation(){
     //normal code, has simulation run?
-    if(data == null || heatmap.length == 0){
+    if(data == null){//} || heatmap.length == 0){
         alert("Plase run a sumulation before saving!");
         return;
     }
