@@ -153,6 +153,9 @@
         //for heatmap
         var heatmap = {};
 
+        //save simulations
+        var simulations = new Array();
+
         //disctionary of selected layers
         var layers_selected = new Array();
 
@@ -447,6 +450,10 @@
           //<p><input id="simulation-1" name="abcdef" type="checkbox" value="on" data-toggle="popover" data-placement="right"> abcdef</p>
           //</li>
           if("simulations" in data){
+              //save sims
+              simulations = data.simulations;
+
+              //load sims
               for(i=0; i<data.simulations.length; i++){
                   console.log("sim "+data.simulations[i]);
 
@@ -533,7 +540,7 @@
               'longitude': mymap.getCenter().lng,
               'zoom': mymap.getZoom(),
               'layers_selected': layers_selected,
-              'simulations': []
+              'simulations': simulations
           };
 
           {% if map_id %}
@@ -687,6 +694,12 @@
           //remove it
           element.outerHTML = "";
           delete element;
+
+          //remove from list
+          var index = simulations.indexOf(name);
+          if (index > -1) {
+              simulations.splice(index, 1);
+          }
 
           //now remove from database
           //Do ajax
