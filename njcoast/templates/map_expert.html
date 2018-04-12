@@ -419,13 +419,18 @@
               type: "POST",
               url: "/map/" + object.name + "/settings/",
               data: {
-                  'sim_id': sim_id
+                  'sim_id': sim_id,
+                  'action': 'add_simulation',
+                  'add_layer': sim_id + "_surge"
               },
               dataType: "json",
               success: function(result) {
                   console.log("SAVING TO MAP -- SUCCESS!" + result.saved);
                   //now auto save so dont flag
                   $.notify("Simulation saved to map " + object.innerHTML, "success");
+
+                  //jump to page
+                  window.location.href = "/map/" + object.name + "/";
               },
               error: function(result) {
                   console.log("ERROR:", result)
