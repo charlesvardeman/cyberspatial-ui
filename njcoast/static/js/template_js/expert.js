@@ -84,7 +84,7 @@ function start_expert_simulation(){
 
     data = {
       "index_SLT": [1,1],
-      "index_W": 0,
+      "index_W": 1,
       "index_prob": 1,
       "indicator": 1,
       "param": [latitude, longitude, angle, input_cp, input_vf, input_rm],
@@ -98,6 +98,7 @@ function start_expert_simulation(){
       "analysis": analysis,
       "storm_type": storm_type,
       "surge_file": "heatmap.json",
+      "wind_file": "wind_heatmap.json",
       "workspace_file": ""
     };
 
