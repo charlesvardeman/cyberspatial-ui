@@ -16,7 +16,7 @@ var seconds_running = 0;
 var addressPoints = null;
 
 //heatmap layer
-var heatmap = null;
+var heatmap = {};
 
 //persistant store for cst
 var sat_marker = null;
@@ -205,6 +205,25 @@ function get_expert_data_to_server() {
     });
 }
 
+//load/unload heatmap
+function load_heatmap(object){
+    //normal code, has simulation run?
+    if(data != null){
+        //if clicked, load
+        if(object.checked && !(object.name in heatmap)){
+            //load it
+            if(object.name == "surge"){
+                load_expert_data_to_server(data.surge_file, object.name);
+            }else if (object.name == "wind"){
+                load_expert_data_to_server(data.wind_file, object.name);
+            }
+        }else if(!object.checked && (object.name in heatmap)){
+            mymap.removeLayer(heatmap[object.name]);
+            delete heatmap[object.name];
+        }
+    }
+}
+
 //AJAX function to get heatmap from S3 bucket, example:
 //https://s3.amazonaws.com/simulation.njcoast.us/simulation/chris/123/heatmap.json
 function load_expert_data_to_server(file_name, json_tag) {
@@ -232,7 +251,7 @@ function load_expert_data_to_server(file_name, json_tag) {
             }
 
             //add to map
-            heatmap = L.heatLayer(data_array, {max: data_max, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
+            heatmap[json_tag] = L.heatLayer(data_array, {max: data_max, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
             $.notify( "Heatmap loaded", "success");
 
             //enable save button? #TODO And Add to map?
@@ -413,7 +432,7 @@ mymap.on('zoomend', function(event) {
 //save expert simulation data
 function save_simulation(){
     //normal code, has simulation run?
-    if(data == null || heatmap == null){
+    if(data == null || heatmap.length == 0){
         alert("Plase run a sumulation before saving!");
         return;
     }
