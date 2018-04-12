@@ -435,14 +435,11 @@
                       if(!document.getElementById(data.layers_selected[i]).checked){
                         document.getElementById(data.layers_selected[i]).click();//checked = true;
                       }
+                  }else{
+                      //push it anyway
+                      layers_selected.push(data.layers_selected[i]);
                   }
               }
-          }
-
-          //if map view then apply
-          if("latitude" in data && "longitude" in data && "zoom" in data){
-              //set map parameters
-              mymap.setView([data.latitude, data.longitude], data.zoom);
           }
 
           //#load simulations
@@ -461,6 +458,12 @@
                   load_simulation_data(data.simulations[i]);
 
               }
+          }
+
+          //if map view then apply
+          if("latitude" in data && "longitude" in data && "zoom" in data){
+              //set map parameters
+              mymap.setView([data.latitude, data.longitude], data.zoom);
           }
 
           //load map descriptions
@@ -498,11 +501,24 @@
           //if clicked, load
           if(object.checked && !(object.name in heatmap)){
               load_heatmap_from_s3(user_id, object.name)
+
+              //add to layers if not there
+              var index = layers_selected.indexOf(object.id);
+              if (index == -1){
+                  layers_selected.push(object.id);
+              }
           }else{
               //#TODO remove
               if(object.name in heatmap){
                   mymap.removeLayer(heatmap[object.name]);
                   delete heatmap[object.name];
+
+                  //remove from layers
+                  var index = layers_selected.indexOf(object.id);
+                  if (index !== -1){
+                      layers_selected.splice(index, 1);
+                      console.log("Removed "+object.name+","+object.id);
+                  }
               }
           }
       }
@@ -666,15 +682,36 @@
                               </div>
                               <p class="follow-unfollow">by ${result.data.user_name} • ${result.data.modified}</p>
                               <ul class="collapse map-layers" id="storm-${sim_id}">
-                                  <li><input name="${sim_id}" type="checkbox" name="gender" value="female" onchange="load_simulation(${result.user_id}, this);" ${wind}> Wind Field</li>
-                                  <li><input name="${sim_id}" type="checkbox" name="gender" value="female" onchange="load_simulation(${result.user_id}, this);" ${surge}> Surge</li>
-                                  <li><input name="${sim_id}" type="checkbox" name="gender" value="female" onchange="load_simulation(${result.user_id}, this);" ${runup}> Total Run Up</li>
+                                  <li><input id="${sim_id}_wind" name="${sim_id}" type="checkbox" name="gender" value="female" onchange="load_simulation(${result.user_id}, this);" ${wind}> Wind Field</li>
+                                  <li><input id="${sim_id}_surge" name="${sim_id}" type="checkbox" name="gender" value="female" onchange="load_simulation(${result.user_id}, this);" ${surge}> Surge</li>
+                                  <li><input id="${sim_id}_runup" name="${sim_id}" type="checkbox" name="gender" value="female" onchange="load_simulation(${result.user_id}, this);" ${runup}> Total Run Up</li>
                                   <li class="shp-scenario"><span>Sea Level Rise:</span> ${data.SLR}<br/><span>Coastal Protection:</span> ${data.protection}<br/><span>Tides:</span> ${data.tide_td}<br/><span>Analysis type:</span> ${data.analysis}<br/><span>Description:</span> ${result.data.description}</li>
                               </ul>
                           </div>`;
 
                       //add to page
                       document.getElementById('simulation_container').innerHTML += html;
+
+                      //enable buttons? surge
+                      var index = layers_selected.indexOf(sim_id+"_surge");
+                      if (index !== -1){
+                          console.log("found "+sim_id);
+                          //document.getElementById(sim_id+"_surge").checked = true;
+                          document.getElementById(sim_id+"_surge").click();
+                      }else{
+                          console.log("not found "+sim_id+","+layers_selected.length);
+                      }
+
+                      //enable buttons? wind
+                      var index = layers_selected.indexOf(sim_id+"_wind");
+                      if (index !== -1){
+                          console.log("found "+sim_id);
+                          document.getElementById(sim_id+"_wind").click();
+                      }else{
+                          console.log("not found "+sim_id+","+layers_selected.length);
+                      }
+
+                      //#TODO runup?
                   }
               },
               error: function(result) {
