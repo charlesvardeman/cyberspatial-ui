@@ -279,6 +279,9 @@ def map_settings(request, map_id):
                     #append new simulation to simulations
                     settings.setdefault('simulations', []).append(request.POST['sim_id'])
 
+                    #append to layers?
+                    settings.setdefault('layers_selected', []).append(request.POST['sim_id']+"_surge")
+
                     #save it
                     map_objs[0].settings = json.dumps(settings)
                     map_objs[0].save()
