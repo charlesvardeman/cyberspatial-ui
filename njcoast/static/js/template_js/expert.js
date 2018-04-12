@@ -89,8 +89,8 @@ function start_expert_simulation(){
       "indicator": 1,
       "param": [latitude, longitude, angle, input_cp, input_vf, input_rm],
       "timeMC": input_ttl,
-      "lat_track": 41.000493,
-      "long_track": -72.610756,
+      "lat_track": latitude,
+      "long_track": longitude,
       "SLR": input_slr,
       "tide": 0,
       "tide_td": tide,
@@ -183,7 +183,15 @@ function get_expert_data_to_server() {
                 $.notify( "Calculation complete!", "success");
 
                 //load data via Ajax
-                load_expert_data_to_server();
+                //surge
+                if(document.getElementById("surge_checkbox").checked){
+                    load_expert_data_to_server(data.surge_file, "surge");
+                }
+
+                //wind
+                if(document.getElementById("wind_checkbox").checked){
+                    load_expert_data_to_server(data.wind_file, "wind");
+                }
             }
         },
         error: function (result) {
@@ -199,10 +207,10 @@ function get_expert_data_to_server() {
 
 //AJAX function to get heatmap from S3 bucket, example:
 //https://s3.amazonaws.com/simulation.njcoast.us/simulation/chris/123/heatmap.json
-function load_expert_data_to_server() {
+function load_expert_data_to_server(file_name, json_tag) {
     $.ajax({
         type: "GET",
-        url: "https://s3.amazonaws.com/simulation.njcoast.us/simulation/" + owner.toString() + "/" + sim_id + "/heatmap.json",
+        url: "https://s3.amazonaws.com/simulation.njcoast.us/simulation/" + owner.toString() + "/" + sim_id + "/" + file_name,
         //data: data,
         dataType: "json",
         //contentType: 'application/json',
@@ -212,8 +220,19 @@ function load_expert_data_to_server() {
             //save data
             addressPoints = data;
 
+            //get correct
+            if(json_tag == "surge"){
+                data_array = addressPoints.surge;
+                data_max = 4;
+            }else if(json_tag == "wind"){
+                data_array = addressPoints.wind;
+                data_max = 0.01;
+            }else{
+                //not supported
+            }
+
             //add to map
-            heatmap = L.heatLayer(addressPoints.surge, {max: 4, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
+            heatmap = L.heatLayer(data_array, {max: data_max, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
             $.notify( "Heatmap loaded", "success");
 
             //enable save button? #TODO And Add to map?
