@@ -282,7 +282,7 @@ function create_storm_track(onOff){
         //so here cosine(40') * 69.172
         //ratio is around 0.78
         //Explaination: https://gis.stackexchange.com/questions/142326/calculating-longitude-length-in-miles
-        var sat_offset_y = Math.cos(angle) * arrow_length;// * 0.78; //
+        var sat_offset_y = Math.cos(angle) * arrow_length * 0.78; //
         var sat_offset_x = Math.sin(angle) * arrow_length;
 
         // create a polyline between markers
@@ -321,8 +321,11 @@ function create_storm_track(onOff){
 
             //find angle
             var angle = Math.atan2(sat_pos.lng - position.lng, sat_pos.lat - position.lat);
-            sat_offset_y = Math.cos(angle) * arrow_length;// * 0.78;
+            sat_offset_y = Math.cos(angle) * arrow_length * 0.78;
             sat_offset_x = Math.sin(angle) * arrow_length;
+
+            //save angleslider
+            sat_marker.angle = angle;
 
             //constrain to circle
             sat_marker.setLatLng(new L.LatLng(position.lat + sat_offset_y, position.lng+sat_offset_x),{draggable:'true'});
@@ -371,9 +374,9 @@ mymap.on('zoomend', function(event) {
     var position = marker.getLatLng();
     var sat_pos = sat_marker.getLatLng();
 
-    //find angle
-    var angle = Math.atan2(sat_pos.lng - position.lng, sat_pos.lat - position.lat);
-    sat_offset_y = Math.cos(angle) * arrow_length;// * 0.78;
+    //load angle, calc position
+    var angle = sat_marker.angle;
+    sat_offset_y = Math.cos(angle) * arrow_length * 0.78;
     sat_offset_x = Math.sin(angle) * arrow_length;
 
     //constrain to circle
