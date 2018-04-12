@@ -31,21 +31,19 @@ RUN pip install GDAL==1.10 --global-option=build_ext --global-option="-I/usr/inc
 # COPY ./requirements /requirements
 
 RUN mkdir /app
+COPY requirements.txt /app/requirements.txt
+
+RUN pip install --no-cache-dir -r /app/requirements.txt --src /usr/local/src
 
 # Main work directory will be app
 WORKDIR /app
 COPY . /app
 
-RUN pip install --no-cache-dir -r /app/requirements.txt --src /usr/local/src
-
 COPY ./start.sh /start.sh
 COPY ./celary.sh /celary.sh
-COPY ./entrypoint.sh /entrypoint.sh
-RUN sed -i 's/\r//' /entrypoint.sh \
-    && sed -i 's/\r//' /celary.sh \
+RUN sed -i 's/\r//' /celary.sh \
     && sed -i 's/\r//' /start.sh \
-    && chmod +x /entrypoint.sh \
     && chmod +x /celary.sh \
     && chmod +x /start.sh
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/start.sh"]
