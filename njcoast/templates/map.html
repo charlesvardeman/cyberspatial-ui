@@ -611,7 +611,7 @@
                   addressPoints = data;
 
                   //add to map
-                  heatmap[simulation] = L.heatLayer(addressPoints.runup, {max: 4, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
+                  heatmap[simulation] = L.heatLayer(addressPoints.surge, {max: 4, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
                   $.notify( "Heatmap loaded", "success");
               },
               error: function (data) {
@@ -731,18 +731,16 @@
                       }
 
                       //files available to enable checkboxes
-                      //#TODO hack as current sims surge not runup!
                       var surge = "disabled";
-                      if(data.runup_file){
+                      if(data.surge_file){
                           surge = "";
                       }
                       var wind = "disabled";
                       if(data.wind_file){
                           wind = "";
                       }
-                      //#TODO hack as current sims surge not runup!
                       var runup = "disabled";
-                      if(data.surge_file){
+                      if(data.runup_file){
                           runup = "";
                       }
 

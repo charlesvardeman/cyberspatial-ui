@@ -97,7 +97,7 @@ function start_expert_simulation(){
       "protection": protection,
       "analysis": analysis,
       "storm_type": storm_type,
-      "runup_file": "heatmap.json",
+      "surge_file": "heatmap.json",
       "workspace_file": ""
     };
 
@@ -212,7 +212,7 @@ function load_expert_data_to_server() {
             addressPoints = data;
 
             //add to map
-            heatmap = L.heatLayer(addressPoints.runup, {max: 4, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
+            heatmap = L.heatLayer(addressPoints.surge, {max: 4, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
             $.notify( "Heatmap loaded", "success");
 
             //enable save button? #TODO And Add to map?
@@ -427,7 +427,7 @@ function save_simulation(){
       "long_track": -72.610756,
       "SLR": 1.0,
       "tide": 0,
-      "runup_file": "heatmap.json",
+      "surge_file": "heatmap.json",
       "workspace_file": ""
     };*/
 
