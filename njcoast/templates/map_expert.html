@@ -94,8 +94,9 @@
 
                 <!-- tabs for basic/advanced tools -->
                 <ul class="nav nav-tabs nav-justified shp-settings">
-                    <li id="basic" class="nav-item">
-                        <a class="nav-link" href="#" onclick="tab_flip_tools(true);">Basic</a>
+                    <li id="basic" class="nav-item disabled">
+                        <a class="nav-link" href="#"  >Basic</a>
+                        <!-- Removed from basic onclick="tab_flip_tools(true);" -->
                     </li>
                     <li id="advanced" class="nav-item active">
                         <a class="nav-link" href="#" onclick="tab_flip_tools(false);">Advanced</a>
@@ -187,9 +188,9 @@
             <div class="map-control-item">
                 <p class="tool-heading">4. View Results on Map</p>
                 <ul class="map-layers">
-                    <li><input type="checkbox" name="gender" value="female"> Wind Field</li>
-                    <li><input type="checkbox" name="gender" value="female"> Surge</li>
-                    <li><input type="checkbox" name="gender" value="female" checked> Total Run Up</li>
+                    <li><input id="wind_checkbox" type="checkbox" name="wind" value="female" onchange="load_heatmap(this);"> Wind Field</li>
+                    <li><input id="surge_checkbox" type="checkbox" name="surge" value="female" onchange="load_heatmap(this);" checked> Surge</li>
+                    <li><input id="runup_checkbox" type="checkbox" name="runup" value="female" disabled> Total Run Up</li>
                 </ul>
             </div>
             <div class="map-control-item">

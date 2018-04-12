@@ -16,7 +16,7 @@ var seconds_running = 0;
 var addressPoints = null;
 
 //heatmap layer
-var heatmap = null;
+var heatmap = {};
 
 //persistant store for cst
 var sat_marker = null;
@@ -84,20 +84,21 @@ function start_expert_simulation(){
 
     data = {
       "index_SLT": [1,1],
-      "index_W": 0,
+      "index_W": 1,
       "index_prob": 1,
       "indicator": 1,
       "param": [latitude, longitude, angle, input_cp, input_vf, input_rm],
       "timeMC": input_ttl,
-      "lat_track": 41.000493,
-      "long_track": -72.610756,
+      "lat_track": latitude,
+      "long_track": longitude,
       "SLR": input_slr,
       "tide": 0,
       "tide_td": tide,
       "protection": protection,
       "analysis": analysis,
       "storm_type": storm_type,
-      "runup_file": "heatmap.json",
+      "surge_file": "heatmap.json",
+      "wind_file": "wind_heatmap.json",
       "workspace_file": ""
     };
 
@@ -182,7 +183,15 @@ function get_expert_data_to_server() {
                 $.notify( "Calculation complete!", "success");
 
                 //load data via Ajax
-                load_expert_data_to_server();
+                //surge
+                if(document.getElementById("surge_checkbox").checked){
+                    load_expert_data_to_server(data.surge_file, "surge");
+                }
+
+                //wind
+                if(document.getElementById("wind_checkbox").checked){
+                    load_expert_data_to_server(data.wind_file, "wind");
+                }
             }
         },
         error: function (result) {
@@ -196,12 +205,31 @@ function get_expert_data_to_server() {
     });
 }
 
+//load/unload heatmap
+function load_heatmap(object){
+    //normal code, has simulation run?
+    if(data != null){
+        //if clicked, load
+        if(object.checked && !(object.name in heatmap)){
+            //load it
+            if(object.name == "surge"){
+                load_expert_data_to_server(data.surge_file, object.name);
+            }else if (object.name == "wind"){
+                load_expert_data_to_server(data.wind_file, object.name);
+            }
+        }else if(!object.checked && (object.name in heatmap)){
+            mymap.removeLayer(heatmap[object.name]);
+            delete heatmap[object.name];
+        }
+    }
+}
+
 //AJAX function to get heatmap from S3 bucket, example:
 //https://s3.amazonaws.com/simulation.njcoast.us/simulation/chris/123/heatmap.json
-function load_expert_data_to_server() {
+function load_expert_data_to_server(file_name, json_tag) {
     $.ajax({
         type: "GET",
-        url: "https://s3.amazonaws.com/simulation.njcoast.us/simulation/" + owner.toString() + "/" + sim_id + "/heatmap.json",
+        url: "https://s3.amazonaws.com/simulation.njcoast.us/simulation/" + owner.toString() + "/" + sim_id + "/" + file_name,
         //data: data,
         dataType: "json",
         //contentType: 'application/json',
@@ -211,8 +239,19 @@ function load_expert_data_to_server() {
             //save data
             addressPoints = data;
 
+            //get correct
+            if(json_tag == "surge"){
+                data_array = addressPoints.surge;
+                data_max = 4;
+            }else if(json_tag == "wind"){
+                data_array = addressPoints.wind;
+                data_max = 0.01;
+            }else{
+                //not supported
+            }
+
             //add to map
-            heatmap = L.heatLayer(addressPoints.runup, {max: 4, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
+            heatmap[json_tag] = L.heatLayer(data_array, {max: data_max, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
             $.notify( "Heatmap loaded", "success");
 
             //enable save button? #TODO And Add to map?
@@ -282,7 +321,7 @@ function create_storm_track(onOff){
         //so here cosine(40') * 69.172
         //ratio is around 0.78
         //Explaination: https://gis.stackexchange.com/questions/142326/calculating-longitude-length-in-miles
-        var sat_offset_y = Math.cos(angle) * arrow_length;// * 0.78; //
+        var sat_offset_y = Math.cos(angle) * arrow_length * 0.78; //
         var sat_offset_x = Math.sin(angle) * arrow_length;
 
         // create a polyline between markers
@@ -321,8 +360,11 @@ function create_storm_track(onOff){
 
             //find angle
             var angle = Math.atan2(sat_pos.lng - position.lng, sat_pos.lat - position.lat);
-            sat_offset_y = Math.cos(angle) * arrow_length;// * 0.78;
+            sat_offset_y = Math.cos(angle) * arrow_length * 0.78;
             sat_offset_x = Math.sin(angle) * arrow_length;
+
+            //save angleslider
+            sat_marker.angle = angle;
 
             //constrain to circle
             sat_marker.setLatLng(new L.LatLng(position.lat + sat_offset_y, position.lng+sat_offset_x),{draggable:'true'});
@@ -371,9 +413,9 @@ mymap.on('zoomend', function(event) {
     var position = marker.getLatLng();
     var sat_pos = sat_marker.getLatLng();
 
-    //find angle
-    var angle = Math.atan2(sat_pos.lng - position.lng, sat_pos.lat - position.lat);
-    sat_offset_y = Math.cos(angle) * arrow_length;// * 0.78;
+    //load angle, calc position
+    var angle = sat_marker.angle;
+    sat_offset_y = Math.cos(angle) * arrow_length * 0.78;
     sat_offset_x = Math.sin(angle) * arrow_length;
 
     //constrain to circle
@@ -390,7 +432,7 @@ mymap.on('zoomend', function(event) {
 //save expert simulation data
 function save_simulation(){
     //normal code, has simulation run?
-    if(data == null || heatmap == null){
+    if(data == null){//} || heatmap.length == 0){
         alert("Plase run a sumulation before saving!");
         return;
     }
@@ -424,7 +466,7 @@ function save_simulation(){
       "long_track": -72.610756,
       "SLR": 1.0,
       "tide": 0,
-      "runup_file": "heatmap.json",
+      "surge_file": "heatmap.json",
       "workspace_file": ""
     };*/
 
