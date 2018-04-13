@@ -41,9 +41,12 @@ COPY . /app
 
 COPY ./start.sh /start.sh
 COPY ./celary.sh /celary.sh
+COPY ./entrypoint.sh /entrypoint.sh
 RUN sed -i 's/\r//' /celary.sh \
     && sed -i 's/\r//' /start.sh \
+    && sed -i 's/\r//' /entrypoint.sh \
+    && chmod +x /entrypoint.sh \
     && chmod +x /celary.sh \
     && chmod +x /start.sh
 
-ENTRYPOINT ["/start.sh"]
+ENTRYPOINT ["/entrypoint.sh"]
