@@ -80,6 +80,10 @@ function start_expert_simulation(){
         storm_type = "Hurricane";
     }
 
+    //get point along path
+    var lat_past_point = latitude - Math.cos(angle * Math.PI / 180) * 0.01;
+    var long_past_point = longitude - Math.sin(angle * Math.PI / 180) * 0.01;
+
     console.log("tide "+tide+", protection "+protection+", analysis "+analysis+", storm "+storm_type);
 
     data = {
@@ -89,8 +93,8 @@ function start_expert_simulation(){
       "indicator": 1,
       "param": [latitude, longitude, angle, input_cp, input_vf, input_rm],
       "timeMC": input_ttl,
-      "lat_track": latitude,
-      "long_track": longitude,
+      "lat_track": [lat_past_point, latitude],
+      "long_track": [long_past_point, longitude],
       "SLR": input_slr,
       "tide": 0,
       "tide_td": tide,
