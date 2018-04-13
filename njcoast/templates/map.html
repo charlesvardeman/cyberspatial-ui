@@ -25,9 +25,14 @@
     <!-- Load Leaflet Editable code -->
     <script src="{% static "js/Leaflet.Editable.js" %}"></script>-->
 
+    <!-- Load Leaflet Heatmap -->
+    <script src="{% static "js/heatmap.min.js" %}"></script>
+    <script src="{% static "js/leaflet-heatmap.js" %}"></script>
+
     <!-- load mods to leaflet for rectangular popups/map icons -->
     <link rel="stylesheet" type="text/css" href="{% static "css/crc_leaflet.css" %}" media="screen" />
     <link rel="stylesheet" type="text/css" href="{% static "css/fontawesome-all.min.css" %}" media="screen" />
+    <style> .leaflet-zoom-hide { position: absolute!important; } </style>
 
 {% endblock extra_head %}
 
