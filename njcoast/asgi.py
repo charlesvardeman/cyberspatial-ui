@@ -5,9 +5,10 @@ defined in the ASGI_APPLICATION setting.
 
 import os
 import django
+import channels.routing
+print dir(channels.routing)
+from channels.routing import get_default_application
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "njcoast.settings")
 django.setup()
-
-from channels.routing import get_default_application
 application = get_default_application()
