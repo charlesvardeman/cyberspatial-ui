@@ -787,7 +787,13 @@
                           </div>`;
 
                       //add to page
-                      document.getElementById('simulation_container').innerHTML += html;
+                      //create div
+                      var new_div = document.createElement('div');
+                      new_div.id = sim_id+'_div';
+                      new_div.innerHTML = html;
+
+                      //and add it to current container
+                      document.getElementById('simulation_container').appendChild(new_div);
 
                       //enable buttons? surge
                       var index = layers_selected.indexOf(sim_id+"_surge");
