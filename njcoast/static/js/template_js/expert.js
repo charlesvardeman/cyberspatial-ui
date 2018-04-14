@@ -342,6 +342,30 @@ function create_storm_track(onOff){
             var marker = event.target;
             var position = marker.getLatLng();
 
+            //bounds
+            var lat_lng_changed = false;
+
+            //check bounds lat
+            if(position.lat > 45){
+                position.lat = 45;
+                lat_lng_changed = true;
+            }else if(position.lat < 34){
+                position.lat = 34;
+                lat_lng_changed = true;
+            }
+
+            //check bounds long
+            if(position.lng > -63){
+                position.lng = -63;
+                lat_lng_changed = true;
+            }else if(position.lng < -77){
+                position.lng = -77;
+                lat_lng_changed = true;
+            }
+
+            //reset
+            if(lat_lng_changed) marker.setLatLng(position);
+
             //fix sat/line pos
             sat_marker.setLatLng(new L.LatLng(position.lat + sat_offset_y, position.lng+sat_offset_x),{draggable:'true'});
             polyline.setLatLngs([[position.lat, position.lng],[position.lat + sat_offset_y, position.lng+sat_offset_x]]);
@@ -364,6 +388,8 @@ function create_storm_track(onOff){
 
             //find angle
             var angle = Math.atan2(sat_pos.lng - position.lng, sat_pos.lat - position.lat);
+            if(angle < -1.047197551196598) angle = -1.047197551196598;
+            if(angle > 0.698131700797732) angle = 0.698131700797732;
             sat_offset_y = Math.cos(angle) * arrow_length * 0.78;
             sat_offset_x = Math.sin(angle) * arrow_length;
 
@@ -402,12 +428,17 @@ function create_storm_track(onOff){
 
 //update marker if valid
 mymap.on('zoomend', function(event) {
-    //console.log("Zoomstart "+mymap.getZoom());
+    //console.log("Zoomstart "+mymap.getZoom()+","+angle);
     //console.log(event.target._animateToCenter.lat);
 
     //test if marker valid
     if(sat_marker == null){
         return;
+    }
+
+    //fix for first use of angle
+    if(!sat_marker.angle){
+        sat_marker.angle = 0;
     }
 
     //get zoom
@@ -498,4 +529,33 @@ function save_simulation(){
         }
     });
 
+}
+
+function latLngChange(object){
+    console.log("LatLong "+object.id+","+object.value);
+    var latlngvalue = parseFloat(object.value);
+
+    //test non numeric
+    if(isNaN(latlngvalue)){
+        if(object.id == "latitude"){
+            object.value = "40.6848037";
+        }else{
+            object.value = "-73.9654541";
+        }
+    }
+
+    //test bounds
+    if(object.id == "latitude"){
+        if(latlngvalue > 45){
+            object.value = "45.0000000";
+        }else if(latlngvalue < 34){
+            object.value = "34.0000000";
+        }
+    }else{
+        if(latlngvalue > -63){
+            object.value = "-63.0000000";
+        }else if(latlngvalue < -77){
+            object.value = "-77.0000000";
+        }
+    }
 }
