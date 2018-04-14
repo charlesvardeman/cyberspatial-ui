@@ -243,19 +243,14 @@ function load_expert_data_to_server(file_name, json_tag) {
             //save data
             addressPoints = data;
 
-            //get correct
             if(json_tag == "surge"){
-                data_array = addressPoints.surge;
-                data_max = 4;
-            }else if(json_tag == "wind"){
-                data_array = addressPoints.wind;
-                data_max = 0.01;
+                heatmap[json_tag] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
+            }else if( json_tag == "wind"){
+                heatmap[json_tag] = create_wind_heatmap(addressPoints.wind).addTo(mymap);
             }else{
                 //not supported
             }
-
-            //add to map
-            heatmap[json_tag] = L.heatLayer(data_array, {max: data_max, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
+            
             $.notify( "Heatmap loaded", "success");
 
             //enable save button? #TODO And Add to map?

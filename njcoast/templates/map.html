@@ -28,6 +28,7 @@
     <!-- Load Leaflet Heatmap -->
     <script src="{% static "js/heatmap.min.js" %}"></script>
     <script src="{% static "js/leaflet-heatmap.js" %}"></script>
+    <script src="{% static 'js/template_js/heatmaps.js' %}"></script>
 
     <!-- load mods to leaflet for rectangular popups/map icons -->
     <link rel="stylesheet" type="text/css" href="{% static "css/crc_leaflet.css" %}" media="screen" />
@@ -604,40 +605,33 @@
 
       //get heatmap from S3
       function load_heatmap_from_s3(owner, simulation, filename, sim_type){
+          console.log("https://s3.amazonaws.com/simulation.njcoast.us/simulation/" + owner + "/" + simulation + "/" + filename);
           $.ajax({
-              type: "GET",
-              url: "https://s3.amazonaws.com/simulation.njcoast.us/simulation/" + owner + "/" + simulation + "/" + filename,
-              //data: data,
-              dataType: "json",
-              //contentType: 'application/json',
-              success: function (data) {
-                  console.log("EXPERT SIMULATION LOAD -- SUCCESS.");
+            type: "GET",
+            url: "https://s3.amazonaws.com/simulation.njcoast.us/simulation/" + owner + "/" + simulation + "/" + filename,
+            dataType: "json",
+            success: function (data) {
+                console.log("EXPERT SIMULATION LOAD -- SUCCESS.");
 
-                  //save data
-                  addressPoints = data;
+                //save data
+                addressPoints = data;
 
-                  //get correct
-                  if(sim_type.includes("surge")){
-                      data_array = addressPoints.surge;
-                      data_max = 4;
-                  }else if(sim_type.includes("wind")){
-                      data_array = addressPoints.wind;
-                      data_max = 0.01;
-                  }else{
-                      //not supported
-                  }
+                //get correct
+                if(sim_type.includes("surge")){
+                    heatmap[sim_type] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
+                }else if(sim_type.includes("wind")){
+                    heatmap[sim_type] = create_wind_heatmap(addressPoints.wind).addTo(mymap);
+                }else{
+                    //not supported
+                }
 
-                  //add to map
-                  heatmap[sim_type] = L.heatLayer(data_array, {max: data_max, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
-                  //heatmap[simulation] = L.heatLayer(addressPoints.surge, {max: 4, radius: 25, gradient: {0.4: 'blue', 0.65: 'lime', 1: 'red'}, blur: 10}).addTo(mymap);
-
-                  $.notify( "Heatmap loaded", "success");
-              },
-              error: function (data) {
-                  console.log("EXPERT SIMULATION LOAD -- ERROR:", data)
-                  $.notify("Failed to load heatmap.", "error");
-              }
-          });
+                $.notify( "Heatmap loaded", "success");
+            },
+            error: function (xhr, status, error) {
+                console.log("EXPERT SIMULATION LOAD -- ERROR:", status + " " + error + " " + xhr.status + " " + xhr.statusText)
+                $.notify("Failed to load heatmap.", "error");
+            }
+        });
       }
 
       //save current map
