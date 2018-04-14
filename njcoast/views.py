@@ -393,4 +393,8 @@ class ExploreTemplateView(TemplateView):
 
         #put into context
         context['simulations_for_user'] = db_data
+
+        #quiery, select if I am the owner
+        context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+
         return context
