@@ -58,6 +58,7 @@
 <script src="{% static 'js/jquery.min.js'%}"></script>
 <script src="{% static 'js/utilities.js' %}"></script>
 <script src="{% static 'js/heatmap.min.js' %}"></script>
+<script src="{% static 'js/template_js/heatmaps.js' %}"></script>
 <script src="{% static 'js/leaflet-heatmap.js' %}"></script>
 <script src="{% static 'NJ-coast-heatmap/nj-coast.js' %}"></script>
 <script>
@@ -374,59 +375,12 @@
             })();
 
 
-            if( surge_checkbox.attr('id') in storm_layer_dict )
-            {
+            if( surge_checkbox.attr('id') in storm_layer_dict ) {
               // remove the old layer and load a new one if surge was already being displayed
               mymap.removeLayer(storm_layer_dict[surge_checkbox.attr('id')]);
             }
-            if(addressPoints)
-            {
-
-                var heatData = {
-                    max: 1000.00,
-                    data: []
-                };
-
-                data_array = addressPoints.runup;
-                for( var i = 0; i < addressPoints.runup.length; i++ ){
-                    heatData.data.push({
-                        lat: addressPoints.runup[i][0], 
-                        lng: addressPoints.runup[i][1], 
-                        value: Math.max(addressPoints.runup[i][2], 0.0),
-                    });
-                }
-
-                var cfg = {
-                    // radius should be small ONLY if scaleRadius is true (or small radius is intended)
-                    // if scaleRadius is false it will be the constant radius used in pixels
-                    "radius": 0.04,
-                    "maxOpacity": .5, 
-                    // scales the radius based on map zoom
-                    "scaleRadius": true, 
-                    "gradient": {
-                        // enter n keys between 0 and 1 here
-                        // for gradient color customization
-                        '.1': 'blue',
-                        '.3': 'yellow',
-                        '.6': 'orange',
-                        '.9': 'red',
-                    },
-                    // if set to false the heatmap uses the global maximum for colorization
-                    // if activated: uses the data maximum within the current map boundaries 
-                    //   (there will always be a red spot with useLocalExtremas true)
-                    "useLocalExtrema": false,
-                    // which field name in your data represents the latitude - default "lat"
-                    latField: 'lat',
-                    // which field name in your data represents the longitude - default "lng"
-                    lngField: 'lng',
-                    // which field name in your data represents the data value - default "value"
-                    valueField: 'value'
-                };
-            
-                var hLayer = new HeatmapOverlay(cfg);
-                hLayer.setData(heatData);
-                
-                storm_layer_dict[surge_checkbox.attr('id')] = hLayer.addTo(mymap);
+            if(addressPoints) {
+                storm_layer_dict[surge_checkbox.attr('id')] = create_surge_heatmap(addressPoints.runup).addTo(mymap);
             }
 
 
