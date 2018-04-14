@@ -366,6 +366,19 @@ function create_storm_track(onOff){
             //reset
             if(lat_lng_changed) marker.setLatLng(position);
 
+            //fix for first use of angle
+            if(!sat_marker.angle){
+                sat_marker.angle = 0;
+            }
+
+            //get zoom
+            var arrow_length = 0.01 * Math.pow(2, 13 - mymap.getZoom());
+
+            //load angle, calc position
+            var angle = sat_marker.angle;
+            sat_offset_y = Math.cos(angle) * arrow_length * 0.78;
+            sat_offset_x = Math.sin(angle) * arrow_length;
+
             //fix sat/line pos
             sat_marker.setLatLng(new L.LatLng(position.lat + sat_offset_y, position.lng+sat_offset_x),{draggable:'true'});
             polyline.setLatLngs([[position.lat, position.lng],[position.lat + sat_offset_y, position.lng+sat_offset_x]]);
