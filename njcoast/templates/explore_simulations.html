@@ -145,7 +145,25 @@
                                     <p class="shp-scenario"><span>Sea Level Rise:</span> {{ simulation.data.SLR }}, <span>Coastal Protection:</span> {{ simulation.data.protection }}, <span>Tides:</span> {{ simulation.data.tide_td }}, <span>Analysis type:</span> {{ simulation.data.analysis }}, <span>Simulation id:</span> {{ simulation.sim_id }}</p>
                                     <br/>
                                     <p class="actions">
+                                        <table style="width: 100%;"><tr><td>
                                         <i class="fa fa-calendar-o"></i>{{ simulation.modified }} |
+                                        </td><td>
+                                        <div class="dropup show pull-right">
+                                            <button class="btn btn-block btn-secondary dropdown-toggle" style="margin-top: 5px" id="dropdownMenuAddToMap_{{ forloop.counter }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Add Results to Map ... <i class="fa fa-caret-up" style="margin-left: 10px" aria-hidden="true"></i>
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuAddToMap_{{ forloop.counter }}">
+                                            {% for map in maps_for_user %}
+                                                <a class="dropdown-item" name="{{ map.id }}" href="#" onclick='add_expert_to_map(this, "{{ simulation.sim_id }}");'>{{ map.name }}</a>
+                                                <div class="dropdown-divider"></div>
+                                                <!--<a class="dropdown-item" href="explore-maps.html">Browse All Maps</a>-->
+                                            {% endfor %}
+                                            </div>
+                                        </div>
+                                        </td></tr></table>
+                                        <!--<a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" style="margin-left: 10px" href="map-p.html">
+                                            <i class="fa fa-plus"></i>Add to Map
+                                        </a>-->
                                     </p>
                                 </div>
                             </div>
@@ -269,6 +287,40 @@ $(document).ready(function () {
     document.getElementById('pagetotal').innerHTML = Math.ceil(counter / 4);
 
 });
+
+//add the current simulation to a map
+function add_expert_to_map(object, sim_id){
+    //save map and sim data
+    map_data = {
+        'sim_id': sim_id,
+    };
+
+    console.log("Map clicked "+JSON.stringify(map_data)+","+object.innerHTML);
+
+    //Do ajax
+    $.ajax({
+        type: "POST",
+        url: "/map/" + object.name + "/settings/",
+        data: {
+            'sim_id': sim_id,
+            'action': 'add_simulation',
+            'add_layer': sim_id + "_surge"
+        },
+        dataType: "json",
+        success: function(result) {
+            console.log("SAVING TO MAP -- SUCCESS!" + result.saved);
+            //now auto save so dont flag
+            //$.notify("Simulation saved to map " + object.innerHTML, "success");
+
+            //jump to page
+            window.location.href = "/map/" + object.name + "/";
+        },
+        error: function(result) {
+            console.log("ERROR:", result)
+            //$.notify("Error saving simulation to map", "error");
+        }
+    });
+}
 
 </script>
 {% endblock extra_script %}
