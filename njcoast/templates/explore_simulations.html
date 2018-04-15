@@ -126,9 +126,9 @@
 
                     <div class="col-md-9">
                         <ul class="list-inline pull-left" id="sort">
-                            <li><a data-value="-date" data-filter="order_by" class="selected" ng-click="single_choice_listener($event)">Most recent</a></li>
-                            <!-- <li><a data-value="date" data-filter="order_by" ng-click="single_choice_listener($event)">Less recent</a></li>
-                            <li><a data-value="title" data-filter="order_by" ng-click="single_choice_listener($event)">A - Z</a></li>
+                            <li><a href="#" name="-modified" data-filter="order_by" class="selected" onclick='reload_simulation_data(this)'>Most recent</a></li>
+                            <li><a href="#" name="modified" data-filter="order_by" onclick='reload_simulation_data(this)'>Less recent</a></li>
+                            <!-- <li><a data-value="title" data-filter="order_by" ng-click="single_choice_listener($event)">A - Z</a></li>
                             <li><a data-value="-title" data-filter="order_by" ng-click="single_choice_listener($event)">Z - A</a></li>-->
                             <!--<li><a data-value="-popular_count" data-filter="order_by" ng-click="single_choice_listener($event)">Most popular</a></li>-->
                         </ul>
@@ -215,7 +215,7 @@ $("#pageForward").on("click", function() {
 $(document).ready(function () {
 
     //load actual data
-    load_simulation_data();
+    load_simulation_data('-modified');
 
 });
 
@@ -253,13 +253,24 @@ function add_expert_to_map(object, sim_id){
     });
 }
 
+//reload ordered data from simulation db
+function reload_simulation_data(object){
+    //set selected
+    $(object).parent().siblings().find('.' + "selected").removeClass("selected");
+    object.classList.add("selected");
+
+    //load data
+    load_simulation_data(object.name);
+}
+
 //load ordered data from simulation db
-function load_simulation_data(){
+function load_simulation_data(order_by){
     $.ajax({
         type: "GET",
         url: "/store/",
         data: {
-            action: "get_my_data"
+            action: "get_my_data",
+            order_by: order_by
         },
         dataType: "json",
         success: function(result) {
@@ -268,6 +279,9 @@ function load_simulation_data(){
 
             //get heatmap from S3
             if(result.status){
+                //clear current list
+                document.getElementById('dashboard-list').innerHTML = "";
+
                 //get JSON data
                 //console.log(result.data[0].sim_id);
                 for(i=0; i<result.data.length;i++){

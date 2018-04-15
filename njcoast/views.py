@@ -343,8 +343,9 @@ def map_expert_simulations(request):
             return JsonResponse({'user_id': 0,'status': False})
 
         elif request.GET['action'] == 'get_my_data': #if getting all data
+            order_by = request.GET['order_by']
             #get data from db
-            db_data = NJCMapExpert.objects.filter(owner = request.user).order_by('-modified')
+            db_data = NJCMapExpert.objects.filter(owner = request.user).order_by(order_by)
 
             #parse out results
             output_array = []
