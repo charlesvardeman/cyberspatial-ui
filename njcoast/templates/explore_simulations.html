@@ -274,6 +274,11 @@ function reload_simulation_data(object){
 function clear_text_search(){
     //clear
     document.getElementById('text_search_input').value = "";
+    document.getElementById('datepicker1').value = "mm/dd/yyyy";
+    document.getElementById('datepicker2').value = "mm/dd/yyyy";
+    start_date = "";
+    end_date = "";
+    text_search = "";
 
     //load data
     load_simulation_data('-modified');
