@@ -43,10 +43,10 @@
         </div>
         <div class="row">
             <!-- #TODO imlement this column, set to hidden -->
-            <div class="col-md-3 hidden">
+            <div class="col-md-3">
                 <div class="selections">
                     Your selections
-                    <a href="" id="clear-search" class="pull-right">Clear</a>
+                    <a href="" id="clear-search" class="pull-right" onclick="clear_text_search();">Clear</a>
                 </div>
                 <nav class="filter">
 
@@ -56,16 +56,16 @@
                             <div class="input-group">
                                 <input name="text_search_input" id="text_search_input" ng-model="text_query" type="text" placeholder="Search by text" class="form-control">
                                 <span class="input-group-btn">
-                                    <button class="btn btn-primary" type="submit" id="text_search_btn"><i class="fa fa-search"></i></button>
+                                    <button class="btn btn-primary" type="submit" id="text_search_btn" onclick="call_text_search();"><i class="fa fa-search"></i></button>
                                 </span>
                             </div>
                         </li>
                     </ul>
                 </nav>
 
+                <!-- made the selection list invisible #TODO implement once we undestand archived storms -->
                 <div id="slide-pane">
-
-
+                    <div class="hidden">
                     <nav class="filter">
                         <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-down"></i>Categories</a></h4>
                         <ul class="nav open" id="categories">
@@ -99,21 +99,19 @@
                             </li>
                         </ul>
                     </nav>
-
-
+                    </div>
 
                     <nav class="filter">
                         <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-down"></i>Date</a></h4>
                         <ul class="nav open" id="date_start">
                             <label>Date begins after:</label>
-                            <li><input value="yyyy-mm-dd" data-date-format="YYYY-MM-DD" type="text" class="datepicker" placeholder="yyyy-mm-dd" ng-model="date_query.date__gte" /></li>
+                            <li><input id="datepicker1" value="mm-dd-yyyy" data-date-format="MM-DD-YYYY" name="start_date" type="text" class="datepicker" placeholder="mm-dd-yyyy" ng-model="date_query.date__gte" onchange="get_dates(this);"/></li>
                         </ul>
                         <ul class="nav open" id="date_end">
                             <label>Date ends before:</label>
-                            <li><input value="yyyy-mm-dd" data-date-format="YYYY-MM-DD" type="text" class="datepicker" placeholder="yyyy-mm-dd" ng-model="date_query.date__lte" /></li>
+                            <li><input id="datepicker2" value="mm-dd-yyyy" data-date-format="MM-DD-YYYY" name="end_date" type="text" class="datepicker" placeholder="mm-dd-yyyy" ng-model="date_query.date__lte" onchange="get_dates(this);"/></li>
                         </ul>
                     </nav>
-
 
                 </div>
             </div>
@@ -126,51 +124,16 @@
 
                     <div class="col-md-9">
                         <ul class="list-inline pull-left" id="sort">
-                            <li><a data-value="-date" data-filter="order_by" class="selected" ng-click="single_choice_listener($event)">Most recent</a></li>
-                            <!-- <li><a data-value="date" data-filter="order_by" ng-click="single_choice_listener($event)">Less recent</a></li>
-                            <li><a data-value="title" data-filter="order_by" ng-click="single_choice_listener($event)">A - Z</a></li>
-                            <li><a data-value="-title" data-filter="order_by" ng-click="single_choice_listener($event)">Z - A</a></li>-->
+                            <li><a href="#" name="-modified" data-filter="order_by" class="selected" onclick='reload_simulation_data(this)'>Most recent</a></li>
+                            <li><a href="#" name="modified" data-filter="order_by" onclick='reload_simulation_data(this)'>Less recent</a></li>
+                            <li><a href="#" name="description" data-filter="order_by" onclick='reload_simulation_data(this)'>A - Z</a></li>
+                            <li><a href="#" name="-description" data-filter="order_by" onclick='reload_simulation_data(this)'>Z - A</a></li>
                             <!--<li><a data-value="-popular_count" data-filter="order_by" ng-click="single_choice_listener($event)">Most popular</a></li>-->
                         </ul>
                     </div>
                 </div>
+                <!-- container for list of simulations -->
                 <ul id="dashboard-list" class="dashboard-list">
-                    {% for simulation in simulations_for_user %}
-                    <li {% if forloop.counter > 4 %}class="hidden"{% endif %}>
-                        <article>
-                            <div class="row items-list">
-                                <div class="col-xs-12 item-info shp-info">
-                                    <h4><div id="badge-{{ forloop.counter }}" class="h-badge what-if">H</div><span id="storm-{{ forloop.counter }}">{{ simulation.data.storm_type }} Run</span></h4>
-                                    <p>{{ simulation.description }} <span class="owner">by <a href="">{{ simulation.user_name }}</a></span></p>
-                                    <p class="shp-scenario"><span>Sea Level Rise:</span> {{ simulation.data.SLR }}, <span>Coastal Protection:</span> {{ simulation.data.protection }}, <span>Tides:</span> {{ simulation.data.tide_td }}, <span>Analysis type:</span> {{ simulation.data.analysis }}, <span>Simulation id:</span> {{ simulation.sim_id }}</p>
-                                    <br/>
-                                    <p class="actions">
-                                        <table style="width: 100%;">
-                                            <tr>
-                                                <td style="font-size: 14px;">
-                                                    <i class="fa fa-calendar-o"></i>{{ simulation.modified }}
-                                                </td>
-                                                <td>
-                                                    <div class="dropup show pull-right">
-                                                        <button class="dropdown-toggle" style="margin-top: 5px;font-size: 14px;" id="dropdownMenuAddToMap_{{ forloop.counter }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            Add Results to Map ... <i href="#"  class="fa fa-caret-up" style="margin-left: 10px" aria-hidden="true"></i>
-                                                        </button>
-                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuAddToMap_{{ forloop.counter }}">
-                                                            {% for map in maps_for_user %}
-                                                            <a style="padding: 2px;" class="dropdown-item" name="{{ map.id }}" onclick='add_expert_to_map(this, "{{ simulation.sim_id }}");'>{{ map.name }}</a>
-                                                            <div class="dropdown-divider"></div>
-                                                            {% endfor %}
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </p>
-                                </div>
-                            </div>
-                        </article>
-                    </li>
-                    {% endfor %}
                 </ul>
 
                 <div class="row" style="margin-bottom: 300px">
@@ -190,7 +153,15 @@
 {% endblock middle %}
 
 {% block extra_script %}
+<script src="{% static 'js/notify.min.js' %}"></script>
+
 <script type=text/javascript>
+
+//date range for Search
+var start_date = "";//"04/11/2018 18:30";
+var end_date = "";//"04/15/2018 9:30";
+var text_search = ""; //"sim stuff";
+
 //total sims
 var counter = 1;
 var page = 1;
@@ -247,45 +218,11 @@ $("#pageForward").on("click", function() {
 //~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $(document).ready(function () {
 
-    //loop until end of data list
-    hurricanes = 0;
-    noreasters = 0;
+    //load actual data
+    load_simulation_data('-modified');
 
-    do{
-        more_elmts = document.getElementById('badge-'+counter);
-
-        //if exists and checked then save
-        if(more_elmts){
-            //change badge if Nor'easter
-            if(document.getElementById('storm-'+counter).innerHTML.indexOf("Nor'easter") >= 0){
-                more_elmts.innerHTML = "N";
-                more_elmts.classList.remove("h-badge");
-                more_elmts.classList.add("n-badge");
-                noreasters++;
-            }else{
-                hurricanes++;
-            }
-
-            //increment
-            counter++;
-        }
-
-    }while(more_elmts)
-
-    //fix last increment
-    counter--;
-
-    //update total
-    document.getElementById('total').innerHTML = counter;
-
-    //update hurricanes
-    document.getElementById('hurricanes').innerHTML = hurricanes;
-
-    //update total
-    document.getElementById('noreasters').innerHTML = noreasters;
-
-    //update total
-    document.getElementById('pagetotal').innerHTML = Math.ceil(counter / 4);
+    $( "#datepicker1" ).datepicker();
+    $( "#datepicker2" ).datepicker();
 
 });
 
@@ -310,18 +247,208 @@ function add_expert_to_map(object, sim_id){
         dataType: "json",
         success: function(result) {
             console.log("SAVING TO MAP -- SUCCESS!" + result.saved);
-            //now auto save so dont flag
-            //$.notify("Simulation saved to map " + object.innerHTML, "success");
+            //flag saved
+            $.notify("Simulation saved to map " + object.innerHTML, "success");
 
             //jump to page
             //window.location.href = "/map/" + object.name + "/";
         },
         error: function(result) {
             console.log("ERROR:", result)
-            //$.notify("Error saving simulation to map", "error");
+            $.notify("Error saving simulation to map", "error");
         }
     });
 }
 
+//reload ordered data from simulation db
+function reload_simulation_data(object){
+    //set selected
+    $(object).parent().siblings().find('.' + "selected").removeClass("selected");
+    object.classList.add("selected");
+
+    //load data
+    load_simulation_data(object.name);
+}
+
+//clear text search
+function clear_text_search(){
+    //clear
+    document.getElementById('text_search_input').value = "";
+    document.getElementById('datepicker1').value = "mm/dd/yyyy";
+    document.getElementById('datepicker2').value = "mm/dd/yyyy";
+    start_date = "";
+    end_date = "";
+    text_search = "";
+
+    //load data
+    load_simulation_data('-modified');
+}
+
+//reload with text search
+function call_text_search(){
+
+    var date_regex = /^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/;
+
+    //test start
+    if(start_date != "" && !(date_regex.test(start_date))){
+        alert("Error in start date "+start_date);
+    }
+
+    //test start
+    if(end_date != "" && !(date_regex.test(end_date))){
+        alert("Error in end date "+end_date);
+    }
+
+    //both dates?
+    if((end_date == "" && start_date != "") || (end_date != "" && start_date == "")){
+        alert("Please enter a start AND end date!");
+    }
+
+    //get text
+    text_search = document.getElementById('text_search_input').value;
+
+    //load data
+    load_simulation_data('-modified');
+}
+
+//get date input
+function get_dates(object){
+    if(object.name == "start_date"){
+        start_date = object.value;
+        console.log("Start "+start_date)
+    }else{
+        end_date = object.value;
+        console.log("End "+end_date)
+    }
+}
+
+//load ordered data from simulation db
+function load_simulation_data(order_by){
+    $.ajax({
+        type: "GET",
+        url: "/store/",
+        data: {
+            action: "get_my_data",
+            order_by: order_by,
+            start_date: start_date,
+            end_date: end_date,
+            text_search: text_search
+        },
+        dataType: "json",
+        success: function(result) {
+
+            console.log("GETTING SIMULATION -- SUCCESS! "+result.status);
+
+            //get heatmap from S3
+            if(result.status){
+                //clear current list
+                document.getElementById('dashboard-list').innerHTML = "";
+
+                //get JSON data
+                //console.log(result.data[0].sim_id);
+                for(i=0; i<result.data.length;i++){
+                    //console.log(result.data[i].sim_id);
+
+                    //setup for hidden list elements
+                    var hide = "";
+                    if(i > 3){
+                        hide = "hidden";
+                    }
+
+                    //counter from 1
+                    count = i+1;
+
+                    //html to crete li
+                    html = `<li class="${hide}">
+                                <article>
+                                    <div class="row items-list">
+                                        <div class="col-xs-12 item-info shp-info">
+                                            <h4><div id="badge-${(count)}" class="h-badge what-if">H</div><span id="storm-${(count)}">${result.data[i].data.storm_type } Run</span></h4>
+                                            <p>${result.data[i].description } <span class="owner">by <a href="">${result.data[i].user_name }</a></span></p>
+                                            <p class="shp-scenario"><span>Sea Level Rise:</span> ${result.data[i].data.SLR }, <span>Coastal Protection:</span> ${result.data[i].data.protection }, <span>Tides:</span> ${result.data[i].data.tide_td }, <span>Analysis type:</span> ${result.data[i].data.analysis }, <span>Simulation id:</span> ${result.data[i].sim_id }</p>
+                                            <br/>
+                                            <p class="actions">
+                                                <table style="width: 100%;">
+                                                    <tr>
+                                                        <td style="font-size: 14px;">
+                                                            <i class="fa fa-calendar-o"></i>${result.data[i].modified }
+                                                        </td>
+                                                        <td>
+                                                            <div class="dropup show pull-right">
+                                                                <button class="dropdown-toggle" style="margin-top: 5px;font-size: 14px;" id="dropdownMenuAddToMap_${count}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                    Add Results to Map ... <i href="#"  class="fa fa-caret-up" style="margin-left: 10px" aria-hidden="true"></i>
+                                                                </button>
+                                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuAddToMap_${count}">
+                                                                    {% for map in maps_for_user %}
+                                                                    <a style="padding: 2px;" class="dropdown-item" name="{{ map.id }}" onclick='add_expert_to_map(this, "${result.data[i].sim_id }");'>{{ map.name }}</a>
+                                                                    <div class="dropdown-divider"></div>
+                                                                    {% endfor %}
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </article>
+                            </li>`;
+
+                    //add it
+                    document.getElementById('dashboard-list').innerHTML += html;
+                }
+
+                //loop until end of data list
+                counter = 1;
+                page = 1;
+                hurricanes = 0;
+                noreasters = 0;
+
+
+                do{
+                    more_elmts = document.getElementById('badge-'+counter);
+
+                    //if exists and checked then save
+                    if(more_elmts){
+                        //change badge if Nor'easter
+                        if(document.getElementById('storm-'+counter).innerHTML.indexOf("Nor'easter") >= 0){
+                            more_elmts.innerHTML = "N";
+                            more_elmts.classList.remove("h-badge");
+                            more_elmts.classList.add("n-badge");
+                            noreasters++;
+                        }else{
+                            hurricanes++;
+                        }
+
+                        //increment
+                        counter++;
+                    }
+
+                }while(more_elmts)
+
+                //fix last increment
+                counter--;
+
+                //update total
+                document.getElementById('total').innerHTML = counter;
+
+                //update hurricanes
+                document.getElementById('hurricanes').innerHTML = hurricanes;
+
+                //update total
+                document.getElementById('noreasters').innerHTML = noreasters;
+
+                //update total
+                document.getElementById('pagetotal').innerHTML = Math.ceil(counter / 4);
+
+            }
+        },
+        error: function(result) {
+            console.log("ERROR:", result)
+            //$.notify("Error loading simulation", "error");
+        }
+    });
+
+}
 </script>
 {% endblock extra_script %}
