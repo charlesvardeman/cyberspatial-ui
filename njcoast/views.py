@@ -245,7 +245,10 @@ def map_settings(request, map_id):
                 data_dict = json.loads(map_objs[0]['settings'])
                 data_dict['description'] = map_objs[0]['description']
                 data_dict['name'] = map_objs[0]['name']
-                data_dict['shared_with'] = json.loads(map_objs[0]['shared_with'])
+                try:
+                    data_dict['shared_with'] = json.loads(map_objs[0]['shared_with'])
+                except:
+                    data_dict['shared_with'] = []
             else:
                 data_dict = {}
 
@@ -274,7 +277,10 @@ def map_settings(request, map_id):
                 #test if it is already there
                 if request.POST['sim_id'] not in map_objs[0].settings:
                     #get settings
-                    settings = json.loads(map_objs[0].settings)
+                    try:
+                        settings = json.loads(map_objs[0].settings)
+                    except:
+                        settings = {}
 
                     #append new simulation to simulations
                     settings.setdefault('simulations', []).append(request.POST['sim_id'])
