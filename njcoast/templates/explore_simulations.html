@@ -105,11 +105,11 @@
                         <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-down"></i>Date</a></h4>
                         <ul class="nav open" id="date_start">
                             <label>Date begins after:</label>
-                            <li><input value="mm-dd-yyyy" data-date-format="MM-DD-YYYY" name="start_date" type="text" class="datepicker" placeholder="mm-dd-yyyy" ng-model="date_query.date__gte" onchange="get_dates(this);"/></li>
+                            <li><input id="datepicker1" value="mm-dd-yyyy" data-date-format="MM-DD-YYYY" name="start_date" type="text" class="datepicker" placeholder="mm-dd-yyyy" ng-model="date_query.date__gte" onchange="get_dates(this);"/></li>
                         </ul>
                         <ul class="nav open" id="date_end">
                             <label>Date ends before:</label>
-                            <li><input value="mm-dd-yyyy" data-date-format="MM-DD-YYYY" name="end_date" type="text" class="datepicker" placeholder="mm-dd-yyyy" ng-model="date_query.date__lte" onchange="get_dates(this);"/></li>
+                            <li><input id="datepicker2" value="mm-dd-yyyy" data-date-format="MM-DD-YYYY" name="end_date" type="text" class="datepicker" placeholder="mm-dd-yyyy" ng-model="date_query.date__lte" onchange="get_dates(this);"/></li>
                         </ul>
                     </nav>
 
@@ -158,8 +158,8 @@
 <script type=text/javascript>
 
 //date range for Search
-var start_date = "04/11/2018 18:30";
-var end_date = "04/15/2018 9:30";
+var start_date = "";//"04/11/2018 18:30";
+var end_date = "";//"04/15/2018 9:30";
 var text_search = ""; //"sim stuff";
 
 //total sims
@@ -221,6 +221,9 @@ $(document).ready(function () {
     //load actual data
     load_simulation_data('-modified');
 
+    $( "#datepicker1" ).datepicker();
+    $( "#datepicker2" ).datepicker();
+
 });
 
 //add the current simulation to a map
@@ -278,6 +281,24 @@ function clear_text_search(){
 
 //reload with text search
 function call_text_search(){
+
+    var date_regex = /^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/;
+
+    //test start
+    if(start_date != "" && !(date_regex.test(start_date))){
+        alert("Error in start date "+start_date);
+    }
+
+    //test start
+    if(end_date != "" && !(date_regex.test(end_date))){
+        alert("Error in end date "+end_date);
+    }
+
+    //both dates?
+    if((end_date == "" && start_date != "") || (end_date != "" && start_date == "")){
+        alert("Please enter a start AND end date!");
+    }
+
     //get text
     text_search = document.getElementById('text_search_input').value;
 
@@ -373,8 +394,11 @@ function load_simulation_data(order_by){
                 }
 
                 //loop until end of data list
+                counter = 1;
+                page = 1;
                 hurricanes = 0;
                 noreasters = 0;
+
 
                 do{
                     more_elmts = document.getElementById('badge-'+counter);

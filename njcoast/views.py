@@ -349,8 +349,8 @@ def map_expert_simulations(request):
             #if dates
             if len(request.GET['start_date']) > 0 and len(request.GET['end_date']) > 0:
                 try:
-                    start_date = datetime.strptime(request.GET['start_date'], '%m/%d/%Y %H:%M')
-                    end_date = datetime.strptime(request.GET['end_date'], '%m/%d/%Y %H:%M')
+                    start_date = datetime.strptime(request.GET['start_date'], '%m/%d/%Y')
+                    end_date = datetime.strptime(request.GET['end_date'], '%m/%d/%Y')
                 except:
                     return JsonResponse({'user_id': 0,'status': False})
 
