@@ -190,6 +190,8 @@
 {% endblock middle %}
 
 {% block extra_script %}
+<script src="{% static 'js/notify.min.js' %}"></script>
+
 <script type=text/javascript>
 //total sims
 var counter = 1;
@@ -310,15 +312,15 @@ function add_expert_to_map(object, sim_id){
         dataType: "json",
         success: function(result) {
             console.log("SAVING TO MAP -- SUCCESS!" + result.saved);
-            //now auto save so dont flag
-            //$.notify("Simulation saved to map " + object.innerHTML, "success");
+            //flag saved
+            $.notify("Simulation saved to map " + object.innerHTML, "success");
 
             //jump to page
             //window.location.href = "/map/" + object.name + "/";
         },
         error: function(result) {
             console.log("ERROR:", result)
-            //$.notify("Error saving simulation to map", "error");
+            $.notify("Error saving simulation to map", "error");
         }
     });
 }
