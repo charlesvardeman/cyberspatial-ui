@@ -328,17 +328,40 @@ def map_settings(request, map_id):
 @login_required
 def map_expert_simulations(request):
     if request.method == "GET":
-        #get matching object
-        sim_objs = NJCMapExpert.objects.filter(sim_id=request.GET['data']).values()
+        #find required action
+        if request.GET['action'] == 'get_sim_id_data':
+            #get matching object
+            sim_objs = NJCMapExpert.objects.filter(sim_id=request.GET['data']).values()
 
-        #get objects and update (should be unique so grab the first)
-        #for map_obj in map_objs:
-        if len(sim_objs) > 0:
-            print "user", sim_objs[0]['user_id'], request.GET['data'], request.user.get_full_name()
+            #get objects and update (should be unique so grab the first)
+            #for map_obj in map_objs:
+            if len(sim_objs) > 0:
+                print "user", sim_objs[0]['user_id'], request.GET['data'], request.user.get_full_name()
 
-            return JsonResponse({'user_id': sim_objs[0]['user_id'], 'status': True, 'data': sim_objs[0]})
+                return JsonResponse({'user_id': sim_objs[0]['user_id'], 'status': True, 'data': sim_objs[0]})
 
-        return JsonResponse({'user_id': 0,'status': False})
+            return JsonResponse({'user_id': 0,'status': False})
+
+        elif request.GET['action'] == 'get_my_data': #if getting all data
+            #get data from db
+            db_data = NJCMapExpert.objects.filter(owner = request.user).order_by('-modified')
+
+            #parse out results
+            output_array = []
+            for dat in db_data:
+                inner_dict = {}
+                inner_dict['sim_id'] = dat.sim_id
+                inner_dict['user_name'] = dat.user_name
+                inner_dict['description'] = dat.description
+                inner_dict['data'] = json.loads(dat.data)
+                inner_dict['modified'] = dat.modified.strftime('%m/%d/%Y %H:%M')
+                output_array.append(inner_dict)
+
+            #send it back
+            return JsonResponse({'user_id': 0,'status': True, 'data': output_array})
+
+        else:
+            return JsonResponse({'user_id': 0,'status': False})
 
     elif request.method == "POST":
         expert_dict = json.loads(request.POST['data'])
@@ -385,16 +408,6 @@ class ExploreTemplateView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ExploreTemplateView, self).get_context_data(**kwargs)
-
-        #get data from db
-        db_data = NJCMapExpert.objects.filter(owner = self.request.user).order_by('-modified')
-
-        #expand json data to dictionary
-        for dat in db_data:
-            dat.data = json.loads(dat.data)
-
-        #put into context
-        context['simulations_for_user'] = db_data
 
         #quiery, select if I am the owner
         context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)

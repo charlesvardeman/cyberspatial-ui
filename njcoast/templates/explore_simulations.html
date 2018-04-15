@@ -134,43 +134,8 @@
                         </ul>
                     </div>
                 </div>
+                <!-- container for list of simulations -->
                 <ul id="dashboard-list" class="dashboard-list">
-                    {% for simulation in simulations_for_user %}
-                    <li {% if forloop.counter > 4 %}class="hidden"{% endif %}>
-                        <article>
-                            <div class="row items-list">
-                                <div class="col-xs-12 item-info shp-info">
-                                    <h4><div id="badge-{{ forloop.counter }}" class="h-badge what-if">H</div><span id="storm-{{ forloop.counter }}">{{ simulation.data.storm_type }} Run</span></h4>
-                                    <p>{{ simulation.description }} <span class="owner">by <a href="">{{ simulation.user_name }}</a></span></p>
-                                    <p class="shp-scenario"><span>Sea Level Rise:</span> {{ simulation.data.SLR }}, <span>Coastal Protection:</span> {{ simulation.data.protection }}, <span>Tides:</span> {{ simulation.data.tide_td }}, <span>Analysis type:</span> {{ simulation.data.analysis }}, <span>Simulation id:</span> {{ simulation.sim_id }}</p>
-                                    <br/>
-                                    <p class="actions">
-                                        <table style="width: 100%;">
-                                            <tr>
-                                                <td style="font-size: 14px;">
-                                                    <i class="fa fa-calendar-o"></i>{{ simulation.modified }}
-                                                </td>
-                                                <td>
-                                                    <div class="dropup show pull-right">
-                                                        <button class="dropdown-toggle" style="margin-top: 5px;font-size: 14px;" id="dropdownMenuAddToMap_{{ forloop.counter }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                            Add Results to Map ... <i href="#"  class="fa fa-caret-up" style="margin-left: 10px" aria-hidden="true"></i>
-                                                        </button>
-                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuAddToMap_{{ forloop.counter }}">
-                                                            {% for map in maps_for_user %}
-                                                            <a style="padding: 2px;" class="dropdown-item" name="{{ map.id }}" onclick='add_expert_to_map(this, "{{ simulation.sim_id }}");'>{{ map.name }}</a>
-                                                            <div class="dropdown-divider"></div>
-                                                            {% endfor %}
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </p>
-                                </div>
-                            </div>
-                        </article>
-                    </li>
-                    {% endfor %}
                 </ul>
 
                 <div class="row" style="margin-bottom: 300px">
@@ -249,45 +214,8 @@ $("#pageForward").on("click", function() {
 //~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $(document).ready(function () {
 
-    //loop until end of data list
-    hurricanes = 0;
-    noreasters = 0;
-
-    do{
-        more_elmts = document.getElementById('badge-'+counter);
-
-        //if exists and checked then save
-        if(more_elmts){
-            //change badge if Nor'easter
-            if(document.getElementById('storm-'+counter).innerHTML.indexOf("Nor'easter") >= 0){
-                more_elmts.innerHTML = "N";
-                more_elmts.classList.remove("h-badge");
-                more_elmts.classList.add("n-badge");
-                noreasters++;
-            }else{
-                hurricanes++;
-            }
-
-            //increment
-            counter++;
-        }
-
-    }while(more_elmts)
-
-    //fix last increment
-    counter--;
-
-    //update total
-    document.getElementById('total').innerHTML = counter;
-
-    //update hurricanes
-    document.getElementById('hurricanes').innerHTML = hurricanes;
-
-    //update total
-    document.getElementById('noreasters').innerHTML = noreasters;
-
-    //update total
-    document.getElementById('pagetotal').innerHTML = Math.ceil(counter / 4);
+    //load actual data
+    load_simulation_data();
 
 });
 
@@ -325,5 +253,123 @@ function add_expert_to_map(object, sim_id){
     });
 }
 
+//load ordered data from simulation db
+function load_simulation_data(){
+    $.ajax({
+        type: "GET",
+        url: "/store/",
+        data: {
+            action: "get_my_data"
+        },
+        dataType: "json",
+        success: function(result) {
+
+            console.log("GETTING SIMULATION -- SUCCESS! "+result.status);
+
+            //get heatmap from S3
+            if(result.status){
+                //get JSON data
+                //console.log(result.data[0].sim_id);
+                for(i=0; i<result.data.length;i++){
+                    //console.log(result.data[i].sim_id);
+
+                    //setup for hidden list elements
+                    var hide = "";
+                    if(i > 3){
+                        hide = "hidden";
+                    }
+
+                    //counter from 1
+                    count = i+1;
+
+                    //html to crete li
+                    html = `<li class="${hide}">
+                                <article>
+                                    <div class="row items-list">
+                                        <div class="col-xs-12 item-info shp-info">
+                                            <h4><div id="badge-${(count)}" class="h-badge what-if">H</div><span id="storm-${(count)}">${result.data[i].data.storm_type } Run</span></h4>
+                                            <p>${result.data[i].description } <span class="owner">by <a href="">${result.data[i].user_name }</a></span></p>
+                                            <p class="shp-scenario"><span>Sea Level Rise:</span> ${result.data[i].data.SLR }, <span>Coastal Protection:</span> ${result.data[i].data.protection }, <span>Tides:</span> ${result.data[i].data.tide_td }, <span>Analysis type:</span> ${result.data[i].data.analysis }, <span>Simulation id:</span> ${result.data[i].sim_id }</p>
+                                            <br/>
+                                            <p class="actions">
+                                                <table style="width: 100%;">
+                                                    <tr>
+                                                        <td style="font-size: 14px;">
+                                                            <i class="fa fa-calendar-o"></i>${result.data[i].modified }
+                                                        </td>
+                                                        <td>
+                                                            <div class="dropup show pull-right">
+                                                                <button class="dropdown-toggle" style="margin-top: 5px;font-size: 14px;" id="dropdownMenuAddToMap_${count}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                                    Add Results to Map ... <i href="#"  class="fa fa-caret-up" style="margin-left: 10px" aria-hidden="true"></i>
+                                                                </button>
+                                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuAddToMap_${count}">
+                                                                    {% for map in maps_for_user %}
+                                                                    <a style="padding: 2px;" class="dropdown-item" name="{{ map.id }}" onclick='add_expert_to_map(this, "${result.data[i].sim_id }");'>{{ map.name }}</a>
+                                                                    <div class="dropdown-divider"></div>
+                                                                    {% endfor %}
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </article>
+                            </li>`;
+
+                    //add it
+                    document.getElementById('dashboard-list').innerHTML += html;
+                }
+
+                //loop until end of data list
+                hurricanes = 0;
+                noreasters = 0;
+
+                do{
+                    more_elmts = document.getElementById('badge-'+counter);
+
+                    //if exists and checked then save
+                    if(more_elmts){
+                        //change badge if Nor'easter
+                        if(document.getElementById('storm-'+counter).innerHTML.indexOf("Nor'easter") >= 0){
+                            more_elmts.innerHTML = "N";
+                            more_elmts.classList.remove("h-badge");
+                            more_elmts.classList.add("n-badge");
+                            noreasters++;
+                        }else{
+                            hurricanes++;
+                        }
+
+                        //increment
+                        counter++;
+                    }
+
+                }while(more_elmts)
+
+                //fix last increment
+                counter--;
+
+                //update total
+                document.getElementById('total').innerHTML = counter;
+
+                //update hurricanes
+                document.getElementById('hurricanes').innerHTML = hurricanes;
+
+                //update total
+                document.getElementById('noreasters').innerHTML = noreasters;
+
+                //update total
+                document.getElementById('pagetotal').innerHTML = Math.ceil(counter / 4);
+
+            }
+        },
+        error: function(result) {
+            console.log("ERROR:", result)
+            //$.notify("Error loading simulation", "error");
+        }
+    });
+
+}
 </script>
 {% endblock extra_script %}
