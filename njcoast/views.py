@@ -236,7 +236,6 @@ def map_settings(request, map_id):
         map_objs = NJCMap.objects.filter(id=map_id).values() #removed owner = request.user,
 
         #get objects and update (should be unique so grab the first)
-        #for map_obj in map_objs:
         if len(map_objs) > 0:
             if len(map_objs[0]['settings']) > 0:
                 data_dict = json.loads(map_objs[0]['settings'])
@@ -251,7 +250,6 @@ def map_settings(request, map_id):
 
             #determine ownership
             if map_objs[0]['owner_id'] != request.user.id:
-            #if len(map_test) == 0:
                 data_dict['owner'] = 'other'
             else:
                 data_dict['owner'] = 'me'
