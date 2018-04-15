@@ -13,7 +13,7 @@ from django.contrib.auth.models import Group
 from django.db.models import Q
 from django.contrib.auth.models import User
 from itertools import chain
-
+from datetime import datetime
 '''
   This function is used to respond to ajax requests for which layers should be
   visible for a given user. Borrowed a lot of this from the GeoNode base code
@@ -343,9 +343,25 @@ def map_expert_simulations(request):
             return JsonResponse({'user_id': 0,'status': False})
 
         elif request.GET['action'] == 'get_my_data': #if getting all data
+            #get the ordering
             order_by = request.GET['order_by']
-            #get data from db
-            db_data = NJCMapExpert.objects.filter(owner = request.user).order_by(order_by)
+
+            #text search?
+            if len(request.GET['text_search']) > 0:
+                #get data from db
+                db_data = NJCMapExpert.objects.filter(owner = request.user, description__contains=request.GET['text_search']).order_by(order_by)
+
+            #or dates
+            elif len(request.GET['start_date']) > 0 and len(request.GET['end_date']) > 0:
+                start_date = datetime.strptime(request.GET['start_date'], '%m/%d/%Y %H:%M')
+                end_date = datetime.strptime(request.GET['end_date'], '%m/%d/%Y %H:%M')
+                #get data from db
+                db_data = NJCMapExpert.objects.filter(owner = request.user, modified__range=(start_date, end_date)).order_by(order_by)
+
+            #or just belonging to user
+            else:
+                #get data from db
+                db_data = NJCMapExpert.objects.filter(owner = request.user).order_by(order_by)
 
             #parse out results
             output_array = []
