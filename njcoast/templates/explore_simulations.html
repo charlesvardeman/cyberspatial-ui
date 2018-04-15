@@ -145,25 +145,26 @@
                                     <p class="shp-scenario"><span>Sea Level Rise:</span> {{ simulation.data.SLR }}, <span>Coastal Protection:</span> {{ simulation.data.protection }}, <span>Tides:</span> {{ simulation.data.tide_td }}, <span>Analysis type:</span> {{ simulation.data.analysis }}, <span>Simulation id:</span> {{ simulation.sim_id }}</p>
                                     <br/>
                                     <p class="actions">
-                                        <table style="width: 100%;"><tr><td>
-                                        <i class="fa fa-calendar-o"></i>{{ simulation.modified }} |
-                                        </td><td>
-                                        <div class="dropup show pull-right">
-                                            <button class="btn btn-block btn-secondary dropdown-toggle" style="margin-top: 5px" id="dropdownMenuAddToMap_{{ forloop.counter }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                Add Results to Map ... <i class="fa fa-caret-up" style="margin-left: 10px" aria-hidden="true"></i>
-                                            </button>
-                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuAddToMap_{{ forloop.counter }}">
-                                            {% for map in maps_for_user %}
-                                                <a class="dropdown-item" name="{{ map.id }}" href="#" onclick='add_expert_to_map(this, "{{ simulation.sim_id }}");'>{{ map.name }}</a>
-                                                <div class="dropdown-divider"></div>
-                                                <!--<a class="dropdown-item" href="explore-maps.html">Browse All Maps</a>-->
-                                            {% endfor %}
-                                            </div>
-                                        </div>
-                                        </td></tr></table>
-                                        <!--<a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" style="margin-left: 10px" href="map-p.html">
-                                            <i class="fa fa-plus"></i>Add to Map
-                                        </a>-->
+                                        <table style="width: 100%;">
+                                            <tr>
+                                                <td style="font-size: 14px;">
+                                                    <i class="fa fa-calendar-o"></i>{{ simulation.modified }}
+                                                </td>
+                                                <td>
+                                                    <div class="dropup show pull-right">
+                                                        <button class="dropdown-toggle" style="margin-top: 5px;font-size: 14px;" id="dropdownMenuAddToMap_{{ forloop.counter }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            Add Results to Map ... <i href="#"  class="fa fa-caret-up" style="margin-left: 10px" aria-hidden="true"></i>
+                                                        </button>
+                                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuAddToMap_{{ forloop.counter }}">
+                                                            {% for map in maps_for_user %}
+                                                            <a style="padding: 2px;" class="dropdown-item" name="{{ map.id }}" onclick='add_expert_to_map(this, "{{ simulation.sim_id }}");'>{{ map.name }}</a>
+                                                            <div class="dropdown-divider"></div>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </p>
                                 </div>
                             </div>
