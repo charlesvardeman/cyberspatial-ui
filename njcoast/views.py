@@ -346,22 +346,21 @@ def map_expert_simulations(request):
             #get the ordering
             order_by = request.GET['order_by']
 
-            #text search?
-            if len(request.GET['text_search']) > 0:
-                #get data from db
-                db_data = NJCMapExpert.objects.filter(owner = request.user, description__contains=request.GET['text_search']).order_by(order_by)
+            #if dates
+            if len(request.GET['start_date']) > 0 and len(request.GET['end_date']) > 0:
+                try:
+                    start_date = datetime.strptime(request.GET['start_date'], '%m/%d/%Y %H:%M')
+                    end_date = datetime.strptime(request.GET['end_date'], '%m/%d/%Y %H:%M')
+                except:
+                    return JsonResponse({'user_id': 0,'status': False})
 
-            #or dates
-            elif len(request.GET['start_date']) > 0 and len(request.GET['end_date']) > 0:
-                start_date = datetime.strptime(request.GET['start_date'], '%m/%d/%Y %H:%M')
-                end_date = datetime.strptime(request.GET['end_date'], '%m/%d/%Y %H:%M')
                 #get data from db
-                db_data = NJCMapExpert.objects.filter(owner = request.user, modified__range=(start_date, end_date)).order_by(order_by)
+                db_data = NJCMapExpert.objects.filter(owner = request.user, modified__range=(start_date, end_date), description__contains=request.GET['text_search']).order_by(order_by)
 
             #or just belonging to user
             else:
                 #get data from db
-                db_data = NJCMapExpert.objects.filter(owner = request.user).order_by(order_by)
+                db_data = NJCMapExpert.objects.filter(owner = request.user, description__contains=request.GET['text_search']).order_by(order_by)
 
             #parse out results
             output_array = []

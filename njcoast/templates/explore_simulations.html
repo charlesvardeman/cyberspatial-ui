@@ -105,14 +105,13 @@
                         <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-down"></i>Date</a></h4>
                         <ul class="nav open" id="date_start">
                             <label>Date begins after:</label>
-                            <li><input value="yyyy-mm-dd" data-date-format="YYYY-MM-DD" type="text" class="datepicker" placeholder="yyyy-mm-dd" ng-model="date_query.date__gte" /></li>
+                            <li><input value="mm-dd-yyyy" data-date-format="MM-DD-YYYY" name="start_date" type="text" class="datepicker" placeholder="mm-dd-yyyy" ng-model="date_query.date__gte" onchange="get_dates(this);"/></li>
                         </ul>
                         <ul class="nav open" id="date_end">
                             <label>Date ends before:</label>
-                            <li><input value="yyyy-mm-dd" data-date-format="YYYY-MM-DD" type="text" class="datepicker" placeholder="yyyy-mm-dd" ng-model="date_query.date__lte" /></li>
+                            <li><input value="mm-dd-yyyy" data-date-format="MM-DD-YYYY" name="end_date" type="text" class="datepicker" placeholder="mm-dd-yyyy" ng-model="date_query.date__lte" onchange="get_dates(this);"/></li>
                         </ul>
                     </nav>
-
 
                 </div>
             </div>
@@ -159,8 +158,8 @@
 <script type=text/javascript>
 
 //date range for Search
-var start_date = ""; //"4/11/2018 18:30";
-var end_date = ""; //"4/15/2018 9:30";
+var start_date = "04/11/2018 18:30";
+var end_date = "04/15/2018 9:30";
 var text_search = ""; //"sim stuff";
 
 //total sims
@@ -284,6 +283,17 @@ function call_text_search(){
 
     //load data
     load_simulation_data('-modified');
+}
+
+//get date input
+function get_dates(object){
+    if(object.name == "start_date"){
+        start_date = object.value;
+        console.log("Start "+start_date)
+    }else{
+        end_date = object.value;
+        console.log("End "+end_date)
+    }
 }
 
 //load ordered data from simulation db
