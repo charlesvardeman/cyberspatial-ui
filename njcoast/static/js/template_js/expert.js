@@ -116,10 +116,8 @@ function start_expert_simulation(){
 function send_expert_data_to_server(data) {
     $.ajax({
         type: "POST",
-        //url: "http://dev.njcoast.us:9090/single?name=" + owner.toString() + "&id=" + sim_id,
-        url: "https://staging.njcoast.us/queue/single?name=" + owner.toString() + "&id=" + sim_id,
+        url: "/queue/single?name=" + owner.toString() + "&id=" + sim_id,
         data: JSON.stringify(data),
-        //dataType: "json",
         contentType: 'application/json',
         success: function (result) {
             console.log("EXPERT SIMULATION -- SUCCESS!", result);
@@ -152,8 +150,7 @@ function send_expert_data_to_server(data) {
 function get_expert_data_to_server() {
     $.ajax({
         type: "GET",
-        //url: "http://dev.njcoast.us:9090/status?name=" + owner.toString() + "&id=" + sim_id,
-        url: "https://staging.njcoast.us/queue/status?name=" + owner.toString() + "&id=" + sim_id,
+        url: "/queue/status?name=" + owner.toString() + "&id=" + sim_id,
         //data: data,
         dataType: "json",
         //contentType: 'application/json',
