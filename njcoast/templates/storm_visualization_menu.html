@@ -62,7 +62,6 @@
 <script src="{% static 'js/leaflet-heatmap.js' %}"></script>
 <script src="{% static 'NJ-coast-heatmap/nj-coast.js' %}"></script>
 <script>
-
     var storm_layer_dict = {}; // dictionary of layers added through active storm layer checkboxes
     var update_map_layers = {}; // Dictionary of layers added through the explore scenarios box
 
@@ -78,7 +77,7 @@
         console.log('Requesting RSS Feed......');
         $.ajax({
             type: "GET",
-            url: "https://s3.amazonaws.com/simulation.njcoast.us/metadata.json",
+            url: simulationPath + "/metadata.json",
             data: {},
             dataType: "json",
             success: function (result) {

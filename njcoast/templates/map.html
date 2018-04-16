@@ -605,10 +605,9 @@
 
       //get heatmap from S3
       function load_heatmap_from_s3(owner, simulation, filename, sim_type){
-          console.log("https://s3.amazonaws.com/simulation.njcoast.us/simulation/" + owner + "/" + simulation + "/" + filename);
           $.ajax({
             type: "GET",
-            url: "https://s3.amazonaws.com/simulation.njcoast.us/simulation/" + owner + "/" + simulation + "/" + filename,
+            url: userSimulationPath + "/" + owner + "/" + simulation + "/" + filename,
             dataType: "json",
             success: function (data) {
                 console.log("EXPERT SIMULATION LOAD -- SUCCESS.");

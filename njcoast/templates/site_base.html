@@ -28,9 +28,11 @@
       <link href="{{ STATIC_URL }}geonode/css/base.css?v={{ VERSION }}" rel="stylesheet" />
       <link href="{{ STATIC_URL }}css/site-base.css" rel="stylesheet"/>
       <style type="text/css">[ng\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}</style>
-
-          <link href="{% static 'css/njcoast-style.css' %}" rel="stylesheet"/>
-
+      <link href="{% static 'css/njcoast-style.css' %}" rel="stylesheet"/>
+      <script>
+          var simulationPath = "{{ SIMULATION_BUCKET }}";
+          var userSimulationPath = "{{ SIMULATION_BUCKET }}/{{ USER_SIMULATION_BUCKET}}";
+      </script>
       {% block extra_head %}
       {% endblock %}
     {% endblock %}

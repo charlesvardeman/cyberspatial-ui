@@ -228,12 +228,11 @@ function load_heatmap(object){
     }
 }
 
-//AJAX function to get heatmap from S3 bucket, example:
-//https://s3.amazonaws.com/simulation.njcoast.us/simulation/chris/123/heatmap.json
+//AJAX function to get heatmap from S3 bucket
 function load_expert_data_to_server(file_name, json_tag) {
     $.ajax({
         type: "GET",
-        url: "https://s3.amazonaws.com/simulation.njcoast.us/simulation/" + owner.toString() + "/" + sim_id + "/" + file_name,
+        url: userSimulationPath + "/" + owner.toString() + "/" + sim_id + "/" + file_name,
         //data: data,
         dataType: "json",
         //contentType: 'application/json',
