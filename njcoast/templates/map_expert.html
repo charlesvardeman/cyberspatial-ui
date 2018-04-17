@@ -231,6 +231,10 @@
     var home_latitude = {{ home_latitude }};
     var home_longitude = {{ home_longitude }};
     var home_zoom = {{ zoom_level }};
+    var annotate_map_id = null;
+    {% if map_id %}
+        annotate_map_id = {{ map_id }};
+    {% endif %}
     var annotationLayer = new L.LayerGroup();
 </script>
 
