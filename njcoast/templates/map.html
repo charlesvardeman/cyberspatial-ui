@@ -149,6 +149,7 @@
     {% if map_id %}
         annotate_map_id = {{ map_id }};
     {% endif %}
+    var annotationLayer = new L.LayerGroup();
 </script>
 
 <script src="{% static 'js/template_js/map.js' %}"></script>
