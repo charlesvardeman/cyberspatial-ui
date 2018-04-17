@@ -455,8 +455,8 @@ function create_storm_track(onOff) {
             if (lat_lng_changed) marker.setLatLng(position);
 
             //fix for first use of angle
-            if (!sat_marker.angle) {
-                sat_marker.angle = 0;
+            if(!sat_marker.angle){
+                sat_marker.angle = document.getElementById("angleslider").value * Math.PI / 180;
             }
 
             //get zoom
@@ -538,8 +538,8 @@ mymap.on('zoomend', function (event) {
     }
 
     //fix for first use of angle
-    if (!sat_marker.angle) {
-        sat_marker.angle = 0;
+    if(!sat_marker.angle){
+        sat_marker.angle = document.getElementById("angleslider").value * Math.PI / 180;
     }
 
     //get zoom
