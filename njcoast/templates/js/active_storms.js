@@ -6,7 +6,7 @@
 
             active_storms.forEach(function(item) {
                 var active_storm_template = $('#activeStorm').clone(true);
-                $(active_storm_template).find('span#storm_name').html(item.);
+                $(active_storm_template).find('span#storm_name').html(item);
             });
 
 
