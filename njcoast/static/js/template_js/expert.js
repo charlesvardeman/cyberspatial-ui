@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /**
  * @author Chris Sweet <csweet1@nd.edu>
@@ -6,6 +6,30 @@
  * @description Runs simulations on James' backend with expert choice of input parameters.
  *
  */
+
+/*
+Base Map -- Centered on Keansburg, NJ
+WMS Tile Layers
+Data: Watershed Boundary Dataset - National Hydrography Overlay Map Service
+     https://catalog.data.gov/dataset/usgs-national-watershed-boundary-dataset-wbd-
+     downloadable-data-collection-national-geospatial-/resource/f55f881d-9de8-471f-9b6b-22cd7a98025d
+XML: https://services.nationalmap.gov/arcgis/services/nhd/MapServer/WMSServer?request=GetCapabilities&service=WMS
+*/
+var mymap = L.map('mapid', { editable: true }).setView([home_latitude, home_longitude], home_zoom);
+var layer_list = [];
+var layer_groups = [];
+
+// Setup Scale View
+var scale_options = { metric: false, imperial: false, maxWidth: 200 };
+
+var language = window.navigator.userLanguage || window.navigator.language;
+if (language == "en-US") {
+    scale_options.imperial = true;
+} else {
+    scale_options.metric = true;
+}
+
+L.control.scale(scale_options).addTo(mymap);
 
 //unique id for this simulation, and storage for data
 var sim_id = 'aimo2wqdb';
@@ -560,42 +584,6 @@ function latLngChange(object) {
 }
 
 /*
-Base Map -- Centered on Keansburg, NJ
-WMS Tile Layers
-Data: Watershed Boundary Dataset - National Hydrography Overlay Map Service
-      https://catalog.data.gov/dataset/usgs-national-watershed-boundary-dataset-wbd-
-      downloadable-data-collection-national-geospatial-/resource/f55f881d-9de8-471f-9b6b-22cd7a98025d
-XML: https://services.nationalmap.gov/arcgis/services/nhd/MapServer/WMSServer?request=GetCapabilities&service=WMS
- */
-var mymap = L.map('mapid', { editable: true }).setView([home_latitude, home_longitude], home_zoom);
-var layer_list = [];
-var layer_groups = [];
-
-// Setup Scale View
-var scale_options = { metric: false, imperial: false, maxWidth: 200 };
-
-var language = window.navigator.userLanguage || window.navigator.language;
-if (language == "en-US") {
-    scale_options.imperial = true;
-} else {
-    scale_options.metric = true;
-}
-
-L.control.scale(scale_options).addTo(mymap);
-
-//~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-$(document).ready(function () {
-
-    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-        maxZoom: 18,
-        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' + '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' + 'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-        id: 'mapbox.streets'
-    }).addTo(mymap);
-
-    get_layers_from_server();
-});
-
-/*
 Ajax call to the server. Returns JSON with layers in it.
 TODO: Will need to update url to GeoServer eventually
  */
@@ -690,14 +678,6 @@ function add_layer_to_menu(layer, ul_id) {
         }
     });
 }
-
-$(function () {
-    $('.beta-feature-not-available').tooltip({
-        title: "Feature not available at this time",
-        placement: "top",
-        width: '300px'
-    });
-});
 
 //function to flip advanced/basic toolset
 function tab_flip_tools(basic) {
