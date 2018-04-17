@@ -221,9 +221,9 @@ function get_layers_from_server() {
             process_layers(result.layers);
 
             //load map settings after layers loaded #TODO maybe this should be elsewhere?
-            {% if map_id %}
+            if( annotate_map_id != null ){
                 load_map();
-            {% endif %}
+            }
         },
         error: function (result) {
             console.log("ERROR:", result)
@@ -291,7 +291,6 @@ function add_layer_to_menu(layer, ul_id) {
     layer_list.push(layer);
 
     $('#' + $.trim(layer.id)).click(function () {
-        {#var link = layer.layer_link;#}
         if ($(this).is(':checked')) {
             for(var i=0; i<layer_list.length; i++) {
                 if (layer_list[i].id == this.id){
