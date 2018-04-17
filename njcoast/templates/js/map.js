@@ -675,7 +675,6 @@ function remove_simulation(name){
 
   //remove it
   element.outerHTML = "";
-  delete element;
 
   //remove from list
   var index = simulations.indexOf(name);
