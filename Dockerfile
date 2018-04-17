@@ -17,8 +17,8 @@ RUN apt-get update && apt-get install -y \
     python-ldap \
     libmemcached-dev libsasl2-dev zlib1g-dev \
     python-pylibmc \
-    curl \
-	--no-install-recommends && rm -rf /var/lib/apt/lists/*
+    curl npm nodejs\
+	--no-install-recommends && rm -rf /var/lib/apt/lists/* && ln -s /usr/bin/nodejs /usr/bin/node
 
 # Upgrade pip
 RUN pip install --upgrade pip
@@ -26,9 +26,6 @@ RUN pip install --upgrade pip
 # python-gdal does not seem to work, let's install manually the version that is
 # compatible with the provided libgdal-dev
 RUN pip install GDAL==1.10 --global-option=build_ext --global-option="-I/usr/include/gdal"
-
-# Requirements have to be pulled and installed here, otherwise caching won't work
-# COPY ./requirements /requirements
 
 RUN mkdir /app
 COPY requirements.txt /app/requirements.txt
@@ -38,6 +35,9 @@ RUN pip install --no-cache-dir -r /app/requirements.txt --src /usr/local/src
 # Main work directory will be app
 WORKDIR /app
 COPY . /app
+
+# Transpile JS for IE
+RUN npm install --save-dev babel-cli babel-preset-env && ./node_modules/.bin/babel njcoast/templates/js -d njcoast/static/js/template_js
 
 COPY ./start.sh /start.sh
 COPY ./celary.sh /celary.sh
