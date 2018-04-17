@@ -39,7 +39,7 @@ $("#pageForward").on("click", function () {
     items.slice(shownItems, shownItems + 4).addClass("hidden");
 
     //add new ones
-    oldshownItems = shownItems;
+    var oldshownItems = shownItems;
 
     if ((shownItems + 8) > counter) {
         shownItems = counter - counter % 4;
@@ -70,7 +70,7 @@ $(document).ready(function () {
 //add the current simulation to a map
 function add_expert_to_map(object, sim_id) {
     //save map and sim data
-    map_data = {
+    var map_data = {
         'sim_id': sim_id,
     };
 
@@ -186,8 +186,7 @@ function load_simulation_data(order_by) {
                 document.getElementById('dashboard-list').innerHTML = "";
 
                 //get JSON data
-                //console.log(result.data[0].sim_id);
-                for (i = 0; i < result.data.length; i++) {
+                for (var i = 0; i < result.data.length; i++) {
                     //console.log(result.data[i].sim_id);
 
                     //setup for hidden list elements
@@ -197,10 +196,10 @@ function load_simulation_data(order_by) {
                     }
 
                     //counter from 1
-                    count = i + 1;
+                    var count = i + 1;
 
                     //html to crete li
-                    html = `<li class="${hide}">
+                    var html = `<li class="${hide}">
                                 <article>
                                     <div class="row items-list">
                                         <div class="col-xs-12 item-info shp-info">
@@ -242,12 +241,12 @@ function load_simulation_data(order_by) {
                 //loop until end of data list
                 counter = 1;
                 page = 1;
-                hurricanes = 0;
-                noreasters = 0;
+                var hurricanes = 0;
+                var noreasters = 0;
 
 
                 do {
-                    more_elmts = document.getElementById('badge-' + counter);
+                    var more_elmts = document.getElementById('badge-' + counter);
 
                     //if exists and checked then save
                     if (more_elmts) {

@@ -4,7 +4,7 @@ function create_surge_heatmap(data){
         data: []
     };
 
-    data_array = data;
+    var data_array = data;
     for( var i = 0; i < data.length; i++ ){
         heatData.data.push({
             lat: data[i][0], 
@@ -17,7 +17,7 @@ function create_surge_heatmap(data){
         // radius should be small ONLY if scaleRadius is true (or small radius is intended)
         // if scaleRadius is false it will be the constant radius used in pixels
         "radius": 0.04,
-        "maxOpacity": .5, 
+        "maxOpacity": 0.5, 
         // scales the radius based on map zoom
         "scaleRadius": true, 
         "gradient": {
@@ -52,26 +52,20 @@ function create_wind_heatmap(data){
         data: []
     };
 
-    var max = 0.0;
-
-    data_array = data;
+    var data_array = data;
     for( var i = 0; i < data.length; i++ ){
         heatData.data.push({
             lat: data[i][0], 
             lng: data[i][1], 
             value: Math.max(data[i][2], 0.0),
         });
-
-        max = Math.max(max, data[i][2]);
     }
-
-    console.log("Max: " + max);
 
     var cfg = {
         // radius should be small ONLY if scaleRadius is true (or small radius is intended)
         // if scaleRadius is false it will be the constant radius used in pixels
         "radius": 0.01,
-        "maxOpacity": .5, 
+        "maxOpacity": 0.5, 
         // scales the radius based on map zoom
         "scaleRadius": true, 
         "gradient": {

@@ -9,10 +9,10 @@ if( annotate_map_id != null ){
 var heatmap = {};
 
 //save simulations
-var simulations = new Array();
+var simulations = [];
 
 //disctionary of selected layers
-var layers_selected = new Array();
+var layers_selected = [];
 
 /*
 Base Map -- Centered on Keansburg, NJ
@@ -358,7 +358,7 @@ function apply_settings(data){
       console.log("Layers selected length " + data.layers_selected.length);
 
       //setup selected layers
-      for(i=0; i<data.layers_selected.length; i++){
+      for(var i=0; i<data.layers_selected.length; i++){
           //find by id, click if not checked
           if(document.getElementById(data.layers_selected[i])){
               if(!document.getElementById(data.layers_selected[i]).checked){
@@ -380,7 +380,7 @@ function apply_settings(data){
       simulations = data.simulations;
 
       //load sims
-      for(i=0; i<data.simulations.length; i++){
+      for(var i=0; i<data.simulations.length; i++){
           console.log("sim "+data.simulations[i]);
 
           //load simulation
@@ -404,7 +404,7 @@ function apply_settings(data){
   //load users shared with
   if("shared_with" in data){
       //console.log("Shares "+data.shared_with[0]);
-      for(i=0; i<data.shared_with.length;i++){
+      for(var i=0; i<data.shared_with.length;i++){
           //get list of users
           var more_elmts;
           var counter = 1;
@@ -461,7 +461,7 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type){
         console.log("EXPERT SIMULATION LOAD -- SUCCESS.");
 
         //save data
-        addressPoints = data;
+        var addressPoints = data;
 
         //get correct
         if(sim_type.includes("surge")){
@@ -484,7 +484,7 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type){
 //save current map
 function save_map(){
   //save map state
-  map_data = {
+  var map_data = {
       'latitude': mymap.getCenter().lat,
       'longitude': mymap.getCenter().lng,
       'zoom': mymap.getZoom(),
@@ -493,7 +493,7 @@ function save_map(){
   };
 
   if( annotate_map_id != null ){
-      map_data['map_id'] = annotate_map_id;
+      map_data.map_id = annotate_map_id;
   }
 
   console.log("Layers "+JSON.stringify(map_data));
@@ -525,7 +525,7 @@ function save_shared_with(){
   var more_elmts;
   var counter = 1;
 
-  data = new Array();
+  var data = [];
 
   //loop until end of list
   do{
@@ -648,7 +648,7 @@ function load_simulation_data(sim_id){
               }
 
               //enable buttons? wind
-              var index = layers_selected.indexOf(sim_id+"_wind");
+              index = layers_selected.indexOf(sim_id+"_wind");
               if (index !== -1){
                   console.log("found "+sim_id);
                   document.getElementById(sim_id+"_wind").click();
