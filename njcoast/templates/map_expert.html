@@ -234,4 +234,137 @@
 </script>
 
 <script src="{% static 'js/template_js/expert.js' %}"></script>
+
+<script type=text/javascript>
+$(document).ready(function() {
+    //add annotation layer
+    annotationLayer.addTo(mymap);
+
+    //load current annotations
+    if(annotate_map_id){
+        get_annotations_from_server();
+    }
+
+    // Note that the path doesn't matter right now; any WebSocket
+    // connection gets bumped over to WebSocket consumers
+    if(annotate_map_id) {
+        var websocket_protocol = window.location.protocol.includes("https") ? "wss://" : "ws://";
+        socket = new WebSocket(websocket_protocol + window.location.host + "/map-socket/" + annotate_map_id + "/");
+        socket.onmessage = function(e) {
+            //onMapClick(e.data);
+            // alert('received socket');
+            console.log(e.data)
+            var socket_object = JSON.parse(e.data)
+            console.log(socket_object)
+
+            //update if we are not the annotator #TODO how to enforce? Or many to many?
+            //now just ignore comms from myself
+            if (socket_object.myid != myid) {
+                //find if adding or modifying objects
+                var object = null;
+                annotationLayer.eachLayer(function(layer) {
+                    // layer.feature is probably defined, to create marker, do something like this
+                    if (layer.myCustomID == socket_object.data.id) {
+                        console.log("Found " + layer.myCustomID);
+                        object = layer;
+                    }
+                });
+                if (object == null) {
+                    //set coloring according to owner
+                    var color_param = {};
+                    var icon_param = {};
+                    if (socket_object.owner != owner) {
+                        color_param = {
+                            color: '#C92D40'
+                        };
+                        icon_param = {
+                            icon: redIcon
+                        };
+                    }
+                    //need to create object here
+                    var newobject = null;
+                    console.log("Objects " + socket_object.type);
+                    //create
+                    if (socket_object.type == 'marker') {
+                        newobject = L.marker([socket_object.data.latitude, socket_object.data.longitude], icon_param);
+                    } else if (socket_object.type == 'polygon' || socket_object.type == 'polyline') {
+                        console.log("Points " + socket_object.data.points);
+                        var points = JSON.parse(socket_object.data.points);
+                        //console.log("Points " + points.length + "," + points[0][0]);
+                        if (socket_object.type == 'polyline') {
+                            newobject = L.polyline(points, color_param);
+                        } else {
+                            newobject = L.polygon(points, color_param);
+                        }
+                    } else if (socket_object.type == 'circle') {
+                        newobject = L.circle([socket_object.data.latitude, socket_object.data.longitude], socket_object.data.radius, {
+                            color: '#C92D40'
+                        });
+                    }
+
+                    //set id and add to layer
+                    if (newobject != null) {
+                        newobject.myCustomID = socket_object.data.id;
+                        newobject.owned = false;
+
+                        //add to layer
+                        annotationLayer.addLayer(newobject);
+
+                        var popup_text = socket_object.data.text;
+
+                        //do I own it? if so editable
+                        if (socket_object.owner == owner) {
+                            //setup popup for editing
+                            if (popup_text == null) {
+                                popup_text = "Input text ...";
+                            }
+
+                            popup_text = load_popup_html(popup_text, popup_text.length);
+
+                            newobject.enableEdit(); //editing
+                            newobject.owned = true;
+                        }
+
+                        if (popup_text == null) {
+                            popup_text = "Undefined";
+                        }
+
+                        //setup popup
+                        newobject.bindPopup(popup_text);
+                        newobject.on('click', function(e) {
+                            this.openPopup();
+                        });
+                    }
+                } else {
+                    //modify or delete
+                    if (socket_object.type == 'delete') {
+                        annotationLayer.removeLayer(object);
+                    } else if (socket_object.type == 'marker') {
+                        object.setLatLng([socket_object.data.latitude, socket_object.data.longitude]);
+                    } else if (socket_object.type == 'polygon' || socket_object.type == 'polyline') {
+                        var points = JSON.parse(socket_object.data.points);
+                        object.setLatLngs(points);
+                    } else if (socket_object.type == 'circle') {
+                        object.setLatLng([socket_object.data.latitude, socket_object.data.longitude]);
+                        object.setRadius(socket_object.data.radius);
+                    } else if (socket_object.type == 'popup') {
+                        //add editing if I own it!
+                        if (socket_object.owner != owner) {
+                            object.setPopupContent(socket_object.data.text);
+                        } else {
+                            object.setPopupContent(load_popup_html(socket_object.data.text, socket_object.data.text.length));
+                        }
+                    }
+                }
+
+            }
+        }
+        socket.onopen = function() {
+            //socket.send("joining map annotation for map " + annotate_map_id);
+        }
+        // Call onopen directly if socket is already open
+        if (socket.readyState == WebSocket.OPEN) socket.onopen();
+    }
+});
+</script>
 {% endblock extra_script %}

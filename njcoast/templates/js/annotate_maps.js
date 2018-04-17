@@ -419,388 +419,256 @@ function annotation_update(e_layer) {
     return JSON.stringify(socket_frame);
 }
 
-//~~~~run once ready, but after the one called in map.html~~~~~~~~~~~~~~~~~~~~~~
-    $(document).ready(function() {
-            //add annotation layer
-            annotationLayer.addTo(mymap);
+//~~~~map annotation section~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//toggle layer
+function toggle_annotation_layer(onOff) {
 
-            //load current annotations
-            if(annotate_map_id){
-                get_annotations_from_server();
-            }
+    if (onOff) {
+        annotationLayer.addTo(mymap);
+    } else {
+        //lose annotation tools if we turn off the layer
+        if(document.getElementById("show_annotate").innerHTML == "Hide Annotation Tools"){
+            toggle_annotate();
+        }
+        mymap.removeLayer(annotationLayer);
+    }
+    console.log(onOff);
+}
 
-            // Note that the path doesn't matter right now; any WebSocket
-            // connection gets bumped over to WebSocket consumers
-            if(annotate_map_id) {
-                var websocket_protocol = window.location.protocol.includes("https") ? "wss://" : "ws://";
-                socket = new WebSocket(websocket_protocol + window.location.host + "/map-socket/" + annotate_map_id + "/");
-                socket.onmessage = function(e) {
-                    //onMapClick(e.data);
-                    // alert('received socket');
-                    console.log(e.data)
-                    var socket_object = JSON.parse(e.data)
-                    console.log(socket_object)
+//toggle annotate controls
+function toggle_annotate() {
 
-                    //update if we are not the annotator #TODO how to enforce? Or many to many?
-                    //now just ignore comms from myself
-                    if (socket_object.myid != myid) {
-                        //find if adding or modifying objects
-                        var object = null;
-                        annotationLayer.eachLayer(function(layer) {
-                            // layer.feature is probably defined, to create marker, do something like this
-                            if (layer.myCustomID == socket_object.data.id) {
-                                console.log("Found " + layer.myCustomID);
-                                object = layer;
-                            }
-                        });
-                        if (object == null) {
-                            //set coloring according to owner
-                            var color_param = {};
-                            var icon_param = {};
-                            if (socket_object.owner != owner) {
-                                color_param = {
-                                    color: '#C92D40'
-                                };
-                                icon_param = {
-                                    icon: redIcon
-                                };
-                            }
-                            //need to create object here
-                            var newobject = null;
-                            console.log("Objects " + socket_object.type);
-                            //create
-                            if (socket_object.type == 'marker') {
-                                newobject = L.marker([socket_object.data.latitude, socket_object.data.longitude], icon_param);
-                            } else if (socket_object.type == 'polygon' || socket_object.type == 'polyline') {
-                                console.log("Points " + socket_object.data.points);
-                                var points = JSON.parse(socket_object.data.points);
-                                //console.log("Points " + points.length + "," + points[0][0]);
-                                if (socket_object.type == 'polyline') {
-                                    newobject = L.polyline(points, color_param);
-                                } else {
-                                    newobject = L.polygon(points, color_param);
-                                }
-                            } else if (socket_object.type == 'circle') {
-                                newobject = L.circle([socket_object.data.latitude, socket_object.data.longitude], socket_object.data.radius, {
-                                    color: '#C92D40'
-                                });
-                            }
+    if (document.getElementById("show_annotate").innerHTML == "Show Annotation Tools") {
+        mymap.addControl(marker_control);
+        mymap.addControl(line_control);
+        mymap.addControl(polygon_control);
+        mymap.addControl(rectangle_control);
+        mymap.addControl(circle_control);
 
-                            //set id and add to layer
-                            if (newobject != null) {
-                                newobject.myCustomID = socket_object.data.id;
-                                newobject.owned = false;
+        //enable map save
+        //$("#save_map").removeClass("disabled");
+        //$("#load_map").removeClass("disabled");
 
-                                //add to layer
-                                annotationLayer.addLayer(newobject);
+        //toggle button message
+        document.getElementById("show_annotate").innerHTML = "Hide Annotation Tools";
+    } else {
+        mymap.removeControl(marker_control);
+        mymap.removeControl(line_control);
+        mymap.removeControl(polygon_control);
+        mymap.removeControl(rectangle_control);
+        mymap.removeControl(circle_control);
 
-                                var popup_text = socket_object.data.text;
+        //disable map save
+        //$("#save_map").addClass("disabled");
+        //$("#load_map").addClass("disabled");
 
-                                //do I own it? if so editable
-                                if (socket_object.owner == owner) {
-                                    //setup popup for editing
-                                    if (popup_text == null) {
-                                        popup_text = "Input text ...";
-                                    }
+        //toggle button message
+        document.getElementById("show_annotate").innerHTML = "Show Annotation Tools";
+    }
+    //console.log(onOff);
 
-                                    popup_text = load_popup_html(popup_text, popup_text.length);
+    //stop button href
+    return false;
+}
 
-                                    newobject.enableEdit(); //editing
-                                    newobject.owned = true;
-                                }
+//save single annotation object
+function save_annotation_element(layer) {
+    console.log("save single");
 
-                                if (popup_text == null) {
-                                    popup_text = "Undefined";
-                                }
+    var all_json = "{\n\t\"objects\": [";
+    var add_comma = false;
 
-                                //setup popup
-                                newobject.bindPopup(popup_text);
-                                newobject.on('click', function(e) {
-                                    this.openPopup();
-                                });
-                            }
-                        } else {
-                            //modify or delete
-                            if (socket_object.type == 'delete') {
-                                annotationLayer.removeLayer(object);
-                            } else if (socket_object.type == 'marker') {
-                                object.setLatLng([socket_object.data.latitude, socket_object.data.longitude]);
-                            } else if (socket_object.type == 'polygon' || socket_object.type == 'polyline') {
-                                var points = JSON.parse(socket_object.data.points);
-                                object.setLatLngs(points);
-                            } else if (socket_object.type == 'circle') {
-                                object.setLatLng([socket_object.data.latitude, socket_object.data.longitude]);
-                                object.setRadius(socket_object.data.radius);
-                            } else if (socket_object.type == 'popup') {
-                                //add editing if I own it!
-                                if (socket_object.owner != owner) {
-                                    object.setPopupContent(socket_object.data.text);
-                                } else {
-                                    object.setPopupContent(load_popup_html(socket_object.data.text, socket_object.data.text.length));
-                                }
-                            }
-                        }
+    //annotation elements add
+    //container for JSON
+    var json_string = "";
 
-                    }
-                }
-                socket.onopen = function() {
-                    //socket.send("joining map annotation for map " + annotate_map_id);
-                }
-                // Call onopen directly if socket is already open
-                if (socket.readyState == WebSocket.OPEN) socket.onopen();
-            }
-        });
+    //look for objects
+    var annotation_jason = annotation_update(layer);
+    if (annotation_jason != null) {
+        json_string += annotation_jason;
+    }
 
-        //~~~~map annotation section~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        //toggle layer
-        function toggle_annotation_layer(onOff) {
+    console.log(json_string);
+    if (json_string.length > 1) {
+        all_json += json_string;
+        add_comma = true;
+    }
 
-            if (onOff) {
-                annotationLayer.addTo(mymap);
+    all_json += "\n\t]\n}";
+    console.log(all_json);
+
+    //send to the server
+    send_annotation_to_server(all_json, 'save');
+}
+
+//save annotation
+function save_annotation_elements() {
+    console.log("save");
+
+    var all_json = "{\n\t\"objects\": [";
+    var add_comma = false;
+
+    //loop over the annotation elements
+    annotationLayer.eachLayer(function(layer) {
+        console.log("Found " + layer.myCustomID + ", " + layer.owned);
+
+        if (add_comma) {
+            all_json += ",\n\t\t";
+        }
+
+        //container for JSON
+        var json_string = "";
+
+        //look for objects
+        var annotation_jason = annotation_update(layer);
+        if (annotation_jason != null) {
+            json_string += annotation_jason;
+        }
+
+        console.log(json_string);
+        if (json_string.length > 1) {
+            all_json += json_string;
+            add_comma = true;
+        }
+    });
+
+    all_json += "\n\t]\n}";
+    console.log(all_json);
+
+    //send to the server
+    send_annotation_to_server(all_json, 'save');
+}
+
+//AJAX stuff to send JSON to server (as the name implies)
+function send_annotation_to_server(data, action) {
+    $.ajax({
+        type: "POST",
+        url: "/map/" + annotate_map_id + "/annotations/",
+        data: {
+            'data': data,
+            'action': action
+        },
+        dataType: "json",
+        success: function(result) {
+            console.log("ANNOTATION STORE -- SUCCESS!");
+            //now auto save so dont flag
+            //$.notify(result.annotations + " annotations saved", "success");
+        },
+        error: function(result) {
+            console.log("ERROR:", result)
+            $.notify("Error saving map annotations", "error");
+        }
+    });
+}
+
+//load JSON version of annotation data into layers
+function load_annotation_elements(json_from_server) {
+    var json = "{\"objects\": [{\"type\":\"marker\",\"text\":\"Nikolai's lair\",\"data\":{\"id\":\"u2lj6ycim\",\"latitude\":39.894089941326044,\"longitude\":-74.12595748901369}},{\"type\":\"polygon\",\"text\":\"Polygon of fear\",\"data\":{\"id\":\"t8vo6pn5u\",\"points\":\"[[39.91726592255928,-74.12509918212892],[39.904230397797335,-74.12458419799806],[39.91199934253401,-74.13368225097658]]\"}}]}";
+    var parsed = json_from_server;
+
+    console.log(parsed.objects.length);
+
+    //loop over objects
+    for (var i = 0; i < parsed.objects.length; i++) {
+        //get object
+        var socket_object = parsed.objects[i];
+        console.log("IDs "+socket_object.owner+","+owner);
+
+        //set coloring according to owner
+        var color_param = {};
+        var icon_param = {};
+        if (socket_object.owner != owner) {
+            color_param = {
+                color: '#C92D40'
+            };
+            icon_param = {
+                icon: redIcon
+            };
+        }
+
+        //create
+        var newobject = null;
+        if (socket_object.type == 'marker') {
+            newobject = L.marker([socket_object.data.latitude, socket_object.data.longitude], icon_param);
+        } else if (socket_object.type == 'polygon' || socket_object.type == 'polyline') {
+            console.log("Points " + socket_object.data.points);
+            var points = JSON.parse(socket_object.data.points);
+            //console.log("Points " + points.length + "," + points[0][0]);
+            if (socket_object.type == 'polyline') {
+                newobject = L.polyline(points, color_param);
             } else {
-                //lose annotation tools if we turn off the layer
-                if(document.getElementById("show_annotate").innerHTML == "Hide Annotation Tools"){
-                    toggle_annotate();
-                }
-                mymap.removeLayer(annotationLayer);
+                newobject = L.polygon(points, color_param);
             }
-            console.log(onOff);
+        } else if (socket_object.type == 'circle') {
+            newobject = L.circle([socket_object.data.latitude, socket_object.data.longitude], socket_object.data.radius, color_param);
         }
 
-        //toggle annotate controls
-        function toggle_annotate() {
+        //set id and add to layer
+        if (newobject != null) {
+            newobject.myCustomID = socket_object.data.id;
+            annotationLayer.addLayer(newobject);
 
-            if (document.getElementById("show_annotate").innerHTML == "Show Annotation Tools") {
-                mymap.addControl(marker_control);
-                mymap.addControl(line_control);
-                mymap.addControl(polygon_control);
-                mymap.addControl(rectangle_control);
-                mymap.addControl(circle_control);
+            var popup_text = socket_object.text;
 
-                //enable map save
-                //$("#save_map").removeClass("disabled");
-                //$("#load_map").removeClass("disabled");
+            //do I own it? if so editable
+            if (socket_object.owner == owner) {
+                //setup popup for editing
+                if (popup_text == null) {
+                    popup_text = "Input text ...";
+                }
 
-                //toggle button message
-                document.getElementById("show_annotate").innerHTML = "Hide Annotation Tools";
-            } else {
-                mymap.removeControl(marker_control);
-                mymap.removeControl(line_control);
-                mymap.removeControl(polygon_control);
-                mymap.removeControl(rectangle_control);
-                mymap.removeControl(circle_control);
+                popup_text = load_popup_html(popup_text, popup_text.length);
 
-                //disable map save
-                //$("#save_map").addClass("disabled");
-                //$("#load_map").addClass("disabled");
-
-                //toggle button message
-                document.getElementById("show_annotate").innerHTML = "Show Annotation Tools";
-            }
-            //console.log(onOff);
-
-            //stop button href
-            return false;
-        }
-
-        //save single annotation object
-        function save_annotation_element(layer) {
-            console.log("save single");
-
-            var all_json = "{\n\t\"objects\": [";
-            var add_comma = false;
-
-            //annotation elements add
-            //container for JSON
-            var json_string = "";
-
-            //look for objects
-            var annotation_jason = annotation_update(layer);
-            if (annotation_jason != null) {
-                json_string += annotation_jason;
+                newobject.enableEdit(); //editing
+                newobject.owned = true;
             }
 
-            console.log(json_string);
-            if (json_string.length > 1) {
-                all_json += json_string;
-                add_comma = true;
+            if (popup_text == null) {
+                popup_text = "Undefined";
             }
 
-            all_json += "\n\t]\n}";
-            console.log(all_json);
+            //newobject.enableEdit(); //editing
 
-            //send to the server
-            send_annotation_to_server(all_json, 'save');
-        }
-
-        //save annotation
-        function save_annotation_elements() {
-            console.log("save");
-
-            var all_json = "{\n\t\"objects\": [";
-            var add_comma = false;
-
-            //loop over the annotation elements
-            annotationLayer.eachLayer(function(layer) {
-                console.log("Found " + layer.myCustomID + ", " + layer.owned);
-
-                if (add_comma) {
-                    all_json += ",\n\t\t";
-                }
-
-                //container for JSON
-                var json_string = "";
-
-                //look for objects
-                var annotation_jason = annotation_update(layer);
-                if (annotation_jason != null) {
-                    json_string += annotation_jason;
-                }
-
-                console.log(json_string);
-                if (json_string.length > 1) {
-                    all_json += json_string;
-                    add_comma = true;
-                }
-            });
-
-            all_json += "\n\t]\n}";
-            console.log(all_json);
-
-            //send to the server
-            send_annotation_to_server(all_json, 'save');
-        }
-
-        //AJAX stuff to send JSON to server (as the name implies)
-        function send_annotation_to_server(data, action) {
-            $.ajax({
-                type: "POST",
-                url: "/map/" + annotate_map_id + "/annotations/",
-                data: {
-                    'data': data,
-                    'action': action
-                },
-                dataType: "json",
-                success: function(result) {
-                    console.log("ANNOTATION STORE -- SUCCESS!");
-                    //now auto save so dont flag
-                    //$.notify(result.annotations + " annotations saved", "success");
-                },
-                error: function(result) {
-                    console.log("ERROR:", result)
-                    $.notify("Error saving map annotations", "error");
-                }
+            //setup popup
+            newobject.bindPopup(popup_text);
+            newobject.on('click', function(e) {
+                this.openPopup();
             });
         }
 
-        //load JSON version of annotation data into layers
-        function load_annotation_elements(json_from_server) {
-            var json = "{\"objects\": [{\"type\":\"marker\",\"text\":\"Nikolai's lair\",\"data\":{\"id\":\"u2lj6ycim\",\"latitude\":39.894089941326044,\"longitude\":-74.12595748901369}},{\"type\":\"polygon\",\"text\":\"Polygon of fear\",\"data\":{\"id\":\"t8vo6pn5u\",\"points\":\"[[39.91726592255928,-74.12509918212892],[39.904230397797335,-74.12458419799806],[39.91199934253401,-74.13368225097658]]\"}}]}";
-            var parsed = json_from_server;
+    }
 
-            console.log(parsed.objects.length);
+    //notify?
+    if(parsed.objects.length > 0){
+        $.notify(parsed.objects.length + " annotations loaded", "success");
+    }
+}
 
-            //loop over objects
-            for (var i = 0; i < parsed.objects.length; i++) {
-                //get object
-                var socket_object = parsed.objects[i];
-                console.log("IDs "+socket_object.owner+","+owner);
-
-                //set coloring according to owner
-                var color_param = {};
-                var icon_param = {};
-                if (socket_object.owner != owner) {
-                    color_param = {
-                        color: '#C92D40'
-                    };
-                    icon_param = {
-                        icon: redIcon
-                    };
-                }
-
-                //create
-                var newobject = null;
-                if (socket_object.type == 'marker') {
-                    newobject = L.marker([socket_object.data.latitude, socket_object.data.longitude], icon_param);
-                } else if (socket_object.type == 'polygon' || socket_object.type == 'polyline') {
-                    console.log("Points " + socket_object.data.points);
-                    var points = JSON.parse(socket_object.data.points);
-                    //console.log("Points " + points.length + "," + points[0][0]);
-                    if (socket_object.type == 'polyline') {
-                        newobject = L.polyline(points, color_param);
-                    } else {
-                        newobject = L.polygon(points, color_param);
-                    }
-                } else if (socket_object.type == 'circle') {
-                    newobject = L.circle([socket_object.data.latitude, socket_object.data.longitude], socket_object.data.radius, color_param);
-                }
-
-                //set id and add to layer
-                if (newobject != null) {
-                    newobject.myCustomID = socket_object.data.id;
-                    annotationLayer.addLayer(newobject);
-
-                    var popup_text = socket_object.text;
-
-                    //do I own it? if so editable
-                    if (socket_object.owner == owner) {
-                        //setup popup for editing
-                        if (popup_text == null) {
-                            popup_text = "Input text ...";
-                        }
-
-                        popup_text = load_popup_html(popup_text, popup_text.length);
-
-                        newobject.enableEdit(); //editing
-                        newobject.owned = true;
-                    }
-
-                    if (popup_text == null) {
-                        popup_text = "Undefined";
-                    }
-
-                    //newobject.enableEdit(); //editing
-
-                    //setup popup
-                    newobject.bindPopup(popup_text);
-                    newobject.on('click', function(e) {
-                        this.openPopup();
-                    });
-                }
-
-            }
-
-            //notify?
-            if(parsed.objects.length > 0){
-                $.notify(parsed.objects.length + " annotations loaded", "success");
-            }
+//AJAX to get annotation layers
+function get_annotations_from_server() {
+    $.ajax({
+        type: "GET",
+        url: "/map/" + annotate_map_id + "/annotations/",
+        data: {},
+        dataType: "json",
+        success: function(result) {
+            console.log("ANNOTATION LAYERS -- SUCCESS!");
+            console.log(result);
+            load_annotation_elements(result);
+        },
+        error: function(result) {
+            console.log("ERROR:", result)
+            $.notify("Error loading map annotations", "error");
         }
+    });
+}
 
-        //AJAX to get annotation layers
-        function get_annotations_from_server() {
-            $.ajax({
-                type: "GET",
-                url: "/map/" + annotate_map_id + "/annotations/",
-                data: {},
-                dataType: "json",
-                success: function(result) {
-                    console.log("ANNOTATION LAYERS -- SUCCESS!");
-                    console.log(result);
-                    load_annotation_elements(result);
-                },
-                error: function(result) {
-                    console.log("ERROR:", result)
-                    $.notify("Error loading map annotations", "error");
-                }
-            });
-        }
-
-        //additional leaflet marker icon
-        var redIcon = new L.Icon({
-            iconUrl: marker_icon_image,
-            shadowUrl: marker_icon_shadow,
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        });
+//additional leaflet marker icon
+var redIcon = new L.Icon({
+    iconUrl: marker_icon_image,
+    shadowUrl: marker_icon_shadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+});
