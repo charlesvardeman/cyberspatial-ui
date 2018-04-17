@@ -158,3 +158,5 @@ venv.bak/
 db.sqlite3
 .idea/
 
+# Node
+node_modules
