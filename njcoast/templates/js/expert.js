@@ -26,7 +26,7 @@ var marker, polyline;
 var sim_saved = false;
 
 //function to start simulation, POSTs input data to the server
-function start_expert_simulation(){
+function start_expert_simulation() {
 
     //load Latitude/Longitude
     var latitude = parseFloat(document.getElementById("latitude").value);
@@ -76,7 +76,7 @@ function start_expert_simulation(){
 
     //get storm type
     var storm_type = "Nor'easter";
-    if(document.getElementById('stormbadge').innerHTML.indexOf("Hurricane") >= 0){
+    if (document.getElementById('stormbadge').innerHTML.indexOf("Hurricane") >= 0) {
         storm_type = "Hurricane";
     }
 
@@ -84,26 +84,26 @@ function start_expert_simulation(){
     var lat_past_point = latitude - Math.cos(angle * Math.PI / 180) * 0.01;
     var long_past_point = longitude - Math.sin(angle * Math.PI / 180) * 0.01;
 
-    console.log("tide "+tide+", protection "+protection+", analysis "+analysis+", storm "+storm_type);
+    console.log("tide " + tide + ", protection " + protection + ", analysis " + analysis + ", storm " + storm_type);
 
     data = {
-      "index_SLT": [1,1],
-      "index_W": 1,
-      "index_prob": 1,
-      "indicator": 1,
-      "param": [latitude, longitude, angle, input_cp, input_vf, input_rm],
-      "timeMC": input_ttl,
-      "lat_track": [lat_past_point, latitude],
-      "long_track": [long_past_point, longitude],
-      "SLR": input_slr,
-      "tide": 0,
-      "tide_td": tide,
-      "protection": protection,
-      "analysis": analysis,
-      "storm_type": storm_type,
-      "surge_file": "heatmap.json",
-      "wind_file": "wind_heatmap.json",
-      "workspace_file": ""
+        "index_SLT": [1, 1],
+        "index_W": 1,
+        "index_prob": 1,
+        "indicator": 1,
+        "param": [latitude, longitude, angle, input_cp, input_vf, input_rm],
+        "timeMC": input_ttl,
+        "lat_track": [lat_past_point, latitude],
+        "long_track": [long_past_point, longitude],
+        "SLR": input_slr,
+        "tide": 0,
+        "tide_td": tide,
+        "protection": protection,
+        "analysis": analysis,
+        "storm_type": storm_type,
+        "surge_file": "heatmap.json",
+        "wind_file": "wind_heatmap.json",
+        "workspace_file": ""
     };
 
     console.log(JSON.stringify(data));
@@ -121,7 +121,7 @@ function send_expert_data_to_server(data) {
         contentType: 'application/json',
         success: function (result) {
             console.log("EXPERT SIMULATION -- SUCCESS!", result);
-            $.notify( "Calculation running", "success");
+            $.notify("Calculation running", "success");
 
             //start checking
             setTimeout(get_expert_data_to_server, 5000);
@@ -158,39 +158,39 @@ function get_expert_data_to_server() {
             console.log("EXPERT SIMULATION -- SUCCESS.", result);
             //$.notify( result.annotations + " annotations saved", "success");
             //data = JSON.parse(result);
-            if(result.complete == false){
+            if (result.complete == false) {
                 //update time
                 seconds_running += 1;
-                console.log("Complete FALSE, time "+seconds_running * 5+" seconds.");
+                console.log("Complete FALSE, time " + seconds_running * 5 + " seconds.");
 
                 //timeout? Set to 3 minutes
-                if(seconds_running > 180){
+                if (seconds_running > 180) {
                     $.notify("Calculation timed out.", "error");
 
                     //re-enable button and remove spinner
                     document.getElementById("calculate").classList.remove("disabled");
                     document.getElementById("spinner").style.display = "none";
-                }else{
+                } else {
                     //re-run if still waiting
                     setTimeout(get_expert_data_to_server, 5000);
                 }
 
-            }else if(result.complete == true){
-                console.log("Complete TRUE, time "+seconds_running+" seconds.");
+            } else if (result.complete == true) {
+                console.log("Complete TRUE, time " + seconds_running + " seconds.");
 
                 //re-enable if complete
                 document.getElementById("calculate").classList.remove("disabled");
                 document.getElementById("spinner").style.display = "none";
-                $.notify( "Calculation complete!", "success");
+                $.notify("Calculation complete!", "success");
 
                 //load data via Ajax
                 //surge
-                if(document.getElementById("surge_checkbox").checked){
+                if (document.getElementById("surge_checkbox").checked) {
                     load_expert_data_to_server(data.surge_file, "surge");
                 }
 
                 //wind
-                if(document.getElementById("wind_checkbox").checked){
+                if (document.getElementById("wind_checkbox").checked) {
                     load_expert_data_to_server(data.wind_file, "wind");
                 }
             }
@@ -207,18 +207,18 @@ function get_expert_data_to_server() {
 }
 
 //load/unload heatmap
-function load_heatmap(object){
+function load_heatmap(object) {
     //normal code, has simulation run?
-    if(data != null){
+    if (data != null) {
         //if clicked, load
-        if(object.checked && !(object.name in heatmap)){
+        if (object.checked && !(object.name in heatmap)) {
             //load it
-            if(object.name == "surge"){
+            if (object.name == "surge") {
                 load_expert_data_to_server(data.surge_file, object.name);
-            }else if (object.name == "wind"){
+            } else if (object.name == "wind") {
                 load_expert_data_to_server(data.wind_file, object.name);
             }
-        }else if(!object.checked && (object.name in heatmap)){
+        } else if (!object.checked && (object.name in heatmap)) {
             mymap.removeLayer(heatmap[object.name]);
             delete heatmap[object.name];
         }
@@ -239,15 +239,15 @@ function load_expert_data_to_server(file_name, json_tag) {
             //save data
             addressPoints = data;
 
-            if(json_tag == "surge"){
+            if (json_tag == "surge") {
                 heatmap[json_tag] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
-            }else if( json_tag == "wind"){
+            } else if (json_tag == "wind") {
                 heatmap[json_tag] = create_wind_heatmap(addressPoints.wind).addTo(mymap);
-            }else{
+            } else {
                 //not supported
             }
-            
-            $.notify( "Heatmap loaded", "success");
+
+            $.notify("Heatmap loaded", "success");
 
             //enable save button? #TODO And Add to map?
             document.getElementById("save_button").classList.remove("disabled");
@@ -263,14 +263,14 @@ function load_expert_data_to_server(file_name, json_tag) {
 //auxiliary functions to link html input devices
 
 //slider text box updates
-function updateInput(e){
+function updateInput(e) {
     var sibling = e.previousElementSibling || e.nextElementSibling;
     sibling.value = e.value;
     e.value = sibling.value;
 }
 
 //create storm track icons
-function create_storm_track(onOff){
+function create_storm_track(onOff) {
 
     if (onOff) {
         //get zoom
@@ -297,15 +297,15 @@ function create_storm_track(onOff){
         // Add in a crosshair for the map
         var crosshairIcon = L.icon({
             iconUrl: '/static/images/crosshair.png',
-            iconSize:     [20, 20], // size of the icon
-            iconAnchor:   [10, 10], // point of the icon which will correspond to marker's location
+            iconSize: [20, 20], // size of the icon
+            iconAnchor: [10, 10], // point of the icon which will correspond to marker's location
         });
 
         // Add in a crosshair for the map
         var arrowIcon = L.icon({
             iconUrl: '/static/images/arrow.png',
-            iconSize:     [24, 24], // size of the icon
-            iconAnchor:   [12, 22], // point of the icon which will correspond to marker's location
+            iconSize: [24, 24], // size of the icon
+            iconAnchor: [12, 22], // point of the icon which will correspond to marker's location
         });
 
         //create markers
@@ -324,11 +324,11 @@ function create_storm_track(onOff){
             [latitude, longitude],
             [latitude + sat_offset_y, longitude + sat_offset_x]
         ];
-        polyline = L.polyline(latlngs, {color: 'black', weight: 2, opacity: 0.5 }).addTo(mymap);
+        polyline = L.polyline(latlngs, { color: 'black', weight: 2, opacity: 0.5 }).addTo(mymap);
 
         //create landfall marker
-        marker = new L.marker([latitude,longitude], {draggable:'true', icon: crosshairIcon});
-        marker.on('drag', function(event){
+        marker = new L.marker([latitude, longitude], { draggable: 'true', icon: crosshairIcon });
+        marker.on('drag', function (event) {
             //get pos
             var marker = event.target;
             var position = marker.getLatLng();
@@ -337,28 +337,28 @@ function create_storm_track(onOff){
             var lat_lng_changed = false;
 
             //check bounds lat
-            if(position.lat > 45){
+            if (position.lat > 45) {
                 position.lat = 45;
                 lat_lng_changed = true;
-            }else if(position.lat < 34){
+            } else if (position.lat < 34) {
                 position.lat = 34;
                 lat_lng_changed = true;
             }
 
             //check bounds long
-            if(position.lng > -63){
+            if (position.lng > -63) {
                 position.lng = -63;
                 lat_lng_changed = true;
-            }else if(position.lng < -77){
+            } else if (position.lng < -77) {
                 position.lng = -77;
                 lat_lng_changed = true;
             }
 
             //reset
-            if(lat_lng_changed) marker.setLatLng(position);
+            if (lat_lng_changed) marker.setLatLng(position);
 
             //fix for first use of angle
-            if(!sat_marker.angle){
+            if (!sat_marker.angle) {
                 sat_marker.angle = 0;
             }
 
@@ -371,8 +371,8 @@ function create_storm_track(onOff){
             sat_offset_x = Math.sin(angle) * arrow_length;
 
             //fix sat/line pos
-            sat_marker.setLatLng(new L.LatLng(position.lat + sat_offset_y, position.lng+sat_offset_x),{draggable:'true'});
-            polyline.setLatLngs([[position.lat, position.lng],[position.lat + sat_offset_y, position.lng+sat_offset_x]]);
+            sat_marker.setLatLng(new L.LatLng(position.lat + sat_offset_y, position.lng + sat_offset_x), { draggable: 'true' });
+            polyline.setLatLngs([[position.lat, position.lng], [position.lat + sat_offset_y, position.lng + sat_offset_x]]);
 
             //update text boxes
             document.getElementById("latitude").value = position.lat.toFixed(7).toString();
@@ -381,8 +381,8 @@ function create_storm_track(onOff){
         mymap.addLayer(marker);
 
         //create direction marker
-        sat_marker = new L.marker([latitude + sat_offset_y, longitude + sat_offset_x], {draggable:'true', rotationAngle: angle * 180 / Math.PI, icon: arrowIcon});
-        sat_marker.on('drag', function(event){
+        sat_marker = new L.marker([latitude + sat_offset_y, longitude + sat_offset_x], { draggable: 'true', rotationAngle: angle * 180 / Math.PI, icon: arrowIcon });
+        sat_marker.on('drag', function (event) {
             //get zoom
             var arrow_length = 0.01 * Math.pow(2, 13 - mymap.getZoom());
 
@@ -392,8 +392,8 @@ function create_storm_track(onOff){
 
             //find angle
             var angle = Math.atan2(sat_pos.lng - position.lng, sat_pos.lat - position.lat);
-            if(angle < -1.047197551196598) angle = -1.047197551196598;
-            if(angle > 0.698131700797732) angle = 0.698131700797732;
+            if (angle < -1.047197551196598) angle = -1.047197551196598;
+            if (angle > 0.698131700797732) angle = 0.698131700797732;
             sat_offset_y = Math.cos(angle) * arrow_length * 0.78;
             sat_offset_x = Math.sin(angle) * arrow_length;
 
@@ -401,21 +401,21 @@ function create_storm_track(onOff){
             sat_marker.angle = angle;
 
             //constrain to circle
-            sat_marker.setLatLng(new L.LatLng(position.lat + sat_offset_y, position.lng+sat_offset_x),{draggable:'true'});
+            sat_marker.setLatLng(new L.LatLng(position.lat + sat_offset_y, position.lng + sat_offset_x), { draggable: 'true' });
 
             //rotate icon
-            sat_marker.setRotationAngle(angle * 180/Math.PI);
+            sat_marker.setRotationAngle(angle * 180 / Math.PI);
 
             //and line
-            polyline.setLatLngs([[position.lat, position.lng],[position.lat + sat_offset_y, position.lng+sat_offset_x]]);
+            polyline.setLatLngs([[position.lat, position.lng], [position.lat + sat_offset_y, position.lng + sat_offset_x]]);
 
             //update angle box
-            document.getElementById("angle").value = Math.round(angle * 180/Math.PI);
-            document.getElementById("angleslider").value = Math.round(angle * 180/Math.PI);
+            document.getElementById("angle").value = Math.round(angle * 180 / Math.PI);
+            document.getElementById("angleslider").value = Math.round(angle * 180 / Math.PI);
 
         });
         mymap.addLayer(sat_marker);
-    }else{
+    } else {
         //if unchecked then remove and re-enable
         document.getElementById("latitude").disabled = false;
         document.getElementById("longitude").disabled = false;
@@ -431,17 +431,17 @@ function create_storm_track(onOff){
 }
 
 //update marker if valid
-mymap.on('zoomend', function(event) {
+mymap.on('zoomend', function (event) {
     //console.log("Zoomstart "+mymap.getZoom()+","+angle);
     //console.log(event.target._animateToCenter.lat);
 
     //test if marker valid
-    if(sat_marker == null){
+    if (sat_marker == null) {
         return;
     }
 
     //fix for first use of angle
-    if(!sat_marker.angle){
+    if (!sat_marker.angle) {
         sat_marker.angle = 0;
     }
 
@@ -458,26 +458,26 @@ mymap.on('zoomend', function(event) {
     sat_offset_x = Math.sin(angle) * arrow_length;
 
     //constrain to circle
-    sat_marker.setLatLng(new L.LatLng(position.lat + sat_offset_y, position.lng+sat_offset_x),{draggable:'true'});
+    sat_marker.setLatLng(new L.LatLng(position.lat + sat_offset_y, position.lng + sat_offset_x), { draggable: 'true' });
 
     //rotate icon
-    sat_marker.setRotationAngle(angle * 180/Math.PI);
+    sat_marker.setRotationAngle(angle * 180 / Math.PI);
 
     //and line
-    polyline.setLatLngs([[position.lat, position.lng],[position.lat + sat_offset_y, position.lng+sat_offset_x]]);
-//}
+    polyline.setLatLngs([[position.lat, position.lng], [position.lat + sat_offset_y, position.lng + sat_offset_x]]);
+    //}
 });
 
 //save expert simulation data
-function save_simulation(){
+function save_simulation() {
     //normal code, has simulation run?
-    if(data == null){//} || heatmap.length == 0){
+    if (data == null) {//} || heatmap.length == 0){
         alert("Plase run a sumulation before saving!");
         return;
     }
 
     //check if sim saved
-    if(sim_saved){
+    if (sim_saved) {
         alert("This simulation has been saved!");
         return;
     }
@@ -520,14 +520,14 @@ function save_simulation(){
             'description': sim_desc
         },
         //dataType: "json",
-        success: function(result) {
+        success: function (result) {
             console.log("SIMULATION STORE -- SUCCESS!");
             $.notify("Simulation data saved", "success");
 
             //flag saved
             sim_saved = true
         },
-        error: function(result) {
+        error: function (result) {
             console.log("SIMULATION STORE ERROR:", result)
             $.notify("Simulation data was not saved", "error");
         }
@@ -535,31 +535,239 @@ function save_simulation(){
 
 }
 
-function latLngChange(object){
-    console.log("LatLong "+object.id+","+object.value);
+function latLngChange(object) {
+    console.log("LatLong " + object.id + "," + object.value);
     var latlngvalue = parseFloat(object.value);
 
     //test non numeric
-    if(isNaN(latlngvalue)){
-        if(object.id == "latitude"){
+    if (isNaN(latlngvalue)) {
+        if (object.id == "latitude") {
             object.value = "40.6848037";
-        }else{
+        } else {
             object.value = "-73.9654541";
         }
     }
 
     //test bounds
-    if(object.id == "latitude"){
-        if(latlngvalue > 45){
+    if (object.id == "latitude") {
+        if (latlngvalue > 45) {
             object.value = "45.0000000";
-        }else if(latlngvalue < 34){
+        } else if (latlngvalue < 34) {
             object.value = "34.0000000";
         }
-    }else{
-        if(latlngvalue > -63){
+    } else {
+        if (latlngvalue > -63) {
             object.value = "-63.0000000";
-        }else if(latlngvalue < -77){
+        } else if (latlngvalue < -77) {
             object.value = "-77.0000000";
         }
     }
+}
+
+/*
+Base Map -- Centered on Keansburg, NJ
+WMS Tile Layers
+Data: Watershed Boundary Dataset - National Hydrography Overlay Map Service
+      https://catalog.data.gov/dataset/usgs-national-watershed-boundary-dataset-wbd-
+      downloadable-data-collection-national-geospatial-/resource/f55f881d-9de8-471f-9b6b-22cd7a98025d
+XML: https://services.nationalmap.gov/arcgis/services/nhd/MapServer/WMSServer?request=GetCapabilities&service=WMS
+ */
+var mymap = L.map('mapid', { editable: true }).setView([ home_latitude, home_longitude ], home_zoom );
+var layer_list = [];
+var layer_groups = [];
+
+// Setup Scale View
+var scale_options = { metric: false, imperial: false, maxWidth: 200 };
+
+var language = window.navigator.userLanguage || window.navigator.language;
+if (language == "en-US") {
+    scale_options.imperial = true;
+} else {
+    scale_options.metric = true;
+}
+
+L.control.scale(scale_options).addTo(mymap);
+
+//~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$(document).ready(function () {
+
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+        maxZoom: 18,
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+            '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+            'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+        id: 'mapbox.streets'
+    }).addTo(mymap);
+
+    get_layers_from_server();
+
+});
+
+/*
+Ajax call to the server. Returns JSON with layers in it.
+TODO: Will need to update url to GeoServer eventually
+ */
+function get_layers_from_server() {
+    $.ajax({
+        type: "GET",
+        url: "/api/my_layers/",
+        data: {},
+        dataType: "json",
+        success: function (result) {
+            console.log("GIS LAYERS -- SUCCESS!");
+            console.log(result.layers);
+            process_layers(result.layers);
+        },
+        error: function (result) {
+            console.log("ERROR:", result)
+        }
+    });
+}
+
+/*
+Function to pull the layer groups out and call the appropriate function
+for layer group or layer to be added to the menu.
+ */
+function process_layers(layers) {
+
+    layers.forEach(function (item) {
+        // Get layer groups
+        layer_groups.push(item.group);
+
+    });
+    layer_groups = layer_groups.unique();
+    console.log(layer_groups);
+
+    layer_groups.forEach(function (group) {
+        // Add the layer category group to the menu
+        add_layer_group_to_menu(group);
+
+        // For each layer in the layers list, if the group matches the current group
+        // add that layer to the unordered list
+        layers.forEach(function (layer) {
+            if (layer.group == group) {
+                var ul_object = '#' + camelize(layer.group.toLowerCase());
+                add_layer_to_menu(layer, ul_object)
+            }
+        });
+    });
+
+}
+
+/*
+The base #layerGroup template is hidden by default. Cloning the template and
+it's children allows us to edit the attributes of each #layerGroup individually.
+
+Attributes are formatted in the exact same way as Kristina's mockups to retain functionality.
+Could likely be simplified, but camelizing the lowercase strings wasn't too difficult.
+ */
+function add_layer_group_to_menu(layerGroup) {
+    var group_template = $('#layerGroup').clone(true);
+    $(group_template).find('span').html(layerGroup);
+    $(group_template).find('a').attr('href', '#' +
+        camelize(layerGroup.toLowerCase())).attr('aria-controls', camelize(layerGroup.toLowerCase()));
+    $(group_template).find('ul').attr('id', camelize(layerGroup.toLowerCase()));
+    $(group_template).removeClass('hidden');
+    $("#gisLayers").append(group_template);
+}
+
+/*
+Add the individual layers to the menu under the appropriate layer category group.
+Params: layer - the layer to add to the menu (complete layer object)
+        ul_id - the id of the unordered list in which to append the layer.
+ */
+function add_layer_to_menu(layer, ul_id) {
+    // Create the HTML <li> for each layer and append to the <ul>
+    var layer_html = '<li><input id="' + $.trim(layer.id) + '" type="checkbox"> ' + $.trim(layer.name) + '</li>';
+    $(ul_id).append(layer_html);
+    layer.maplayer = L.tileLayer.wms(layer.layer_link, { layers: layer.layer, transparent: true, format: 'image/png' });
+    layer_list.push(layer);
+
+    $('#' + $.trim(layer.id)).click(function () {
+        if ($(this).is(':checked')) {
+            for (var i = 0; i < layer_list.length; i++) {
+                if (layer_list[i].id == this.id) {
+                    console.log("found matching layer: " + this.id);
+                    layer_list[i].maplayer.addTo(mymap);
+                }
+            }
+        } else {
+            for (var i = 0; i < layer_list.length; i++) {
+                if (layer_list[i].id == this.id) {
+                    console.log("found matching layer: " + this.id);
+                    mymap.removeLayer(layer_list[i].maplayer);
+                }
+            }
+        }
+    });
+}
+
+$(function () {
+    $('.beta-feature-not-available').tooltip(
+        {
+            title: "Feature not available at this time",
+            placement: "top",
+            width: '300px'
+        });
+});
+
+//function to flip advanced/basic toolset
+function tab_flip_tools(basic) {
+    console.log("Flipped " + basic);
+    if (basic) {
+        //flip tools header
+        document.getElementById("advanced").classList.remove("active");
+        document.getElementById("basic").classList.add("active");
+
+        //switch on div containing basic
+        document.getElementById("advanced_tools").style.display = "none";
+        document.getElementById("basic_tools").style.display = "block";
+    } else {
+        //flip tools header
+        document.getElementById("basic").classList.remove("active");
+        document.getElementById("advanced").classList.add("active");
+
+        //switch on div containing advanced
+        document.getElementById("advanced_tools").style.display = "block";
+        document.getElementById("basic_tools").style.display = "none";
+    }
+}
+
+//add the current simulation to a map
+function add_expert_to_map(object) {
+    //need to save first!
+    if (!sim_saved) {
+        save_simulation();
+    }
+
+    //save map and sim data
+    map_data = {
+        'sim_id': sim_id,
+    };
+
+    console.log("Map clicked " + JSON.stringify(map_data) + "," + object.innerHTML);
+
+    //Do ajax
+    $.ajax({
+        type: "POST",
+        url: "/map/" + object.name + "/settings/",
+        data: {
+            'sim_id': sim_id,
+            'action': 'add_simulation',
+            'add_layer': sim_id + "_surge"
+        },
+        dataType: "json",
+        success: function (result) {
+            console.log("SAVING TO MAP -- SUCCESS!" + result.saved);
+            //now auto save so dont flag
+            $.notify("Simulation saved to map " + object.innerHTML, "success");
+
+            //jump to page
+            window.location.href = "/map/" + object.name + "/";
+        },
+        error: function (result) {
+            console.log("ERROR:", result)
+            $.notify("Error saving simulation to map", "error");
+        }
+    });
 }
