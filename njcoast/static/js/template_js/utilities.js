@@ -12,8 +12,8 @@ Array.prototype.unique = function () {
 };
 
 // Turn a string into camel-case. Note: If first letter of string is capitalized, will remain capitalized.
-camelize = function camelize(str) {
+function camelize(str) {
     return str.replace(/\W+(.)/g, function (match, chr) {
         return chr.toUpperCase();
     });
-};
+}
