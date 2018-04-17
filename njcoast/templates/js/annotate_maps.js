@@ -12,7 +12,6 @@ var socket;
 var myid = Math.random().toString(36).substr(2, 9);
 
 //~~~~create layer group to add marker~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-var annotationLayer = new L.LayerGroup();
 mymap.editTools.featuresLayer = annotationLayer;
 
 //~~~~annotate controls~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
