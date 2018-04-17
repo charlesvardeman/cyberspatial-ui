@@ -101,7 +101,7 @@ function add_layer_to_menu(layer, ul_id) {
 Array.prototype.unique = function () {
     var arr = [];
     for (var i = 0; i < this.length; i++) {
-        if (!arr.includes(this[i])) {
+        if (!(arr.indexOf(this[i]) !== -1)) {
             arr.push(this[i]);
         }
     }

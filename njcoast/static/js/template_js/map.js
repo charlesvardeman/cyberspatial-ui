@@ -456,9 +456,9 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type) {
             var addressPoints = data;
 
             //get correct
-            if (sim_type.includes("surge")) {
+            if (sim_type.indexOf("surge") !== -1) {
                 heatmap[sim_type] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
-            } else if (sim_type.includes("wind")) {
+            } else if (sim_type.indexOf("wind") !== -1) {
                 heatmap[sim_type] = create_wind_heatmap(addressPoints.wind).addTo(mymap);
             } else {
                 //not supported

@@ -37,7 +37,7 @@ WORKDIR /app
 COPY . /app
 
 # Transpile JS for IE
-RUN npm install --save-dev babel-cli babel-preset-env && ./node_modules/.bin/babel njcoast/templates/js -d njcoast/static/js/template_js
+RUN npm install babel-cli babel-preset-env babel-plugin-array-includes && ./node_modules/.bin/babel njcoast/templates/js -d njcoast/static/js/template_js
 
 COPY ./start.sh /start.sh
 COPY ./celary.sh /celary.sh
