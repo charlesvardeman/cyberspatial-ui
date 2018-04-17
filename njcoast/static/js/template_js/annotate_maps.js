@@ -130,7 +130,7 @@ function deleteObject() {
 
     //remote
     if (annotate_map_id) {
-        socket_frame = {
+        var socket_frame = {
             type: 'delete',
             data: {
                 id: current_popup_marker.myCustomID
@@ -207,7 +207,7 @@ function finishedEdit() {
     document.getElementById("trash_text").classList.remove("disabled");
 
     if (annotate_map_id) {
-        socket_frame = {
+        var socket_frame = {
             owner: owner,
             myid: myid,
             type: 'popup',
@@ -257,7 +257,7 @@ mymap.on('editable:dragend', function (e) {
 mymap.on('editable:editing', function (e) {
     if (annotate_map_id) {
         //test if annotation object and send
-        annotation_jason = annotation_update(e.layer);
+        var annotation_jason = annotation_update(e.layer);
         if (annotation_jason != null) {
             socket.send(annotation_jason);
 
@@ -274,7 +274,7 @@ mymap.on('editable:drawing:end', function (e) {
     if (annotate_map_id) {
 
         //test if annotation object and send
-        annotation_jason = annotation_update(e.layer);
+        var annotation_jason = annotation_update(e.layer);
         if (annotation_jason != null) {
             socket.send(annotation_jason);
 
@@ -290,7 +290,7 @@ mymap.on('editable:drag', function (e) {
     if (annotate_map_id) {
 
         //test if annotation object and send
-        annotation_jason = annotation_update(e.layer);
+        var annotation_jason = annotation_update(e.layer);
         if (annotation_jason != null) {
             socket.send(annotation_jason);
         }
@@ -312,13 +312,13 @@ function annotation_update(e_layer) {
     if (e_layer instanceof L.Polygon) {
         type = 'polygon';
 
-        LatLngs = e_layer.getLatLngs();
+        var LatLngs = e_layer.getLatLngs();
         console.log("Polygon," + e_layer.myCustomID + "," + LatLngs[0]);
 
         //convert LatLng data so can use stringify
         var lldata = [];
-        for (i = 0; i < LatLngs[0].length; i++) {
-            localdata = new Array(LatLngs[0][i].lat, LatLngs[0][i].lng);
+        for (var i = 0; i < LatLngs[0].length; i++) {
+            var localdata = new Array(LatLngs[0][i].lat, LatLngs[0][i].lng);
             lldata.push(localdata);
         }
 
@@ -336,13 +336,13 @@ function annotation_update(e_layer) {
         //type
         type = 'polyline';
 
-        LatLngs = e_layer.getLatLngs();
+        var LatLngs = e_layer.getLatLngs();
         console.log("Polyline," + e_layer.myCustomID + "," + LatLngs[0]);
 
         //convert LatLng data so can use stringify
         var lldata = [];
-        for (i = 0; i < LatLngs.length; i++) {
-            localdata = new Array(LatLngs[i].lat, LatLngs[i].lng);
+        for (var i = 0; i < LatLngs.length; i++) {
+            var localdata = new Array(LatLngs[i].lat, LatLngs[i].lng);
             lldata.push(localdata);
         }
 
@@ -387,12 +387,12 @@ function annotation_update(e_layer) {
     }
 
     //get popup text
-    popuptext = e_layer.getPopup().getContent();
-    pos1 = popuptext.indexOf("id=\"txt\">") + 9;
-    pos2 = popuptext.indexOf("</span>");
+    var popuptext = e_layer.getPopup().getContent();
+    var pos1 = popuptext.indexOf("id=\"txt\">") + 9;
+    var pos2 = popuptext.indexOf("</span>");
 
     //craeat JSON package and send
-    socket_frame = {
+    var socket_frame = {
         owner: owner,
         myid: myid,
         type: type,
@@ -415,13 +415,13 @@ $(document).ready(function () {
     // Note that the path doesn't matter right now; any WebSocket
     // connection gets bumped over to WebSocket consumers
     if (annotate_map_id) {
-        websocket_protocol = window.location.protocol.includes("https") ? "wss://" : "ws://";
+        var websocket_protocol = window.location.protocol.includes("https") ? "wss://" : "ws://";
         socket = new WebSocket(websocket_protocol + window.location.host + "/map-socket/" + annotate_map_id + "/");
         socket.onmessage = function (e) {
             //onMapClick(e.data);
             // alert('received socket');
             console.log(e.data);
-            socket_object = JSON.parse(e.data);
+            var socket_object = JSON.parse(e.data);
             console.log(socket_object);
 
             //update if we are not the annotator #TODO how to enforce? Or many to many?
@@ -486,7 +486,7 @@ $(document).ready(function () {
                                 popup_text = "Input text ...";
                             }
 
-                            var popup_text = load_popup_html(popup_text, popup_text.length);
+                            popup_text = load_popup_html(popup_text, popup_text.length);
 
                             newobject.enableEdit(); //editing
                             newobject.owned = true;
@@ -597,7 +597,7 @@ function save_annotation_element(layer) {
     var json_string = "";
 
     //look for objects
-    annotation_jason = annotation_update(layer);
+    var annotation_jason = annotation_update(layer);
     if (annotation_jason != null) {
         json_string += annotation_jason;
     }
@@ -634,7 +634,7 @@ function save_annotation_elements() {
         var json_string = "";
 
         //look for objects
-        annotation_jason = annotation_update(layer);
+        var annotation_jason = annotation_update(layer);
         if (annotation_jason != null) {
             json_string += annotation_jason;
         }
@@ -683,9 +683,9 @@ function load_annotation_elements(json_from_server) {
     console.log(parsed.objects.length);
 
     //loop over objects
-    for (i = 0; i < parsed.objects.length; i++) {
+    for (var i = 0; i < parsed.objects.length; i++) {
         //get object
-        socket_object = parsed.objects[i];
+        var socket_object = parsed.objects[i];
         console.log("IDs " + socket_object.owner + "," + owner);
 
         //set coloring according to owner
@@ -701,6 +701,7 @@ function load_annotation_elements(json_from_server) {
         }
 
         //create
+        var newobject = null;
         if (socket_object.type == 'marker') {
             newobject = L.marker([socket_object.data.latitude, socket_object.data.longitude], icon_param);
         } else if (socket_object.type == 'polygon' || socket_object.type == 'polyline') {
@@ -730,7 +731,7 @@ function load_annotation_elements(json_from_server) {
                     popup_text = "Input text ...";
                 }
 
-                var popup_text = load_popup_html(popup_text, popup_text.length);
+                popup_text = load_popup_html(popup_text, popup_text.length);
 
                 newobject.enableEdit(); //editing
                 newobject.owned = true;

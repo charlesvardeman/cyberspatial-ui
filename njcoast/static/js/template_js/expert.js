@@ -450,8 +450,8 @@ mymap.on('zoomend', function (event) {
 
     //load angle, calc position
     var angle = sat_marker.angle;
-    sat_offset_y = Math.cos(angle) * arrow_length * 0.78;
-    sat_offset_x = Math.sin(angle) * arrow_length;
+    var sat_offset_y = Math.cos(angle) * arrow_length * 0.78;
+    var sat_offset_x = Math.sin(angle) * arrow_length;
 
     //constrain to circle
     sat_marker.setLatLng(new L.LatLng(position.lat + sat_offset_y, position.lng + sat_offset_x), { draggable: 'true' });
@@ -729,7 +729,7 @@ function add_expert_to_map(object) {
     }
 
     //save map and sim data
-    map_data = {
+    var map_data = {
         'sim_id': sim_id
     };
 

@@ -41,7 +41,7 @@ $("#pageForward").on("click", function () {
     items.slice(shownItems, shownItems + 4).addClass("hidden");
 
     //add new ones
-    oldshownItems = shownItems;
+    var oldshownItems = shownItems;
 
     if (shownItems + 8 > counter) {
         shownItems = counter - counter % 4;
@@ -71,7 +71,7 @@ $(document).ready(function () {
 //add the current simulation to a map
 function add_expert_to_map(object, sim_id) {
     //save map and sim data
-    map_data = {
+    var map_data = {
         'sim_id': sim_id
     };
 
@@ -187,8 +187,7 @@ function load_simulation_data(order_by) {
                 document.getElementById('dashboard-list').innerHTML = "";
 
                 //get JSON data
-                //console.log(result.data[0].sim_id);
-                for (i = 0; i < result.data.length; i++) {
+                for (var i = 0; i < result.data.length; i++) {
                     //console.log(result.data[i].sim_id);
 
                     //setup for hidden list elements
@@ -198,10 +197,10 @@ function load_simulation_data(order_by) {
                     }
 
                     //counter from 1
-                    count = i + 1;
+                    var count = i + 1;
 
                     //html to crete li
-                    html = "<li class=\"" + hide + "\">\n                                <article>\n                                    <div class=\"row items-list\">\n                                        <div class=\"col-xs-12 item-info shp-info\">\n                                            <h4><div id=\"badge-" + count + "\" class=\"h-badge what-if\">H</div><span id=\"storm-" + count + "\">" + result.data[i].data.storm_type + " Run</span></h4>\n                                            <p>" + result.data[i].description + " <span class=\"owner\">by <a href=\"\">" + result.data[i].user_name + "</a></span></p>\n                                            <p class=\"shp-scenario\"><span>Sea Level Rise:</span> " + result.data[i].data.SLR + ", <span>Coastal Protection:</span> " + result.data[i].data.protection + ", <span>Tides:</span> " + result.data[i].data.tide_td + ", <span>Analysis type:</span> " + result.data[i].data.analysis + ", <span>Simulation id:</span> " + result.data[i].sim_id + "</p>\n                                            <br/>\n                                            <p class=\"actions\">\n                                                <table style=\"width: 100%;\">\n                                                    <tr>\n                                                        <td style=\"font-size: 14px;\">\n                                                            <i class=\"fa fa-calendar-o\"></i> " + result.data[i].modified + "\n                                                        </td>\n                                                        <td>\n                                                            <div class=\"dropup show pull-right\">\n                                                                <button class=\"dropdown-toggle\" style=\"margin-top: 5px;font-size: 14px;\" id=\"dropdownMenuAddToMap_" + count + "\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\n                                                                    Add Results to Map ... <i href=\"#\"  class=\"fa fa-caret-up\" style=\"margin-left: 10px\" aria-hidden=\"true\"></i>\n                                                                </button>\n                                                                <div class=\"dropdown-menu\" aria-labelledby=\"dropdownMenuAddToMap_" + count + "\">\n                                                                    {% for map in maps_for_user %}\n                                                                    <a style=\"padding: 2px;\" class=\"dropdown-item\" name=\"{{ map.id }}\" onclick='add_expert_to_map(this, \"" + result.data[i].sim_id + "\");'>{{ map.name }}</a>\n                                                                    <div class=\"dropdown-divider\"></div>\n                                                                    {% endfor %}\n                                                                </div>\n                                                            </div>\n                                                        </td>\n                                                    </tr>\n                                                </table>\n                                            </p>\n                                        </div>\n                                    </div>\n                                </article>\n                            </li>";
+                    var html = "<li class=\"" + hide + "\">\n                                <article>\n                                    <div class=\"row items-list\">\n                                        <div class=\"col-xs-12 item-info shp-info\">\n                                            <h4><div id=\"badge-" + count + "\" class=\"h-badge what-if\">H</div><span id=\"storm-" + count + "\">" + result.data[i].data.storm_type + " Run</span></h4>\n                                            <p>" + result.data[i].description + " <span class=\"owner\">by <a href=\"\">" + result.data[i].user_name + "</a></span></p>\n                                            <p class=\"shp-scenario\"><span>Sea Level Rise:</span> " + result.data[i].data.SLR + ", <span>Coastal Protection:</span> " + result.data[i].data.protection + ", <span>Tides:</span> " + result.data[i].data.tide_td + ", <span>Analysis type:</span> " + result.data[i].data.analysis + ", <span>Simulation id:</span> " + result.data[i].sim_id + "</p>\n                                            <br/>\n                                            <p class=\"actions\">\n                                                <table style=\"width: 100%;\">\n                                                    <tr>\n                                                        <td style=\"font-size: 14px;\">\n                                                            <i class=\"fa fa-calendar-o\"></i> " + result.data[i].modified + "\n                                                        </td>\n                                                        <td>\n                                                            <div class=\"dropup show pull-right\">\n                                                                <button class=\"dropdown-toggle\" style=\"margin-top: 5px;font-size: 14px;\" id=\"dropdownMenuAddToMap_" + count + "\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">\n                                                                    Add Results to Map ... <i href=\"#\"  class=\"fa fa-caret-up\" style=\"margin-left: 10px\" aria-hidden=\"true\"></i>\n                                                                </button>\n                                                                <div class=\"dropdown-menu\" aria-labelledby=\"dropdownMenuAddToMap_" + count + "\">\n                                                                    {% for map in maps_for_user %}\n                                                                    <a style=\"padding: 2px;\" class=\"dropdown-item\" name=\"{{ map.id }}\" onclick='add_expert_to_map(this, \"" + result.data[i].sim_id + "\");'>{{ map.name }}</a>\n                                                                    <div class=\"dropdown-divider\"></div>\n                                                                    {% endfor %}\n                                                                </div>\n                                                            </div>\n                                                        </td>\n                                                    </tr>\n                                                </table>\n                                            </p>\n                                        </div>\n                                    </div>\n                                </article>\n                            </li>";
 
                     //add it
                     document.getElementById('dashboard-list').innerHTML += html;
@@ -210,11 +209,11 @@ function load_simulation_data(order_by) {
                 //loop until end of data list
                 counter = 1;
                 page = 1;
-                hurricanes = 0;
-                noreasters = 0;
+                var hurricanes = 0;
+                var noreasters = 0;
 
                 do {
-                    more_elmts = document.getElementById('badge-' + counter);
+                    var more_elmts = document.getElementById('badge-' + counter);
 
                     //if exists and checked then save
                     if (more_elmts) {
