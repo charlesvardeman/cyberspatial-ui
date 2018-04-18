@@ -174,7 +174,7 @@ $(document).ready(function() {
     // Note that the path doesn't matter right now; any WebSocket
     // connection gets bumped over to WebSocket consumers
     if(annotate_map_id) {
-        var websocket_protocol = window.location.protocol.includes("https") ? "wss://" : "ws://";
+        var websocket_protocol = window.location.protocol.indexOf("https") >= 0 ? "wss://" : "ws://";
         socket = new WebSocket(websocket_protocol + window.location.host + "/map-socket/" + annotate_map_id + "/");
         socket.onmessage = function(e) {
             //onMapClick(e.data);
