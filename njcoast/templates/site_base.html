@@ -15,14 +15,6 @@
 
     <title>{% block title %}{{ SITE_NAME }}{% endblock %}</title>
     {% block head %}
-      <script>
-        if(!document.getElementsByClassName) {
-          document.getElementsByClassName = function(className) {
-              return this.querySelectorAll("." + className);
-          };
-          Element.prototype.getElementsByClassName = document.getElementsByClassName;
-      }
-      </script>
       {% if DEBUG_STATIC %}
           <link href="{{ STATIC_URL }}lib/css/jquery.dataTables.css?v={{ VERSION }}" rel="stylesheet" />
           <link href="{{ STATIC_URL }}lib/css/select2.css?v={{ VERSION }}" rel="stylesheet"/>
@@ -31,6 +23,27 @@
       {% else %}
         <link href="{{ STATIC_URL }}lib/css/assets.min.css?v={{ VERSION }}" rel="stylesheet"/>
       {% endif %}
+
+      <script>
+        if(!document.getElementsByClassName) {
+          document.getElementsByClassName = function(className) {
+            return this.querySelectorAll("." + className);
+          };
+          Element.prototype.getElementsByClassName = document.getElementsByClassName;
+        }
+
+        if (SVGElement.prototype.contains === undefined) {
+          SVGElement.prototype.contains = function(el) {
+            return $.contains(this, el);
+          };
+        }
+
+        if (SVGElement.prototype.getElementsByClassName === undefined) {
+          SVGElement.prototype.getElementsByClassName = function(className) {
+            return this.querySelectorAll('.' + className);
+          };
+        }
+      </script>
 
       <link href="{{ STATIC_URL }}geonode/css/ext-compatibility.css?v={{ VERSION }}" rel="stylesheet" />
       <link href="{{ STATIC_URL }}geonode/css/base.css?v={{ VERSION }}" rel="stylesheet" />
