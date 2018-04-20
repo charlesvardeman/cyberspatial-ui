@@ -463,11 +463,12 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type) {
                 heatmap[sim_type] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
             } else if (sim_type.indexOf("wind") !== -1) {
                 heatmap[sim_type] = create_wind_heatmap(addressPoints.wind).addTo(mymap);
-            } else {
-                //not supported
-            }
+            } else {}
+            //not supported
 
-            $.notify("Heatmap loaded", "success");
+
+            //remove heatmap loaded for production
+            //$.notify( "Heatmap loaded", "success");
         },
         error: function error(xhr, status, _error2) {
             console.log("EXPERT SIMULATION LOAD -- ERROR:", status + " " + _error2 + " " + xhr.status + " " + xhr.statusText);

@@ -475,7 +475,8 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type){
             //not supported
         }
 
-        $.notify( "Heatmap loaded", "success");
+        //remove heatmap loaded for production
+        //$.notify( "Heatmap loaded", "success");
     },
     error: function (xhr, status, error) {
         console.log("EXPERT SIMULATION LOAD -- ERROR:", status + " " + error + " " + xhr.status + " " + xhr.statusText)
