@@ -646,10 +646,10 @@ function load_annotation_elements(json_from_server) {
 
     }
 
-    //notify?
-    if(parsed.objects.length > 0){
-        $.notify(parsed.objects.length + " annotations loaded", "success");
-    }
+    //notify? Dont for production
+    //if(parsed.objects.length > 0){
+    //    $.notify(parsed.objects.length + " annotations loaded", "success");
+    //}
 }
 
 //AJAX to get annotation layers

@@ -372,6 +372,9 @@ function apply_settings(data) {
         //save sims
         simulations = data.simulations;
 
+        //clear current data
+        document.getElementById('simulation_container').innerHTML = "";
+
         //load sims
         for (var i = 0; i < data.simulations.length; i++) {
             console.log("sim " + data.simulations[i]);
@@ -460,11 +463,12 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type) {
                 heatmap[sim_type] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
             } else if (sim_type.indexOf("wind") !== -1) {
                 heatmap[sim_type] = create_wind_heatmap(addressPoints.wind).addTo(mymap);
-            } else {
-                //not supported
-            }
+            } else {}
+            //not supported
 
-            $.notify("Heatmap loaded", "success");
+
+            //remove heatmap loaded for production
+            //$.notify( "Heatmap loaded", "success");
         },
         error: function error(xhr, status, _error2) {
             console.log("EXPERT SIMULATION LOAD -- ERROR:", status + " " + _error2 + " " + xhr.status + " " + xhr.statusText);
@@ -603,7 +607,7 @@ function load_simulation_data(sim_id) {
                 }
 
                 //generate html
-                var html = "<div id='" + sim_id + "'>\n                      <div class=\"map-layer-group-heading what-if\">\n                        <a data-toggle=\"collapse\" href=\"#storm-" + sim_id + "\" aria-expanded=\"false\" aria-controls=\"storm-" + sim_id + "\">\n                          <i class=\"fa fa-chevron-right\" aria-hidden=\"true\"></i> <div class=\"" + badge + "\">" + sim_heading.charAt(0) + "</div>" + sim_heading + "<span><i class=\"fa fa-close\" aria-hidden=\"true\" onclick=\"remove_simulation('" + sim_id + "');\"></i></span>\n                        </a>\n                      </div>\n                      <p class=\"follow-unfollow\">by " + result.data.user_name + " \u2022 " + result.data.modified + "</p>\n                      <ul class=\"collapse map-layers\" id=\"storm-" + sim_id + "\">\n                          <li><input id=\"" + sim_id + "_wind\" name=\"" + sim_id + "\" type=\"checkbox\" value=\"" + wind_file + "\" onchange=\"load_simulation(" + result.user_id + ", this);\" " + wind + "> Wind Field</li>\n                          <li><input id=\"" + sim_id + "_surge\" name=\"" + sim_id + "\" type=\"checkbox\" value=\"" + surge_file + "\" onchange=\"load_simulation(" + result.user_id + ", this);\" " + surge + "> Surge</li>\n                          <li><input id=\"" + sim_id + "_runup\" name=\"" + sim_id + "\" type=\"checkbox\" value=\"" + runup_file + "\" onchange=\"load_simulation(" + result.user_id + ", this);\" " + runup + "> Total Run Up</li>\n                          <li class=\"shp-scenario\"><span>Sea Level Rise:</span> " + data.SLR + "<br/><span>Coastal Protection:</span> " + data.protection + "<br/><span>Tides:</span> " + data.tide_td + "<br/><span>Analysis type:</span> " + data.analysis + "<br/><span>Description:</span> " + result.data.description + "</li>\n                      </ul>\n                  </div>";
+                var html = "<div id='" + sim_id + "'>\n                      <div class=\"map-layer-group-heading what-if\">\n                        <a data-toggle=\"collapse\" href=\"#storm-" + sim_id + "\" aria-expanded=\"false\" aria-controls=\"storm-" + sim_id + "\">\n                          <i class=\"fa fa-chevron-right\" aria-hidden=\"true\"></i> <div class=\"" + badge + "\">" + sim_heading.charAt(0) + "</div>" + sim_heading + "<span><i class=\"fa fa-close\" aria-hidden=\"true\" onclick=\"remove_simulation('" + sim_id + "');\"></i></span>\n                        </a>\n                      </div>\n                      <p class=\"follow-unfollow\">by " + result.data.user_name + " \u2022 " + result.data.modified + "</p>\n                      <ul class=\"collapse map-layers\" id=\"storm-" + sim_id + "\">\n                          <li><input id=\"" + sim_id + "_wind\" name=\"" + sim_id + "\" type=\"checkbox\" value=\"" + wind_file + "\" onchange=\"load_simulation(" + result.user_id + ", this);\" " + wind + "> Wind Field</li>\n                          <li><input id=\"" + sim_id + "_surge\" name=\"" + sim_id + "\" type=\"checkbox\" value=\"" + surge_file + "\" onchange=\"load_simulation(" + result.user_id + ", this);\" " + surge + "> Surge</li>\n                          <li><input id=\"" + sim_id + "_runup\" name=\"" + sim_id + "\" type=\"checkbox\" value=\"" + runup_file + "\" onchange=\"load_simulation(" + result.user_id + ", this);\" " + runup + "> Total Run Up</li>\n                          <li class=\"shp-scenario\"><span>Sea Level Rise:</span> " + data.SLR + "m<br/><span>Coastal Protection:</span> " + data.protection + "<br/><span>Tides:</span> " + data.tide_td + "<br/><span>Analysis type:</span> " + data.analysis + "<br/><span>Description:</span> " + result.data.description + "</li>\n                      </ul>\n                  </div>";
 
                 //add to page
                 //create div
