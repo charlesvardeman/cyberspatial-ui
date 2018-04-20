@@ -61,7 +61,7 @@ function add_active_storm_to_menu(active_storms) {
 
         $(active_storm_template).append("<div class=\"collapse active_storm\" id=\"" + camelcaseName + "\">\n" +
             "<ul class=\"map-layers\">\n" +
-            "<div><li><input type=\"checkbox\" id=\"" + camelcaseName + "_wind_field_box\" class=\"windfield_box scenario_box\" disabled onchange=\"storm_vis_check($(this), '" + camelcaseName + "')\"> Wind Field</li></div> \n" +
+            "<div><li><input type=\"checkbox\" id=\"" + camelcaseName + "_wind_field_box\" class=\"windfield_box scenario_box\" onchange=\"storm_vis_check($(this), '" + camelcaseName + "')\"> Wind Field</li></div> \n" +
             "<li><input type=\"checkbox\" id=\"" + camelcaseName + "_surge_box\" class=\"surge_box scenario_box\" onchange=\"storm_vis_check($(this), '" + camelcaseName + "')\"> Surge</li>\n" +
             "<div class=\"beta-feature-not-available\"><li><input type=\"checkbox\" id=\"" + camelcaseName + "_total_run_up_box\" class=\"runup_box scenario_box\" disabled onchange=\"storm_vis_check($(this), '" + camelcaseName + "')\"> Total Run Up</li></div> </ul>" +
             "<div class=\"well plain orange scenarios\">\n" +
