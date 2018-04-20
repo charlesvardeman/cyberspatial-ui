@@ -281,8 +281,17 @@ mymap.on('editable:drawing:end', function (e) {
             save_annotation_element(e.layer);
         }
     }
+    //popup marker box
+    //delay to prevent map closing it for marker
+    setTimeout(open_popup, 50, e.layer);
+
     console.log("editable:drawing:end, edited");
 });
+
+//open popup after a delay
+function open_popup(layer){
+    layer.openPopup();
+}
 
 //called while object being dragged
 mymap.on('editable:drag', function (e) {
