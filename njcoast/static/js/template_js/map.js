@@ -1,7 +1,7 @@
 "use strict";
 
 //fix for callable js
-if (annotate_map_id != null) {
+if (annotate_map_id == null) {
     $("#save_map").addClass("disabled");
     $("#load_map").addClass("disabled");
     $("#share_map").addClass("disabled");
