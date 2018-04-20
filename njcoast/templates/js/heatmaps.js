@@ -17,6 +17,7 @@ function create_surge_heatmap(data){
         // radius should be small ONLY if scaleRadius is true (or small radius is intended)
         // if scaleRadius is false it will be the constant radius used in pixels
         "radius": 0.04,
+        "opacity": 0.65,
         "maxOpacity": 0.75, 
         // scales the radius based on map zoom
         "scaleRadius": true, 
@@ -65,6 +66,7 @@ function create_wind_heatmap(data){
         // radius should be small ONLY if scaleRadius is true (or small radius is intended)
         // if scaleRadius is false it will be the constant radius used in pixels
         "radius": 0.01,
+        "opacity": 0.65,
         "maxOpacity": 0.75, 
         // scales the radius based on map zoom
         "scaleRadius": true, 
