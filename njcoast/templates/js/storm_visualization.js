@@ -61,7 +61,7 @@ function add_active_storm_to_menu(active_storms) {
 
         $(active_storm_template).append("<div class=\"collapse active_storm\" id=\"" + camelcaseName + "\">\n" +
             "<ul class=\"map-layers\">\n" +
-            "<div class=\"beta-feature-not-available\"><li><input type=\"checkbox\" id=\"" + camelcaseName + "_wind_field_box\" class=\"windfield_box scenario_box\" disabled onchange=\"storm_vis_check($(this), '" + camelcaseName + "')\"> Wind Field</li></div> \n" +
+            "<div><li><input type=\"checkbox\" id=\"" + camelcaseName + "_wind_field_box\" class=\"windfield_box scenario_box\" disabled onchange=\"storm_vis_check($(this), '" + camelcaseName + "')\"> Wind Field</li></div> \n" +
             "<li><input type=\"checkbox\" id=\"" + camelcaseName + "_surge_box\" class=\"surge_box scenario_box\" onchange=\"storm_vis_check($(this), '" + camelcaseName + "')\"> Surge</li>\n" +
             "<div class=\"beta-feature-not-available\"><li><input type=\"checkbox\" id=\"" + camelcaseName + "_total_run_up_box\" class=\"runup_box scenario_box\" disabled onchange=\"storm_vis_check($(this), '" + camelcaseName + "')\"> Total Run Up</li></div> </ul>" +
             "<div class=\"well plain orange scenarios\">\n" +
@@ -123,13 +123,11 @@ function add_active_storm_to_menu(active_storms) {
 
         // reapply the tooltip functionality since these were
         //  created asynchronously after the DOM is ready.
-        $('.beta-feature-not-available').tooltip(
-            {
-                title: "Feature not available at this time",
-                placement: "top",
-                width: '300px'
-            });
-
+        $('.beta-feature-not-available').tooltip( {
+            title: "Feature not available at this time",
+            placement: "top",
+            width: '300px'
+        });
     });
 }
 
@@ -293,13 +291,12 @@ function updateMapClick(storm_name) {
     if (surge_checkbox.is(":checked")) {
 
         //load heatmap data
-        var heatmap_url = s3_path + "surge/heatmap__slr_" + parseInt(sea_level * 10) + "__tide_" + tides + "__analysis_" + analysis_type + ".json"
+        var heatmap_url = s3_path + "heatmap__slr_" + parseInt(sea_level * 10) + "__tide_" + tides + "__analysis_" + analysis_type + ".json"
         var addressPoints = (function () {
             var json = null;
             $.ajax({
                 'async': false,
                 'global': false,
-                //'url': "{% static 'NJ-coast-heatmap/heatmap.json' %}",
                 'url': heatmap_url,
                 'dataType': "json",
                 'success': function (data) {
@@ -315,13 +312,41 @@ function updateMapClick(storm_name) {
             mymap.removeLayer(storm_layer_dict[surge_checkbox.attr('id')]);
         }
         if (addressPoints) {
-            storm_layer_dict[surge_checkbox.attr('id')] = create_surge_heatmap(addressPoints.runup).addTo(mymap);
+            storm_layer_dict[surge_checkbox.attr('id')] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
         }
-
-
     } else {
         // Remove the layer toggled from this checkbox
         mymap.removeLayer(storm_layer_dict[surge_checkbox.attr('id')]);
     }
 
+    var wind_checkbox = $('#' + storm_name + '_wind_field_box')
+    if (wind_checkbox.is(":checked")) {
+
+        //load heatmap data
+        var heatmap_url = s3_path + "wind_heatmap__slr_" + parseInt(sea_level * 10) + "__tide_" + tides + "__analysis_" + analysis_type + ".json"
+        var addressPoints = (function () {
+            var json = null;
+            $.ajax({
+                'async': false,
+                'global': false,
+                'url': heatmap_url,
+                'dataType': "json",
+                'success': function (data) {
+                    json = data;
+                }
+            });
+            return json;
+        })();
+
+        if (wind_checkbox.attr('id') in storm_layer_dict) {
+            // remove the old layer and load a new one if surge was already being displayed
+            mymap.removeLayer(storm_layer_dict[wind_checkbox.attr('id')]);
+        }
+        if (addressPoints) {
+            storm_layer_dict[wind_checkbox.attr('id')] = create_wind_heatmap(addressPoints.wind).addTo(mymap);
+        }
+    } else {
+        // Remove the layer toggled from this checkbox
+        mymap.removeLayer(storm_layer_dict[wind_checkbox.attr('id')]);
+    }
 }
