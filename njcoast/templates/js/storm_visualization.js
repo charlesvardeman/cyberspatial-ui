@@ -315,8 +315,9 @@ function updateMapClick(storm_name) {
             storm_layer_dict[surge_checkbox.attr('id')] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
         }
     } else {
-        // Remove the layer toggled from this checkbox
-        mymap.removeLayer(storm_layer_dict[surge_checkbox.attr('id')]);
+        if (surge_checkbox.attr('id') in storm_layer_dict) {
+            mymap.removeLayer(storm_layer_dict[surge_checkbox.attr('id')]);
+        }
     }
 
     var wind_checkbox = $('#' + storm_name + '_wind_field_box')
@@ -346,7 +347,8 @@ function updateMapClick(storm_name) {
             storm_layer_dict[wind_checkbox.attr('id')] = create_wind_heatmap(addressPoints.wind).addTo(mymap);
         }
     } else {
-        // Remove the layer toggled from this checkbox
-        mymap.removeLayer(storm_layer_dict[wind_checkbox.attr('id')]);
+        if (wind_checkbox.attr('id') in storm_layer_dict) {
+            mymap.removeLayer(storm_layer_dict[wind_checkbox.attr('id')]);
+        }
     }
 }
