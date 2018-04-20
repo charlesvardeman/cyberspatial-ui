@@ -180,8 +180,8 @@ function start_expert_simulation() {
     }
 
     //get point along path
-    var lat_past_point = latitude - Math.cos(angle * Math.PI / 180) * 0.01;
-    var long_past_point = longitude - Math.sin(angle * Math.PI / 180) * 0.01;
+    var lat_past_point = latitude - Math.cos(angle * Math.PI / 180) * 0.015;
+    var long_past_point = longitude - Math.sin(angle * Math.PI / 180) * 0.015;
 
     console.log("tide " + tide + ", protection " + protection + ", analysis " + analysis + ", storm " + storm_type);
 
@@ -371,7 +371,7 @@ function create_storm_track(onOff) {
 
     if (onOff) {
         //get zoom
-        var arrow_length = 0.01 * Math.pow(2, 13 - mymap.getZoom());
+        var arrow_length = 0.015 * Math.pow(2, 13 - mymap.getZoom());
 
         //load Latitude/Longitude and angle
         var latitude = parseFloat(document.getElementById("latitude").value);
@@ -393,16 +393,16 @@ function create_storm_track(onOff) {
 
         // Add in a crosshair for the map
         var crosshairIcon = L.icon({
-            iconUrl: '/static/images/crosshair.png',
-            iconSize: [20, 20], // size of the icon
-            iconAnchor: [10, 10] // point of the icon which will correspond to marker's location
+            iconUrl: '/static/images/icon_storm-dir-start.png',
+            iconSize: [24, 24], // size of the icon
+            iconAnchor: [12, 12] // point of the icon which will correspond to marker's location
         });
 
         // Add in a crosshair for the map
         var arrowIcon = L.icon({
-            iconUrl: '/static/images/arrow.png',
-            iconSize: [24, 24], // size of the icon
-            iconAnchor: [12, 22] // point of the icon which will correspond to marker's location
+            iconUrl: '/static/images/icon_storm-dir-arrow.png',
+            iconSize: [20, 20], // size of the icon
+            iconAnchor: [10, 10] // point of the icon which will correspond to marker's location
         });
 
         //create markers
@@ -417,8 +417,8 @@ function create_storm_track(onOff) {
         var sat_offset_x = Math.sin(angle) * arrow_length;
 
         // create a polyline between markers
-        var latlngs = [[latitude, longitude], [latitude + sat_offset_y, longitude + sat_offset_x]];
-        polyline = L.polyline(latlngs, { color: 'black', weight: 2, opacity: 0.5 }).addTo(mymap);
+        var latlngs = [[latitude + sat_offset_y * 0.13, longitude + sat_offset_x * 0.13], [latitude + sat_offset_y, longitude + sat_offset_x]];
+        polyline = L.polyline(latlngs, { color: '#eb6b00', weight: 3, opacity: 1.0 }).addTo(mymap);
 
         //create landfall marker
         marker = new L.marker([latitude, longitude], { draggable: 'true', icon: crosshairIcon });
@@ -453,11 +453,11 @@ function create_storm_track(onOff) {
 
             //fix for first use of angle
             if (!sat_marker.angle) {
-                sat_marker.angle = 0;
+                sat_marker.angle = document.getElementById("angleslider").value * Math.PI / 180;
             }
 
             //get zoom
-            var arrow_length = 0.01 * Math.pow(2, 13 - mymap.getZoom());
+            var arrow_length = 0.015 * Math.pow(2, 13 - mymap.getZoom());
 
             //load angle, calc position
             var angle = sat_marker.angle;
@@ -466,7 +466,7 @@ function create_storm_track(onOff) {
 
             //fix sat/line pos
             sat_marker.setLatLng(new L.LatLng(position.lat + sat_offset_y, position.lng + sat_offset_x), { draggable: 'true' });
-            polyline.setLatLngs([[position.lat, position.lng], [position.lat + sat_offset_y, position.lng + sat_offset_x]]);
+            polyline.setLatLngs([[position.lat + sat_offset_y * 0.13, position.lng + sat_offset_x * 0.13], [position.lat + sat_offset_y, position.lng + sat_offset_x]]);
 
             //update text boxes
             document.getElementById("latitude").value = position.lat.toFixed(7).toString();
@@ -478,7 +478,7 @@ function create_storm_track(onOff) {
         sat_marker = new L.marker([latitude + sat_offset_y, longitude + sat_offset_x], { draggable: 'true', rotationAngle: angle * 180 / Math.PI, icon: arrowIcon });
         sat_marker.on('drag', function (event) {
             //get zoom
-            var arrow_length = 0.01 * Math.pow(2, 13 - mymap.getZoom());
+            var arrow_length = 0.015 * Math.pow(2, 13 - mymap.getZoom());
 
             //get pos
             var position = marker.getLatLng();
@@ -501,7 +501,7 @@ function create_storm_track(onOff) {
             sat_marker.setRotationAngle(angle * 180 / Math.PI);
 
             //and line
-            polyline.setLatLngs([[position.lat, position.lng], [position.lat + sat_offset_y, position.lng + sat_offset_x]]);
+            polyline.setLatLngs([[position.lat + sat_offset_y * 0.13, position.lng + sat_offset_x * 0.13], [position.lat + sat_offset_y, position.lng + sat_offset_x]]);
 
             //update angle box
             document.getElementById("angle").value = Math.round(angle * 180 / Math.PI);
@@ -535,11 +535,11 @@ mymap.on('zoomend', function (event) {
 
     //fix for first use of angle
     if (!sat_marker.angle) {
-        sat_marker.angle = 0;
+        sat_marker.angle = document.getElementById("angleslider").value * Math.PI / 180;
     }
 
     //get zoom
-    var arrow_length = 0.01 * Math.pow(2, 13 - mymap.getZoom());
+    var arrow_length = 0.015 * Math.pow(2, 13 - mymap.getZoom());
 
     //get pos
     var position = marker.getLatLng();
@@ -557,7 +557,7 @@ mymap.on('zoomend', function (event) {
     sat_marker.setRotationAngle(angle * 180 / Math.PI);
 
     //and line
-    polyline.setLatLngs([[position.lat, position.lng], [position.lat + sat_offset_y, position.lng + sat_offset_x]]);
+    polyline.setLatLngs([[position.lat + sat_offset_y * 0.13, position.lng + sat_offset_x * 0.13], [position.lat + sat_offset_y, position.lng + sat_offset_x]]);
     //}
 });
 
