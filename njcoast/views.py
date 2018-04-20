@@ -239,8 +239,6 @@ def map_settings(request, map_id):
         if len(map_objs) > 0:
             if len(map_objs[0]['settings']) > 0:
                 data_dict = json.loads(map_objs[0]['settings'])
-                data_dict['description'] = map_objs[0]['description']
-                data_dict['name'] = map_objs[0]['name']
                 try:
                     data_dict['shared_with'] = json.loads(map_objs[0]['shared_with'])
                 except:
@@ -248,6 +246,9 @@ def map_settings(request, map_id):
             else:
                 data_dict = {}
 
+            data_dict['description'] = map_objs[0]['description']
+            data_dict['name'] = map_objs[0]['name']
+            
             #determine ownership
             if map_objs[0]['owner_id'] != request.user.id:
                 data_dict['owner'] = 'other'
