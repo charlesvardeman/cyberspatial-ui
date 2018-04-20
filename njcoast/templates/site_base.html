@@ -114,10 +114,6 @@
                               <li> <a href="{% url "new_map" %}">{% trans "Create Map" %}</a></li>
                         </ul>
                   </li>
-              {% elif user.is_authenticated %}
-                  <li id="nav_maps">
-                        <a href="{% url "maps_browse" %}" role="button">{% trans "Map" %}</a>
-                  </li>
               {% endif %}
             <li>
             {% if user.is_superuser %}
