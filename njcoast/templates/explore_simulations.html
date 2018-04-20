@@ -153,6 +153,11 @@
 {% endblock middle %}
 
 {% block extra_script %}
+<script type=text/javascript>
+    var map_id = {{ map_id }};
+    var map_name = {{ map_name }}
+</script>
+
 <script src="{% static 'js/notify.min.js' %}"></script>
 <script src="{% static 'js/template_js/explore.js' %}"></script>
 {% endblock extra_script %}

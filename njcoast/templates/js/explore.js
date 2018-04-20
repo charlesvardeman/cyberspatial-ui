@@ -220,7 +220,7 @@ function load_simulation_data(order_by) {
                                                                 </button>
                                                                 <div class="dropdown-menu" aria-labelledby="dropdownMenuAddToMap_${count}">
                                                                     {% for map in maps_for_user %}
-                                                                    <a style="padding: 2px;" class="dropdown-item" name="{{ map.id }}" onclick='add_expert_to_map(this, "${result.data[i].sim_id}");'>{{ map.name }}</a>
+                                                                    <a style="padding: 2px;" class="dropdown-item" name="`+map_id+`" onclick='add_expert_to_map(this, "${result.data[i].sim_id}");'>"`+map_name+`"</a>
                                                                     <div class="dropdown-divider"></div>
                                                                     {% endfor %}
                                                                 </div>
