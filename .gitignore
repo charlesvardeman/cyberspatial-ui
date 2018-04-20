@@ -160,3 +160,5 @@ db.sqlite3
 
 # Node
 node_modules
+
+njcoast/static/js/template_js
