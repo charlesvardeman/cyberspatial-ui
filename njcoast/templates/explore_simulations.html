@@ -154,8 +154,14 @@
 
 {% block extra_script %}
 <script type=text/javascript>
-    var map_id = {{ map_id }};
-    var map_name = {{ map_name }}
+    function AddUserMaps(sim_id){
+        var html = `{% for map in maps_for_user %}
+        <a style="padding: 2px;" class="dropdown-item" name="{{ map.id }}" onclick='add_expert_to_map(this, "${sim_id}");'>"{{ map.name }}"</a>
+        <div class="dropdown-divider"></div>
+        {% endfor %}`;
+
+        $("#add_"+sim_id).innerHTML = html
+    }
 </script>
 
 <script src="{% static 'js/notify.min.js' %}"></script>

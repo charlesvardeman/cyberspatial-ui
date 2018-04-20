@@ -218,11 +218,7 @@ function load_simulation_data(order_by) {
                                                                 <button class="dropdown-toggle" style="margin-top: 5px;font-size: 14px;" id="dropdownMenuAddToMap_${count}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                                     Add Results to Map ... <i href="#"  class="fa fa-caret-up" style="margin-left: 10px" aria-hidden="true"></i>
                                                                 </button>
-                                                                <div class="dropdown-menu" aria-labelledby="dropdownMenuAddToMap_${count}">
-                                                                    {% for map in maps_for_user %}
-                                                                    <a style="padding: 2px;" class="dropdown-item" name="`+map_id+`" onclick='add_expert_to_map(this, "${result.data[i].sim_id}");'>"`+map_name+`"</a>
-                                                                    <div class="dropdown-divider"></div>
-                                                                    {% endfor %}
+                                                                <div id="add_${result.data[i].sim_id}" class="dropdown-menu" aria-labelledby="dropdownMenuAddToMap_${count}">
                                                                 </div>
                                                             </div>
                                                         </td>
@@ -236,6 +232,7 @@ function load_simulation_data(order_by) {
 
                     //add it
                     document.getElementById('dashboard-list').innerHTML += html;
+                    AddUserMaps(result.data[i].sim_id);
                 }
 
                 //loop until end of data list
