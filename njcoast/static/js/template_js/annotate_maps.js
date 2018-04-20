@@ -289,7 +289,7 @@ mymap.on('editable:drawing:end', function (e) {
 });
 
 //open popup after a delay
-function open_popup(layer){
+function open_popup(layer) {
     layer.openPopup();
 }
 
