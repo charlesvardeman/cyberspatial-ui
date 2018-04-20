@@ -267,7 +267,7 @@ function updateMapClick(storm_name) {
 
     var storm_div = $("." + storm_name)
 
-    var sea_level = $("input[id='" + storm_name + "_input_slr").val();
+    var sea_level = $("input[id='" + storm_name + "_input_slr']").val();
     var coastal_protection = $("input[name='" + storm_name + "_dunes']:checked").val();
     var tides = $("input[name='" + storm_name + "_tides']:checked").val();
     var analysis_type = $("input[name='" + storm_name + "_analysis']:checked").val();
