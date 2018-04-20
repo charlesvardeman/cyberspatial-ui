@@ -180,8 +180,8 @@ function start_expert_simulation() {
     }
 
     //get point along path
-    var lat_past_point = latitude - Math.cos(angle * Math.PI / 180) * 0.01;
-    var long_past_point = longitude - Math.sin(angle * Math.PI / 180) * 0.01;
+    var lat_past_point = latitude - Math.cos(angle * Math.PI / 180) * 0.015;
+    var long_past_point = longitude - Math.sin(angle * Math.PI / 180) * 0.015;
 
     console.log("tide " + tide + ", protection " + protection + ", analysis " + analysis + ", storm " + storm_type);
 
@@ -371,7 +371,7 @@ function create_storm_track(onOff) {
 
     if (onOff) {
         //get zoom
-        var arrow_length = 0.01 * Math.pow(2, 13 - mymap.getZoom());
+        var arrow_length = 0.015 * Math.pow(2, 13 - mymap.getZoom());
 
         //load Latitude/Longitude and angle
         var latitude = parseFloat(document.getElementById("latitude").value);
@@ -457,7 +457,7 @@ function create_storm_track(onOff) {
             }
 
             //get zoom
-            var arrow_length = 0.01 * Math.pow(2, 13 - mymap.getZoom());
+            var arrow_length = 0.015 * Math.pow(2, 13 - mymap.getZoom());
 
             //load angle, calc position
             var angle = sat_marker.angle;
@@ -478,7 +478,7 @@ function create_storm_track(onOff) {
         sat_marker = new L.marker([latitude + sat_offset_y, longitude + sat_offset_x], { draggable: 'true', rotationAngle: angle * 180 / Math.PI, icon: arrowIcon });
         sat_marker.on('drag', function (event) {
             //get zoom
-            var arrow_length = 0.01 * Math.pow(2, 13 - mymap.getZoom());
+            var arrow_length = 0.015 * Math.pow(2, 13 - mymap.getZoom());
 
             //get pos
             var position = marker.getLatLng();
@@ -539,7 +539,7 @@ mymap.on('zoomend', function (event) {
     }
 
     //get zoom
-    var arrow_length = 0.01 * Math.pow(2, 13 - mymap.getZoom());
+    var arrow_length = 0.015 * Math.pow(2, 13 - mymap.getZoom());
 
     //get pos
     var position = marker.getLatLng();
