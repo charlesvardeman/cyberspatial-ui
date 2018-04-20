@@ -156,7 +156,7 @@
 <script type=text/javascript>
     function AddUserMaps(sim_id){
         var html = `{% for map in maps_for_user %}
-        <a style="padding: 2px;" class="dropdown-item" name="{{ map.id }}" onclick='add_expert_to_map(this, ${sim_id});'>"{{ map.name }}"</a>
+        <a style="padding: 2px;" class="dropdown-item" name="{{ map.id }}" onclick='add_expert_to_map(this, ${sim_id});'>{{ map.name }}</a>
         <div class="dropdown-divider"></div>
         {% endfor %}`;
 
