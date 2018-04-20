@@ -379,6 +379,9 @@ function apply_settings(data){
       //save sims
       simulations = data.simulations;
 
+      //clear current data
+      document.getElementById('simulation_container').innerHTML = "";
+
       //load sims
       for(var i=0; i<data.simulations.length; i++){
           console.log("sim "+data.simulations[i]);
