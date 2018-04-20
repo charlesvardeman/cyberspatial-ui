@@ -173,9 +173,9 @@ function start_expert_simulation() {
 
     //get storm type
     var storm_type = "Nor'easter";
-    if (document.getElementById('stormbadge').innerHTML.indexOf("Hurricane") >= 0) {
+    //if (document.getElementById('stormbadge').innerHTML.indexOf("Hurricane") >= 0) {
         storm_type = "Hurricane";
-    }
+    //}
 
     //get point along path
     var lat_past_point = latitude - Math.cos(angle * Math.PI / 180) * 0.015;
