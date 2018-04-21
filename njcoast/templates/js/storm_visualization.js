@@ -63,7 +63,8 @@ function add_active_storm_to_menu(active_storms) {
             "<ul class=\"map-layers\">\n" +
             "<div><li><input type=\"checkbox\" id=\"" + camelcaseName + "_wind_field_box\" class=\"windfield_box scenario_box\" onchange=\"storm_vis_check($(this), '" + camelcaseName + "')\"> Wind Field</li></div> \n" +
             "<li><input type=\"checkbox\" id=\"" + camelcaseName + "_surge_box\" class=\"surge_box scenario_box\" onchange=\"storm_vis_check($(this), '" + camelcaseName + "')\"> Surge</li>\n" +
-            "<div class=\"beta-feature-not-available\"><li><input type=\"checkbox\" id=\"" + camelcaseName + "_total_run_up_box\" class=\"runup_box scenario_box\" disabled onchange=\"storm_vis_check($(this), '" + camelcaseName + "')\"> Total Run Up</li></div> </ul>" +
+            "<div class=\"beta-feature-not-available\"><li><input type=\"checkbox\" id=\"" + camelcaseName + "_total_run_up_box\" class=\"runup_box scenario_box\" disabled onchange=\"storm_vis_check($(this), '" + camelcaseName + "')\"> Total Run Up</li></div>" +
+            "<li><input type=\"checkbox\" id=\"" + camelcaseName + "_cone_box\" class=\"cone_box scenario_box\" onchange=\"storm_vis_check($(this), '" + camelcaseName + "')\"> Predicted cone</li> </ul>\n" +
             "<div class=\"well plain orange scenarios\">\n" +
             "                  <h5>Explore Scenarios</h5>\n" +
             "                  <ul class=\"map-layers\">\n" +
@@ -351,4 +352,73 @@ function updateMapClick(storm_name) {
             mymap.removeLayer(storm_layer_dict[wind_checkbox.attr('id')]);
         }
     }
+
+    //get cone
+    var cone_checkbox = $('#' + storm_name + '_cone_box')
+    if (cone_checkbox.is(":checked")) {
+
+        //load cone data
+        var cone_url = s3_path + "cone.json"
+        var addressPoints = (function () {
+            var json = null;
+            $.ajax({
+                'async': false,
+                'global': false,
+                'url': cone_url,
+                'dataType': "json",
+                'success': function (data) {
+                    json = data;
+                }
+            });
+            return json;
+        })();
+
+        if (cone_checkbox.attr('id') in storm_layer_dict) {
+            // remove the old layer and load a new one if surge was already being displayed
+            mymap.removeLayer(storm_layer_dict[cone_checkbox.attr('id')]);
+        }
+        if (addressPoints) {
+            storm_layer_dict[cone_checkbox.attr('id')] = load_cone(addressPoints);
+        }
+    } else {
+        if (cone_checkbox.attr('id') in storm_layer_dict) {
+            mymap.removeLayer(storm_layer_dict[cone_checkbox.attr('id')]);
+        }
+    }
+
+}
+
+//load cone data
+function load_cone(addressPoints){
+
+    var cone = L.layerGroup();
+
+    //add main cone to map
+    new L.Polyline(addressPoints.main_track, {
+        color: 'black',
+        weight: 2,
+        opacity: 1,
+        smoothFactor: 1
+    }).addTo(cone);
+
+    //left
+    new L.Polyline(addressPoints.cone_left, {
+        color: 'red',
+        weight: 2,
+        opacity: 1,
+        smoothFactor: 1
+    }).addTo(cone);
+
+    //right
+    new L.Polyline(addressPoints.cone_right, {
+        color: 'yellow',
+        weight: 2,
+        opacity: 1,
+        smoothFactor: 1
+    }).addTo(cone);
+
+    //add the group
+    cone.addTo(mymap);
+
+    return cone;
 }
