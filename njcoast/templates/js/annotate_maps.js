@@ -11,6 +11,9 @@ var socket;
 //create unique id to tag socket comms
 var myid = Math.random().toString(36).substr(2, 9);
 
+//boolean to limit annotation comms
+var annotation_available = true;
+
 //~~~~create layer group to add marker~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 mymap.editTools.featuresLayer = annotationLayer;
 
@@ -269,7 +272,11 @@ mymap.on('editable:dragend', function(e) {
 
 // called while object is being edited
 mymap.on('editable:editing', function(e) {
-    if(annotate_map_id) {
+    if(annotate_map_id && annotation_available) {
+        //delay before next
+        annotation_available = false;
+        setTimeout(reset_annotation_available, 100);
+
         //test if annotation object and send
         var annotation_jason = annotation_update(e.layer);
         if (annotation_jason != null) {
@@ -282,6 +289,11 @@ mymap.on('editable:editing', function(e) {
 
     console.log("editing");
 });
+
+//reset annotation flag
+function reset_annotation_available(){
+    annotation_available = true;
+}
 
 //called at the end of editing
 mymap.on('editable:drawing:end', function(e) {
@@ -310,7 +322,10 @@ function open_popup(layer){
 
 //called while object being dragged
 mymap.on('editable:drag', function(e) {
-    if(annotate_map_id) {
+    if(annotate_map_id && annotation_available) {
+        //delay before next
+        annotation_available = false;
+        setTimeout(reset_annotation_available, 100);
 
         //test if annotation object and send
         var annotation_jason = annotation_update(e.layer);
