@@ -92,15 +92,20 @@ class MapTemplateView(TemplateView):
 
         #get unique users in groups but exclude myself
         usersList = []
-        
+
         first_pass = True
         for group in groups:
             tempList = group.user_set.exclude(pk=self.request.user.pk)
             if not first_pass:
-                usersList = (usersList | tempList).distinct()
+                if tempList:
+                    usersList = (usersList | tempList)
             else:
-                first_pass = False
-                usersList = tempList
+                if tempList:
+                    first_pass = False
+                    usersList = tempList
+
+        #make distinct
+        usersList.distinct()
 
         #send to client
         context['users_in_group'] = usersList
@@ -247,7 +252,7 @@ def map_settings(request, map_id):
 
             data_dict['description'] = map_objs[0]['description']
             data_dict['name'] = map_objs[0]['name']
-            
+
             #determine ownership
             if map_objs[0]['owner_id'] != request.user.id:
                 data_dict['owner'] = 'other'
