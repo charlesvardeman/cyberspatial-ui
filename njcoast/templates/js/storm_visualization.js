@@ -41,7 +41,7 @@ function add_active_storm_to_menu(active_storms) {
         $(active_storm_template).addClass(camelcaseName);
         $(active_storm_template).data("s3_base_path", item.s3_base_path);
         $(active_storm_template).find('a').attr('href', '#' + camelcaseName).attr('aria-controls', camelcaseName);
-        var last_update_date = new Date(item.last_updated);
+        var last_update_date = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(Date.parse(item.last_updated));
         $(active_storm_template).find('p#last_updated').text(last_update_date);
 
         // Set the correct badge icon for the storm type
