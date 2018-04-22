@@ -615,6 +615,8 @@ function load_simulation_data(sim_id){
                   runup = "";
                   runup_file = data.runup_file;
               }
+              
+              var modified = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(Date.parse(result.data.modified));
 
               //generate html
               var html =  `<div id='${sim_id}'>
@@ -623,7 +625,7 @@ function load_simulation_data(sim_id){
                           <i class="fa fa-chevron-right" aria-hidden="true"></i> <div class="${badge}">${sim_heading.charAt(0)}</div>${sim_heading}<span><i class="fa fa-close" aria-hidden="true" onclick="remove_simulation('${sim_id}');"></i></span>
                         </a>
                       </div>
-                      <p class="follow-unfollow">by ${result.data.user_name} • ${result.data.modified}</p>
+                      <p class="follow-unfollow">by ${result.data.user_name} • ${modified}</p>
                       <ul class="collapse map-layers" id="storm-${sim_id}">
                           <li><input id="${sim_id}_wind" name="${sim_id}" type="checkbox" value="${wind_file}" onchange="load_simulation(${result.user_id}, this);" ${wind}> Wind Field</li>
                           <li><input id="${sim_id}_surge" name="${sim_id}" type="checkbox" value="${surge_file}" onchange="load_simulation(${result.user_id}, this);" ${surge}> Surge</li>
