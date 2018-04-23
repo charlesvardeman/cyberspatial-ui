@@ -91,21 +91,16 @@ class MapTemplateView(TemplateView):
         groups = Group.objects.filter(user=self.request.user).exclude(name='anonymous')
 
         #get unique users in groups but exclude myself
-        usersList = []
-
-        first_pass = True
+        usersList = set()
         for group in groups:
             tempList = group.user_set.exclude(pk=self.request.user.pk)
-            if not first_pass:
-                if tempList:
-                    usersList = (usersList | tempList).distinct()
-            else:
-                if tempList:
-                    first_pass = False
-                    usersList = tempList
+            if tempList:
+                for user in tempList:
+                    print user
+                    usersList.add(user.username)
 
         #send to client
-        context['users_in_group'] = usersList
+        context['users_in_group'] = list(usersList)
 
         return context
 
