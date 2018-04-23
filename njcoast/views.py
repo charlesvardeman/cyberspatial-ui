@@ -98,14 +98,11 @@ class MapTemplateView(TemplateView):
             tempList = group.user_set.exclude(pk=self.request.user.pk)
             if not first_pass:
                 if tempList:
-                    usersList = (usersList | tempList)
+                    usersList = (usersList | tempList).distinct()
             else:
                 if tempList:
                     first_pass = False
                     usersList = tempList
-
-        #make distinct
-        usersList.distinct()
 
         #send to client
         context['users_in_group'] = usersList
