@@ -144,7 +144,7 @@ function start_expert_simulation() {
     var input_cp = parseFloat(document.getElementById("input_cp").value);
 
     //load speed
-    var input_vf = parseFloat(document.getElementById("input_vf").value);
+    var input_vf = parseFloat(document.getElementById("input_vf").value) * 1.852001;
 
     //load radius
     var input_rm = parseFloat(document.getElementById("input_rm").value);
