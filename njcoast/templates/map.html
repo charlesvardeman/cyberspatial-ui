@@ -150,6 +150,8 @@
         annotate_map_id = {{ map_id }};
     {% endif %}
     var annotationLayer = new L.LayerGroup();
+
+    var mymap = L.map('mapid', { zoomControl: false, editable: true }).setView([ home_latitude, home_longitude ], home_zoom );
 </script>
 
 <script src="{% static 'js/template_js/map.js' %}"></script>

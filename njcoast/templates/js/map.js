@@ -22,7 +22,6 @@ Data: Watershed Boundary Dataset - National Hydrography Overlay Map Service
       downloadable-data-collection-national-geospatial-/resource/f55f881d-9de8-471f-9b6b-22cd7a98025d
 XML: https://services.nationalmap.gov/arcgis/services/nhd/MapServer/WMSServer?request=GetCapabilities&service=WMS
  */
-var mymap = L.map('mapid', { zoomControl: false, editable: true}).setView([home_latitude, home_longitude], home_zoom);
 var layer_list = [];
 var layer_groups = [];
 
