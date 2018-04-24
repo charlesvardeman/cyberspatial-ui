@@ -629,7 +629,7 @@ function load_simulation_data(sim_id){
                           <li><input id="${sim_id}_wind" name="${sim_id}" type="checkbox" value="${wind_file}" onchange="load_simulation(${result.user_id}, this);" ${wind}> Wind Field</li>
                           <li><input id="${sim_id}_surge" name="${sim_id}" type="checkbox" value="${surge_file}" onchange="load_simulation(${result.user_id}, this);" ${surge}> Surge</li>
                           <li><input id="${sim_id}_runup" name="${sim_id}" type="checkbox" value="${runup_file}" onchange="load_simulation(${result.user_id}, this);" ${runup}> Total Run Up</li>
-                          <li class="shp-scenario"><span>Sea Level Rise:</span> ${data.SLR}m<br/><span>Coastal Protection:</span> ${data.protection}<br/><span>Tides:</span> ${data.tide_td}<br/><span>Analysis type:</span> ${data.analysis}<br/><span>Description:</span> ${result.data.description}</li>
+                          <li class="shp-scenario"><span>Sea Level Rise:</span> ${data.SLR * 3.28084} ft<br/><span>Coastal Protection:</span> ${data.protection}<br/><span>Tides:</span> ${data.tide_td}<br/><span>Analysis type:</span> ${data.analysis}<br/><span>Description:</span> ${result.data.description}</li>
                       </ul>
                   </div>`;
 
