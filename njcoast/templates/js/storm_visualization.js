@@ -70,8 +70,8 @@ function add_active_storm_to_menu(active_storms) {
             "                    <li class=\"explore-scenario-controls\">\n" +
             "                      <p>Sea Level Rise</p>\n" +
             "                      <div class=\"shp-controls\">\n" +
-            "                        <input id=\"" + camelcaseName + "_slr_slider\" class=\"range-input sealevel " + camelcaseName + "_slr_range\" data-target=\"slr\" min=\"0\" max=\"1.5\" step=\"0.5\" value=\"0\" type=\"range\">\n" +
-            "                        <input id=\"" + camelcaseName + "_input_slr\" class=\"sealevel num-input job-input " + camelcaseName + "_slr_input\" name=\"slr\" value=\"0\" type=\"text\"> m\n" +
+            "                        <input id=\"" + camelcaseName + "_slr_slider\" class=\"range-input sealevel " + camelcaseName + "_slr_range\" data-target=\"slr\" min=\"0\" max=\"4.5\" step=\"1.5\" value=\"0\" type=\"range\">\n" +
+            "                        <input id=\"" + camelcaseName + "_input_slr\" class=\"sealevel num-input job-input " + camelcaseName + "_slr_input\" name=\"slr\" value=\"0\" type=\"text\"> ft\n" +
             "                      </div>\n" +
             "                    </li>\n" +
             "                    <li class=\"explore-scenario-controls controls-" + camelcaseName + "\">\n" +
@@ -267,7 +267,9 @@ function updateMapClick(storm_name) {
 
     var storm_div = $("." + storm_name)
 
-    var sea_level = $("input[id='" + storm_name + "_input_slr']").val();
+    var sea_level = $("input[id='" + storm_name + "_input_slr']").val() * 0.3048;
+    sea_level = (Math.round(sea_level * 2) / 2).toFixed(1)
+    
     var coastal_protection = $("input[name='" + storm_name + "_dunes']:checked").val();
     var tides = $("input[name='" + storm_name + "_tides']:checked").val();
     var analysis_type = $("input[name='" + storm_name + "_analysis']:checked").val();
