@@ -1,0 +1,25 @@
+{
+  "name": "cyberspatial",
+  "version": "1.0.0",
+  "description": "This project contains the files needed to replace the Geonode interface for use on the NJCoast project.",
+  "private": true,
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-plugin-array-includes": "^2.0.3",
+    "babel-preset-env": "^1.6.1"
+  },
+  "scripts": {
+    "babel": "babel njcoast/templates/js -d njcoast/static/js/template_js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NJCoast/cyberspatial-ui.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NJCoast/cyberspatial-ui/issues"
+  },
+  "homepage": "https://github.com/NJCoast/cyberspatial-ui#readme"
+}
