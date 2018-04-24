@@ -2,7 +2,7 @@ from django.conf.urls import patterns, url
 from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 
-from geonode.urls import *
+from geonode.urls import urlpatterns
 from .views import my_gis_layers, MapTemplateView, DashboardTemplateView, MapExpertTemplateView, ExploreTemplateView
 from njcoast.views import map_annotations, new_njc_map_view, map_expert_simulations, map_settings
 
