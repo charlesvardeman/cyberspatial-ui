@@ -161,4 +161,8 @@ db.sqlite3
 # Node
 node_modules
 
+# VSCode
+.vscode
+
+# Generated files
 njcoast/static/js/template_js
