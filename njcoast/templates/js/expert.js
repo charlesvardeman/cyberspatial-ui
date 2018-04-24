@@ -147,7 +147,7 @@ function start_expert_simulation() {
     var input_vf = parseFloat(document.getElementById("input_vf").value) * 1.852001;
 
     //load radius
-    var input_rm = parseFloat(document.getElementById("input_rm").value);
+    var input_rm = parseFloat(document.getElementById("input_rm").value) * 1.609344;
 
     //load SLR
     var input_slr = parseFloat(document.getElementById("input_slr").value) * 0.3048;
