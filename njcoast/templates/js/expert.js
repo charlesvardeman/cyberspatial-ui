@@ -820,3 +820,30 @@ function add_expert_to_map(object) {
         }
     });
 }
+
+function updateCatagory() {
+    document.getElementById("input_vf").value = "50.0"
+
+    switch ($('input[name=intensity]:checked').val()) {
+        case "1":
+            document.getElementById("input_cp").value = "25.0";
+            document.getElementById("input_rm").value = "33.0";
+            break;
+        case "2":
+            document.getElementById("input_cp").value = "40.0";
+            document.getElementById("input_rm").value = "37.0";
+            break;
+        case "3":
+            document.getElementById("input_cp").value = "55.0";
+            document.getElementById("input_rm").value = "50.0";
+            break;
+        case "4":
+            document.getElementById("input_cp").value = "70.0";
+            document.getElementById("input_rm").value = "50.0";
+            break;
+        case "5":
+            document.getElementById("input_cp").value = "85.0";
+            document.getElementById("input_rm").value = "40.0";
+            break;
+    }
+}

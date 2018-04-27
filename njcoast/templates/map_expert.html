@@ -97,11 +97,10 @@
 
                 <!-- tabs for basic/advanced tools -->
                 <ul class="nav nav-tabs nav-justified shp-settings">
-                    <li id="basic" class="nav-item disabled">
-                        <a class="nav-link" href="#"  >Basic</a>
-                        <!-- Removed from basic onclick="tab_flip_tools(true);" -->
+                    <li id="basic" class="nav-item active">
+                        <a class="nav-link" href="#" onclick="tab_flip_tools(true);" >Basic</a>
                     </li>
-                    <li id="advanced" class="nav-item active">
+                    <li id="advanced" class="nav-item">
                         <a class="nav-link" href="#" onclick="tab_flip_tools(false);">Advanced</a>
                     </li>
                 </ul>
@@ -110,11 +109,11 @@
                 <div id="basic_tools" style="display: none;">
                     <p class="slider-label">Storm Intensity</p>
                     <ul class="shp-tool-radios one-line" style="margin-bottom: 30px">
-                        <li><input type="radio" name="intensity" value="current" checked> Cat 1</li>
-                        <li><input type="radio" name="intensity" value="degraded"> Cat 2</li>
-                        <li><input type="radio" name="intensity" value="compromised"> Cat 3</li>
-                        <li><input type="radio" name="intensity" value="degraded"> Cat 4</li>
-                        <li><input type="radio" name="intensity" value="compromised"> Cat 5</li>
+                        <li><input type="radio" name="intensity" value="1" onchange="updateCatagory()" checked> Cat 1</li>
+                        <li><input type="radio" name="intensity" value="2" onchange="updateCatagory()"> Cat 2</li>
+                        <li><input type="radio" name="intensity" value="3" onchange="updateCatagory()"> Cat 3</li>
+                        <li><input type="radio" name="intensity" value="4" onchange="updateCatagory()"> Cat 4</li>
+                        <li><input type="radio" name="intensity" value="5" onchange="updateCatagory()"> Cat 5</li>
                     </ul>
                 </div>
                 <!-- end Basic tools -->
