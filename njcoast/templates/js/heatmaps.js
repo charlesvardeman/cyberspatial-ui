@@ -65,11 +65,11 @@ function create_wind_heatmap(data){
     var cfg = {
         // radius should be small ONLY if scaleRadius is true (or small radius is intended)
         // if scaleRadius is false it will be the constant radius used in pixels
-        "radius": 0.01,
+        "radius": 0.0075,
         "opacity": 0.65,
         "maxOpacity": 0.75, 
         // scales the radius based on map zoom
-        "scaleRadius": true, 
+        "scaleRadius": true,  
         "gradient": {
             '0.37': '#ffffcc',
             '0.475': '#ffe775',
