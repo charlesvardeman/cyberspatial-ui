@@ -1,6 +1,6 @@
 function create_surge_heatmap(data){
     var heatData = {
-        max: 1000.00,
+        max: 10.00,
         data: []
     };
 
@@ -16,7 +16,7 @@ function create_surge_heatmap(data){
     var cfg = {
         // radius should be small ONLY if scaleRadius is true (or small radius is intended)
         // if scaleRadius is false it will be the constant radius used in pixels
-        "radius": 0.04,
+        "radius": 0.0025,
         "opacity": 0.65,
         "maxOpacity": 0.75, 
         // scales the radius based on map zoom
