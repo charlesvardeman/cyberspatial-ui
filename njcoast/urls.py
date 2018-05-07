@@ -9,6 +9,8 @@ from njcoast.views import map_annotations, new_njc_map_view, map_expert_simulati
 urlpatterns = patterns('',
                        url(r'^/?$', TemplateView.as_view(template_name='site_index.html'), name='home'),
                        url(r'^about/$', TemplateView.as_view(template_name='site_about.html'), name='about'),
+                       url(r'^resources-faq/$', TemplateView.as_view(template_name='site_resources_faq.html'), name='faq'),
+                       url(r'^resources-shp/$', TemplateView.as_view(template_name='site_resources_shp.html'), name='shp'),
                        url(r'^explore/$', login_required(ExploreTemplateView.as_view()), name='explore'),
                        url(r'^maps/$', login_required(MapTemplateView.as_view()), name='maps_browse'),
                        url(r'^expert/$', login_required(MapExpertTemplateView.as_view()), name='maps_expert'),

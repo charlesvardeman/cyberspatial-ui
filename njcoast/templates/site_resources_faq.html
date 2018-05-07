@@ -1,0 +1,46 @@
+{% extends 'site_base.html' %}
+{% load i18n %}
+{% load staticfiles %}
+{% load base_tags %}
+
+{% block body_class %}home{% endblock %}
+
+{% block middle %}
+  <div class="jumbotron njcoast-image slim">
+    <div class="container">
+      <div class="row">
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="row spaced">
+      <div class="col-md-9 faq">
+        <h3>Frequently Asked Questions</h3>
+          <h4>What is NJcoast?</h4>
+            <p>NJcoast is a user-friendly, web-environment that provides efficient access to geospatial data and custom tools to evaluate storm scenarios, all without the need to learn or maintain sophisticated Geographic Information Systems (GIS) software in-house.</p>
+
+          <h4>What is GeoNode?</h4>
+            <p>NJcoast is built on an open-source, geospatial content management system (CMS) called GeoNode, which was designed to be extended and modified by different software developers. Whenever an open-source platform like  GeoNode is customized in this way, it is called an instance — NJcoast is a customized instance of the GeoNode open-source CMS. Other unique GeoNode instances have been developed by hundreds of organizations, including the World Bank, United Nations, European Union and US State Department, to support a wide variety of projects that include response to natural disasters and humanitarian aid efforts.</p>
+
+          <h4>Why launch NJcoast?</h4>
+            <p>Service delivery requires access to an ever-increasing volume of geospatial data from different local, county, state and even federal sources. In the event of a hurricane or nor’easter, access to data, including projected impacts of the storm on local infrastructure and municipal assets, is especially vital to inform preemptive actions that can save lives and mitigate property damage. NJcoast provides a new level of data access and support for this critical decision making.</p>
+
+          <h4>How does NJcoast work?</h4>
+            <p>Each user is assigned a role: (i) Planning & Service Delivery, (ii) Emergency Management or (iii) First Responder. The NJcoast Map View will pre-populate with the latest versions of GIS data most relevant to the user’s assigned role and municipality. From here, users can visualize the different GIS layers, annotate them, and share them with others. Users can also simulate the impact of hurricanes and nor’easters, using the same models that produce Flood Insurance Rate Maps. NJcoast also includes a live mode that tracks active storms off of New Jersey’s coast.</p>
+
+          <h4>When will NJcoast be available?</h4>
+            <p>NJcoast is being beta-tested with two pilot municipalities (Berkeley Township and the Borough of Keansburg) in the Spring of 2018 before NJcoast V.1.0 is released at the end of June 2018.</p>
+
+          <h4>How do I access NJcoast?</h4>
+            <p>All users must be registered. With your username and password, you can then access NJcoast through any standard web browser on your computer, smartphone or tablet. You can request an account here.</p>
+
+          <h4>Who is developing NJcoast?</h4>
+            <p>NJcoast is funded by the New Jersey Department of Community Affairs (DCA), Office of Local Planning Services (LPS) and is being developed by a team of engineers and computer scientists at the University of Notre Dame, in collaboration with civil engineers from the University at Buffalo.</p>
+
+          <h4>Who do I contact with questions?</h4>
+            <p>Feel free to contact DCA Contact with any questions or concerns. Email: INSERT EMAIL | Office: INSERT PHONE.</p>
+        </div>
+      </div>
+    </div>
+ {% endblock %}
