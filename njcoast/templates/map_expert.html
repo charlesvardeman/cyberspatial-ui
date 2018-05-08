@@ -74,7 +74,7 @@
             <div class="map-control-item">
                 <p class="tool-heading">Set storm characteristics</p><!-- originally had '2. s' -->
                 <div class="well plain">
-                    <p style="margin-top: 15px"><input type="checkbox" value="off" data-toggle="popover" data-placement="right" onclick="create_storm_track(this.checked);"> Draw Storm Track on Map</p>
+                    <!--<p style="margin-top: 15px"><input type="checkbox" value="off" data-toggle="popover" data-placement="right" onclick="create_storm_track(this.checked);"> Draw Storm Track on Map</p>-->
                     <!--<button id="cst" class="btn btn-primary btn-sm btn-block" data-toggle="modal" data-target="" onclick="create_storm_track();">Draw Storm Track on Map</button>-->
                     <table class="table shp-table">
                         <tr>
@@ -90,8 +90,8 @@
                     </table>
                     <p class="slider-label">Storm Track Angle</p>
                     <div class="shp-controls" style="margin-bottom: 30px">
-                        <input id="angleslider" class="range-input" data-target="rm" min="-60" max="40" step="5" value="0" type="range" oninput="updateInput(this)" onchange="updateInput(this)">
-                        <input id="angle" class="num-input job-input" name="rm" value="0" type="text" onchange="updateInput(this)"> &deg;
+                        <input id="angleslider" class="range-input" data-target="rm" min="-60" max="40" step="5" value="0" type="range" oninput="update_storm_track(this)" onchange="updateInput(this)">
+                        <input id="angle" class="num-input job-input" name="rm" value="0" type="text" onchange="update_storm_track(this);"> &deg;
                     </div>
                 </div>
 
@@ -261,6 +261,9 @@ $(document).ready(function() {
     if(annotate_map_id){
         get_annotations_from_server();
     }
+
+    //force storm track widget on
+    create_storm_track(true);
 
     // Note that the path doesn't matter right now; any WebSocket
     // connection gets bumped over to WebSocket consumers
