@@ -400,7 +400,7 @@ function update_widget(){
     //actually set
     polyline.setLatLngs(latlngs);
 
-    //fix marker
+    //fix sat marker
     sat_marker.angle = angle;
 
     //constrain to circle
@@ -408,6 +408,9 @@ function update_widget(){
 
     //rotate icon
     sat_marker.setRotationAngle(angle * 180 / Math.PI);
+
+    //fix marker
+    marker.setLatLng(new L.LatLng(latitude, longitude), { draggable: 'true' });
 
 }
 
