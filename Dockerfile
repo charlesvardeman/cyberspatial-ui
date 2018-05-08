@@ -28,16 +28,19 @@ RUN pip install --upgrade pip
 RUN pip install GDAL==1.10 --global-option=build_ext --global-option="-I/usr/include/gdal"
 
 RUN mkdir /app
-COPY requirements.txt /app/requirements.txt
+WORKDIR /app
 
+COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt --src /usr/local/src
 
+COPY package.json /app/package.json
+RUN npm install
+
 # Main work directory will be app
-WORKDIR /app
 COPY . /app
 
 # Transpile JS for IE
-RUN npm install && npm run babel
+RUN npm run babel
 
 COPY ./start.sh /start.sh
 COPY ./celary.sh /celary.sh
