@@ -97,16 +97,16 @@
 
                 <!-- tabs for basic/advanced tools -->
                 <ul class="nav nav-tabs nav-justified shp-settings">
-                    <li id="basic" class="nav-item active" style="display:block">
+                    <li id="basic" class="nav-item active">
                         <a class="nav-link" href="#" onclick="tab_flip_tools(true);" >Basic</a>
                     </li>
-                    <li id="advanced" class="nav-item" style="display:none">
+                    <li id="advanced" class="nav-item">
                         <a class="nav-link" href="#" onclick="tab_flip_tools(false);">Advanced</a>
                     </li>
                 </ul>
 
                 <!-- basic tools -->
-                <div id="basic_tools" style="display: none;">
+                <div id="basic_tools" style="display: block;">
                     <p class="slider-label">Storm Intensity</p>
                     <ul class="shp-tool-radios one-line" style="margin-bottom: 30px">
                         <li><input type="radio" name="intensity" value="1" onchange="updateCatagory()" checked> Cat 1</li>
@@ -119,7 +119,7 @@
                 <!-- end Basic tools -->
 
                 <!--Advanced tools -->
-                <div id="advanced_tools" style="display: block;">
+                <div id="advanced_tools" style="display: none;">
 
                     <p class="slider-label">Translational Speed</p>
                     <div class="shp-controls">
