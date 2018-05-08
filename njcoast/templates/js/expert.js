@@ -591,7 +591,7 @@ mymap.on('zoomend', function (event) {
     }
 
     //get zoom
-    var arrow_length = 0.015 * Math.pow(2, 13 - mymap.getZoom());
+    arrow_length = 0.015 * Math.pow(2, 13 - mymap.getZoom());
 
     //get pos
     var position = marker.getLatLng();
