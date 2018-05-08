@@ -707,6 +707,9 @@ function latLngChange(object) {
             object.value = "-77.0000000";
         }
     }
+
+    //update widget
+    update_widget();
 }
 
 /*
