@@ -97,3 +97,6 @@ LOCALE_PATHS = (
     ) + LOCALE_PATHS
 
 TEMPLATES[0]['DIRS'].insert(0, os.path.join(LOCAL_ROOT, "templates"))
+
+# Handle Exported Variables
+TEMPLATES[0]['OPTIONS']['context_processors'].append('njcoast.context_processors.export_vars')

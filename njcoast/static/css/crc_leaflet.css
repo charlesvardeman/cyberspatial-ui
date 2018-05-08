@@ -4,3 +4,12 @@
    -moz-border-radius: 0 !important;
     border-radius: 0 !important;
  }
+
+ .hidden {
+   display:none;
+ }
+
+ textarea {
+     resize: none;
+     padding: 1px 1px 1px 1px;
+ }

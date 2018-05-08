@@ -17,8 +17,8 @@ RUN apt-get update && apt-get install -y \
     python-ldap \
     libmemcached-dev libsasl2-dev zlib1g-dev \
     python-pylibmc \
-    curl \
-	--no-install-recommends && rm -rf /var/lib/apt/lists/*
+    curl npm nodejs\
+	--no-install-recommends && rm -rf /var/lib/apt/lists/* && ln -s /usr/bin/nodejs /usr/bin/node
 
 # Upgrade pip
 RUN pip install --upgrade pip
@@ -27,23 +27,27 @@ RUN pip install --upgrade pip
 # compatible with the provided libgdal-dev
 RUN pip install GDAL==1.10 --global-option=build_ext --global-option="-I/usr/include/gdal"
 
-# Requirements have to be pulled and installed here, otherwise caching won't work
-# COPY ./requirements /requirements
-
 RUN mkdir /app
+WORKDIR /app
+
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt --src /usr/local/src
+
+COPY package.json /app/package.json
+RUN npm install
 
 # Main work directory will be app
-WORKDIR /app
 COPY . /app
 
-RUN pip install --no-cache-dir -r /app/requirements.txt --src /usr/local/src
+# Transpile JS for IE
+RUN npm run babel
 
 COPY ./start.sh /start.sh
 COPY ./celary.sh /celary.sh
 COPY ./entrypoint.sh /entrypoint.sh
-RUN sed -i 's/\r//' /entrypoint.sh \
-    && sed -i 's/\r//' /celary.sh \
+RUN sed -i 's/\r//' /celary.sh \
     && sed -i 's/\r//' /start.sh \
+    && sed -i 's/\r//' /entrypoint.sh \
     && chmod +x /entrypoint.sh \
     && chmod +x /celary.sh \
     && chmod +x /start.sh

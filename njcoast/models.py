@@ -10,6 +10,8 @@ class NJCMap(models.Model):
     )
     name = models.CharField(max_length=50)
     description = models.TextField(blank=True)
+    settings = models.TextField(blank=True)
+    shared_with = models.TextField(blank=True)
     # layers = models.ManyToManyField(Layer, blank=True)
     is_default = models.BooleanField(default=False)
 
@@ -19,7 +21,7 @@ class NJCMap(models.Model):
 class NJCMapAnnotation(models.Model):
     leaflet_id = models.CharField(max_length=50)
     type = models.CharField(max_length=50)
-    text = models.CharField(max_length=250, blank=True, null=True)
+    text = models.TextField(blank=True, null=True)
     data = models.TextField()
     map = models.ForeignKey(NJCMap, on_delete=models.CASCADE)
     owner = models.ForeignKey(
@@ -36,9 +38,14 @@ class NJCMapExpert(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
+        blank=True,
+        null=True
     )
     sim_id = models.CharField(max_length=20)
     user_id = models.CharField(max_length=10)
+    catagory = models.CharField(max_length=20, blank=True)
+    type = models.CharField(max_length=20, blank=True)
+    user_name = models.TextField(blank=True)
     description = models.TextField(blank=True)
     data = models.TextField(blank=True)
     modified    = models.DateTimeField()

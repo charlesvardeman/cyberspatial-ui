@@ -158,3 +158,11 @@ venv.bak/
 db.sqlite3
 .idea/
 
+# Node
+node_modules
+
+# VSCode
+.vscode
+
+# Generated files
+njcoast/static/js/template_js

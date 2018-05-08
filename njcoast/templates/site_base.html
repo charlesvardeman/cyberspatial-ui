@@ -24,13 +24,36 @@
         <link href="{{ STATIC_URL }}lib/css/assets.min.css?v={{ VERSION }}" rel="stylesheet"/>
       {% endif %}
 
+      <script>
+        if(!document.getElementsByClassName) {
+          document.getElementsByClassName = function(className) {
+            return this.querySelectorAll("." + className);
+          };
+          Element.prototype.getElementsByClassName = document.getElementsByClassName;
+        }
+
+        if (SVGElement.prototype.contains === undefined) {
+          SVGElement.prototype.contains = function(el) {
+            return $.contains(this, el);
+          };
+        }
+
+        if (SVGElement.prototype.getElementsByClassName === undefined) {
+          SVGElement.prototype.getElementsByClassName = function(className) {
+            return this.querySelectorAll('.' + className);
+          };
+        }
+      </script>
+
       <link href="{{ STATIC_URL }}geonode/css/ext-compatibility.css?v={{ VERSION }}" rel="stylesheet" />
       <link href="{{ STATIC_URL }}geonode/css/base.css?v={{ VERSION }}" rel="stylesheet" />
       <link href="{{ STATIC_URL }}css/site-base.css" rel="stylesheet"/>
       <style type="text/css">[ng\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}</style>
-
-          <link href="{% static 'css/njcoast-style.css' %}" rel="stylesheet"/>
-
+      <link href="{% static 'css/njcoast-style.css' %}" rel="stylesheet"/>
+      <script>
+          var simulationPath = "{{ SIMULATION_BUCKET }}";
+          var userSimulationPath = "{{ SIMULATION_BUCKET }}/{{ USER_SIMULATION_BUCKET}}";
+      </script>
       {% block extra_head %}
       {% endblock %}
     {% endblock %}
@@ -91,10 +114,6 @@
                               <li> <a href="{% url "new_map" %}">{% trans "Create Map" %}</a></li>
                         </ul>
                   </li>
-              {% elif user.is_authenticated %}
-                  <li id="nav_maps">
-                        <a href="{% url "maps_browse" %}" role="button">{% trans "Map" %}</a>
-                  </li>
               {% endif %}
             <li>
             {% if user.is_superuser %}
@@ -112,8 +131,22 @@
                         <li><a href="{% url "group_create" %}">{% trans "Create Group" %}</a></li>
                         {% endif %}
                   </ul>
+            {% elif user.is_authenticated %}
+	            <a href="#"resources" %}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Resources" %}<i class="fa fa-angle-down fa-lg"></i></a>
+                  <ul class="dropdown-menu">
+                    <li><a href="{% url "faq" %}" role="button">{% trans "FAQ" %}</a></li>
+                    <li><a href="{% url "shp" %}" role="button">{% trans "SHP Tool" %}</a></li>
+                    <li><a href="{% url "about" %}" role="button">{% trans "Documentation" %}</a></li>
+                    <li><a href="{% url "about" %}" role="button">{% trans "Tutorials" %}</a></li>
+                  </ul>
+                <li><a href="{% url "about" %}" role="button">{% trans "About" %}</a></li>
             {% else %}
-                  <a href="{% url "about" %}" role="button">{% trans "About" %}</a>
+	            <a href="#"resources" %}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Resources" %}<i class="fa fa-angle-down fa-lg"></i></a>
+                  <ul class="dropdown-menu">
+                    <li><a href="{% url "faq" %}" role="button">{% trans "FAQ" %}</a></li>
+                    <li><a href="{% url "shp" %}" role="button">{% trans "SHP Tool" %}</a></li>
+                  </ul>
+                  <li><a href="{% url "about" %}" role="button">{% trans "About" %}</a></li>
             {% endif %}
             </li>
 
@@ -122,18 +155,6 @@
             {% endblock %}
           </ul>
 	      <ul class="nav navbar-nav navbar-right">
-            <!-- <li>
-              <div class="search">
-                <form id="search" action="{% url "search" %}" >
-                  <span class="fa fa-search"></span>
-                  {% if HAYSTACK_SEARCH %}
-                  <input id="search_input" type="text" placeholder="Search" name="q">
-                  {% else %}
-                  <input id="search_input" type="text" placeholder="Search" name="title__icontains">
-                  {% endif %}
-                </form>
-              </div>
-	        </li> -->
             {% if not user.is_authenticated and ACCOUNT_OPEN_SIGNUP %}
             <li><a href="{% url "account_signup" %}">{% trans "Register" %}</a></li>
             {% endif %}
@@ -214,69 +235,158 @@
   <footer>
     <div class="container">
       <div class="row">
-        <!-- <div class="col-md-2">
-          <ul class="list-unstyled">
-            <li>Data</li>
-            <li><a href="{% url "layer_browse" %}">{% trans "Layers" %}</a></li>
-            <li><a href="{% url "document_browse" %}">{% trans "Documents" %}</a></li>
-            {% if user.is_authenticated %}
-            <li><a href="{% url "services" %}">{% trans "Remote Services" %}</a></li>
-            <li><a href="{% url "layer_upload" %}">Upload Layer</a></li>
-            {% if 'geonode.contrib.createlayer' in INSTALLED_APPS %}
-              <li><a href="{% url "layer_create" %}">{% trans "Create Layer" %}</a></li>
-            {% endif %}
-            <li><a href="{% url "document_upload" %}">Upload Document</a></li>
-            <li><a href="{% url "register_service" %}">{% trans "Add Remote Service" %}</a></li>
-            {% endif %}
-          </ul>
-        </div>
         <div class="col-md-2">
           <ul class="list-unstyled">
-            <li>Maps</li>
-            <li><a href="{% url "maps_browse" %}">{% trans "Explore Maps" %}</a></li>
-            {% if user.is_authenticated %}
-            <li> <a href="{% url "new_map" %}">{% trans "Create Map" %}</a></li>
-            {% endif %}
+            <li>Data</li>
+            <li><a href="/layers/">Layers</a></li>
+            <li><a href="/documents/">Documents</a></li>
           </ul>
         </div>
-		<div class="col-md-2">
-          <ul class="list-unstyled">
-            <li>About</li>
-            <li><a href="{% url "profile_browse" %}">{% trans "People" %}</a></li>
-            <li><a href="{% url "group_list" %}">{% trans "Groups" %}</a></li>
-            {% if perms.announcements.can_manage %}
-            <li><a href="{% url "announcements_list" %}">{% trans "Announcements" %}</a></li>
-            {% endif %}
-            {% if user.is_superuser %}
-            <li><a href="/admin/people/profile/add/">{% trans "Add User" %}</a></li>
-            <li><a href="{% url "account_invite_user" %}">{% trans "Invite User" %}</a></li>
-            <li><a href="{% url "group_create" %}">{% trans "Create Group" %}</a></li>
-            {% endif %}
-          </ul>
-        </div>
-      -->
-        <div class="col-md-12 text-right">
+      <div class="col-md-2">
+        <ul class="list-unstyled">
+          <li>Maps</li>
+          <li><a href="/maps/">Explore Maps</a></li>
+        </ul>
+      </div>
+      <div class="col-md-2">
+        <ul class="list-unstyled">
+          <li>About</li>
+          <li><a href="/people/">People</a></li>   
+          <li><a href="/groups/">Groups</a></li>
+        </ul>
+      </div>
+        <div class="col-md-6 text-right">
           <ul class="list-unstyled">
             <li>{% trans "Powered by" %} <a href="http://geonode.org">{% trans "GeoNode" %}</a> <em>{% trans "version" %} {{ VERSION }}</em></li>
-            <!-- <li><a href="{% url "developer" %}">{% trans "Developers" %}</a> | <a href="{% url "about" %}">{% trans "About" %}</a><li> -->
+            <li><a href="/developer">Developers</a> | <a href="/about">About</a></li>
           </ul>
-          <!-- <label class="hidden">{% trans "Language" %}</label>
-          {% if csrf_token != "NOTPROVIDED" %}
-          {% get_current_language as LANGUAGE %}
-          <form class="form-inline" action="/i18n/setlang/" method="post">
-          {% csrf_token %}
+        <label class="hidden">Language</label>
+        <form class="form-inline" action="/i18n/setlang/" method="post">
+          <input type='hidden' name='csrfmiddlewaretoken' value='KYnTyykJtly0xoMBQb3mzsmockWyZqDN' />
             <select class="col-md-6 pull-right" name="language" onchange="javascript:form.submit()">
-              {% for lang in LANGUAGES %}
-              <option value="{{ lang.0 }}" {% ifequal LANGUAGE_CODE lang.0 %} selected="selected"{% endifequal %}>
-                {{ lang.1 }}
+              <option value="en"  selected="selected">
+                English
               </option>
-              {% endfor %}
+              
+              <option value="es" >
+                Español
+              </option>
+              
+              <option value="it" >
+                Italiano
+              </option>
+              
+              <option value="fr" >
+                Français
+              </option>
+              
+              <option value="de" >
+                Deutsch
+              </option>
+              
+              <option value="el" >
+                Ελληνικά
+              </option>
+              
+              <option value="id" >
+                Bahasa Indonesia
+              </option>
+              
+              <option value="zh-cn" >
+                中文
+              </option>
+              
+              <option value="ja" >
+                日本語
+              </option>
+              
+              <option value="fa" >
+                Persian
+              </option>
+              
+              <option value="ar" >
+                Arabic
+              </option>
+              
+              <option value="bn" >
+                Bengali
+              </option>
+              
+              <option value="ne" >
+                Nepali
+              </option>
+              
+              <option value="sq" >
+                Albanian
+              </option>
+              
+              <option value="af" >
+                Afrikaans
+              </option>
+              
+              <option value="sw" >
+                Swahili
+              </option>
+              
+              <option value="pt" >
+                Portuguese
+              </option>
+              
+              <option value="pt-br" >
+                Portuguese (Brazil)
+              </option>
+              
+              <option value="ru" >
+                Russian
+              </option>
+              
+              <option value="vi" >
+                Vietnamese
+              </option>
+              
+              <option value="ko" >
+                한국어
+              </option>
+              
+              <option value="am" >
+                Amharic
+              </option>
+              
+              <option value="km" >
+                Khmer
+              </option>
+              
+              <option value="pl" >
+                Polish
+              </option>
+              
+              <option value="sv" >
+                Swedish
+              </option>
+              
+              <option value="th" >
+                ไทย
+              </option>
+              
+              <option value="uk" >
+                Ukranian
+              </option>
+              
+              <option value="si" >
+                Sinhala
+              </option>
+              
+              <option value="ta" >
+                Tamil
+              </option>
+              
+              <option value="tl" >
+                Tagalog
+              </option>
             </select>
           </form>
-          {% endif %}-->
         </div>
-      </div>
-    </div>
+      </div> 
   </footer>
   {% endblock footer %}
 

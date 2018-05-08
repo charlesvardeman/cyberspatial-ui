@@ -25,9 +25,15 @@
     <!-- Load Leaflet Editable code -->
     <script src="{% static "js/Leaflet.Editable.js" %}"></script>-->
 
+    <!-- Load Leaflet Heatmap -->
+    <script src="{% static "js/heatmap.min.js" %}"></script>
+    <script src="{% static "js/leaflet-heatmap.js" %}"></script>
+    <script src="{% static 'js/template_js/heatmaps.js' %}"></script>
+
     <!-- load mods to leaflet for rectangular popups/map icons -->
     <link rel="stylesheet" type="text/css" href="{% static "css/crc_leaflet.css" %}" media="screen" />
     <link rel="stylesheet" type="text/css" href="{% static "css/fontawesome-all.min.css" %}" media="screen" />
+    <style> .leaflet-zoom-hide { position: absolute!important; } </style>
 
 {% endblock extra_head %}
 
@@ -38,24 +44,6 @@
 
 <div class="container-fluid">
     <div class="page-header map-header">
-        <!--<p>keansburg <span>|</span> planning</p> -->
-        <!-- <div id="leaflet-map-menu">
-            <div class="dropdown show title-drop pull-right">
-                <a class="btn btn-title dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                    Standard Planning Map <i class="fa fa-caret-down" style="margin-left: 10px"
-                                             aria-hidden="true"></i>
-                </a>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item" href="#">My Custom Map #1</a>
-                    <a class="dropdown-item" href="#">Smith's Planning Map</a>
-                    <a class="dropdown-item" href="#">Hurricane Jose Map - Annotated</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">Browse All Maps</a>
-                </div>
-            </div>
-            <img class="img-responsive" src="{% static 'images/map-page-icons.png' %}"/>
-        </div>-->
     </div>
     <div class="row">
 
@@ -64,10 +52,14 @@
         </div>
         <div class="col-sm-4 col-lg-3 col-xl-2" id="map-control-panel">
             <div class="map-control-item">
+                <h4 id="map_name" class="map-control-item-heading"></h4>
+                <p id="map_description" class="qualifier" style="margin-bottom: 0"></p>
+            </div>
+            <div class="map-control-item">
 
                 <a data-toggle="collapse" href="#gisLayers" aria-expanded="false" aria-controls="gisLayers">
                     <h4 class="map-control-item-heading">GIS Layers
-            <i class="fa fa-chevron-down pull-right" aria-hidden="true"></i></h4>
+                        <i class="fa fa-chevron-down pull-right" aria-hidden="true"></i></h4>
                     <p class="qualifier" style="margin-bottom: 0">for Planning role</p>
                 </a>
                 <div class="collapse in" id="gisLayers">
@@ -110,13 +102,30 @@
 
             <div class="map-control-item">
                 <p class="qualifier" style="margin-top: 10px">Save current map configuration (e.g. active layers and annotations), copy the map and save with a new name, or download the map.</p>
-                <button id="save_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="save_annotation_elements();">Save Map</button>
-                <button id="load_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="get_annotations_from_server();">Load Map</button>
+                <button id="save_map" class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="" onclick="save_map();">Save Map</button>
+                <button id="load_map" class="btn btn-secondary btn-md btn-block disabled" disabled data-toggle="popover" data-target="" onclick="load_map();">Load Map</button>
                 <!--<button id="load_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="load_annotation_elements();">Load Map</button>-->
                 <div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Download Map
                         </button></div>
-                <div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Share Map
-                        </button></div>
+
+                {% if map_id %}
+                <a data-toggle="collapse" href="#users" aria-expanded="false" aria-controls="users">
+                    <h4 class="map-control-item-heading">Sharing<i class="fa fa-chevron-down pull-right"
+                                                                               aria-hidden="true"></i></h4>
+                    <p class="qualifier" style="margin-bottom: 0">Share maps with other users</p>
+                </a>
+                <div class="collapse" id="users">
+                    <p style="margin-top: 10px"><button id="share_map" class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="" onclick="save_shared_with();">Share Map</button></p>
+                    <p class="qualifier" style="margin-top: 10px">Select users in my group to share with</p>
+                    <ul class="dashboard-list">
+                      {% for user in users_in_group %}
+                      <li>
+                        <p><input id="share-{{ forloop.counter }}" name="{{ user }}" type="checkbox" value="on" data-toggle="popover" data-placement="right"> {{ user }}</p>
+                      </li>
+                      {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
             </div>
         </div>
 
@@ -125,173 +134,165 @@
 {% endblock middle %}
 
 {% block extra_script %}
-<script src="{% static 'js/utilities.js' %}"></script>
+<script src="{% static 'js/template_js/utilities.js' %}"></script>
 <script src="{% static 'js/notify.min.js' %}"></script>
 
-    <script type=text/javascript>
-        //fix for callable js
-        var annotate_map_id = null;
-        {% if map_id %}
-            var annotate_map_id = {{ map_id }};
-        {% endif %}
-        
-        var marker_icon_image = "{% static "images/marker-icon-2x-red.png" %}";
-        var marker_icon_shadow = "{% static "images/marker-shadow.png" %}";
+<script type=text/javascript>
+    var marker_icon_image = "{% static "images/marker-icon-2x-red.png" %}";
+    var marker_icon_shadow = "{% static "images/marker-shadow.png" %}";
+    var owner = {{ user.id }};
+    var home_latitude = {{ home_latitude }};
+    var home_longitude = {{ home_longitude }};
+    var home_zoom = {{ zoom_level }};
 
-        //
-        var owner = {{ user.id }};
+    var annotate_map_id = null;
+    {% if map_id %}
+        annotate_map_id = {{ map_id }};
+    {% endif %}
+    var annotationLayer = new L.LayerGroup();
 
-        /*
-        Base Map -- Centered on Keansburg, NJ
-        WMS Tile Layers
-        Data: Watershed Boundary Dataset - National Hydrography Overlay Map Service
-              https://catalog.data.gov/dataset/usgs-national-watershed-boundary-dataset-wbd-
-              downloadable-data-collection-national-geospatial-/resource/f55f881d-9de8-471f-9b6b-22cd7a98025d
-        XML: https://services.nationalmap.gov/arcgis/services/nhd/MapServer/WMSServer?request=GetCapabilities&service=WMS
-         */
-        var mymap = L.map('mapid', {editable: true}).setView([{{ home_latitude }}, {{ home_longitude }}], {{ zoom_level }});
-        var layer_list = [];
-        var layer_groups = [];
+    var mymap = L.map('mapid', { zoomControl: false, editable: true }).setView([ home_latitude, home_longitude ], home_zoom );
+</script>
 
-        // Setup Scale View
-        var scale_options = { metric: false, imperial: false, maxWidth: 200 };
+<script src="{% static 'js/template_js/map.js' %}"></script>
+<script src="{% static 'js/template_js/annotate_maps.js' %}"></script>
 
-        var language = window.navigator.userLanguage || window.navigator.language;
-        if( language == "en-US" ){
-            scale_options.imperial = true;
-        }else{
-            scale_options.metric = true;
-        }
+<script type=text/javascript>
+$(document).ready(function() {
+    $('.beta-feature-not-available').tooltip({
+        title: "Feature not available at this time",
+        placement: "top",
+        width: '300px'
+    });
 
-        L.control.scale(scale_options).addTo(mymap);
+    //add annotation layer
+    annotationLayer.addTo(mymap);
 
-        //~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        $(document).ready(function () {
+    //load current annotations
+    if(annotate_map_id){
+        get_annotations_from_server();
+    }
 
-            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-                maxZoom: 18,
-                attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-                '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-                'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-                id: 'mapbox.streets'
-            }).addTo(mymap);
+    // Note that the path doesn't matter right now; any WebSocket
+    // connection gets bumped over to WebSocket consumers
+    if(annotate_map_id) {
+        var websocket_protocol = window.location.protocol.indexOf("https") >= 0 ? "wss://" : "ws://";
+        socket = new WebSocket(websocket_protocol + window.location.host + "/map-socket/" + annotate_map_id + "/");
+        socket.onmessage = function(e) {
+            //onMapClick(e.data);
+            // alert('received socket');
+            console.log(e.data)
+            var socket_object = JSON.parse(e.data)
+            console.log(socket_object)
 
-            get_layers_from_server();
-
-        });
-
-        /*
-        Ajax call to the server. Returns JSON with layers in it.
-        TODO: Will need to update url to GeoServer eventually
-         */
-        function get_layers_from_server() {
-            $.ajax({
-                type: "GET",
-                url: "/api/my_layers/",
-                data: {},
-                dataType: "json",
-                success: function (result) {
-                    console.log("GIS LAYERS -- SUCCESS!");
-                    console.log(result.layers);
-                    process_layers(result.layers);
-                },
-                error: function (result) {
-                    console.log("ERROR:", result)
-                }
-            });
-        }
-
-        /*
-        Function to pull the layer groups out and call the appropriate function
-        for layer group or layer to be added to the menu.
-         */
-        function process_layers(layers) {
-
-            layers.forEach(function (item) {
-                // Get layer groups
-                layer_groups.push(item.group);
-
-            });
-            layer_groups = layer_groups.unique();
-            console.log(layer_groups);
-
-            layer_groups.forEach(function (group) {
-                // Add the layer category group to the menu
-               add_layer_group_to_menu(group);
-
-               // For each layer in the layers list, if the group matches the current group
-                // add that layer to the unordered list
-               layers.forEach(function (layer){
-                  if(layer.group == group) {
-                      var ul_object = '#' + camelize(layer.group.toLowerCase());
-                      add_layer_to_menu(layer, ul_object)
-                  }
-               });
-            });
-
-        }
-
-        /*
-        The base #layerGroup template is hidden by default. Cloning the template and
-        it's children allows us to edit the attributes of each #layerGroup individually.
-
-        Attributes are formatted in the exact same way as Kristina's mockups to retain functionality.
-        Could likely be simplified, but camelizing the lowercase strings wasn't too difficult.
-         */
-        function add_layer_group_to_menu(layerGroup) {
-            var group_template = $('#layerGroup').clone(true);
-            $(group_template).find('span').html(layerGroup);
-            $(group_template).find('a').attr('href', '#' +
-                camelize(layerGroup.toLowerCase())).attr('aria-controls', camelize(layerGroup.toLowerCase()));
-            $(group_template).find('ul').attr('id', camelize(layerGroup.toLowerCase()));
-            $(group_template).removeClass('hidden');
-            $("#gisLayers").append(group_template);
-        }
-
-        /*
-        Add the individual layers to the menu under the appropriate layer category group.
-        Params: layer - the layer to add to the menu (complete layer object)
-                ul_id - the id of the unordered list in which to append the layer.
-         */
-        function add_layer_to_menu(layer, ul_id) {
-            // Create the HTML <li> for each layer and append to the <ul>
-            var layer_html = '<li><input id="' + $.trim(layer.id) + '" type="checkbox"> ' + $.trim(layer.name) + '</li>';
-            $(ul_id).append(layer_html);
-            layer.maplayer = L.tileLayer.wms(layer.layer_link, {layers: layer.layer, transparent: true, format: 'image/png'});
-            layer_list.push(layer);
-
-            $('#' + $.trim(layer.id)).click(function () {
-                {#var link = layer.layer_link;#}
-                if ($(this).is(':checked')) {
-                    for(var i=0; i<layer_list.length; i++) {
-                        if (layer_list[i].id == this.id){
-                            console.log("found matching layer: " + this.id);
-                            layer_list[i].maplayer.addTo(mymap);
+            //update if we are not the annotator #TODO how to enforce? Or many to many?
+            //now just ignore comms from myself
+            if (socket_object.myid != myid) {
+                //find if adding or modifying objects
+                var object = null;
+                annotationLayer.eachLayer(function(layer) {
+                    // layer.feature is probably defined, to create marker, do something like this
+                    if (layer.myCustomID == socket_object.data.id) {
+                        console.log("Found " + layer.myCustomID);
+                        object = layer;
+                    }
+                });
+                if (object == null) {
+                    //set coloring according to owner
+                    var color_param = {};
+                    var icon_param = {};
+                    if (socket_object.owner != owner) {
+                        color_param = {
+                            color: '#C92D40'
+                        };
+                        icon_param = {
+                            icon: redIcon
+                        };
+                    }
+                    //need to create object here
+                    var newobject = null;
+                    console.log("Objects " + socket_object.type);
+                    //create
+                    if (socket_object.type == 'marker') {
+                        newobject = L.marker([socket_object.data.latitude, socket_object.data.longitude], icon_param);
+                    } else if (socket_object.type == 'polygon' || socket_object.type == 'polyline') {
+                        console.log("Points " + socket_object.data.points);
+                        var points = JSON.parse(socket_object.data.points);
+                        //console.log("Points " + points.length + "," + points[0][0]);
+                        if (socket_object.type == 'polyline') {
+                            newobject = L.polyline(points, color_param);
+                        } else {
+                            newobject = L.polygon(points, color_param);
                         }
+                    } else if (socket_object.type == 'circle') {
+                        newobject = L.circle([socket_object.data.latitude, socket_object.data.longitude], socket_object.data.radius, {
+                            color: '#C92D40'
+                        });
+                    }
+
+                    //set id and add to layer
+                    if (newobject != null) {
+                        newobject.myCustomID = socket_object.data.id;
+                        newobject.owned = false;
+
+                        //add to layer
+                        annotationLayer.addLayer(newobject);
+
+                        var popup_text = socket_object.data.text;
+
+                        //do I own it? if so editable
+                        if (socket_object.owner == owner) {
+                            //setup popup for editing
+                            if (popup_text == null) {
+                                popup_text = "Input text ...";
+                            }
+
+                            popup_text = load_popup_html(popup_text, popup_text.length);
+
+                            newobject.enableEdit(); //editing
+                            newobject.owned = true;
+                        }
+
+                        if (popup_text == null) {
+                            popup_text = "Undefined";
+                        }
+
+                        //setup popup
+                        newobject.bindPopup(popup_text);
+                        newobject.on('click', function(e) {
+                            this.openPopup();
+                        });
                     }
                 } else {
-                    for(var i=0; i<layer_list.length; i++) {
-                        if (layer_list[i].id == this.id){
-                            console.log("found matching layer: " + this.id);
-                            mymap.removeLayer(layer_list[i].maplayer);
+                    //modify or delete
+                    if (socket_object.type == 'delete') {
+                        annotationLayer.removeLayer(object);
+                    } else if (socket_object.type == 'marker') {
+                        object.setLatLng([socket_object.data.latitude, socket_object.data.longitude]);
+                    } else if (socket_object.type == 'polygon' || socket_object.type == 'polyline') {
+                        var points = JSON.parse(socket_object.data.points);
+                        object.setLatLngs(points);
+                    } else if (socket_object.type == 'circle') {
+                        object.setLatLng([socket_object.data.latitude, socket_object.data.longitude]);
+                        object.setRadius(socket_object.data.radius);
+                    } else if (socket_object.type == 'popup') {
+                        //add editing if I own it!
+                        if (socket_object.owner != owner) {
+                            object.setPopupContent(socket_object.data.text);
+                        } else {
+                            object.setPopupContent(load_popup_html(socket_object.data.text, socket_object.data.text.length));
                         }
                     }
                 }
-            });
+
+            }
         }
-
-      $(function () {
-        $('.beta-feature-not-available').tooltip(
-          {
-            title: "Feature not available at this time",
-            placement: "top",
-            width: '300px'
-          });
-      });
-
-
-    </script>
-
-    <script src="{% static 'js/template_js/annotate_maps.js' %}"></script>
-
+        socket.onopen = function() {
+            //socket.send("joining map annotation for map " + annotate_map_id);
+        }
+        // Call onopen directly if socket is already open
+        if (socket.readyState == WebSocket.OPEN) socket.onopen();
+    }
+});
+</script>
 {% endblock extra_script %}

@@ -760,6 +760,15 @@ li.shp-scenario span {
   font-size: 0.7em;
 }
 
+.faq {
+  margin: 20px 0 40px;
+}
+.faq h4 {
+  color: #f07d20;
+  letter-spacing: .5px;
+  margin: 30px 0 5px;
+}
+
 @media screen and (max-width: 768px) {
 
   .jumbotron.njcoast-image .action-box {
