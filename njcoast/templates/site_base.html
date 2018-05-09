@@ -261,10 +261,15 @@
             <li><a href="/developer">Developers</a> | <a href="/about">About</a></li>
           </ul>
         <label class="hidden">Language</label>
+
         <form class="form-inline" action="/i18n/setlang/" method="post">
-          <input type='hidden' name='csrfmiddlewaretoken' value='KYnTyykJtly0xoMBQb3mzsmockWyZqDN' />
-            <select class="col-md-6 pull-right" name="language" onchange="javascript:form.submit()">
-              <option value="en"  selected="selected">
+          <input type='hidden' name='csrfmiddlewaretoken' value='{{ csrf_token }}'/>
+            <select class="col-md-6 pull-right" name="language" oninput="javascript:form.submit()">
+              <option value="en" selected hidden> 
+                English
+              </option>
+               
+              <option value="en">
                 English
               </option>
               
