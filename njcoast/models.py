@@ -57,3 +57,12 @@ class NJCMapExpert(models.Model):
 
     def __str__(self):
         return self.sim_id
+
+class NJCMunicipality(models.Model):
+    name = models.CharField(max_length=20)
+    home_latitude = models.CharField(max_length=20)
+    home_longitude = models.CharField(max_length=20)
+    zoom_level = models.PositiveIntegerField()
+
+    def __str__(self):
+        return self.name
