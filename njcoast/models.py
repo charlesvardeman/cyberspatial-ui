@@ -2,6 +2,11 @@
 from django.db import models
 from django.conf import settings
 from geonode.layers.models import Layer
+from geonode.people.models import Profile
+
+class NJCUserMeta(models.Model):
+    user = models.OneToOneField(Profile)
+    is_dca_approved = models.BooleanField(default=False)
 
 class NJCMap(models.Model):
     owner = models.ForeignKey(
