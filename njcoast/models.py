@@ -7,6 +7,8 @@ from geonode.people.models import Profile
 class NJCUserMeta(models.Model):
     user = models.OneToOneField(Profile)
     is_dca_approved = models.BooleanField(default=False)
+    municipality = models.ForeignKey('NJCMunicipality',
+                        on_delete=models.CASCADE,blank=True,null=True)
 
 class NJCMap(models.Model):
     owner = models.ForeignKey(
