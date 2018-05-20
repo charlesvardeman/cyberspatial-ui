@@ -82,6 +82,7 @@ class NJCMunicipality(models.Model):
     home_latitude = models.CharField(max_length=20)
     home_longitude = models.CharField(max_length=20)
     zoom_level = models.PositiveIntegerField()
+    code = models.PositiveIntegerField()
 
     def __str__(self):
         return self.name
