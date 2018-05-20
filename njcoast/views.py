@@ -18,6 +18,8 @@ from datetime import datetime
 from django.shortcuts import render, redirect
 from .forms import SignUpForm
 from .models import NJCUserMeta
+from django import forms
+
 '''
   This function is used to respond to ajax requests for which layers should be
   visible for a given user. Borrowed a lot of this from the GeoNode base code
@@ -435,25 +437,29 @@ class ExploreTemplateView(TemplateView):
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
-        if form.is_valid():
-            #create user/profile
-            user = form.save(commit=False)
+        try:
+            if form.is_valid():
+                #create user/profile
+                user = form.save(commit=False)
 
-            #force inactive as we need to approve
-            user.is_active = False
+                #force inactive as we need to approve
+                user.is_active = False
 
-            #save Profile so that we append the NJC additional parameters
-            user.save()
+                #save Profile so that we append the NJC additional parameters
+                user.save()
 
-            #now we can populate the additional fields
-            #user.njcusermeta.is_dca_approved = True
-            user.njcusermeta.municipality = NJCMunicipality.objects.get(name=form.cleaned_data.get('municipality'))
+                #now we can populate the additional fields
+                #user.njcusermeta.is_dca_approved = True
+                user.njcusermeta.municipality = NJCMunicipality.objects.get(name=form.cleaned_data.get('municipality'))
 
-            #now save everything
-            user.save()
+                #now save everything
+                user.save()
 
-            #back home, or flag that save was successful
-            return redirect('home')
+                #back home, or flag that save was successful
+                return redirect('home')
+        except:
+            print "Username or email address already in use!"
+            return render(request, 'signup.html', {'form': form, 'error_data': 'User or email exists, please select an alternative!'})
     else:
         form = SignUpForm()
-    return render(request, 'signup.html', {'form': form})
+    return render(request, 'signup.html', {'form': form, 'error_data': ''})
