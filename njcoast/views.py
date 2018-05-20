@@ -4,7 +4,7 @@ from django.conf import settings
 from geonode.layers.models import Layer
 from django.views.generic import TemplateView
 import json
-from models import NJCMap, NJCMapAnnotation, NJCMapExpert
+from models import NJCMap, NJCMapAnnotation, NJCMapExpert, NJCMunicipality
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -436,12 +436,6 @@ def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            #form.save()
-            #username = form.cleaned_data.get('username')
-            #raw_password = form.cleaned_data.get('password1')
-            #user = authenticate(username=username, password=raw_password)
-            #login(request, user)
-
             #create user/profile
             user = form.save(commit=False)
 
@@ -452,14 +446,8 @@ def signup(request):
             user.save()
 
             #now we can populate the additional fields
-            user.njcusermeta.is_dca_approved = True
-
-            #play area
-            #user.njcusermeta.municipality = form.cleaned_data.get('municipality')
-            #actualuser = User(username = user.username)
-            #actualuser.refresh_from_db()  # load the profile instance created by the signal
-            #NJCUserMeta.objects.get(user__username == user.name).municipality = form.cleaned_data.get('municipality')
-            print form.cleaned_data.get('municipality')
+            #user.njcusermeta.is_dca_approved = True
+            user.njcusermeta.municipality = NJCMunicipality.objects.get(name=form.cleaned_data.get('municipality'))
 
             #now save everything
             user.save()
