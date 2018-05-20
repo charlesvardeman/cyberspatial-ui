@@ -10,7 +10,7 @@ class SignUpForm(ProfileCreationForm):
     last_name = forms.CharField(max_length=30, required=True, help_text='Required.')
     municipality = forms.ModelChoiceField(queryset=NJCMunicipality.objects)
     role = forms.ModelChoiceField(queryset=NJCRole.objects)
-    justification = forms.CharField(max_length=254, help_text='Required. Please write a justification for your request.')
+    justification = forms.CharField(widget=forms.Textarea(attrs={'cols' : "25", 'rows': "2", }),max_length=254, help_text='Required. Please write a justification for your request.')
 
     class Meta:
         model = Profile
