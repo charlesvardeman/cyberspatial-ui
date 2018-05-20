@@ -1,0 +1,379 @@
+{% extends 'site_base.html' %}
+{% load i18n %}
+{% load staticfiles %}
+{% load base_tags %}
+
+{% block body_class %}home{% endblock %}
+
+{% block middle %}
+<div class="jumbotron njcoast-image slimmer"></div>
+
+<div class="gray-zone">
+    <div class="container-fluid">
+        <div class="page-header" style="border: none">
+            <!--<a href="admin-dca-change.html" class="btn btn-primary btn-md pull-right">Edit DCA Approvers</a>-->
+            <h3>DCA Administrator Controls</h3>
+        </div>
+
+        <ul class="nav nav-tabs nav-justified admin-tabs">
+            <li id="tab_1" onclick="flip_tabs(this);" class="active"><a href="#"><span class="fa fa-user-circle"></span> Municipal Approvers</a></li>
+            <li id="tab_2" onclick="flip_tabs(this);"><a href="#"><span class="fa fa-users"></span> All NJcoast Users</a></li>
+            <li id="tab_3" onclick="flip_tabs(this);"><a href="#"><span class="fa fa-exclamation-circle"></span> Account Requests</a></li>
+        </ul>
+
+        <!-- municipalities code ---------------------------------------------->
+        <div id="data_1">
+            <div class="filter-bkgrnd, hidden">
+
+                <div class="row">
+                    <div class="col-sm-4">
+
+                        <span class="f-label">Filters:</span>
+
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            County <span class="caret"></span>
+          </button>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">Atlantic</a></li>
+                                <li><a href="#">Bergen</a></li>
+                                <li><a href="#">Burlington</a></li>
+                                <li><a href="#">Camden</a></li>
+                            </ul>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-8">
+
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Search table for...">
+                            <span class="input-group-btn">
+              <button class="btn btn-default" type="button"><span class="fa fa-search"></span></button>
+                            </span>
+                        </div>
+                        <!-- /input-group -->
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="table-bkgrnd">
+
+                <table class="table table-hover admin">
+                    <tbody>
+                        <tr>
+                            <th>Code <span class="fa fa-sort"></span></th>
+                            <th>Municipality <span class="fa fa-sort"></span></th>
+                            <th>Name <span class="fa fa-sort"></span></th>
+                            <th>Position <span class="fa fa-sort"></span></th>
+                            <th>Email</th>
+                            <th>Notes</th>
+                            <th</th>
+                        </tr>
+                        <tr>
+                            <td>1506</td>
+                            <td>Berkeley Twp</td>
+                            <td>John Camera</td>
+                            <td class="position">Township Administrator</td>
+                            <td><a>jcamera@twp.berkeley.nj.us</a></td>
+                            <td class="notes">Approved 2-2-2018 by sthompson; Second note added later</td>
+                            <td><a href="admin-ma-profile.html"><span class="fa fa-info-circle"></span></a></td>
+                        </tr>
+                        <tr>
+                            <td>1323</td>
+                            <td>Keansburg Boro</td>
+                            <td>Edward P. Striedl</td>
+                            <td class="position">Construction / Code Enforcement / Zoning Officer, Floodplain Manager</td>
+                            <td><a>ed.striedl@keansburg-nj.us</a></td>
+                            <td class="notes">Approved 12-14-2017 by khenderson</td>
+                            <td><a href="admin-ma-profile.html"><span class="fa fa-info-circle"></span></a></td>
+                        </tr>
+                        <tr>
+                            <td>0101</td>
+                            <td>Absecon City</td>
+                            <td class="null">n/a</td>
+                            <td class="position null">n/a</td>
+                            <td class="null">n/a</td>
+                            <td class="notes"></td>
+                            <td><a href="admin-ma-profile-null.html"><span class="fa fa-info-circle"></span></a></td>
+                        </tr>
+                        <tr>
+                            <td>0102</td>
+                            <td>Atlantic City</td>
+                            <td class="null">n/a</td>
+                            <td class="position null">n/a</td>
+                            <td class="null">n/a</td>
+                            <td class="notes"></td>
+                            <td><a href="admin-ma-profile-null.html"><span class="fa fa-info-circle"></span></a></td>
+                        </tr>
+                        <tr>
+                            <td>0103</td>
+                            <td>Brigantine City</td>
+                            <td class="null">n/a</td>
+                            <td class="position null">n/a</td>
+                            <td class="null">n/a</td>
+                            <td class="notes"></td>
+                            <td><a href="admin-ma-profile-null.html"><span class="fa fa-info-circle"></span></a></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+        <!-- END munivcipalities code ----------------------------------------->
+
+        <!-- njcoast users ---------------------------------------------------->
+        <div id="data_2" class="hidden">
+            <div class="filter-bkgrnd">
+                <div class="row">
+                    <div class="col-sm-8">
+
+                        <ul class="selected">
+                            <li>Your selection:</li>
+                            <li>Berkeley Twp <span class="fa fa-times"></span></li>
+                        </ul>
+
+                    </div>
+                    <div class="col-sm-4">
+
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Search table for...">
+                            <span class="input-group-btn">
+                  <button class="btn btn-default" type="button"><span class="fa fa-search"></span></button>
+                            </span>
+                        </div>
+                        <!-- /input-group -->
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="table-bkgrnd">
+
+                <div class="row">
+                    <div class="col-sm-2">
+
+                        <ul class="user-filters">
+                            <li>Status <span class="fa fa-chevron-down pull-right"></span></li>
+                            <ul>
+                                <li><input type="checkbox"> Pending</li>
+                                <li><input type="checkbox"> Active</li>
+                                <li><input type="checkbox"> Inactive</li>
+                            </ul>
+                            <li>County <span class="fa fa-chevron-right pull-right"></span></li>
+                            <li>Municipality <span class="fa fa-chevron-right pull-right"></span></li>
+                            <li>Role <span class="fa fa-chevron-right pull-right"></span></li>
+                        </ul>
+
+                    </div>
+
+                    <div class="col-sm-10">
+                        <table class="table table-hover admin-user">
+                            <tbody>
+                                <tr>
+                                    <th>Name <span class="fa fa-sort"></span></th>
+                                    <th>Email</th>
+                                    <th>Role <span class="fa fa-sort"></span></th>
+                                    <th>Municipality <span class="fa fa-sort"></span></th>
+                                    <th>Status</th>
+                                    <th>Notes</th>
+                                    <th></th>
+                                </tr>
+                                <tr>
+                                    <td>Bethany Ambrose</td>
+                                    <td><a>bambrose@gmail.com</a></td>
+                                    <td>FR</td>
+                                    <td><a href="admin-ma-profile.html">Berkeley Twp</a></td>
+                                    <td class="status pnd">pending</td>
+                                    <td><a href="admin-dca-acct-req.html" class="btn btn-warning btn-sm btn-block">View Request</a></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Sarah Jones</td>
+                                    <td><a>sjones@gmail.com</a></td>
+                                    <td>PL</td>
+                                    <td><a href="admin-ma-profile.html">Berkeley Twp</a></td>
+                                    <td class="status act">active</td>
+                                    <td class="notes">Muni approval 2-1-2018 by mjensen; DCA approval 2-2-2018 by esheridan</td>
+                                    <td><a href="admin-user-profile.html"><span class="fa fa-info-circle"></span></a></td>
+                                </tr>
+                                <tr>
+                                    <td>Mark DeSoto</td>
+                                    <td><a>mdesoto@gmail.com</a></td>
+                                    <td>PL</td>
+                                    <td><a href="admin-ma-profile.html">Berkeley Twp</a></td>
+                                    <td class="status act">active</td>
+                                    <td class="notes">Muni approval 2-8-2018 by mjensen; DCA approval 2-12-2018 by esheridan</td>
+                                    <td><a href="admin-user-profile.html"><span class="fa fa-info-circle"></span></a></td>
+                                </tr>
+                                <tr>
+                                    <td>Martin Lawrence</td>
+                                    <td><a>mlawrence@gmail.com</a></td>
+                                    <td>EM</td>
+                                    <td><a href="admin-ma-profile.html">Berkeley Twp</a></td>
+                                    <td class="status act">active</td>
+                                    <td class="notes">Muni approval 12-12-2017 by mjensen; DCA approval 12-14-2017 by esheridan</td>
+                                    <td><a href="admin-user-profile.html"><span class="fa fa-info-circle"></span></a></td>
+                                </tr>
+                                <tr>
+                                    <td>Marcia Delgato</td>
+                                    <td><a>mdelgato@gmail.com</a></td>
+                                    <td>EM</td>
+                                    <td><a href="admin-ma-profile.html">Berkeley Twp</a></td>
+                                    <td class="status act">active</td>
+                                    <td class="notes">Muni approval 12-12-2017 by mjensen; DCA approval 12-14-2017 by esheridan</td>
+                                    <td><a href="admin-user-profile.html"><span class="fa fa-info-circle"></span></a></td>
+                                </tr>
+                                <tr>
+                                    <td>Sam Elkins</td>
+                                    <td><a>selkins@gmail.com</a></td>
+                                    <td>PL</td>
+                                    <td><a href="admin-ma-profile.html">Berkeley Twp</a></td>
+                                    <td class="status inact">inactive</td>
+                                    <td class="notes">Muni decline 2-18-2018 by mjensen: Not affiliated with NJ</td>
+                                    <td><a href="admin-user-profile.html"><span class="fa fa-info-circle"></span></a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        <!-- END njcoast users ------------------------------------------------>
+
+        <!-- account requests ------------------------------------------------->
+        <div id="data_3" class="hidden">
+            <div class="filter-bkgrnd">
+                <i><span class="fa fa-exclamation-circle"></span> 2 pending requests</i>
+            </div>
+
+            <div class="table-bkgrnd">
+
+                <div class="row review-request">
+                    <div class="col-md-5 col-lg-4">
+                        <div class="well">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <th style="border-top: 0">Name</th>
+                                        <td style="border-top: 0">Bethany Ambrose</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Title</th>
+                                        <td>Deputy Sherriff</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Municipality</th>
+                                        <td><a href="admin-ma-profile.html">Berkeley Twp</a></td>
+                                    </tr>
+                                    <tr>
+                                        <th>Role</th>
+                                        <td>First Responder</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p><b>Justification:</b> I am the newly appointed Deputy Sherriff and would like to use NJcoast in emergencies.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-7 col-lg-8">
+                        <p class="qualifier" style="margin-top: 10px;">Received: 2-5-2018; Muni Approval: John Camera 2-6-2018</p>
+                        <textarea class="form-control" placeholder="Notes..." rows="7"></textarea>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+       Change Role <span class="caret"></span>
+     </button>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">Planner</a></li>
+                                <li><a href="#">Emergency Manager</a></li>
+                                <li><a href="#">First Responder</a></li>
+                            </ul>
+                        </div>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="">Approve</button>
+                        <button class="btn btn-default" data-toggle="modal" data-target="">Decline*</button>
+                        <p class="qualifier" style="margin-top: 10px;">*Any notes entered for a Declined applicant will be shared with the applicant to justify the decision.</p>
+                    </div>
+
+                </div>
+
+                <hr/>
+
+                <div class="row review-request">
+                    <div class="col-md-5 col-lg-4">
+                        <div class="well">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <th style="border-top: 0">Name</th>
+                                        <td style="border-top: 0">Xavier Rhodes</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Title</th>
+                                        <td>Ocean County Planner</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Municipality</th>
+                                        <td>Statewide</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Role</th>
+                                        <td>Planner</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <p><b>Justification:</b> I participate in planning activities for Ocean County and would like to be able to access data in one place and run storm simulations.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-7 col-lg-8">
+                        <p class="qualifier" style="margin-top: 10px;">Received: 2-6-2018</p>
+                        <textarea class="form-control" placeholder="Notes..." rows="7"></textarea>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+       Change Role <span class="caret"></span>
+     </button>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">Planner</a></li>
+                                <li><a href="#">Emergency Manager</a></li>
+                                <li><a href="#">First Responder</a></li>
+                            </ul>
+                        </div>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="">Approve</button>
+                        <button class="btn btn-default" data-toggle="modal" data-target="">Decline*</button>
+                        <p class="qualifier" style="margin-top: 10px;">*Any notes entered for a Declined applicant will be shared with the applicant to justify the decision.</p>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+        <!-- END account requests -------------------------------------------->
+
+    </div>
+</div>{% endblock %}
+
+{% block extra_script %}
+<script type=text/javascript>
+
+//flip the tabs and their data
+function flip_tabs(object){
+    //clear Active
+    for(i=1; i<=3; i++){
+        //remove active
+        if("tab_"+i != object.id){
+            document.getElementById("tab_"+i).classList.remove("active");
+            document.getElementById("data_"+i).classList.add("hidden");
+        }else{ //add active
+            object.classList.add("active");
+            document.getElementById("data_"+i).classList.remove("hidden");
+        }
+    }
+
+    //print
+    console.log("Clicked "+object.id);
+}
+
+</script>
+{% endblock extra_script %}

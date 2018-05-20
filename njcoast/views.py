@@ -482,3 +482,16 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form, 'error_data': ''})
+
+class DCADashboardTemplateView(TemplateView):
+    template_name = 'dca_dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(DCADashboardTemplateView, self).get_context_data(**kwargs)
+
+        #quiery, select if I am the owner
+        context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+
+        #quiery, select if I an in the list of shared_with__contains
+        context['shared_maps_for_user'] = NJCMap.objects.filter(shared_with__contains = self.request.user)
+        return context

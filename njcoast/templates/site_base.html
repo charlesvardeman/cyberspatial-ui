@@ -84,6 +84,11 @@
 	    <div id="navbar" class="navbar-collapse collapse">
 	      <ul class="nav navbar-nav toolbar">
               {% block tabs %}
+              {% if user.is_staff %}
+                  <li id="dca_dashboard">
+                        <a href="{% url "dca_dashboard" %}" role="button">{% trans "DCA Admin" %}</a>
+                  </li>
+              {% endif %}
               {% if user.is_authenticated %}
                   <li id="nav_dashboard">
                         <a href="{% url "dashboard" %}" role="button">{% trans "Dashboard" %}</a>
