@@ -454,6 +454,7 @@ def signup(request):
                 user.njcusermeta.municipality = NJCMunicipality.objects.get(name=form.cleaned_data.get('municipality'))
                 user.njcusermeta.role = NJCRole.objects.get(name=form.cleaned_data.get('role'))
                 user.njcusermeta.justification = form.cleaned_data.get('justification')
+                user.njcusermeta.position = form.cleaned_data.get('position')
 
                 #now save everything
                 user.save()
@@ -462,7 +463,7 @@ def signup(request):
                 #messages.success(request, 'Account created successfully')
                 #return redirect('home')
                 return render(request, 'account_created.html')
-                
+
         except KeyError as e:
             print "Username already in use!",e.message
 
