@@ -4,7 +4,7 @@ from django.conf import settings
 from geonode.layers.models import Layer
 from django.views.generic import TemplateView
 import json
-from models import NJCMap, NJCMapAnnotation, NJCMapExpert, NJCMunicipality
+from models import NJCMap, NJCMapAnnotation, NJCMapExpert, NJCMunicipality, NJCRole
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -452,20 +452,24 @@ def signup(request):
                 #now we can populate the additional fields
                 #user.njcusermeta.is_dca_approved = True
                 user.njcusermeta.municipality = NJCMunicipality.objects.get(name=form.cleaned_data.get('municipality'))
+                user.njcusermeta.role = NJCRole.objects.get(name=form.cleaned_data.get('role'))
 
                 #now save everything
                 user.save()
 
                 #back home, or flag that save was successful
+                #messages.success(request, 'Account created successfully')
                 return redirect('home')
         except KeyError as e:
             print "Username already in use!",e.message
+
             return render(request, 'signup.html', {'form': form, 'error_data': 'User exists, please select an alternative!'})
 
         except IntegrityError as e:
             print "Email address already in use!",e.message
             #delete user if created with duplicate email
             user.delete()
+
             return render(request, 'signup.html', {'form': form, 'error_data': 'Email exists, please select an alternative!'})
 
         except:

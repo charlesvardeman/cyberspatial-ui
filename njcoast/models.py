@@ -15,6 +15,8 @@ class NJCUserMeta(models.Model):
     is_muni_approved = models.BooleanField(default=False)
     municipality = models.ForeignKey('NJCMunicipality',
                         on_delete=models.CASCADE,blank=True,null=True)
+    role = models.ForeignKey('NJCRole',
+                        on_delete=models.CASCADE,blank=True,null=True)
 
 # need to do this to add the addendum to GeoNode Profile
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
@@ -78,6 +80,12 @@ class NJCMunicipality(models.Model):
     home_latitude = models.CharField(max_length=20)
     home_longitude = models.CharField(max_length=20)
     zoom_level = models.PositiveIntegerField()
+
+    def __str__(self):
+        return self.name
+
+class NJCRole(models.Model):
+    name = models.CharField(max_length=20)
 
     def __str__(self):
         return self.name
