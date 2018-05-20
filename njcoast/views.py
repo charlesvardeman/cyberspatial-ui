@@ -19,6 +19,7 @@ from django.shortcuts import render, redirect
 from .forms import SignUpForm
 from .models import NJCUserMeta
 from django import forms
+from django.db import IntegrityError
 
 '''
   This function is used to respond to ajax requests for which layers should be
@@ -457,9 +458,19 @@ def signup(request):
 
                 #back home, or flag that save was successful
                 return redirect('home')
+        except KeyError as e:
+            print "Username already in use!",e.message
+            return render(request, 'signup.html', {'form': form, 'error_data': 'User exists, please select an alternative!'})
+
+        except IntegrityError as e:
+            print "Email address already in use!",e.message
+            #delete user if created with duplicate email
+            user.delete()
+            return render(request, 'signup.html', {'form': form, 'error_data': 'Email exists, please select an alternative!'})
+
         except:
-            print "Username or email address already in use!"
-            return render(request, 'signup.html', {'form': form, 'error_data': 'User or email exists, please select an alternative!'})
+            print "Undefined error!"
+
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form, 'error_data': ''})
