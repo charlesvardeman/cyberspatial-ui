@@ -17,6 +17,7 @@ class NJCUserMeta(models.Model):
                         on_delete=models.CASCADE,blank=True,null=True)
     role = models.ForeignKey('NJCRole',
                         on_delete=models.CASCADE,blank=True,null=True)
+    justification = models.TextField(blank=True,null=True)
 
 # need to do this to add the addendum to GeoNode Profile
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)

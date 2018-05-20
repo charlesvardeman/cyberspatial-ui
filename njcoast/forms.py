@@ -6,9 +6,12 @@ from .models import NJCMunicipality, NJCRole
 
 class SignUpForm(ProfileCreationForm):
     email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')
+    first_name = forms.CharField(max_length=30, required=True, help_text='Required.')
+    last_name = forms.CharField(max_length=30, required=True, help_text='Required.')
     municipality = forms.ModelChoiceField(queryset=NJCMunicipality.objects)
     role = forms.ModelChoiceField(queryset=NJCRole.objects)
+    justification = forms.CharField(max_length=254, help_text='Required. Please write a justification for your request.')
 
     class Meta:
         model = Profile
-        fields = ('username', 'email', 'password1', 'password2', 'municipality', 'role', )
+        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2', 'municipality', 'role', 'justification', )

@@ -453,7 +453,8 @@ def signup(request):
                 #user.njcusermeta.is_dca_approved = True
                 user.njcusermeta.municipality = NJCMunicipality.objects.get(name=form.cleaned_data.get('municipality'))
                 user.njcusermeta.role = NJCRole.objects.get(name=form.cleaned_data.get('role'))
-
+                user.njcusermeta.justification = form.cleaned_data.get('justification')
+                
                 #now save everything
                 user.save()
 
