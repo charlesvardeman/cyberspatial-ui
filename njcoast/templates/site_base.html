@@ -144,7 +144,7 @@
 	            <a href="#"resources" %}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Resources" %}<i class="fa fa-angle-down fa-lg"></i></a>
                   <ul class="dropdown-menu">
                     <li><a href="{% url "faq" %}" role="button">{% trans "FAQ" %}</a></li>
-                    <li><a href="{% url "shp" %}" role="button">{% trans "SHP Tool" %}</a></li> 
+                    <li><a href="{% url "shp" %}" role="button">{% trans "SHP Tool" %}</a></li>
                   </ul>
                   <li><a href="{% url "about" %}" role="button">{% trans "About" %}</a></li>
             {% endif %}
@@ -156,7 +156,7 @@
           </ul>
 	      <ul class="nav navbar-nav navbar-right">
             {% if not user.is_authenticated and ACCOUNT_OPEN_SIGNUP %}
-            <li><a href="{% url "account_signup" %}">{% trans "Register" %}</a></li>
+            <li><a href="{% url "signup" %}">{% trans "Register" %}</a></li>
             {% endif %}
             {% if user.is_authenticated %}
             <li>
@@ -251,7 +251,7 @@
       <div class="col-md-2">
         <ul class="list-unstyled">
           <li>About</li>
-          <li><a href="/people/">People</a></li>   
+          <li><a href="/people/">People</a></li>
           <li><a href="/groups/">Groups</a></li>
         </ul>
       </div>
@@ -265,133 +265,133 @@
         <form class="form-inline" action="/i18n/setlang/" method="post">
           <input type='hidden' name='csrfmiddlewaretoken' value='{{ csrf_token }}'/>
             <select class="col-md-6 pull-right" name="language" oninput="javascript:form.submit()">
-              <option value="en" selected hidden> 
+              <option value="en" selected hidden>
                 English
               </option>
-               
+
               <option value="en">
                 English
               </option>
-              
+
               <option value="es" >
                 Español
               </option>
-              
+
               <option value="it" >
                 Italiano
               </option>
-              
+
               <option value="fr" >
                 Français
               </option>
-              
+
               <option value="de" >
                 Deutsch
               </option>
-              
+
               <option value="el" >
                 Ελληνικά
               </option>
-              
+
               <option value="id" >
                 Bahasa Indonesia
               </option>
-              
+
               <option value="zh-cn" >
                 中文
               </option>
-              
+
               <option value="ja" >
                 日本語
               </option>
-              
+
               <option value="fa" >
                 Persian
               </option>
-              
+
               <option value="ar" >
                 Arabic
               </option>
-              
+
               <option value="bn" >
                 Bengali
               </option>
-              
+
               <option value="ne" >
                 Nepali
               </option>
-              
+
               <option value="sq" >
                 Albanian
               </option>
-              
+
               <option value="af" >
                 Afrikaans
               </option>
-              
+
               <option value="sw" >
                 Swahili
               </option>
-              
+
               <option value="pt" >
                 Portuguese
               </option>
-              
+
               <option value="pt-br" >
                 Portuguese (Brazil)
               </option>
-              
+
               <option value="ru" >
                 Russian
               </option>
-              
+
               <option value="vi" >
                 Vietnamese
               </option>
-              
+
               <option value="ko" >
                 한국어
               </option>
-              
+
               <option value="am" >
                 Amharic
               </option>
-              
+
               <option value="km" >
                 Khmer
               </option>
-              
+
               <option value="pl" >
                 Polish
               </option>
-              
+
               <option value="sv" >
                 Swedish
               </option>
-              
+
               <option value="th" >
                 ไทย
               </option>
-              
+
               <option value="uk" >
                 Ukranian
               </option>
-              
+
               <option value="si" >
                 Sinhala
               </option>
-              
+
               <option value="ta" >
                 Tamil
               </option>
-              
+
               <option value="tl" >
                 Tagalog
               </option>
             </select>
           </form>
         </div>
-      </div> 
+      </div>
   </footer>
   {% endblock footer %}
 

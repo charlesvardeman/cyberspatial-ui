@@ -14,6 +14,10 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from itertools import chain
 from datetime import datetime
+
+from django.shortcuts import render, redirect
+from .forms import SignUpForm
+from .models import NJCUserMeta
 '''
   This function is used to respond to ajax requests for which layers should be
   visible for a given user. Borrowed a lot of this from the GeoNode base code
@@ -426,3 +430,42 @@ class ExploreTemplateView(TemplateView):
         context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
 
         return context
+
+#signup new users.
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            #form.save()
+            #username = form.cleaned_data.get('username')
+            #raw_password = form.cleaned_data.get('password1')
+            #user = authenticate(username=username, password=raw_password)
+            #login(request, user)
+
+            #create user/profile
+            user = form.save(commit=False)
+
+            #force inactive as we need to approve
+            user.is_active = False
+
+            #save Profile so that we append the NJC additional parameters
+            user.save()
+
+            #now we can populate the additional fields
+            user.njcusermeta.is_dca_approved = True
+
+            #play area
+            #user.njcusermeta.municipality = form.cleaned_data.get('municipality')
+            #actualuser = User(username = user.username)
+            #actualuser.refresh_from_db()  # load the profile instance created by the signal
+            #NJCUserMeta.objects.get(user__username == user.name).municipality = form.cleaned_data.get('municipality')
+            print form.cleaned_data.get('municipality')
+
+            #now save everything
+            user.save()
+
+            #back home, or flag that save was successful
+            return redirect('home')
+    else:
+        form = SignUpForm()
+    return render(request, 'signup.html', {'form': form})

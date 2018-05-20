@@ -4,12 +4,24 @@ from django.conf import settings
 from geonode.layers.models import Layer
 from geonode.people.models import Profile
 
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from account.conf import settings
+
+#new addendum to GeoNode Profile
 class NJCUserMeta(models.Model):
-    user = models.OneToOneField(Profile)
+    user = models.OneToOneField(Profile, on_delete=models.CASCADE)
     is_dca_approved = models.BooleanField(default=False)
     is_muni_approved = models.BooleanField(default=False)
     municipality = models.ForeignKey('NJCMunicipality',
                         on_delete=models.CASCADE,blank=True,null=True)
+
+# need to do this to add the addendum to GeoNode Profile
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def update_user_profile(sender, instance, created, **kwargs):
+    if created:
+        NJCUserMeta.objects.create(user=instance)
+    instance.njcusermeta.save()
 
 class NJCMap(models.Model):
     owner = models.ForeignKey(
