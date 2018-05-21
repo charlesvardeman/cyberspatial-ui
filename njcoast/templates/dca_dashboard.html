@@ -187,60 +187,29 @@
                                     <th>Notes</th>
                                     <th></th>
                                 </tr>
+                                {% for user in users %}
                                 <tr>
-                                    <td>Bethany Ambrose</td>
-                                    <td><a>bambrose@gmail.com</a></td>
-                                    <td>FR</td>
-                                    <td><a href="admin-ma-profile.html">Berkeley Twp</a></td>
+                                    <td>{{ user.first_name }} {{ user.last_name }}</td>
+                                    <td><a>{{ user.email }}</a></td>
+                                    <td>{{ user.njcusermeta.role }}</td>
+                                    <td><a href="admin-ma-profile.html">{{ user.njcusermeta.municipality }}</a></td>
+                                    {% if user.is_active %}
+                                    <td class="status act">active</td>
+                                    <td class="notes">{{ user.njcusermeta.notes }}</td>
+                                    <td><a href="admin-user-profile.html"><span class="fa fa-info-circle"></span></a></td>
+                                    {% else %}
+                                    {% if user.njcusermeta.is_dca_approved %}
+                                    <td class="status inact">inactive</td>
+                                    <td class="notes">{{ user.njcusermeta.notes }}</td>
+                                    <td><a href="admin-user-profile.html"><span class="fa fa-info-circle"></span></a></td>
+                                    {% else %}
                                     <td class="status pnd">pending</td>
                                     <td><a href="admin-dca-acct-req.html" class="btn btn-warning btn-sm btn-block">View Request</a></td>
+                                    {% endif %}
+                                    {% endif %}
                                     <td></td>
                                 </tr>
-                                <tr>
-                                    <td>Sarah Jones</td>
-                                    <td><a>sjones@gmail.com</a></td>
-                                    <td>PL</td>
-                                    <td><a href="admin-ma-profile.html">Berkeley Twp</a></td>
-                                    <td class="status act">active</td>
-                                    <td class="notes">Muni approval 2-1-2018 by mjensen; DCA approval 2-2-2018 by esheridan</td>
-                                    <td><a href="admin-user-profile.html"><span class="fa fa-info-circle"></span></a></td>
-                                </tr>
-                                <tr>
-                                    <td>Mark DeSoto</td>
-                                    <td><a>mdesoto@gmail.com</a></td>
-                                    <td>PL</td>
-                                    <td><a href="admin-ma-profile.html">Berkeley Twp</a></td>
-                                    <td class="status act">active</td>
-                                    <td class="notes">Muni approval 2-8-2018 by mjensen; DCA approval 2-12-2018 by esheridan</td>
-                                    <td><a href="admin-user-profile.html"><span class="fa fa-info-circle"></span></a></td>
-                                </tr>
-                                <tr>
-                                    <td>Martin Lawrence</td>
-                                    <td><a>mlawrence@gmail.com</a></td>
-                                    <td>EM</td>
-                                    <td><a href="admin-ma-profile.html">Berkeley Twp</a></td>
-                                    <td class="status act">active</td>
-                                    <td class="notes">Muni approval 12-12-2017 by mjensen; DCA approval 12-14-2017 by esheridan</td>
-                                    <td><a href="admin-user-profile.html"><span class="fa fa-info-circle"></span></a></td>
-                                </tr>
-                                <tr>
-                                    <td>Marcia Delgato</td>
-                                    <td><a>mdelgato@gmail.com</a></td>
-                                    <td>EM</td>
-                                    <td><a href="admin-ma-profile.html">Berkeley Twp</a></td>
-                                    <td class="status act">active</td>
-                                    <td class="notes">Muni approval 12-12-2017 by mjensen; DCA approval 12-14-2017 by esheridan</td>
-                                    <td><a href="admin-user-profile.html"><span class="fa fa-info-circle"></span></a></td>
-                                </tr>
-                                <tr>
-                                    <td>Sam Elkins</td>
-                                    <td><a>selkins@gmail.com</a></td>
-                                    <td>PL</td>
-                                    <td><a href="admin-ma-profile.html">Berkeley Twp</a></td>
-                                    <td class="status inact">inactive</td>
-                                    <td class="notes">Muni decline 2-18-2018 by mjensen: Not affiliated with NJ</td>
-                                    <td><a href="admin-user-profile.html"><span class="fa fa-info-circle"></span></a></td>
-                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>

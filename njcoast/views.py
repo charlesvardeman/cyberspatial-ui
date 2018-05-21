@@ -20,6 +20,7 @@ from .forms import SignUpForm
 from .models import NJCUserMeta
 from django import forms
 from django.db import IntegrityError
+from geonode.people.models import Profile
 
 '''
   This function is used to respond to ajax requests for which layers should be
@@ -489,9 +490,11 @@ class DCADashboardTemplateView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(DCADashboardTemplateView, self).get_context_data(**kwargs)
 
-        #quiery, select if I am the owner
-        context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+        users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').order_by('last_name')
+        for user in users:
+            print user.username
 
-        #quiery, select if I an in the list of shared_with__contains
-        context['shared_maps_for_user'] = NJCMap.objects.filter(shared_with__contains = self.request.user)
+        #quiery, select all users
+        context['users'] = users
+
         return context
