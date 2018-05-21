@@ -41,10 +41,9 @@
                                     County <span class="caret"></span>
                                         </button>
                             <ul class="dropdown-menu">
-                                <li><a href="#">Atlantic</a></li>
-                                <li><a href="#">Bergen</a></li>
-                                <li><a href="#">Burlington</a></li>
-                                <li><a href="#">Camden</a></li>
+                                {% for county in counties %}
+                                <li><a href="#">{{ county.name }}</a></li>
+                                {% endfor %}
                             </ul>
                         </div>
 
@@ -164,7 +163,7 @@
                                     <td>{{ user.first_name }} {{ user.last_name }}</td>
                                     <td><a>{{ user.email }}</a></td>
                                     <td>{{ user.njcusermeta.role }}</td>
-                                    <td><a href="admin-ma-profile.html">{{ user.njcusermeta.municipality }}</a></td>
+                                    <td>{{ user.njcusermeta.municipality }}</td>
                                     {% if user.is_active %}
                                     <td class="status act">active</td>
                                     <td class="notes">{{ user.njcusermeta.notes }}</td>
@@ -219,7 +218,7 @@
                                     </tr>
                                     <tr>
                                         <th>Municipality</th>
-                                        <td><a href="admin-ma-profile.html">{{ user.njcusermeta.municipality }}</a></td>
+                                        <td>{{ user.njcusermeta.municipality }}</td>
                                     </tr>
                                     <tr>
                                         <th>Role</th>
@@ -239,9 +238,9 @@
                                     Change Role <span class="caret"></span>
                                         </button>
                             <ul class="dropdown-menu">
-                                <li><a href="#">Planner</a></li>
-                                <li><a href="#">Emergency Manager</a></li>
-                                <li><a href="#">First Responder</a></li>
+                                {% for role in roles %}
+                                <li><a href="#">{{ role.name }}</a></li>
+                                {% endfor %}
                             </ul>
                         </div>
                         <button class="btn btn-primary" data-toggle="modal" data-target="">Approve</button>
