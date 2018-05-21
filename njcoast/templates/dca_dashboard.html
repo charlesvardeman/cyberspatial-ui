@@ -222,7 +222,7 @@
                                     </tr>
                                     <tr>
                                         <th>Role</th>
-                                        <td>{{ user.njcusermeta.role }}</td>
+                                        <td id="role_{{ forloop.counter }}" >{{ user.njcusermeta.role }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -231,7 +231,7 @@
                     </div>
                     <div class="col-md-7 col-lg-8">
                         <p class="qualifier" style="margin-top: 10px;">Received: {{ user.date_joined }}; Muni Approval: {{ user.muni_approval_date }}</p>
-                        <textarea class="form-control" placeholder="" rows="7">{{ user.njcusermeta.notes }}</textarea>
+                        <textarea id="text_{{ forloop.counter }}" class="form-control" placeholder="" rows="7">{{ user.njcusermeta.notes }}</textarea>
                         <div class="btn-group">
                             <button type="button" class="btn btn-default dropdown-toggle"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -243,7 +243,7 @@
                                 {% endfor %}
                             </ul>
                         </div>
-                        <button class="btn btn-primary" data-toggle="modal" data-target="">Approve</button>
+                        <button id="button_{{ forloop.counter }}" name="{{ user.username }}" onclick="user_update(this, 'approve');" class="btn btn-primary" data-toggle="modal" data-target="">Approve</button>
                         <button class="btn btn-default" data-toggle="modal" data-target="">Decline*</button>
                         <p class="qualifier" style="margin-top: 10px;">*Any notes entered for a Declined applicant will be shared with the applicant to justify the decision.</p>
                     </div>
@@ -331,6 +331,35 @@
 
 {% block extra_script %}
 <script type=text/javascript>
+//user approvals
+function user_update(object, action){
+    //strip out button number
+    user_number = object.id.substring(7);
+    console.log("clicked "+object.name+","+user_number+","+document.getElementById("text_"+user_number).value+","+document.getElementById("role_"+user_number).innerHTML);
+
+    //do Ajax call
+    $.ajax({
+        type: "POST",
+        url: "/user/settings/",
+        data: {
+            'role': document.getElementById("role_"+user_number).innerHTML,
+            'notes': document.getElementById("text_"+user_number).value,
+            'user': object.name,
+            'action': action
+        },
+        dataType: "json",
+        success: function(result) {
+            console.log("USER APPROVAL -- SUCCESS!" + result.updated);
+            //now auto save so dont flag
+            console.log("Settings saved", "success");
+        },
+        error: function(result) {
+            console.log("ERROR:", result)
+            console.log("Error saving map settings", "error");
+        }
+    });
+
+}
 
 //view user info
 function view_user_info(view_info, number){
