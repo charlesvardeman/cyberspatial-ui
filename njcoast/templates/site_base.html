@@ -1,5 +1,7 @@
 {% load i18n avatar_tags %}
 {% load staticfiles %}
+{% load njcoast_extras %}
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -84,7 +86,8 @@
 	    <div id="navbar" class="navbar-collapse collapse">
 	      <ul class="nav navbar-nav toolbar">
               {% block tabs %}
-              {% if user.is_staff %}
+
+              {% if request.user|has_group:"dca_administrators" %}
                   <li id="dca_dashboard">
                         <a href="{% url "dca_dashboard" %}" role="button">{% trans "DCA Admin" %}</a>
                   </li>
