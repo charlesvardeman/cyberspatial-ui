@@ -21,9 +21,9 @@
         </div>
 
         <ul class="nav nav-tabs nav-justified admin-tabs">
-            <li id="tab_1" onclick="flip_tabs(this);" class="active"><a href="#"><span class="fa fa-user-circle"></span> Municipal Approvers</a></li>
-            <li id="tab_2" onclick="flip_tabs(this);"><a href="#"><span class="fa fa-users"></span> All NJcoast Users</a></li>
-            <li id="tab_3" onclick="flip_tabs(this);"><a href="#"><span class="fa fa-exclamation-circle"></span> Account Requests</a></li>
+            <li id="tab_1" onclick="flip_tabs(this.id);" class="active"><a href="#"><span class="fa fa-user-circle"></span> Municipal Approvers</a></li>
+            <li id="tab_2" onclick="flip_tabs(this.id);"><a href="#"><span class="fa fa-users"></span> All NJcoast Users</a></li>
+            <li id="tab_3" onclick="flip_tabs(this.id);"><a href="#"><span class="fa fa-exclamation-circle"></span> Account Requests</a></li>
         </ul>
 
         <!-- municipalities code ---------------------------------------------->
@@ -171,7 +171,7 @@
                                     <td><a onclick="view_user_info(true, {{ forloop.counter }});" href="#"><span class="fa fa-info-circle"></span></a></td>
                                         {% else %}
                                     <td class="status pnd">pending</td>
-                                    <td><a href="admin-dca-acct-req.html" class="btn btn-warning btn-sm btn-block">View Request</a></td>
+                                    <td><a onclick="flip_tabs('tab_3');" href="#" class="btn btn-warning btn-sm btn-block">View Request</a></td>
                                         {% endif %}
                                     {% endif %}
                                     <div class="hidden" id="user_{{ forloop.counter }}_5">{{ user.njcusermeta.position }}</div>
@@ -340,7 +340,6 @@ function view_user_info(view_info, number){
         document.getElementById("navigation_4").innerHTML = "<span class=\"fa fa-chevron-left\"></span> Return to All NJcoast Users list";
         //copy data over
         for(i=1; i<=8; i++){
-            console.log(i);
             document.getElementById("info_"+i).innerHTML = document.getElementById("user_"+number+"_"+i).innerHTML;
         }
         document.getElementById("data_4").classList.remove("hidden");
@@ -352,24 +351,24 @@ function view_user_info(view_info, number){
 }
 
 //flip the tabs and their data
-function flip_tabs(object){
+function flip_tabs(id){
     //hide user info if open
     document.getElementById("data_4").classList.add("hidden");
-    
+
     //clear Active and set new
     for(i=1; i<=3; i++){
         //remove active
-        if("tab_"+i != object.id){
+        if("tab_"+i != id){
             document.getElementById("tab_"+i).classList.remove("active");
             document.getElementById("data_"+i).classList.add("hidden");
         }else{ //add active
-            object.classList.add("active");
+            document.getElementById(id).classList.add("active");
             document.getElementById("data_"+i).classList.remove("hidden");
         }
     }
 
     //print
-    console.log("Clicked "+object.id);
+    console.log("Clicked "+id);
 }
 
 </script>
