@@ -2,6 +2,33 @@
 from django.db import models
 from django.conf import settings
 from geonode.layers.models import Layer
+from geonode.people.models import Profile
+
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from account.conf import settings
+
+#new addendum to GeoNode Profile
+class NJCUserMeta(models.Model):
+    user = models.OneToOneField(Profile, on_delete=models.CASCADE)
+    is_dca_approved = models.BooleanField(default=False)
+    is_muni_approved = models.BooleanField(default=False)
+    municipality = models.ForeignKey('NJCMunicipality',
+                        on_delete=models.CASCADE,blank=True,null=True)
+    role = models.ForeignKey('NJCRole',
+                        on_delete=models.CASCADE,blank=True,null=True)
+    justification = models.TextField(blank=True,null=True)
+    position = models.TextField(blank=True,null=True)
+    dca_approval_date = models.DateTimeField(blank=True,null=True)
+    muni_approval_date = models.DateTimeField(blank=True,null=True)
+    notes = models.TextField(blank=True,null=True)
+
+# need to do this to add the addendum to GeoNode Profile
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def update_user_profile(sender, instance, created, **kwargs):
+    if created:
+        NJCUserMeta.objects.create(user=instance)
+    instance.njcusermeta.save()
 
 class NJCMap(models.Model):
     owner = models.ForeignKey(
@@ -52,3 +79,28 @@ class NJCMapExpert(models.Model):
 
     def __str__(self):
         return self.sim_id
+
+class NJCMunicipality(models.Model):
+    name = models.CharField(max_length=20)
+    home_latitude = models.CharField(max_length=20)
+    home_longitude = models.CharField(max_length=20)
+    zoom_level = models.PositiveIntegerField()
+    code = models.PositiveIntegerField()
+    county = models.ForeignKey('NJCCounty', blank=True,null=True)
+    group_name = models.CharField(max_length=20, default="")
+
+    def __str__(self):
+        return self.name
+
+class NJCRole(models.Model):
+    name = models.CharField(max_length=20)
+    group_name = models.CharField(max_length=20, default="")
+
+    def __str__(self):
+        return self.name
+
+class NJCCounty(models.Model):
+    name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name

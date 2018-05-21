@@ -1,0 +1,194 @@
+/*
+ * Style overrides for NJ Coast Admin Interface
+ */
+
+.null,
+.non-editable {
+  color: #999;
+}
+
+ul.nav-tabs.admin-tabs > li > a {
+  font-size: 20px;
+  letter-spacing: 1px;
+  font-weight: 400;
+  padding: 15px 25px;
+}
+ul.nav-tabs.admin-tabs > li:last-child > a {
+  color: #eb6b00;
+}
+
+.no-tab-bkgrnd {
+  background: #fff;
+  border-top: 1px solid #ddd;
+  padding: 0;
+}
+.table-bkgrnd {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-top: none;
+  padding: 0 20px 20px;
+  min-height: 50vh;
+  overflow: scroll;
+}
+.filter-bkgrnd {
+  background: #fff;
+  border-left:  1px solid #ddd;
+  border-right:  1px solid #ddd;
+  padding: 30px 30px 20px;
+  margin: 0;
+}
+.return-to-list {
+  background: #fff;
+  border-left:  1px solid #ddd;
+  border-right:  1px solid #ddd;
+  padding: 30px 30px 40px;
+  margin: 0;
+  font-size: 18px;
+}
+.return-to-list span {
+  padding-right: 5px;
+}
+span.f-label {
+  color: #999;
+  text-transform: uppercase;
+  font-size: .9em;
+  padding-right: 10px;
+}
+
+ul.selected {
+  list-style-type: none;
+  padding: 0;
+}
+ul.selected li {
+  display: inline-block;
+  background: #e5e5e5;
+  padding: 10px 15px;
+  border-radius: 25px;
+}
+ul.selected li:first-child {
+  background: transparent;
+  padding: 10px 15px 10px 0;
+  color: #999;
+  text-transform: uppercase;
+  font-size: .9em;
+}
+
+.table.admin {
+  font-size: 0.9em;
+}
+.table.admin th span,
+.table.admin-user th span {
+  font-size: 0.8em;
+}
+.table.admin th,
+.table.admin-user th {
+  border-top: none;
+}
+.table.admin td.notes,
+.table.admin-user td.notes {
+  font-size: 0.8em;
+  font-style: italic;
+  color: #999;
+  max-width: 18vw;
+}
+.table.admin td.notes .btn,
+.table.admin-user td.notes .btn {
+  font-style: normal;
+}
+.table.admin td.notes {
+  max-width: 25vw;
+}
+.table.admin td.position {
+  max-width: 20vw;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.table.admin-user td:nth-child(3) {
+  font-size: 0.9em;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.table.edit-profile input {
+  margin-bottom: 5px;
+}
+.table.edit-profile input:last-child {
+  margin-bottom: 0;
+}
+
+.status {
+  text-transform: uppercase;
+  font-size: 0.8em;
+  font-weight: bold;
+  letter-spacing: .5px;
+}
+.status.act {
+  color: #449d44;
+}
+.status.inact {
+  color: #b2b2b2;
+}
+.status.pnd {
+  color: #ec971f;
+}
+
+ul.user-filters {
+  list-style-type: none;
+  padding: 0;
+}
+ul.user-filters li {
+  color: #fff;
+  padding: 8px 10px 5px;
+  background: #2c689c;
+  border-bottom: 3px solid #fff;
+}
+ul.user-filters ul {
+  list-style-type: none;
+  padding-left: 10px;
+}
+ul.user-filters ul li {
+  color: #333;
+  background: transparent;
+  padding: 5px 10px;
+  border-bottom: none;
+}
+
+.row.review-request {
+  margin: 40px 0;
+}
+.row.review-request:first-child {
+  margin-top: 10px;
+}
+.row.review-request .well {
+  margin: 0;
+}
+.row.review-request .table {
+  margin-bottom: 10px;
+}
+.row.review-request textarea {
+  margin-bottom: 10px;
+}
+
+.muni-info {
+  padding: 20px;
+}
+
+.lg-list-identifier {
+  text-align: center;
+}
+.lg-list-identifier {
+  color: #3276b1;
+  opacity: .5;
+}
+.lg-list-identifier p {
+  margin-top: 10px;
+  font-size: 18px;
+}
+
+
+@media screen and (max-width: 768px) {
+
+
+}

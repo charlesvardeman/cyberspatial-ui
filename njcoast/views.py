@@ -4,7 +4,7 @@ from django.conf import settings
 from geonode.layers.models import Layer
 from django.views.generic import TemplateView
 import json
-from models import NJCMap, NJCMapAnnotation, NJCMapExpert
+from models import NJCMap, NJCMapAnnotation, NJCMapExpert, NJCMunicipality, NJCRole
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -14,6 +14,13 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from itertools import chain
 from datetime import datetime
+
+from django.shortcuts import render, redirect
+from .forms import SignUpForm
+from .models import NJCUserMeta
+from django import forms
+from django.db import IntegrityError
+
 '''
   This function is used to respond to ajax requests for which layers should be
   visible for a given user. Borrowed a lot of this from the GeoNode base code
@@ -425,4 +432,66 @@ class ExploreTemplateView(TemplateView):
         #quiery, select if I am the owner
         context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
 
+        return context
+
+#signup new users.
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        try:
+            if form.is_valid():
+                #create user/profile
+                user = form.save(commit=False)
+
+                #force inactive as we need to approve
+                user.is_active = False
+
+                #save Profile so that we append the NJC additional parameters
+                user.save()
+
+                #now we can populate the additional fields
+                #user.njcusermeta.is_dca_approved = True
+                user.njcusermeta.municipality = NJCMunicipality.objects.get(name=form.cleaned_data.get('municipality'))
+                user.njcusermeta.role = NJCRole.objects.get(name=form.cleaned_data.get('role'))
+                user.njcusermeta.justification = form.cleaned_data.get('justification')
+                user.njcusermeta.position = form.cleaned_data.get('position')
+
+                #now save everything
+                user.save()
+
+                #back home, or flag that save was successful
+                #messages.success(request, 'Account created successfully')
+                #return redirect('home')
+                return render(request, 'account_created.html')
+
+        except KeyError as e:
+            print "Username already in use!",e.message
+
+            return render(request, 'signup.html', {'form': form, 'error_data': 'User exists, please select an alternative!'})
+
+        except IntegrityError as e:
+            print "Email address already in use!",e.message
+            #delete user if created with duplicate email
+            user.delete()
+
+            return render(request, 'signup.html', {'form': form, 'error_data': 'Email exists, please select an alternative!'})
+
+        except:
+            print "Undefined error!"
+
+    else:
+        form = SignUpForm()
+    return render(request, 'signup.html', {'form': form, 'error_data': ''})
+
+class DCADashboardTemplateView(TemplateView):
+    template_name = 'dca_dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(DCADashboardTemplateView, self).get_context_data(**kwargs)
+
+        #quiery, select if I am the owner
+        context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+
+        #quiery, select if I an in the list of shared_with__contains
+        context['shared_maps_for_user'] = NJCMap.objects.filter(shared_with__contains = self.request.user)
         return context
