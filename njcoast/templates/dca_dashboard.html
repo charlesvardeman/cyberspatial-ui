@@ -79,11 +79,7 @@
                         {% for user in users %}
                         {% ifequal  user.njcusermeta.role|stringformat:"s" "Municipal Approvers" %}
                         <tr>
-                            {% for municipality in municipalities %}
-                                {% ifequal municipality.name|stringformat:"s" user.njcusermeta.municipality|stringformat:"s" %}
-                            <td>{{ municipality.code }}</td>
-                                {% endifequal %}
-                            {% endfor %}
+                            <td>{{ user.njcusermeta.municipality.code }}</td>
                             <td>{{ user.njcusermeta.municipality }}</td>
                             <td>{{ user.first_name }} {{ user.last_name }}</td>
                             <td class="position">{{ user.njcusermeta.position }}</td>
@@ -160,24 +156,28 @@
                                 </tr>
                                 {% for user in users %}
                                 <tr>
-                                    <td>{{ user.first_name }} {{ user.last_name }}</td>
-                                    <td><a>{{ user.email }}</a></td>
-                                    <td>{{ user.njcusermeta.role }}</td>
-                                    <td>{{ user.njcusermeta.municipality }}</td>
+                                    <td id="user_{{ forloop.counter }}_1">{{ user.first_name }} {{ user.last_name }}</td>
+                                    <td><a id="user_{{ forloop.counter }}_2">{{ user.email }}</a></td>
+                                    <td id="user_{{ forloop.counter }}_3">{{ user.njcusermeta.role }}</td>
+                                    <td id="user_{{ forloop.counter }}_4">{{ user.njcusermeta.municipality }}</td>
                                     {% if user.is_active %}
                                     <td class="status act">active</td>
                                     <td class="notes">{{ user.njcusermeta.notes }}</td>
-                                    <td><a href="admin-user-profile.html"><span class="fa fa-info-circle"></span></a></td>
+                                    <td><a onclick="view_user_info(true, {{ forloop.counter }});" href="#"><span class="fa fa-info-circle"></span></a></td>
                                     {% else %}
-                                    {% if user.njcusermeta.is_dca_approved %}
+                                        {% if user.njcusermeta.is_dca_approved %}
                                     <td class="status inact">inactive</td>
                                     <td class="notes">{{ user.njcusermeta.notes }}</td>
-                                    <td><a href="admin-user-profile.html"><span class="fa fa-info-circle"></span></a></td>
-                                    {% else %}
+                                    <td><a onclick="view_user_info(true, {{ forloop.counter }});" href="#"><span class="fa fa-info-circle"></span></a></td>
+                                        {% else %}
                                     <td class="status pnd">pending</td>
                                     <td><a href="admin-dca-acct-req.html" class="btn btn-warning btn-sm btn-block">View Request</a></td>
+                                        {% endif %}
                                     {% endif %}
-                                    {% endif %}
+                                    <div class="hidden" id="user_{{ forloop.counter }}_5">{{ user.njcusermeta.position }}</div>
+                                    <div class="hidden" id="user_{{ forloop.counter }}_6">{{ user.njcusermeta.justification }}</div>
+                                    <div class="hidden" id="user_{{ forloop.counter }}_7">{{ user.njcusermeta.municipality.code }}</div>
+                                    <div class="hidden" id="user_{{ forloop.counter }}_8">{{ user.voice }}</div>
                                     <td></td>
                                 </tr>
                                 {% endfor %}
@@ -231,7 +231,7 @@
                     </div>
                     <div class="col-md-7 col-lg-8">
                         <p class="qualifier" style="margin-top: 10px;">Received: {{ user.date_joined }}; Muni Approval: {{ user.muni_approval_date }}</p>
-                        <textarea class="form-control" placeholder="{{ user.njcusermeta.notes }}" rows="7"></textarea>
+                        <textarea class="form-control" placeholder="" rows="7">{{ user.njcusermeta.notes }}</textarea>
                         <div class="btn-group">
                             <button type="button" class="btn btn-default dropdown-toggle"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -255,7 +255,75 @@
 
             </div>
         </div>
-        <!-- END account requests -------------------------------------------->
+        <!-- END account requests --------------------------------------------->
+
+        <!-- account info ----------------------------------------------------->
+        <div id="data_4" class="hidden">
+            <div class="return-to-list">
+                <a id="navigation_4" onclick="view_user_info(false, 0);" href="#"><span class="fa fa-chevron-left"></span> Return to All NJcoast Users list</a>
+            </div>
+
+            <div class="table-bkgrnd">
+
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div class="lg-list-identifier ">
+                            <span class="fa fa-users fa-5x "></span>
+                            <p>NJcoast User Profile</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-9">
+
+                        <table class="table">
+                            <tbody>
+                                <tr>
+                                    <th style="border-top: 0">Full Name</th>
+                                    <td id="info_1" style="border-top: 0">Sarah Jones</td>
+                                </tr>
+                                <tr>
+                                    <th>Position/Title</th>
+                                    <td id="info_5">Planner</td>
+                                </tr>
+                                <tr>
+                                    <th>Municipality Name</th>
+                                    <td id="info_4">Berkeley Twp</td>
+                                </tr>
+                                <tr>
+                                    <th>Municipality Code</th>
+                                    <td id="info_7">1506</td>
+                                </tr>
+                                <tr>
+                                    <!--<tr>
+                                        <th>Mailing address</th>
+                                        <td>627 Pinewald-Keswick Rd<br/>Bayville, NJ 08721</td>
+                                    </tr>-->
+                                    <th>Email</th>
+                                    <td><a id="info_2">sjones@gmail.com</a></td>
+                                </tr>
+                                <tr>
+                                    <th>Phone</th>
+                                    <td id="info_8">732-341-1132</td>
+                                </tr>
+                                <tr>
+                                    <th>Role</th>
+                                    <td id="info_3">PL - Planning</td>
+                                </tr>
+                                <tr>
+                                    <th>Justification</th>
+                                    <td id="info_6">I am involved in planning for Berkeley, and need the tool for storm projection.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <a href="admin-user-profile-edit.html" class="btn btn-primary">Edit</a>
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">
+                                          Delete
+                                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END account info ------------------------------------------------->
 
     </div>
 </div>
@@ -264,9 +332,31 @@
 {% block extra_script %}
 <script type=text/javascript>
 
+//view user info
+function view_user_info(view_info, number){
+    console.log("data "+view_info+","+number);
+    if(view_info){
+        //set return link
+        document.getElementById("navigation_4").innerHTML = "<span class=\"fa fa-chevron-left\"></span> Return to All NJcoast Users list";
+        //copy data over
+        for(i=1; i<=8; i++){
+            console.log(i);
+            document.getElementById("info_"+i).innerHTML = document.getElementById("user_"+number+"_"+i).innerHTML;
+        }
+        document.getElementById("data_4").classList.remove("hidden");
+        document.getElementById("data_2").classList.add("hidden");
+    }else{
+        document.getElementById("data_2").classList.remove("hidden");
+        document.getElementById("data_4").classList.add("hidden");
+    }
+}
+
 //flip the tabs and their data
 function flip_tabs(object){
-    //clear Active
+    //hide user info if open
+    document.getElementById("data_4").classList.add("hidden");
+    
+    //clear Active and set new
     for(i=1; i<=3; i++){
         //remove active
         if("tab_"+i != object.id){
