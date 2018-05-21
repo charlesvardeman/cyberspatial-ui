@@ -77,51 +77,23 @@
                             <th>Notes</th>
                             <th</th>
                         </tr>
+                        {% for user in users %}
+                        {% ifequal  user.njcusermeta.role|stringformat:"s" "Municipal Approvers" %}
                         <tr>
-                            <td>1506</td>
-                            <td>Berkeley Twp</td>
-                            <td>John Camera</td>
-                            <td class="position">Township Administrator</td>
-                            <td><a>jcamera@twp.berkeley.nj.us</a></td>
-                            <td class="notes">Approved 2-2-2018 by sthompson; Second note added later</td>
+                            {% for municipality in municipalities %}
+                                {% ifequal municipality.name|stringformat:"s" user.njcusermeta.municipality|stringformat:"s" %}
+                            <td>{{ municipality.code }}</td>
+                                {% endifequal %}
+                            {% endfor %}
+                            <td>{{ user.njcusermeta.municipality }}</td>
+                            <td>{{ user.first_name }} {{ user.last_name }}</td>
+                            <td class="position">{{ user.njcusermeta.position }}</td>
+                            <td><a>{{ user.email }}</a></td>
+                            <td class="notes">{{ user.njcusermeta.notes }}</td>
                             <td><a href="admin-ma-profile.html"><span class="fa fa-info-circle"></span></a></td>
                         </tr>
-                        <tr>
-                            <td>1323</td>
-                            <td>Keansburg Boro</td>
-                            <td>Edward P. Striedl</td>
-                            <td class="position">Construction / Code Enforcement / Zoning Officer, Floodplain Manager</td>
-                            <td><a>ed.striedl@keansburg-nj.us</a></td>
-                            <td class="notes">Approved 12-14-2017 by khenderson</td>
-                            <td><a href="admin-ma-profile.html"><span class="fa fa-info-circle"></span></a></td>
-                        </tr>
-                        <tr>
-                            <td>0101</td>
-                            <td>Absecon City</td>
-                            <td class="null">n/a</td>
-                            <td class="position null">n/a</td>
-                            <td class="null">n/a</td>
-                            <td class="notes"></td>
-                            <td><a href="admin-ma-profile-null.html"><span class="fa fa-info-circle"></span></a></td>
-                        </tr>
-                        <tr>
-                            <td>0102</td>
-                            <td>Atlantic City</td>
-                            <td class="null">n/a</td>
-                            <td class="position null">n/a</td>
-                            <td class="null">n/a</td>
-                            <td class="notes"></td>
-                            <td><a href="admin-ma-profile-null.html"><span class="fa fa-info-circle"></span></a></td>
-                        </tr>
-                        <tr>
-                            <td>0103</td>
-                            <td>Brigantine City</td>
-                            <td class="null">n/a</td>
-                            <td class="position null">n/a</td>
-                            <td class="null">n/a</td>
-                            <td class="notes"></td>
-                            <td><a href="admin-ma-profile-null.html"><span class="fa fa-info-circle"></span></a></td>
-                        </tr>
+                        {% endifequal %}
+                        {% endfor %}
                     </tbody>
                 </table>
 
