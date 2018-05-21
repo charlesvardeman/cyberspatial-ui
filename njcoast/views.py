@@ -551,6 +551,26 @@ def user_approval(request):
                 #flag OK
                 return JsonResponse({'updated': True})
 
+        #approve?
+        elif request.POST['action'] == 'update_role':
+            #load user
+            user = Profile.objects.get(username=request.POST['user'])
+
+            #test we got them
+            if user:
+                print "Approve",user.username
+                #set notes
+                user.njcusermeta.notes = request.POST['notes']
+
+                #role
+                user.njcusermeta.role = NJCRole.objects.get(name=request.POST['role'])
+
+                #save results
+                user.save()
+
+                #flag OK
+                return JsonResponse({'updated': True})
+
         else:
             print "Action not recognized", request.POST['action']
 
