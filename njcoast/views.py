@@ -4,7 +4,7 @@ from django.conf import settings
 from geonode.layers.models import Layer
 from django.views.generic import TemplateView
 import json
-from models import NJCMap, NJCMapAnnotation, NJCMapExpert, NJCMunicipality, NJCRole
+from models import NJCMap, NJCMapAnnotation, NJCMapExpert, NJCMunicipality, NJCRole, NJCCounty
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -510,5 +510,11 @@ class DCADashboardTemplateView(TemplateView):
             print municipality.name
 
         context['municipalities'] = NJCMunicipality.objects.all()
+
+        #get counties
+        context['counties'] = NJCCounty.objects.all().order_by('name')
+
+        #get roles
+        context['roles'] = NJCRole.objects.all().order_by('name')
 
         return context
