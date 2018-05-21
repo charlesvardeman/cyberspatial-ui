@@ -493,7 +493,7 @@ class DCADashboardTemplateView(TemplateView):
         users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').order_by('last_name')
         count = 0
         for user in users:
-            print user.username, user.voice
+            print user.username, user.voice, user.username
             if not user.is_active and not user.njcusermeta.is_dca_approved:
                 count = count + 1
 
@@ -518,3 +518,40 @@ class DCADashboardTemplateView(TemplateView):
         context['roles'] = NJCRole.objects.all().order_by('name')
 
         return context
+
+'''
+  Ajax calls to approve or modify users from DCA dashboard.
+'''
+@login_required
+def user_approval(request):
+    if request.method == "POST":
+        print "Action", request.POST['action']
+
+        #test action
+        #approve?
+        if request.POST['action'] == 'approve':
+            #load user
+            user = Profile.objects.get(username=request.POST['user'])
+
+            #test we got them
+            if user:
+                print "Approve",user.username
+                #set Active
+                user.is_active = True
+
+                #set dca approved
+                user.njcusermeta.is_dca_approved = True
+
+                #set dca approved
+                user.njcusermeta.notes = request.POST['notes']
+
+                #save results
+                user.save()
+
+                #flag OK
+                return JsonResponse({'updated': True})
+
+        else:
+            print "Action not recognized", request.POST['action']
+
+        return JsonResponse({'updated': False})
