@@ -86,11 +86,20 @@ class NJCMunicipality(models.Model):
     home_longitude = models.CharField(max_length=20)
     zoom_level = models.PositiveIntegerField()
     code = models.PositiveIntegerField()
+    county = models.ForeignKey('NJCCounty', blank=True,null=True)
+    group_name = models.CharField(max_length=20, default="")
 
     def __str__(self):
         return self.name
 
 class NJCRole(models.Model):
+    name = models.CharField(max_length=20)
+    group_name = models.CharField(max_length=20, default="")
+
+    def __str__(self):
+        return self.name
+
+class NJCCounty(models.Model):
     name = models.CharField(max_length=20)
 
     def __str__(self):
