@@ -7,6 +7,7 @@
 
 {% block extra_head %}
     <link rel="stylesheet" type="text/css" href="{% static "css/fontawesome-all.min.css" %}" media="screen" />
+    <link rel="stylesheet" type="text/css" href="{% static "css/njcoast-admin-style.css" %}" media="screen" />
 {% endblock extra_head %}
 
 {% block middle %}
@@ -35,9 +36,10 @@
                         <span class="f-label">Filters:</span>
 
                         <div class="btn-group">
-                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            County <span class="caret"></span>
-          </button>
+                            <button type="button" class="btn btn-default dropdown-toggle"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    County <span class="caret"></span>
+                                        </button>
                             <ul class="dropdown-menu">
                                 <li><a href="#">Atlantic</a></li>
                                 <li><a href="#">Bergen</a></li>
