@@ -330,6 +330,8 @@
 {% endblock %}
 
 {% block extra_script %}
+<script src="{% static 'js/notify.min.js' %}"></script>
+
 <script type=text/javascript>
 //user approvals
 function user_update(object, action){
@@ -351,11 +353,11 @@ function user_update(object, action){
         success: function(result) {
             console.log("USER APPROVAL -- SUCCESS!" + result.updated);
             //now auto save so dont flag
-            console.log("Settings saved", "success");
+            $.notify("User updated", "success");
         },
         error: function(result) {
             console.log("ERROR:", result)
-            console.log("Error saving map settings", "error");
+            $.notify("Error updating user", "error");
         }
     });
 
