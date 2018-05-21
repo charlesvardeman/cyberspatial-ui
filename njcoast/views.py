@@ -493,7 +493,7 @@ class DCADashboardTemplateView(TemplateView):
         users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').order_by('last_name')
         count = 0
         for user in users:
-            print user.username
+            print user.username, user.voice
             if not user.is_active and not user.njcusermeta.is_dca_approved:
                 count = count + 1
 
