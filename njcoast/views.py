@@ -491,8 +491,14 @@ class DCADashboardTemplateView(TemplateView):
         context = super(DCADashboardTemplateView, self).get_context_data(**kwargs)
 
         users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').order_by('last_name')
+        count = 0
         for user in users:
             print user.username
+            if not user.is_active and not user.njcusermeta.is_dca_approved:
+                count = count + 1
+
+        print count
+        context['number_to_be_approved'] = count
 
         #quiery, select all users
         context['users'] = users
@@ -502,7 +508,7 @@ class DCADashboardTemplateView(TemplateView):
 
         for municipality in municipalities:
             print municipality.name
-            
+
         context['municipalities'] = NJCMunicipality.objects.all()
 
         return context

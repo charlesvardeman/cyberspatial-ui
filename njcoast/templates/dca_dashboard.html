@@ -195,11 +195,15 @@
         <!-- account requests ------------------------------------------------->
         <div id="data_3" class="hidden">
             <div class="filter-bkgrnd">
-                <i><span class="fa fa-exclamation-circle"></span> 2 pending requests</i>
+                <i><span class="fa fa-exclamation-circle"></span> {{ number_to_be_approved }} pending requests</i>
             </div>
 
             <div class="table-bkgrnd">
-
+                {% for user in users %}
+                    {% if user.is_active %}
+                    {% else %}
+                        {% if user.njcusermeta.is_dca_approved %}
+                        {% else %}
                 <div class="row review-request">
                     <div class="col-md-5 col-lg-4">
                         <div class="well">
@@ -207,28 +211,28 @@
                                 <tbody>
                                     <tr>
                                         <th style="border-top: 0">Name</th>
-                                        <td style="border-top: 0">Bethany Ambrose</td>
+                                        <td style="border-top: 0">{{ user.first_name }} {{ user.last_name }}</td>
                                     </tr>
                                     <tr>
                                         <th>Title</th>
-                                        <td>Deputy Sherriff</td>
+                                        <td>{{ user.njcusermeta.position }}</td>
                                     </tr>
                                     <tr>
                                         <th>Municipality</th>
-                                        <td><a href="admin-ma-profile.html">Berkeley Twp</a></td>
+                                        <td><a href="admin-ma-profile.html">{{ user.njcusermeta.municipality }}</a></td>
                                     </tr>
                                     <tr>
                                         <th>Role</th>
-                                        <td>First Responder</td>
+                                        <td>{{ user.njcusermeta.role }}</td>
                                     </tr>
                                 </tbody>
                             </table>
-                            <p><b>Justification:</b> I am the newly appointed Deputy Sherriff and would like to use NJcoast in emergencies.</p>
+                            <p><b>Justification:</b>{{ user.njcusermeta.justification }}</p>
                         </div>
                     </div>
                     <div class="col-md-7 col-lg-8">
-                        <p class="qualifier" style="margin-top: 10px;">Received: 2-5-2018; Muni Approval: John Camera 2-6-2018</p>
-                        <textarea class="form-control" placeholder="Notes..." rows="7"></textarea>
+                        <p class="qualifier" style="margin-top: 10px;">Received: {{ user.date_joined }}; Muni Approval: {{ user.muni_approval_date }}</p>
+                        <textarea class="form-control" placeholder="{{ user.njcusermeta.notes }}" rows="7"></textarea>
                         <div class="btn-group">
                             <button type="button" class="btn btn-default dropdown-toggle"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -244,57 +248,11 @@
                         <button class="btn btn-default" data-toggle="modal" data-target="">Decline*</button>
                         <p class="qualifier" style="margin-top: 10px;">*Any notes entered for a Declined applicant will be shared with the applicant to justify the decision.</p>
                     </div>
-
                 </div>
-
                 <hr/>
-
-                <div class="row review-request">
-                    <div class="col-md-5 col-lg-4">
-                        <div class="well">
-                            <table class="table">
-                                <tbody>
-                                    <tr>
-                                        <th style="border-top: 0">Name</th>
-                                        <td style="border-top: 0">Xavier Rhodes</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Title</th>
-                                        <td>Ocean County Planner</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Municipality</th>
-                                        <td>Statewide</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Role</th>
-                                        <td>Planner</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <p><b>Justification:</b> I participate in planning activities for Ocean County and would like to be able to access data in one place and run storm simulations.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-7 col-lg-8">
-                        <p class="qualifier" style="margin-top: 10px;">Received: 2-6-2018</p>
-                        <textarea class="form-control" placeholder="Notes..." rows="7"></textarea>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-default dropdown-toggle"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Change Role <span class="caret"></span>
-                                        </button>
-                            <ul class="dropdown-menu">
-                                <li><a href="#">Planner</a></li>
-                                <li><a href="#">Emergency Manager</a></li>
-                                <li><a href="#">First Responder</a></li>
-                            </ul>
-                        </div>
-                        <button class="btn btn-primary" data-toggle="modal" data-target="">Approve</button>
-                        <button class="btn btn-default" data-toggle="modal" data-target="">Decline*</button>
-                        <p class="qualifier" style="margin-top: 10px;">*Any notes entered for a Declined applicant will be shared with the applicant to justify the decision.</p>
-                    </div>
-
-                </div>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
 
             </div>
         </div>
