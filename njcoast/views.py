@@ -497,4 +497,12 @@ class DCADashboardTemplateView(TemplateView):
         #quiery, select all users
         context['users'] = users
 
+        #get municipalities
+        municipalities = NJCMunicipality.objects.all()
+
+        for municipality in municipalities:
+            print municipality.name
+            
+        context['municipalities'] = NJCMunicipality.objects.all()
+
         return context
