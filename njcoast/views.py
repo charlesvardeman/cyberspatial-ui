@@ -558,13 +558,34 @@ def user_approval(request):
 
             #test we got them
             if user:
-                print "Approve",user.username
+                print "Role update",user.username
                 #set notes
                 user.njcusermeta.notes = request.POST['notes']
 
                 #role
                 user.njcusermeta.role = NJCRole.objects.get(name=request.POST['role'])
 
+                #save results
+                user.save()
+
+                #flag OK
+                return JsonResponse({'updated': True})
+
+        #approve?
+        elif request.POST['action'] == 'decline':
+            #load user
+            user = Profile.objects.get(username=request.POST['user'])
+
+            #test we got them
+            if user:
+                print "Decline",user.username
+                #set notes
+                user.njcusermeta.notes = request.POST['notes']
+
+                #set dca approved/is_muni_approved, with not active this means INACTIVE
+                user.njcusermeta.is_dca_approved = True
+                user.njcusermeta.is_muni_approved = True
+                
                 #save results
                 user.save()
 
