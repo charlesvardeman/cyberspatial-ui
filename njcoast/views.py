@@ -543,6 +543,7 @@ def user_to_dictionary(user):
     user_dict['justification'] = user.njcusermeta.justification
     user_dict['voice'] = user.voice
     user_dict['notes'] = user.njcusermeta.notes
+    user_dict['role'] = user.njcusermeta.role.name
     user_dict['is_dca_approved'] = user.njcusermeta.is_dca_approved
     user_dict['is_muni_approved'] = user.njcusermeta.is_muni_approved
     user_dict['dca_approval_date'] = user.njcusermeta.dca_approval_date.__str__()

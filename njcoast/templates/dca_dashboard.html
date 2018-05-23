@@ -258,7 +258,8 @@
                 <a id="navigation_4" onclick="view_user_info('', 2, '');" href="#"><span class="fa fa-chevron-left"></span> Return to All NJcoast Users list</a>
             </div>
 
-            <div class="table-bkgrnd">
+            <!--User data presented-------------------------------------------->
+            <div id="info_user" class="table-bkgrnd">
 
                 <div class="row">
                     <div class="col-sm-3">
@@ -310,13 +311,128 @@
                             </tbody>
                         </table>
 
-                        <a href="admin-user-profile-edit.html" class="btn btn-primary">Edit</a>
+                        <a onclick="show_user_edit(true);" href="#" class="btn btn-primary">Edit</a>
                         <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">
                                           Delete
                                         </button>
                     </div>
                 </div>
             </div>
+            <!--END of data presented------------------------------------------>
+
+            <!--Editable version----------------------------------------------->
+            <div id="editable_user" class="table-bkgrnd hidden">
+
+                <div class="row">
+                    <div class="col-sm-3"> <!-- col-md-6 "-->
+                            <div class="lg-list-identifier ">
+                              <span class="fa fa-users fa-5x "></span>
+                              <p>NJcoast User Profile</p>
+                            </div>
+                          </div>
+                          <div class="col-sm-9 "> <!-- col-md-6"-->
+
+                        <table class="table edit-profile">
+                            <tbody>
+                                <tr>
+                                    <th style="border-top: 0">Full Name</th>
+                                    <td style="border-top: 0"><input type="text" class="form-control" id="edit_name" value="Sarah Jones"></td>
+                                </tr>
+                                <tr>
+                                    <th>Position/Title</th>
+                                    <td><input type="text" class="form-control" id="edit_role" value="Planner"></td>
+                                </tr>
+                                <tr>
+                                    <th>Municipality Name</th>
+                                    <td><input type="text" class="form-control" id="edit_municipality" value="Berkeley Twp"></td>
+                                </tr>
+                                <tr>
+                                    <th>Municipality Code</th>
+                                    <!-- Should auto-update when Municipality changes -->
+                                    <td id="edit_code" style="color:#999">1506</td>
+                                </tr>
+                                <tr>
+                                    <th>Mailing address</th>
+                                    <td>
+                                        <input type="text" class="form-control" id="ma-street-address-1" value="627 Pinewald-Keswick Rd">
+                                        <input type="text" class="form-control" id="ma-street-address-2" placeholder="Address line 2">
+                                        <input type="text" class="form-control" id="ma-city" value="Bayville">
+                                        <input type="text" class="form-control" id="ma-zip" value="08721">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Email</th>
+                                    <td><input type="email" class="form-control" id="edit_email" value="sjones@gmail.com"></td>
+                                </tr>
+                                <tr>
+                                    <th>Phone</th>
+                                    <td><input type="tel" class="form-control" id="edit_voice" value="732-341-1132"></td>
+                                </tr>
+                                <tr>
+                                    <th>Role</th>
+                                    <td>
+                                        <select class="form-control">
+                                            {% for role in roles %}
+                                            <option>{{ role.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Justification</th>
+                                    <td id="edit_justification" style="color:#999">I am involved in planning for Berkeley, and need the tool for storm projection.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#saveChanges-1">
+                              Save changes
+                            </button>
+                        <a onclick="show_user_edit(false);" href="#" class="btn btn-default">Cancel</a>
+
+
+                        <!-- Modal - Save changes button -->
+                        <div class="modal fade" id="saveChanges-1" tabindex="-1" role="dialog" aria-labelledby="saveChanges">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title" id="saveChanges">Save changes</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        You have made changes to this NJcoast user profile. Would you like to save these changes?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <a class="btn btn-primary" href="admin-user-profile.html">Yes</a>
+                                        <a class="btn btn-default" href="admin-user-profile.html">No</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal - Return to list link (only triggered if changes have been made) -->
+                        <div class="modal fade" id="saveChanges-2" tabindex="-1" role="dialog" aria-labelledby="saveBeforeReturn">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title" id="saveBeforeReturn">Save changes</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        You have made changes to this NJcoast user profile. Would you like to save these changes?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <a class="btn btn-primary" href="admin-dca-users.html">Yes</a>
+                                        <a class="btn btn-default" href="admin-dca-users.html">No</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+            </div>
+            <!--END Editable version------------------------------------------->
+
         </div>
         <!-- END account info ------------------------------------------------->
 
@@ -328,6 +444,18 @@
 <script src="{% static 'js/notify.min.js' %}"></script>
 
 <script type=text/javascript>
+//user editing
+function show_user_edit(do_edit){
+    //flip pages
+    if(do_edit){
+        document.getElementById("info_user").classList.add("hidden");
+        document.getElementById("editable_user").classList.remove("hidden");
+    }else{
+        document.getElementById("info_user").classList.remove("hidden");
+        document.getElementById("editable_user").classList.add("hidden");
+    }
+}
+
 //user approvals
 function user_update(username, user_number, action, role){
     //update role if required
@@ -385,9 +513,22 @@ function view_user_info(username, tab_to_return_to, return_text){
                     console.log(result.data+","+result.data.name);
                     //put data into html
                     for(user_var in result.data){
+                        //info form
                         try {
                             elmt = document.getElementById("info_"+user_var);
                             elmt.innerHTML = result.data[user_var];
+                        }
+                        catch(err) {
+                        }
+
+                        //edit form
+                        try {
+                            elmt = document.getElementById("edit_"+user_var);
+                            if(elmt.nodeName == "INPUT"){
+                                elmt.value = result.data[user_var];
+                            }else{
+                                elmt.innerHTML = result.data[user_var];
+                            }
                         }
                         catch(err) {
                         }
