@@ -240,12 +240,12 @@
                                         </button>
                             <ul class="dropdown-menu">
                                 {% for role in roles %}
-                                <li><a id="button3_{{ forloop.parentloop.counter }}" name="{{ user.username }}" onclick="user_update(this, 'update_role', '{{ role.name }}');" href="#">{{ role.name }}</a></li>
+                                <li><a onclick="user_update('{{ user.username }}', '{{ forloop.parentloop.counter }}', 'update_role', '{{ role.name }}');" href="#">{{ role.name }}</a></li>
                                 {% endfor %}
                             </ul>
                         </div>
-                        <button id="button1_{{ forloop.counter }}" name="{{ user.username }}" onclick="user_update(this, 'approve', '');" class="btn btn-primary" data-toggle="modal" data-target="">Approve</button>
-                        <button id="button2_{{ forloop.counter }}" name="{{ user.username }}" onclick="user_update(this, 'decline', '');" class="btn btn-default" data-toggle="modal" data-target="">Decline*</button>
+                        <button onclick="user_update('{{ user.username }}', '{{ forloop.counter }}', 'approve', '');" class="btn btn-primary" data-toggle="modal" data-target="">Approve</button>
+                        <button onclick="user_update('{{ user.username }}', '{{ forloop.counter }}', 'decline', '');" class="btn btn-default" data-toggle="modal" data-target="">Decline*</button>
                         <p class="qualifier" style="margin-top: 10px;">*Any notes entered for a Declined applicant will be shared with the applicant to justify the decision.</p>
                     </div>
                 </div>
@@ -335,10 +335,7 @@
 
 <script type=text/javascript>
 //user approvals
-function user_update(object, action, role){
-    //strip out button number
-    user_number = object.id.substring(8);
-
+function user_update(username, user_number, action, role){
     //update role if required
     if(action == 'update_role'){
         document.getElementById("role_"+user_number).innerHTML = role;
@@ -351,7 +348,7 @@ function user_update(object, action, role){
         data: {
             'role': role,
             'notes': document.getElementById("text_"+user_number).value,
-            'user': object.name,
+            'user': username,
             'action': action
         },
         dataType: "json",
