@@ -484,38 +484,49 @@ def signup(request):
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form, 'error_data': ''})
 
+#DCA admin dashboard
 class DCADashboardTemplateView(TemplateView):
     template_name = 'dca_dashboard.html'
 
     def get_context_data(self, **kwargs):
         context = super(DCADashboardTemplateView, self).get_context_data(**kwargs)
 
+        #get users
         users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').order_by('last_name')
-        count = 0
+        total_users = len(users)
+        count_requests = 0
         for user in users:
             print user.username, user.voice, user.username
+            #find number to be approved
             if not user.is_active and not user.njcusermeta.is_dca_approved:
-                count = count + 1
+                count_requests = count_requests + 1
 
-        print count
-        context['number_to_be_approved'] = count
+        #print data and add to context
+        print count_requests, total_users
+        context['number_to_be_approved'] = count_requests
+        context['total_users'] = total_users
 
         #quiery, select all users
         context['users'] = users
 
         #get municipalities
-        municipalities = NJCMunicipality.objects.all()
+        municipalities = NJCMunicipality.objects.exclude(name='Statewide').order_by('name')
 
         for municipality in municipalities:
             print municipality.name
 
-        context['municipalities'] = NJCMunicipality.objects.all()
+        context['municipalities'] = NJCMunicipality.objects.exclude(name='Statewide').order_by('name')
+
+        #and muni admins
+        muni_admins = Profile.objects.filter(groups__name='municipal_administrators').order_by('last_name')
+        print "Muni admins",len(muni_admins)
+        context['muni_admins'] = muni_admins
 
         #get counties
         context['counties'] = NJCCounty.objects.all().order_by('name')
 
         #get roles
-        context['roles'] = NJCRole.objects.all().order_by('name')
+        context['roles'] = NJCRole.objects.all().order_by('name').order_by('name')
 
         return context
 
