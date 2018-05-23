@@ -519,12 +519,48 @@ class DCADashboardTemplateView(TemplateView):
 
         return context
 
+#Parse out user object to dictionary
+def user_to_dictionary(user):
+    #convert user data
+    user_dict = {}
+    user_dict['username'] = user.username
+    user_dict['name'] = user.first_name + " " + user.last_name
+    user_dict['email'] = user.email
+    user_dict['municipality'] = user.njcusermeta.municipality.name
+    user_dict['position'] = user.njcusermeta.position
+    user_dict['code'] = user.njcusermeta.municipality.code
+    user_dict['justification'] = user.njcusermeta.justification
+    user_dict['voice'] = user.voice
+    user_dict['notes'] = user.njcusermeta.notes
+    user_dict['is_dca_approved'] = user.njcusermeta.is_dca_approved
+    user_dict['is_muni_approved'] = user.njcusermeta.is_muni_approved
+    user_dict['dca_approval_date'] = user.njcusermeta.dca_approval_date.__str__()
+    user_dict['muni_approval_date'] = user.njcusermeta.muni_approval_date.__str__()
+
+    #Return
+    return user_dict
+
+
 '''
   Ajax calls to approve or modify users from DCA dashboard.
 '''
 @login_required
 def user_approval(request):
-    if request.method == "POST":
+    #GET section of the API
+    if request.method == "GET":
+        print "Action", request.GET['action']
+        #find required action
+        if request.GET['action'] == 'get_user':
+            user = Profile.objects.get(username=request.GET['user'])
+            #test we got them
+            if user:
+                #flag OK and return data
+                return JsonResponse({'updated': True, 'data': user_to_dictionary(user)})
+        else:
+            print "Action not recognized", request.GET['action']
+
+    #POST section of the API
+    elif request.method == "POST":
         print "Action", request.POST['action']
 
         #test action
@@ -585,7 +621,7 @@ def user_approval(request):
                 #set dca approved/is_muni_approved, with not active this means INACTIVE
                 user.njcusermeta.is_dca_approved = True
                 user.njcusermeta.is_muni_approved = True
-                
+
                 #save results
                 user.save()
 
