@@ -85,7 +85,7 @@
                             <td class="position">{{ user.njcusermeta.position }}</td>
                             <td><a>{{ user.email }}</a></td>
                             <td class="notes">{{ user.njcusermeta.notes }}</td>
-                            <td><a onclick="view_user_info(true, {{ forloop.counter }},1);" href="#"><span class="fa fa-info-circle"></span></a></td>
+                            <td><a onclick="view_user_info('{{ user.username  }}', 1, 'Return to Municipal Approvers list');" href="#"><span class="fa fa-info-circle"></span></a></td>
                         </tr>
                         {% endifequal %}
                         {% endfor %}
@@ -163,12 +163,12 @@
                                     {% if user.is_active %}
                                     <td class="status act">active</td>
                                     <td class="notes">{{ user.njcusermeta.notes }}</td>
-                                    <td><a onclick="view_user_info(true, {{ forloop.counter }}, 2);" href="#"><span class="fa fa-info-circle"></span></a></td>
+                                    <td><a onclick="view_user_info('{{ user.username }}', 2, 'Return to All NJcoast Users list');" href="#"><span class="fa fa-info-circle"></span></a></td>
                                     {% else %}
                                         {% if user.njcusermeta.is_dca_approved %}
                                     <td class="status inact">inactive</td>
                                     <td class="notes">{{ user.njcusermeta.notes }}</td>
-                                    <td><a onclick="view_user_info(true, {{ forloop.counter }}, 2);" href="#"><span class="fa fa-info-circle"></span></a></td>
+                                    <td><a onclick="view_user_info('{{ user.username }}', 2, 'Return to All NJcoast Users list');" href="#"><span class="fa fa-info-circle"></span></a></td>
                                         {% else %}
                                     <td class="status pnd">pending</td>
                                     <td><a onclick="flip_tabs('tab_3');" href="#" class="btn btn-warning btn-sm btn-block">View Request</a></td>
@@ -178,6 +178,7 @@
                                     <div class="hidden" id="user_{{ forloop.counter }}_6">{{ user.njcusermeta.justification }}</div>
                                     <div class="hidden" id="user_{{ forloop.counter }}_7">{{ user.njcusermeta.municipality.code }}</div>
                                     <div class="hidden" id="user_{{ forloop.counter }}_8">{{ user.voice }}</div>
+                                    <div class="hidden" id="user_{{ forloop.counter }}_9">{{ user.username }}</div>
                                     <td></td>
                                 </tr>
                                 {% endfor %}
@@ -260,7 +261,7 @@
         <!-- account info ----------------------------------------------------->
         <div id="data_4" class="hidden">
             <div id="navigation_4" class="return-to-list">
-                <a id="navigation_4" onclick="view_user_info(false, 0, 2);" href="#"><span class="fa fa-chevron-left"></span> Return to All NJcoast Users list</a>
+                <a id="navigation_4" onclick="view_user_info('', 2, '');" href="#"><span class="fa fa-chevron-left"></span> Return to All NJcoast Users list</a>
             </div>
 
             <div class="table-bkgrnd">
@@ -278,19 +279,19 @@
                             <tbody>
                                 <tr>
                                     <th style="border-top: 0">Full Name</th>
-                                    <td id="info_1" style="border-top: 0">Sarah Jones</td>
+                                    <td id="info_name" style="border-top: 0">Sarah Jones</td>
                                 </tr>
                                 <tr>
                                     <th>Position/Title</th>
-                                    <td id="info_5">Planner</td>
+                                    <td id="info_position">Planner</td>
                                 </tr>
                                 <tr>
                                     <th>Municipality Name</th>
-                                    <td id="info_4">Berkeley Twp</td>
+                                    <td id="info_municipality">Berkeley Twp</td>
                                 </tr>
                                 <tr>
                                     <th>Municipality Code</th>
-                                    <td id="info_7">1506</td>
+                                    <td id="info_code">1506</td>
                                 </tr>
                                 <tr>
                                     <!--<tr>
@@ -298,19 +299,19 @@
                                         <td>627 Pinewald-Keswick Rd<br/>Bayville, NJ 08721</td>
                                     </tr>-->
                                     <th>Email</th>
-                                    <td><a id="info_2">sjones@gmail.com</a></td>
+                                    <td><a id="info_email">sjones@gmail.com</a></td>
                                 </tr>
                                 <tr>
                                     <th>Phone</th>
-                                    <td id="info_8">732-341-1132</td>
+                                    <td id="info_voice">732-341-1132</td>
                                 </tr>
                                 <tr>
                                     <th>Role</th>
-                                    <td id="info_3">PL - Planning</td>
+                                    <td id="info_role">PL - Planning</td>
                                 </tr>
                                 <tr>
                                     <th>Justification</th>
-                                    <td id="info_6">I am involved in planning for Berkeley, and need the tool for storm projection.</td>
+                                    <td id="info_justification">I am involved in planning for Berkeley, and need the tool for storm projection.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -356,8 +357,14 @@ function user_update(object, action, role){
         dataType: "json",
         success: function(result) {
             console.log("USER APPROVAL -- SUCCESS!" + result.updated);
-            //now auto save so dont flag
-            $.notify("User updated", "success");
+
+            if(result.updated){
+                //flag success
+                $.notify("User updated", "success");
+            }else{
+                //or failure
+                $.notify("Error updating user", "error");
+            }
         },
         error: function(result) {
             console.log("ERROR:", result)
@@ -368,24 +375,52 @@ function user_update(object, action, role){
 }
 
 //view user info
-function view_user_info(view_info, number, tab){
-    console.log("data "+view_info+","+number);
-    if(view_info){
-        //set return link
-        if(tab == 2){
-            document.getElementById("navigation_4").innerHTML = "<a onclick=\"view_user_info(false, 0, "+tab+");\" href=\"#\"><span class=\"fa fa-chevron-left\"></span> Return to All NJcoast Users list";
-        }else{
-            document.getElementById("navigation_4").innerHTML = "<a onclick=\"view_user_info(false, 0, "+tab+");\" href=\"#\"><span class=\"fa fa-chevron-left\"></span> Return to Municipal Approvers list";
-        }
+function view_user_info(username, tab_to_return_to, return_text){
+    console.log("data "+username);
+    if(username != ""){
+        //do Ajax call
+        $.ajax({
+            type: "GET",
+            url: "/user/settings/",
+            data: {
+                'user': username,
+                'action': 'get_user'
+            },
+            dataType: "json",
+            success: function(result) {
+                console.log("USER APPROVAL -- SUCCESS!" + result.updated);
 
-        //copy data over
-        for(i=1; i<=8; i++){
-            document.getElementById("info_"+i).innerHTML = document.getElementById("user_"+number+"_"+i).innerHTML;
-        }
-        document.getElementById("data_4").classList.remove("hidden");
-        document.getElementById("data_"+tab).classList.add("hidden");
+                if(result.updated){
+                    console.log(result.data+","+result.data.name);
+                    //put data into html
+                    for(user_var in result.data){
+                        try {
+                            elmt = document.getElementById("info_"+user_var);
+                            elmt.innerHTML = result.data[user_var];
+                        }
+                        catch(err) {
+                        }
+
+                        //flip pages
+                        document.getElementById("data_4").classList.remove("hidden");
+                        document.getElementById("data_"+tab_to_return_to).classList.add("hidden");
+
+                        //set return link
+                        document.getElementById("navigation_4").innerHTML = "<a onclick=\"view_user_info('', "+tab_to_return_to+", '');\" href=\"#\"><span class=\"fa fa-chevron-left\"></span> "+return_text;
+                        //console.log("variable "+user_var+","+result.data[user_var]);
+                    }
+                }else{
+                    //or failure
+                    console.log("Error retrieving user");
+                }
+            },
+            error: function(result) {
+                console.log("Error retrieving user!");
+            }
+        });
     }else{
-        document.getElementById("data_"+tab).classList.remove("hidden");
+        //flip pages back
+        document.getElementById("data_"+tab_to_return_to).classList.remove("hidden");
         document.getElementById("data_4").classList.add("hidden");
     }
 }
