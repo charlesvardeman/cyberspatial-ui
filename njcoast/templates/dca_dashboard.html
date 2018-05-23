@@ -156,10 +156,10 @@
                                 </tr>
                                 {% for user in users %}
                                 <tr>
-                                    <td id="user_{{ forloop.counter }}_1">{{ user.first_name }} {{ user.last_name }}</td>
-                                    <td><a id="user_{{ forloop.counter }}_2">{{ user.email }}</a></td>
-                                    <td id="user_{{ forloop.counter }}_3">{{ user.njcusermeta.role }}</td>
-                                    <td id="user_{{ forloop.counter }}_4">{{ user.njcusermeta.municipality }}</td>
+                                    <td>{{ user.first_name }} {{ user.last_name }}</td>
+                                    <td><a>{{ user.email }}</a></td>
+                                    <td>{{ user.njcusermeta.role }}</td>
+                                    <td>{{ user.njcusermeta.municipality }}</td>
                                     {% if user.is_active %}
                                     <td class="status act">active</td>
                                     <td class="notes">{{ user.njcusermeta.notes }}</td>
@@ -174,11 +174,6 @@
                                     <td><a onclick="flip_tabs('tab_3');" href="#" class="btn btn-warning btn-sm btn-block">View Request</a></td>
                                         {% endif %}
                                     {% endif %}
-                                    <div class="hidden" id="user_{{ forloop.counter }}_5">{{ user.njcusermeta.position }}</div>
-                                    <div class="hidden" id="user_{{ forloop.counter }}_6">{{ user.njcusermeta.justification }}</div>
-                                    <div class="hidden" id="user_{{ forloop.counter }}_7">{{ user.njcusermeta.municipality.code }}</div>
-                                    <div class="hidden" id="user_{{ forloop.counter }}_8">{{ user.voice }}</div>
-                                    <div class="hidden" id="user_{{ forloop.counter }}_9">{{ user.username }}</div>
                                     <td></td>
                                 </tr>
                                 {% endfor %}
