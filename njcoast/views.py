@@ -680,6 +680,23 @@ def user_approval(request):
                 #flag OK
                 return JsonResponse({'updated': True})
 
+        #decline?
+        elif request.POST['action'] == 'delete':
+            #load user
+            user = Profile.objects.get(username=request.POST['user'])
+
+            #test we got them
+            if user:
+                print "Delete",user.username
+
+                user.is_active = False
+
+                #save results
+                user.save()
+
+                #flag OK
+                return JsonResponse({'updated': True})
+
         else:
             print "Action not recognized", request.POST['action']
 
