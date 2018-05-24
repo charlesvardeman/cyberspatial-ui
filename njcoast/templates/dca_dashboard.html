@@ -143,7 +143,7 @@
 
                     <div class="col-sm-10">
                         <table class="table table-hover admin-user">
-                            <tbody>
+                            <tbody id=user_list>
                                 <tr>
                                     <th>Name <span class="fa fa-sort"></span></th>
                                     <th>Email</th>
@@ -454,6 +454,79 @@
 <script src="{% static 'js/notify.min.js' %}"></script>
 
 <script type=text/javascript>
+//update user info list
+function update_user_list(){
+    //do Ajax call
+    $.ajax({
+        type: "GET",
+        url: "/user/settings/",
+        data: {
+            'action': 'get_users'
+        },
+        dataType: "json",
+        success: function(result) {
+            console.log("USER APPROVAL -- SUCCESS!" + result.updated);
+
+            //success?
+            if(result.updated){
+                //update table
+                table_body = document.getElementById("user_list");
+                table_body.innerHTML =  `   <tr>
+                            <th>Name <span class="fa fa-sort"></span></th>
+                            <th>Email</th>
+                            <th>Role <span class="fa fa-sort"></span></th>
+                            <th>Municipality <span class="fa fa-sort"></span></th>
+
+                            <th>Status</th>
+                            <th>Notes</th>
+                            <th></th>
+                        </tr>`;
+
+                //loop over users
+                for(i=0; i<result.data.length; i++){
+                    user = result.data[i];
+                    console.log(user.name);
+
+                    //basic user data
+                    html_string = `<tr>
+                                        <td>${ user.name }</td>
+                                        <td><a>${ user.email }</a></td>
+                                        <td>${ user.role }</td>
+                                        <td>${ user.municipality }</td>`;
+
+                    //variable data
+                    if(user.active){
+                        html_string +=  `<td class="status act">active</td>
+                                        <td class="notes">${ user.notes }</td>
+                                        <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
+                    }else{
+                        if(user.is_dca_approved){
+                            html_string +=  `<td class="status inact">inactive</td>
+                                            <td class="notes">${ user.notes }</td>
+                                            <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
+                        }else{
+                            html_string +=  `<td class="status pnd">pending</td>
+                                            <td><a onclick="flip_tabs('tab_3');" href="#" class="btn btn-warning btn-sm btn-block">View Request</a></td>`;
+                        }
+                    }
+
+                    //end row
+                    html_string +=  `   <td></td>
+                                    </tr>`;
+                    //combine string into html
+                    table_body.innerHTML += html_string;
+                }
+            }else{
+                //or failure
+            }
+        },
+        error: function(result) {
+            console.log("ERROR:", result)
+        }
+    });
+
+}
+
 //set muni code after selecting
 function set_municipality_code(code){
     console.log(code);
@@ -534,6 +607,9 @@ function save_changes(username){
 
                 //reload view
                 view_user_info(username, 2, "Return to All NJcoast Users list");
+
+                //reload main list
+                update_user_list();
 
                 //flag success
                 $.notify("User updated", "success");
