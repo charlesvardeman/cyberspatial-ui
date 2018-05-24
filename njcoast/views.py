@@ -515,7 +515,7 @@ class DCADashboardTemplateView(TemplateView):
         for municipality in municipalities:
             print municipality.name
 
-        context['municipalities'] = NJCMunicipality.objects.exclude(name='Statewide').order_by('name')
+        context['municipalities'] = NJCMunicipality.objects.order_by('name') #exclude(name='Statewide').
 
         #and muni admins
         muni_admins = Profile.objects.filter(groups__name='municipal_administrators').order_by('last_name')
