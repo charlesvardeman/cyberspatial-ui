@@ -560,6 +560,9 @@ function delete_user(username){
             //fade out modal
             $("#myModal").modal("hide");
 
+            //reload main list
+            update_user_list();
+
         },
         error: function(result) {
             console.log("ERROR:", result)
