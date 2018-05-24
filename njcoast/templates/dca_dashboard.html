@@ -365,9 +365,9 @@
                                     <th>Municipality Name</th>
                                     <!--<td><input type="text" class="form-control" id="edit_municipality" value="Berkeley Twp"></td>-->
                                     <td>
-                                        <select id="edit_municipality_selector" class="form-control">
+                                        <select id="edit_municipality_selector" onchange="set_municipality_code(this.value);" class="form-control">
                                             {% for municipality in municipalities %}
-                                            <option value="{{ municipality.name }}">{{ municipality.name }}</option>
+                                            <option value="{{ municipality.code }}">{{ municipality.name }}</option>
                                             {% endfor %}
                                         </select>
                                     </td>
@@ -454,6 +454,12 @@
 <script src="{% static 'js/notify.min.js' %}"></script>
 
 <script type=text/javascript>
+//set muni code after selecting
+function set_municipality_code(code){
+    console.log(code);
+    document.getElementById("edit_code").innerHTML = code;
+}
+
 //delete user data
 function delete_user(username){
     //fade out modal
@@ -577,7 +583,7 @@ function view_user_info(username, tab_to_return_to, return_text){
                         selctr = document.getElementById("edit_municipality_selector");
                         for(i=0; i<selctr.options.length; i++){
                             if(result.data.municipality == selctr.options[i].text){
-                                selctr.value = result.data.municipality;
+                                selctr.value = result.data.code;
                             }
                         }
 
