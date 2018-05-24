@@ -310,13 +310,32 @@
                                 </tr>
                             </tbody>
                         </table>
-
                         <a onclick="show_user_edit(true);" href="#" class="btn btn-primary">Edit</a>
                         <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">
                                           Delete
                                         </button>
                     </div>
                 </div>
+
+                <!-- Modal -->
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="myModalLabel">Delete NJcoast User Profile</h4>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you would like to delete this NJcoast user profile?
+                            </div>
+                            <div class="modal-footer">
+                                <a onclick="delete_user(document.getElementById('edit_username').innerHTML);" class="btn btn-primary" href="#">Yes</a>
+                                <a onclick="$('#myModal').modal('hide');" class="btn btn-default" href="#">No</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
             <!--END of data presented------------------------------------------>
 
@@ -384,6 +403,7 @@
                                 </tr>
                             </tbody>
                         </table>
+                        <div class="hidden" id="edit_username"></div>
 
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#saveChanges-1">
                               Save changes
@@ -403,33 +423,15 @@
                                         You have made changes to this NJcoast user profile. Would you like to save these changes?
                                     </div>
                                     <div class="modal-footer">
-                                        <a class="btn btn-primary" href="admin-user-profile.html">Yes</a>
-                                        <a class="btn btn-default" href="admin-user-profile.html">No</a>
+                                        <a onclick="save_changes(document.getElementById('edit_username').innerHTML);" class="btn btn-primary" href="#">Yes</a>
+                                        <a onclick="$('#saveChanges-1').modal('hide');" class="btn btn-default" href="#">No</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Modal - Return to list link (only triggered if changes have been made) -->
-                        <div class="modal fade" id="saveChanges-2" tabindex="-1" role="dialog" aria-labelledby="saveBeforeReturn">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                        <h4 class="modal-title" id="saveBeforeReturn">Save changes</h4>
-                                    </div>
-                                    <div class="modal-body">
-                                        You have made changes to this NJcoast user profile. Would you like to save these changes?
-                                    </div>
-                                    <div class="modal-footer">
-                                        <a class="btn btn-primary" href="admin-dca-users.html">Yes</a>
-                                        <a class="btn btn-default" href="admin-dca-users.html">No</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    </div>
                 </div>
-            </div>
             </div>
             <!--END Editable version------------------------------------------->
 
@@ -444,6 +446,22 @@
 <script src="{% static 'js/notify.min.js' %}"></script>
 
 <script type=text/javascript>
+//delete user data
+function delete_user(username){
+    //fade out modal
+    $("#myModal").modal("hide");
+    console.log(username);
+}
+
+//save user data
+function save_changes(username){
+    //fade out modal
+    $("#saveChanges-1").modal("hide");
+    console.log(username);
+    document.getElementById("info_user").classList.remove("hidden");
+    document.getElementById("editable_user").classList.add("hidden");
+}
+
 //user editing
 function show_user_edit(do_edit){
     //flip pages
