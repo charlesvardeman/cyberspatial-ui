@@ -537,6 +537,8 @@ def user_to_dictionary(user):
     user_dict['username'] = user.username
     user_dict['name'] = user.first_name + " " + user.last_name
     user_dict['email'] = user.email
+
+    #additional user fields for NJC
     user_dict['municipality'] = user.njcusermeta.municipality.name
     user_dict['position'] = user.njcusermeta.position
     user_dict['code'] = user.njcusermeta.municipality.code
@@ -549,9 +551,14 @@ def user_to_dictionary(user):
     user_dict['dca_approval_date'] = user.njcusermeta.dca_approval_date.__str__()
     user_dict['muni_approval_date'] = user.njcusermeta.muni_approval_date.__str__()
 
+    #mailing address data
+    user_dict['address_line_1'] = user.njcusermeta.address_line_1
+    user_dict['address_line_2'] = user.njcusermeta.address_line_2
+    user_dict['city'] = user.njcusermeta.city
+    user_dict['zip'] = user.njcusermeta.zip
+
     #Return
     return user_dict
-
 
 '''
   Ajax calls to approve or modify users from DCA dashboard.
