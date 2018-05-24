@@ -636,6 +636,12 @@ def user_approval(request):
                 print "Update all",user.username, request.POST['role'], request.POST['municipality']
 
                 #fields to update
+                namesplit = request.POST['name'].rsplit(' ',1)
+                if len(namesplit) == 2:
+                    #print namesplit[0], ",", namesplit[1]
+                    user.first_name = namesplit[0]
+                    user.second_name = namesplit[1]
+
                 #name
                 user.njcusermeta.email = request.POST['email']
                 user.voice = request.POST['voice']
