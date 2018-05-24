@@ -608,6 +608,9 @@ function view_user_info(username, tab_to_return_to, return_text){
         //flip pages back
         document.getElementById("data_"+tab_to_return_to).classList.remove("hidden");
         document.getElementById("data_4").classList.add("hidden");
+
+        //flip out of edit if editing
+        show_user_edit(false);
     }
 }
 
