@@ -462,9 +462,41 @@ function set_municipality_code(code){
 
 //delete user data
 function delete_user(username){
-    //fade out modal
-    $("#myModal").modal("hide");
     console.log(username);
+
+    //do Ajax call
+    $.ajax({
+        type: "POST",
+        url: "/user/settings/",
+        data: {
+            'user': username,
+            'action': 'delete'
+        },
+        dataType: "json",
+        success: function(result) {
+            console.log("USER APPROVAL -- SUCCESS!" + result.updated);
+
+            if(result.updated){
+                //flag success
+                $.notify("User updated", "success");
+            }else{
+                //or failure
+                $.notify("Error updating user", "error");
+            }
+
+            //fade out modal
+            $("#myModal").modal("hide");
+
+        },
+        error: function(result) {
+            console.log("ERROR:", result)
+            $.notify("Error updating user", "error");
+
+            //fade out modal
+            $("#myModal").modal("hide");
+        }
+    });
+
 }
 
 //save user data
@@ -496,9 +528,6 @@ function save_changes(username){
             console.log("USER APPROVAL -- SUCCESS!" + result.updated);
 
             if(result.updated){
-                //fade out modal
-                $("#saveChanges-1").modal("hide");
-
                 //flip back to view
                 document.getElementById("info_user").classList.remove("hidden");
                 document.getElementById("editable_user").classList.add("hidden");
@@ -512,10 +541,17 @@ function save_changes(username){
                 //or failure
                 $.notify("Error updating user", "error");
             }
+
+            //fade out modal
+            $("#saveChanges-1").modal("hide");
+
         },
         error: function(result) {
             console.log("ERROR:", result)
             $.notify("Error updating user", "error");
+
+            //fade out modal
+            $("#saveChanges-1").modal("hide");
         }
     });
 
