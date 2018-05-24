@@ -565,19 +565,14 @@ function update_user_list(){
 
                         //create roles list
                         list_roles = document.getElementById("account_list_roles_"+i);
-                        list_roles.innerHTML = "";//`<li><a onclick="user_update('${ user.username }', '${ i }', 'update_role', 'test');" href="#">test</a></li>`;
+                        list_roles.innerHTML = "";
 
                         //get edit selector for role
                         selctr = document.getElementById("edit_role_selector");
                         for(j=0; j<selctr.options.length; j++){
                             role_name = selctr.options[j].text;
-                            list_roles.innerHTML += `<li><a onclick="user_update('${ user.username }', '${ i }', 'update_role', '${ role_name }');" href="#">${ role_name }</a></li>`;
+                            list_roles.innerHTML += `<li><a onclick="user_update('${ user.username }', '${ j }', 'update_role', '${ role_name }');" href="#">${ role_name }</a></li>`;
                         }
-
-                        /*{% for role in roles %}
-                        <li><a onclick="user_update('{{ user.username }}', '{{ forloop.parentloop.counter }}', 'update_role', '{{ role.name }}');" href="#">{{ role.name }}</a></li>
-                        {% endfor %}*/
-
                     }
                 }
             }else{
@@ -736,6 +731,10 @@ function user_update(username, user_number, action, role){
             if(result.updated){
                 //flag success
                 $.notify("User updated", "success");
+
+                //reload main list
+                update_user_list();
+
             }else{
                 //or failure
                 $.notify("Error updating user", "error");
