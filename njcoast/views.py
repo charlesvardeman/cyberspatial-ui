@@ -537,6 +537,7 @@ def user_to_dictionary(user):
     user_dict['username'] = user.username
     user_dict['name'] = user.first_name + " " + user.last_name
     user_dict['email'] = user.email
+    user_dict['active'] = user.is_active
 
     #additional user fields for NJC
     user_dict['municipality'] = user.njcusermeta.municipality.name
@@ -575,6 +576,19 @@ def user_approval(request):
             if user:
                 #flag OK and return data
                 return JsonResponse({'updated': True, 'data': user_to_dictionary(user)})
+
+        if request.GET['action'] == 'get_users':
+            users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').order_by('last_name')
+            #test we got them
+            if users:
+                output_array = []
+
+                #get each user
+                for user in users:
+                    output_array.append(user_to_dictionary(user))
+
+                #flag OK and return data
+                return JsonResponse({'updated': True, 'data': output_array})
         else:
             print "Action not recognized", request.GET['action']
 
