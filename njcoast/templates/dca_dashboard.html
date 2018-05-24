@@ -192,7 +192,7 @@
                 <i><span class="fa fa-exclamation-circle"></span> {{ number_to_be_approved }} pending requests</i>
             </div>
 
-            <div class="table-bkgrnd">
+            <div id="account_list" class="table-bkgrnd">
                 {% for user in users %}
                     {% if user.is_active %}
                     {% else %}
@@ -515,6 +515,70 @@ function update_user_list(){
                                     </tr>`;
                     //combine string into html
                     table_body.innerHTML += html_string;
+
+                    //approval list?
+                    if(!user.active && !user.is_dca_approved){
+                        document.getElementById("account_list").innerHTML =
+                                `<div class="row review-request">
+                                    <div class="col-md-5 col-lg-4">
+                                        <div class="well">
+                                            <table class="table">
+                                                <tbody>
+                                                    <tr>
+                                                        <th style="border-top: 0">Name</th>
+                                                        <td style="border-top: 0">${ user.name }</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Title</th>
+                                                        <td>${ user.position }</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Municipality</th>
+                                                        <td>${ user.municipality }</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Role</th>
+                                                        <td id="role_${i}" >${ user.role }</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <p><b>Justification:</b>${ user.justification }</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-7 col-lg-8">
+                                        <p class="qualifier" style="margin-top: 10px;">Received: ${ user.date_joined }; Muni Approval: ${ user.muni_approval_date }</p>
+                                        <textarea id="text_${i}" class="form-control" placeholder="" rows="7">${ user.notes }</textarea>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-default dropdown-toggle"
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    Change Role <span class="caret"></span>
+                                                        </button>
+                                            <ul id="account_list_roles_${i}" class="dropdown-menu">
+                                            </ul>
+                                        </div>
+                                        <button onclick="user_update('${ user.username }', '${ i }}', 'approve', '');" class="btn btn-primary" data-toggle="modal" data-target="">Approve</button>
+                                        <button onclick="user_update('${ user.username }', '${ i }', 'decline', '');" class="btn btn-default" data-toggle="modal" data-target="">Decline*</button>
+                                        <p class="qualifier" style="margin-top: 10px;">*Any notes entered for a Declined applicant will be shared with the applicant to justify the decision.</p>
+                                    </div>
+                                </div>
+                                <hr/>`;
+
+                        //create roles list
+                        list_roles = document.getElementById("account_list_roles_"+i);
+                        list_roles.innerHTML = "";//`<li><a onclick="user_update('${ user.username }', '${ i }', 'update_role', 'test');" href="#">test</a></li>`;
+
+                        //get edit selector for role
+                        selctr = document.getElementById("edit_role_selector");
+                        for(j=0; j<selctr.options.length; j++){
+                            role_name = selctr.options[j].text;
+                            list_roles.innerHTML += `<li><a onclick="user_update('${ user.username }', '${ i }', 'update_role', '${ role_name }');" href="#">${ role_name }</a></li>`;
+                        }
+
+                        /*{% for role in roles %}
+                        <li><a onclick="user_update('{{ user.username }}', '{{ forloop.parentloop.counter }}', 'update_role', '{{ role.name }}');" href="#">{{ role.name }}</a></li>
+                        {% endfor %}*/
+
+                    }
                 }
             }else{
                 //or failure
