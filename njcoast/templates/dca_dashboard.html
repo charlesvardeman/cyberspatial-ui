@@ -363,7 +363,15 @@
                                 </tr>
                                 <tr>
                                     <th>Municipality Name</th>
-                                    <td><input type="text" class="form-control" id="edit_municipality" value="Berkeley Twp"></td>
+                                    <!--<td><input type="text" class="form-control" id="edit_municipality" value="Berkeley Twp"></td>-->
+                                    <td>
+                                        <select id="edit_municipality_selector" class="form-control">
+                                            {% for municipality in municipalities %}
+                                            <option value="{{ municipality.name }}">{{ municipality.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+
                                 </tr>
                                 <tr>
                                     <th>Municipality Code</th>
@@ -390,9 +398,9 @@
                                 <tr>
                                     <th>Role</th>
                                     <td>
-                                        <select class="form-control">
+                                        <select id="edit_role_selector" class="form-control">
                                             {% for role in roles %}
-                                            <option>{{ role.name }}</option>
+                                            <option value="{{ role.name }}">{{ role.name }}</option>
                                             {% endfor %}
                                         </select>
                                     </td>
@@ -455,11 +463,17 @@ function delete_user(username){
 
 //save user data
 function save_changes(username){
+    console.log(username);
+
     //fade out modal
     $("#saveChanges-1").modal("hide");
-    console.log(username);
+
+    //flip back to view
     document.getElementById("info_user").classList.remove("hidden");
     document.getElementById("editable_user").classList.add("hidden");
+
+    //reload view
+    view_user_info(username, 2, "Return to All NJcoast Users list");
 }
 
 //user editing
@@ -549,6 +563,22 @@ function view_user_info(username, tab_to_return_to, return_text){
                             }
                         }
                         catch(err) {
+                        }
+
+                        //set edit selector for role
+                        selctr = document.getElementById("edit_role_selector");
+                        for(i=0; i<selctr.options.length; i++){
+                            if(result.data.role == selctr.options[i].text){
+                                selctr.value = result.data.role;
+                            }
+                        }
+
+                        //set edit selector for municipality
+                        selctr = document.getElementById("edit_municipality_selector");
+                        for(i=0; i<selctr.options.length; i++){
+                            if(result.data.municipality == selctr.options[i].text){
+                                selctr.value = result.data.municipality;
+                            }
                         }
 
                         //flip pages
