@@ -359,7 +359,7 @@
                                 </tr>
                                 <tr>
                                     <th>Position/Title</th>
-                                    <td><input type="text" class="form-control" id="edit_role" value="Planner"></td>
+                                    <td><input type="text" class="form-control" id="edit_position" value="Planner"></td>
                                 </tr>
                                 <tr>
                                     <th>Municipality Name</th>
@@ -471,15 +471,54 @@ function delete_user(username){
 function save_changes(username){
     console.log(username);
 
-    //fade out modal
-    $("#saveChanges-1").modal("hide");
+    //do Ajax call
+    $.ajax({
+        type: "POST",
+        url: "/user/settings/",
+        data: {
+            'position': document.getElementById("edit_position").value,
+            'name': document.getElementById("edit_name").value,
+            'email': document.getElementById("edit_email").value,
+            'voice': document.getElementById("edit_voice").value,
+            'role': document.getElementById("edit_role_selector").
+                        options[document.getElementById("edit_role_selector").selectedIndex].text,
+            'municipality': document.getElementById("edit_municipality_selector").
+                        options[document.getElementById("edit_municipality_selector").selectedIndex].text,
+            'address_line_1': document.getElementById("edit_address_line_1").value,
+            'address_line_2': document.getElementById("edit_address_line_2").value,
+            'city': document.getElementById("edit_city").value,
+            'zip': document.getElementById("edit_zip").value,
+            'user': username,
+            'action': 'update_all'
+        },
+        dataType: "json",
+        success: function(result) {
+            console.log("USER APPROVAL -- SUCCESS!" + result.updated);
 
-    //flip back to view
-    document.getElementById("info_user").classList.remove("hidden");
-    document.getElementById("editable_user").classList.add("hidden");
+            if(result.updated){
+                //fade out modal
+                $("#saveChanges-1").modal("hide");
 
-    //reload view
-    view_user_info(username, 2, "Return to All NJcoast Users list");
+                //flip back to view
+                document.getElementById("info_user").classList.remove("hidden");
+                document.getElementById("editable_user").classList.add("hidden");
+
+                //reload view
+                view_user_info(username, 2, "Return to All NJcoast Users list");
+
+                //flag success
+                $.notify("User updated", "success");
+            }else{
+                //or failure
+                $.notify("Error updating user", "error");
+            }
+        },
+        error: function(result) {
+            console.log("ERROR:", result)
+            $.notify("Error updating user", "error");
+        }
+    });
+
 }
 
 //user editing

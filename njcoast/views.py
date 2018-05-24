@@ -606,7 +606,7 @@ def user_approval(request):
                 #flag OK
                 return JsonResponse({'updated': True})
 
-        #approve?
+        #update notes and role?
         elif request.POST['action'] == 'update_role':
             #load user
             user = Profile.objects.get(username=request.POST['user'])
@@ -626,7 +626,34 @@ def user_approval(request):
                 #flag OK
                 return JsonResponse({'updated': True})
 
-        #approve?
+        #update all?
+        elif request.POST['action'] == 'update_all':
+            #load user
+            user = Profile.objects.get(username=request.POST['user'])
+
+            #test we got them
+            if user:
+                print "Update all",user.username, request.POST['role'], request.POST['municipality']
+
+                #fields to update
+                #name
+                user.njcusermeta.email = request.POST['email']
+                user.voice = request.POST['voice']
+                user.njcusermeta.role = NJCRole.objects.get(name=request.POST['role'])
+                user.njcusermeta.municipality = NJCMunicipality.objects.get(name=request.POST['municipality'])
+                user.njcusermeta.address_line_1 = request.POST['address_line_1']
+                user.njcusermeta.address_line_2 = request.POST['address_line_2']
+                user.njcusermeta.city = request.POST['city']
+                user.njcusermeta.zip = request.POST['zip']
+                user.njcusermeta.position = request.POST['position']
+
+                #save results
+                user.save()
+
+                #flag OK
+                return JsonResponse({'updated': True})
+
+        #decline?
         elif request.POST['action'] == 'decline':
             #load user
             user = Profile.objects.get(username=request.POST['user'])
