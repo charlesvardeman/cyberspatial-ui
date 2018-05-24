@@ -538,6 +538,7 @@ def user_to_dictionary(user):
     user_dict['name'] = user.first_name + " " + user.last_name
     user_dict['email'] = user.email
     user_dict['active'] = user.is_active
+    user_dict['date_joined'] = user.date_joined
 
     #additional user fields for NJC
     user_dict['municipality'] = user.njcusermeta.municipality.name
