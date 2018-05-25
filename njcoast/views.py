@@ -667,7 +667,7 @@ def user_approval(request):
                 if len(namesplit) == 2:
                     #print namesplit[0], ",", namesplit[1]
                     user.first_name = namesplit[0]
-                    user.second_name = namesplit[1]
+                    user.last_name = namesplit[1]
 
                 #name
                 user.njcusermeta.email = request.POST['email']
@@ -697,9 +697,9 @@ def user_approval(request):
                 #fields to update
                 namesplit = request.POST['name'].rsplit(' ',1)
                 if len(namesplit) == 2:
-                    #print namesplit[0], ",", namesplit[1]
+                    print namesplit[0], ",", namesplit[1]
                     user.first_name = namesplit[0]
-                    user.second_name = namesplit[1]
+                    user.last_name = namesplit[1]
 
                 #populate
                 user.voice = request.POST['voice']
@@ -713,6 +713,7 @@ def user_approval(request):
                 user.njcusermeta.is_dca_approved = True
                 user.njcusermeta.is_muni_approved = True
                 user.njcusermeta.muni_approval_date = timezone.now()
+                user.njcusermeta.dca_approval_date = timezone.now()
 
                 #save updates
                 user.save()
