@@ -21,6 +21,7 @@ from .models import NJCUserMeta
 from django import forms
 from django.db import IntegrityError
 from geonode.people.models import Profile
+from django.utils import timezone
 
 '''
   This function is used to respond to ajax requests for which layers should be
@@ -512,15 +513,26 @@ class DCADashboardTemplateView(TemplateView):
         #get municipalities
         municipalities = NJCMunicipality.objects.exclude(name='Statewide').order_by('name')
 
+        munis_without_admin = []
         for municipality in municipalities:
             print municipality.name
+            munis_without_admin.append(municipality)
 
+        #full list
         context['municipalities'] = NJCMunicipality.objects.order_by('name') #exclude(name='Statewide').
 
         #and muni admins
         muni_admins = Profile.objects.filter(groups__name='municipal_administrators').order_by('last_name')
         print "Muni admins",len(muni_admins)
         context['muni_admins'] = muni_admins
+
+        #get definative list of munis without admins
+        for muni_admin in muni_admins:
+            try:
+                munis_without_admin.remove(muni_admin.njcusermeta.municipality)
+            except:
+                pass
+        context['munis_without_admin'] = munis_without_admin
 
         #get counties
         context['counties'] = NJCCounty.objects.all().order_by('name')
@@ -673,6 +685,49 @@ def user_approval(request):
 
                 #flag OK
                 return JsonResponse({'updated': True})
+
+        #update all?
+        elif request.POST['action'] == 'create_muni_admin':
+            user = Profile.objects.create_user(username=request.POST['user'],
+                                 email=request.POST['email'],
+                                 password='glass onion')
+            if user:
+                print "Created", request.POST['user']
+
+                #fields to update
+                namesplit = request.POST['name'].rsplit(' ',1)
+                if len(namesplit) == 2:
+                    #print namesplit[0], ",", namesplit[1]
+                    user.first_name = namesplit[0]
+                    user.second_name = namesplit[1]
+
+                #populate
+                user.voice = request.POST['voice']
+                user.njcusermeta.role = NJCRole.objects.get(name=request.POST['role'])
+                user.njcusermeta.municipality = NJCMunicipality.objects.get(name=request.POST['municipality'])
+                user.njcusermeta.address_line_1 = request.POST['address_line_1']
+                user.njcusermeta.address_line_2 = request.POST['address_line_2']
+                user.njcusermeta.city = request.POST['city']
+                user.njcusermeta.zip = request.POST['zip']
+                user.njcusermeta.position = request.POST['position']
+                user.njcusermeta.is_dca_approved = True
+                user.njcusermeta.is_muni_approved = True
+                user.njcusermeta.muni_approval_date = timezone.now()
+
+                #save updates
+                user.save()
+
+                #add user to group
+                muni_admin_group = Group.objects.get(name='municipal_administrators')
+
+                if muni_admin_group:
+                    muni_admin_group.user_set.add(user)
+
+                    #flag OK
+                    return JsonResponse({'updated': True})
+                else:
+                    #flag error
+                    return JsonResponse({'updated': False})
 
         #decline?
         elif request.POST['action'] == 'decline':
