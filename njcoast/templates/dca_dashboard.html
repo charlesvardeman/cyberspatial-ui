@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load staticfiles %}
 {% load base_tags %}
+{% load njcoast_extras %}
 
 {% block body_class %}home{% endblock %}
 
@@ -21,13 +22,15 @@
         </div>
 
         <ul class="nav nav-tabs nav-justified admin-tabs">
+            {% if request.user|has_group:"dca_administrators" %}
             <li id="tab_1" onclick="flip_tabs(this.id);" class="active"><a href="#"><span class="fa fa-user-circle"></span> Municipal Approvers</a></li>
-            <li id="tab_2" onclick="flip_tabs(this.id);"><a href="#"><span class="fa fa-users"></span> All NJcoast Users</a></li>
+            {% endif %}
+            <li id="tab_2" onclick="flip_tabs(this.id);" {% if request.user|has_group:"municipal_administrators" %}class="active"{% endif %}><a href="#"><span class="fa fa-users"></span> All NJcoast Users</a></li>
             <li id="tab_3" onclick="flip_tabs(this.id);"><a href="#"><span class="fa fa-exclamation-circle"></span> Account Requests</a></li>
         </ul>
 
         <!-- municipalities code ---------------------------------------------->
-        <div id="data_1">
+        <div id="data_1" {% if request.user|has_group:"municipal_administrators" %}class="hidden"{% endif %}>
             <div class="filter-bkgrnd">
 
                 <div class="row">
@@ -107,7 +110,7 @@
         <!-- END munivcipalities code ----------------------------------------->
 
         <!-- njcoast users ---------------------------------------------------->
-        <div id="data_2" class="hidden">
+        <div id="data_2" {% if request.user|has_group:"dca_administrators" %}class="hidden"{% endif %}>
             <div class="filter-bkgrnd">
                 <div class="row">
                     <div class="col-sm-8">
@@ -983,11 +986,15 @@ function flip_tabs(id){
     for(i=1; i<=3; i++){
         //remove active
         if("tab_"+i != id){
-            document.getElementById("tab_"+i).classList.remove("active");
-            document.getElementById("data_"+i).classList.add("hidden");
+            try{
+                document.getElementById("tab_"+i).classList.remove("active");
+                document.getElementById("data_"+i).classList.add("hidden");
+            }catch(err){}
         }else{ //add active
-            document.getElementById(id).classList.add("active");
-            document.getElementById("data_"+i).classList.remove("hidden");
+            try{
+                document.getElementById(id).classList.add("active");
+                document.getElementById("data_"+i).classList.remove("hidden");
+            }catch(err){}
         }
     }
 
