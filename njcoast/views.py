@@ -502,7 +502,7 @@ class DCADashboardTemplateView(TemplateView):
 
         #get users
         if is_dca:
-            users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').order_by('last_name')
+            users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').filter(njcusermeta__is_muni_approved=True).order_by('last_name')
         elif is_muni:
             users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').exclude(groups__name='municipal_administrators').exclude(groups__name='dca_administrators').filter(njcusermeta__municipality__name=current_muni).order_by('last_name')
 
@@ -612,7 +612,7 @@ def user_approval(request):
         elif request.GET['action'] == 'get_users':
             #get users
             if is_dca:
-                users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').order_by('last_name')
+                users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').filter(njcusermeta__is_muni_approved=True).order_by('last_name')
             elif is_muni:
                 users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').exclude(groups__name='municipal_administrators').exclude(groups__name='dca_administrators').filter(njcusermeta__municipality__name=current_muni).order_by('last_name')
             else:
@@ -627,7 +627,7 @@ def user_approval(request):
                     output_array.append(user_to_dictionary(user))
 
                 #flag OK and return data
-                return JsonResponse({'updated': True, 'data': output_array})
+                return JsonResponse({'updated': True, 'data': output_array, 'is_muni': is_muni, 'is_dca': is_dca})
 
         elif request.GET['action'] == 'get_muni_admins':
                     #get municipalities

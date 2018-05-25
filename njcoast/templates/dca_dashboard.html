@@ -183,8 +183,14 @@
                                     <td class="notes">{{ user.njcusermeta.notes }}</td>
                                     <td><a onclick="view_user_info('{{ user.username }}', 2, 'Return to All NJcoast Users list');" href="#"><span class="fa fa-info-circle"></span></a></td>
                                         {% else %}
+                                            {% if user.njcusermeta.is_muni_approved and request.user|has_group:"dca_administrators" or not user.njcusermeta.is_muni_approved and request.user|has_group:"municipal_administrators" %}
                                     <td class="status pnd">pending</td>
                                     <td><a onclick="flip_tabs('tab_3');" href="#" class="btn btn-warning btn-sm btn-block">View Request</a></td>
+                                            {% else %}
+                                    <td class="status pnd">pending</td>
+                                    <td class="notes">{{ user.njcusermeta.notes }}</td>
+                                    <td><a onclick="view_user_info('{{ user.username }}', 2, 'Return to All NJcoast Users list');" href="#"><span class="fa fa-info-circle"></span></a></td>
+                                            {% endif %}
                                         {% endif %}
                                     {% endif %}
                                     <td></td>
@@ -208,10 +214,8 @@
 
             <div id="account_list" class="table-bkgrnd">
                 {% for user in users %}
-                    {% if user.is_active %}
-                    {% else %}
-                        {% if user.njcusermeta.is_dca_approved %}
-                        {% else %}
+                    {% if not user.is_active %}
+                        {% if not user.njcusermeta.is_dca_approved and request.user|has_group:"dca_administrators" or not user.njcusermeta.is_muni_approved and request.user|has_group:"municipal_administrators" %}
                 <div class="row review-request">
                     <div class="col-md-5 col-lg-4">
                         <div class="well">
@@ -596,8 +600,14 @@ function update_user_list(){
                                             <td class="notes">${ user.notes }</td>
                                             <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
                         }else{
-                            html_string +=  `<td class="status pnd">pending</td>
-                                            <td><a onclick="flip_tabs('tab_3');" href="#" class="btn btn-warning btn-sm btn-block">View Request</a></td>`;
+                            if( (user.is_muni_approved && result.is_dca) || (!user.is_muni_approved && result.is_muni) ){
+                                html_string +=  `<td class="status pnd">pending</td>
+                                                <td><a onclick="flip_tabs('tab_3');" href="#" class="btn btn-warning btn-sm btn-block">View Request</a></td>`;
+                            }else{
+                                html_string +=  `<td class="status pnd">pending</td>
+                                                <td class="notes">${ user.notes }</td>
+                                                <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
+                            }
                         }
                     }
 
@@ -608,7 +618,7 @@ function update_user_list(){
                     table_body.innerHTML += html_string;
 
                     //----Approval list?----------------------------------------
-                    if(!user.active && !user.is_dca_approved){
+                    if(!user.active && ( (!user.is_dca_approved && result.is_dca) || (!user.is_muni_approved && result.is_muni) )){
                         document.getElementById("account_list").innerHTML =
                                 `<div class="row review-request">
                                     <div class="col-md-5 col-lg-4">
