@@ -590,7 +590,7 @@ def user_approval(request):
                 #flag OK and return data
                 return JsonResponse({'updated': True, 'data': user_to_dictionary(user)})
 
-        if request.GET['action'] == 'get_users':
+        elif request.GET['action'] == 'get_users':
             users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').order_by('last_name')
             #test we got them
             if users:
@@ -602,6 +602,34 @@ def user_approval(request):
 
                 #flag OK and return data
                 return JsonResponse({'updated': True, 'data': output_array})
+
+        elif request.GET['action'] == 'get_muni_admins':
+                    #get municipalities
+                    municipalities = NJCMunicipality.objects.exclude(name='Statewide').order_by('name')
+
+                    if municipalities:
+                        munis_without_admin = []
+                        for municipality in municipalities:
+                            print municipality.name
+                            munis_without_admin.append({'municipality': municipality.name, 'code': municipality.code})
+
+                        #and muni admins
+                        muni_admins = Profile.objects.filter(groups__name='municipal_administrators').order_by('last_name')
+                        if muni_admins:
+                            print "Muni admins",len(muni_admins)
+
+                            #get definative list of munis without admins
+                            output_array = []
+                            for muni_admin in muni_admins:
+                                output_array.append(user_to_dictionary(muni_admin))
+                                try:
+                                    munis_without_admin.remove({'municipality': muni_admin.njcusermeta.municipality.name, 'code': muni_admin.njcusermeta.municipality.code})
+                                except:
+                                    pass
+
+                            #flag OK and return data
+                            return JsonResponse({'updated': True, 'data': output_array, 'munis': munis_without_admin})
+
         else:
             print "Action not recognized", request.GET['action']
 
