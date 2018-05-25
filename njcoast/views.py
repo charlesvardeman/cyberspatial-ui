@@ -611,7 +611,7 @@ def user_approval(request):
                         munis_without_admin = []
                         for municipality in municipalities:
                             print municipality.name
-                            munis_without_admin.append({'municipality': municipality.name, 'code': municipality.code})
+                            munis_without_admin.append({'name': municipality.name, 'code': municipality.code})
 
                         #and muni admins
                         muni_admins = Profile.objects.filter(groups__name='municipal_administrators').order_by('last_name')
@@ -623,7 +623,7 @@ def user_approval(request):
                             for muni_admin in muni_admins:
                                 output_array.append(user_to_dictionary(muni_admin))
                                 try:
-                                    munis_without_admin.remove({'municipality': muni_admin.njcusermeta.municipality.name, 'code': muni_admin.njcusermeta.municipality.code})
+                                    munis_without_admin.remove({'name': muni_admin.njcusermeta.municipality.name, 'code': muni_admin.njcusermeta.municipality.code})
                                 except:
                                     pass
 
