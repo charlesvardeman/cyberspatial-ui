@@ -591,6 +591,11 @@ def user_to_dictionary(user):
 '''
 @login_required
 def user_approval(request):
+    #get current user
+    current_user = request.user
+    is_dca = current_user.groups.filter(name='dca_administrators').exists()
+    is_muni = current_user.groups.filter(name='municipal_administrators').exists()
+
     #GET section of the API
     if request.method == "GET":
         print "Action", request.GET['action']
@@ -658,13 +663,20 @@ def user_approval(request):
             #test we got them
             if user:
                 print "Approve",user.username
-                #set Active
-                user.is_active = True
+                #approve according to my rights
+                if is_dca:
+                    #set dca approved
+                    user.njcusermeta.is_dca_approved = True
+                    user.njcusermeta.dca_approval_date = timezone.now()
+                    #set Active
+                    user.is_active = True
 
-                #set dca approved
-                user.njcusermeta.is_dca_approved = True
+                if is_muni:
+                    #set muni approved
+                    user.njcusermeta.is_muni_approved = True
+                    user.njcusermeta.muni_approval_date = timezone.now()
 
-                #set dca approved
+                #set notes
                 user.njcusermeta.notes = request.POST['notes']
 
                 #save results
