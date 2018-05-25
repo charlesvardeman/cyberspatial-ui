@@ -67,7 +67,7 @@
             <div class="table-bkgrnd">
 
                 <table class="table table-hover admin">
-                    <tbody>
+                    <tbody id="muni_admin_list">
                         <tr>
                             <th>Code <span class="fa fa-sort"></span></th>
                             <th>Municipality <span class="fa fa-sort"></span></th>
@@ -465,7 +465,83 @@
 <script src="{% static 'js/notify.min.js' %}"></script>
 
 <script type=text/javascript>
-//update user info list
+// Update muni approved list
+// AJAX call to get up to date information on muni approvers.
+// Will be extended when UI design for pages is available.
+function update_muni_admins(){
+    //do Ajax call
+    $.ajax({
+        type: "GET",
+        url: "/user/settings/",
+        data: {
+            'action': 'get_muni_admins'
+        },
+        dataType: "json",
+        success: function(result) {
+            console.log("USER APPROVAL -- SUCCESS!" + result.updated);
+
+            //success?
+            if(result.updated){
+                //update table
+                table_body = document.getElementById("muni_admin_list");
+                table_body.innerHTML = `<tr>
+                                            <th>Code <span class="fa fa-sort"></span></th>
+                                            <th>Municipality <span class="fa fa-sort"></span></th>
+                                            <th>Name <span class="fa fa-sort"></span></th>
+                                            <th>Position <span class="fa fa-sort"></span></th>
+                                            <th>Email</th>
+                                            <th>Notes</th>
+                                            <th</th>
+                                        </tr>`;
+
+                //loop over users
+                for(i=0; i<result.data.length; i++){
+                    muni_admin = result.data[i];
+                    //console.log(muni_admin.name);
+
+                    //----All muni admins---------------------------------------
+                    //basic muni admin data
+                    table_body.innerHTML +=   `<tr>
+                                        <td>${ muni_admin.code }</td>
+                                        <td>${ muni_admin.municipality }</td>
+                                        <td>${ muni_admin.name }</td>
+                                        <td class="position">${ muni_admin.position }</td>
+                                        <td><a>${ muni_admin.email }</a></td>
+                                        <td class="notes">${ muni_admin.notes }</td>
+                                        <td><a onclick="view_user_info('${ muni_admin.username  }', 1, 'Return to Municipal Approvers list');" href="#"><span class="fa fa-info-circle"></span></a></td>
+                                    </tr>`;
+                }
+
+                //loop over remaining munis
+                for(i=0; i<result.munis.length; i++){
+                    muni_without_admin = result.munis[i];
+                    //console.log(muni_without_admin.name);
+
+                    //----All muni admins---------------------------------------
+                    //basic muni admin data
+                    table_body.innerHTML +=   `<tr>
+                                                    <td>${ muni_without_admin.code }</td>
+                                                    <td>${ muni_without_admin.name }</td>
+                                                    <td class="null">n/a</td>
+                                                    <td class="position null">n/a</td>
+                                                    <td class="null">n/a</td>
+                                                    <td class="notes"></td>
+                                                    <td><a onclick="create_new_muni_admin('${ muni_without_admin.name }', '${ muni_without_admin.code }', 1, 'Return to Municipal Approvers list');" href="#"><span class="fa fa-info-circle"></span></a></td>
+                                                </tr>`;
+                }
+            }else{
+                //or failure
+            }
+        },
+        error: function(result) {
+            console.log("ERROR:", result)
+        }
+    });
+}
+
+// Update user info list
+// AJAX call to get up to date information on users.
+// Will be extended when UI design for pages is available.
 function update_user_list(){
     //do Ajax call
     $.ajax({
@@ -498,6 +574,7 @@ function update_user_list(){
                     user = result.data[i];
                     console.log(user.name);
 
+                    //----All NJC users-----------------------------------------
                     //basic user data
                     html_string = `<tr>
                                         <td>${ user.name }</td>
@@ -527,7 +604,7 @@ function update_user_list(){
                     //combine string into html
                     table_body.innerHTML += html_string;
 
-                    //approval list?
+                    //----Approval list?----------------------------------------
                     if(!user.active && !user.is_dca_approved){
                         document.getElementById("account_list").innerHTML =
                                 `<div class="row review-request">
@@ -633,6 +710,8 @@ function delete_user(username){
             //reload main list
             update_user_list();
 
+            //reload munis
+            update_muni_admins();
         },
         error: function(result) {
             console.log("ERROR:", result)
@@ -693,6 +772,9 @@ function save_changes(username){
 
                 //reload main list
                 update_user_list();
+
+                //reload munis
+                update_muni_admins();
 
                 //flag success
                 $.notify("User updated", "success");
@@ -755,6 +837,9 @@ function user_update(username, user_number, action, role){
 
                 //reload main list
                 update_user_list();
+
+                //reload munis
+                update_muni_admins();
 
             }else{
                 //or failure
