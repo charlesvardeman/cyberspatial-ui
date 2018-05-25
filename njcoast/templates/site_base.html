@@ -92,6 +92,11 @@
                         <a href="{% url "dca_dashboard" %}" role="button">{% trans "DCA Admin" %}</a>
                   </li>
               {% endif %}
+              {% if request.user|has_group:"municipal_administrators" %}
+                  <li id="dca_dashboard">
+                        <a href="{% url "dca_dashboard" %}" role="button">{% trans "Admin" %}</a>
+                  </li>
+              {% endif %}
               {% if user.is_authenticated %}
                   <li id="nav_dashboard">
                         <a href="{% url "dashboard" %}" role="button">{% trans "Dashboard" %}</a>

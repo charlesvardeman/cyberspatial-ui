@@ -492,8 +492,19 @@ class DCADashboardTemplateView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(DCADashboardTemplateView, self).get_context_data(**kwargs)
 
+        #get current user
+        current_user = self.request.user
+        is_dca = current_user.groups.filter(name='dca_administrators').exists()
+        is_muni = current_user.groups.filter(name='municipal_administrators').exists()
+
+        print "User", current_user.username, is_dca, is_muni
+
         #get users
-        users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').order_by('last_name')
+        if is_dca:
+            users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').order_by('last_name')
+        elif is_muni:
+            users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').exclude(groups__name='municipal_administrators').exclude(groups__name='dca_administrators').order_by('last_name')
+
         total_users = len(users)
         count_requests = 0
         for user in users:
@@ -521,18 +532,19 @@ class DCADashboardTemplateView(TemplateView):
         #full list
         context['municipalities'] = NJCMunicipality.objects.order_by('name') #exclude(name='Statewide').
 
-        #and muni admins
-        muni_admins = Profile.objects.filter(groups__name='municipal_administrators').order_by('last_name')
-        print "Muni admins",len(muni_admins)
-        context['muni_admins'] = muni_admins
+        if is_dca:
+            #and muni admins
+            muni_admins = Profile.objects.filter(groups__name='municipal_administrators').order_by('last_name')
+            print "Muni admins",len(muni_admins)
+            context['muni_admins'] = muni_admins
 
-        #get definative list of munis without admins
-        for muni_admin in muni_admins:
-            try:
-                munis_without_admin.remove(muni_admin.njcusermeta.municipality)
-            except:
-                pass
-        context['munis_without_admin'] = munis_without_admin
+            #get definative list of munis without admins
+            for muni_admin in muni_admins:
+                try:
+                    munis_without_admin.remove(muni_admin.njcusermeta.municipality)
+                except:
+                    pass
+            context['munis_without_admin'] = munis_without_admin
 
         #get counties
         context['counties'] = NJCCounty.objects.all().order_by('name')
