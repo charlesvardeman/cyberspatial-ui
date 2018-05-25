@@ -494,6 +494,7 @@ class DCADashboardTemplateView(TemplateView):
 
         #get current user
         current_user = self.request.user
+        current_muni = current_user.njcusermeta.municipality.name
         is_dca = current_user.groups.filter(name='dca_administrators').exists()
         is_muni = current_user.groups.filter(name='municipal_administrators').exists()
 
@@ -503,7 +504,7 @@ class DCADashboardTemplateView(TemplateView):
         if is_dca:
             users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').order_by('last_name')
         elif is_muni:
-            users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').exclude(groups__name='municipal_administrators').exclude(groups__name='dca_administrators').order_by('last_name')
+            users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').exclude(groups__name='municipal_administrators').exclude(groups__name='dca_administrators').filter(njcusermeta__municipality__name=current_muni).order_by('last_name')
 
         total_users = len(users)
         count_requests = 0
@@ -593,6 +594,7 @@ def user_to_dictionary(user):
 def user_approval(request):
     #get current user
     current_user = request.user
+    current_muni = current_user.njcusermeta.municipality.name
     is_dca = current_user.groups.filter(name='dca_administrators').exists()
     is_muni = current_user.groups.filter(name='municipal_administrators').exists()
 
@@ -608,7 +610,14 @@ def user_approval(request):
                 return JsonResponse({'updated': True, 'data': user_to_dictionary(user)})
 
         elif request.GET['action'] == 'get_users':
-            users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').order_by('last_name')
+            #get users
+            if is_dca:
+                users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').order_by('last_name')
+            elif is_muni:
+                users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').exclude(groups__name='municipal_administrators').exclude(groups__name='dca_administrators').filter(njcusermeta__municipality__name=current_muni).order_by('last_name')
+            else:
+                print "Not a valid user!"
+
             #test we got them
             if users:
                 output_array = []
