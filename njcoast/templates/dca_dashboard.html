@@ -638,6 +638,9 @@ function update_muni_admins(){
                     //console.log(muni_admin.name);
 
                     //----All muni admins---------------------------------------
+                    if(muni_admin.notes == null){
+                        muni_admin.notes = "";
+                    }
                     //basic muni admin data
                     table_body.innerHTML +=   `<tr>
                                         <td>${ muni_admin.code }</td>
@@ -729,6 +732,9 @@ function update_user_list(){
 
                     //----All NJC users-----------------------------------------
                     //basic user data
+                    if(user.notes == null){
+                        user.notes = "";
+                    }
                     if(result.is_dca){
                         html_string = `<tr>
                                             <td>${ user.name }</td>
