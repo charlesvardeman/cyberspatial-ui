@@ -633,31 +633,46 @@ def user_approval(request):
                 return JsonResponse({'updated': True, 'data': output_array, 'is_muni': is_muni, 'is_dca': is_dca})
 
         elif request.GET['action'] == 'get_muni_admins':
-                    #get municipalities
-                    municipalities = NJCMunicipality.objects.exclude(name='Statewide').order_by('name')
+            #get municipalities
+            municipalities = NJCMunicipality.objects.exclude(name='Statewide').order_by('name')
 
-                    if municipalities:
-                        munis_without_admin = []
-                        for municipality in municipalities:
-                            print municipality.name
-                            munis_without_admin.append({'name': municipality.name, 'code': municipality.code})
+            if municipalities:
+                munis_without_admin = []
+                for municipality in municipalities:
+                    print municipality.name
+                    munis_without_admin.append({'name': municipality.name, 'code': municipality.code})
 
-                        #and muni admins
-                        muni_admins = Profile.objects.filter(groups__name='municipal_administrators').order_by('last_name')
-                        if muni_admins:
-                            print "Muni admins",len(muni_admins)
+                #and muni admins
+                muni_admins = Profile.objects.filter(groups__name='municipal_administrators').order_by('last_name')
+                if muni_admins:
+                    print "Muni admins",len(muni_admins)
 
-                            #get definative list of munis without admins
-                            output_array = []
-                            for muni_admin in muni_admins:
-                                output_array.append(user_to_dictionary(muni_admin))
-                                try:
-                                    munis_without_admin.remove({'name': muni_admin.njcusermeta.municipality.name, 'code': muni_admin.njcusermeta.municipality.code})
-                                except:
-                                    pass
+                    #get definative list of munis without admins
+                    output_array = []
+                    for muni_admin in muni_admins:
+                        output_array.append(user_to_dictionary(muni_admin))
+                        try:
+                            munis_without_admin.remove({'name': muni_admin.njcusermeta.municipality.name, 'code': muni_admin.njcusermeta.municipality.code})
+                        except:
+                            pass
 
-                            #flag OK and return data
-                            return JsonResponse({'updated': True, 'data': output_array, 'munis': munis_without_admin})
+                    #flag OK and return data
+                    return JsonResponse({'updated': True, 'data': output_array, 'munis': munis_without_admin})
+
+        elif request.GET['action'] == 'get_dca_admins':
+            #get dca admins
+            dca_admins = Profile.objects.filter(groups__name='dca_administrators').order_by('last_name')
+            if dca_admins:
+                print "DCA admins",len(dca_admins)
+
+                output_array = []
+
+                #get each user
+                for dca_admin in dca_admins:
+                    output_array.append(user_to_dictionary(dca_admin))
+
+                #flag OK and return data
+                return JsonResponse({'updated': True, 'data': output_array})
 
         else:
             print "Action not recognized", request.GET['action']
