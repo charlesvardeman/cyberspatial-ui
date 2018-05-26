@@ -749,7 +749,7 @@ def user_approval(request):
                     user.last_name = namesplit[1]
 
                 #name
-                user.njcusermeta.email = request.POST['email']
+                user.email = request.POST['email']
                 user.voice = request.POST['voice']
                 user.njcusermeta.role = NJCRole.objects.get(name=request.POST['role'])
                 user.njcusermeta.municipality = NJCMunicipality.objects.get(name=request.POST['municipality'])
