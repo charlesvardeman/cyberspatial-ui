@@ -354,7 +354,7 @@
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                                 <h4 class="modal-title" id="myModalLabel">Delete NJcoast User Profile</h4>
                             </div>
-                            <div class="modal-body">
+                            <div id="info_user_modal" class="modal-body">
                                 Are you sure you would like to delete this NJcoast user profile?
                             </div>
                             <div class="modal-footer">
@@ -456,7 +456,7 @@
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                                         <h4 class="modal-title" id="saveChanges">Save changes</h4>
                                     </div>
-                                    <div class="modal-body">
+                                    <div id="editable_user_modal" class="modal-body">
                                         You have made changes to this NJcoast user profile. Would you like to save these changes?
                                     </div>
                                     <div class="modal-footer">
@@ -1089,6 +1089,8 @@ function create_new_dca_approver(tab_to_return_to, return_text){
     //flip pages to see edit
     document.getElementById("data_4_decorator").innerHTML = `<span class="fa fa-users fa-5x "></span><p>DCA Approver Profile</p>`;
     document.getElementById("editable_user_decorator").innerHTML = `<span class="fa fa-users fa-5x "></span><p>DCA Approver Profile</p>`;
+    document.getElementById("editable_user_modal").innerHTML = "You have made changes to this DCA Approver user profile. Would you like to save these changes?";
+    document.getElementById("info_user_modal").innerHTML = "Are you sure you would like to delete this DCA Approver user profile?";
     document.getElementById("data_4").classList.remove("hidden");
 
     document.getElementById("data_"+tab_to_return_to).classList.add("hidden");
@@ -1136,6 +1138,8 @@ function create_new_muni_admin(muni, code, tab_to_return_to, return_text){
     //flip pages to see edit
     document.getElementById("data_4_decorator").innerHTML = `<span class="fa fa-user-circle fa-5x "></span><p>Municipal Approver Profile</p>`;
     document.getElementById("editable_user_decorator").innerHTML = `<span class="fa fa-user-circle fa-5x "></span><p>Municipal Approver Profile</p>`;
+    document.getElementById("editable_user_modal").innerHTML = "You have made changes to this Municipal Approver user profile. Would you like to save these changes?";
+    document.getElementById("info_user_modal").innerHTML = "Are you sure you would like to delete this Municipal Approver user profile?";
     document.getElementById("data_4").classList.remove("hidden");
     document.getElementById("data_"+tab_to_return_to).classList.add("hidden");
 
@@ -1207,13 +1211,19 @@ function view_user_info(username, tab_to_return_to, return_text){
                                     decorata_string = `<span class="fa fa-user-circle fa-5x "></span><p>${ result.current_muni } User Profile</p>`;
                                     document.getElementById("data_4_decorator").innerHTML = decorata_string;
                                     document.getElementById("editable_user_decorator").innerHTML = decorata_string;
+                                    document.getElementById("editable_user_modal").innerHTML = "You have made changes to this Municipal Approver user profile. Would you like to save these changes?";
+                                    document.getElementById("info_user_modal").innerHTML = "Are you sure you would like to delete this Municipal Approver user profile?";
                                 }else{  //or dca?
                                     document.getElementById("data_4_decorator").innerHTML = `<span class="fa fa-users fa-5x "></span><p>NJcoast User Profile</p>`;
                                     document.getElementById("editable_user_decorator").innerHTML = `<span class="fa fa-users fa-5x "></span><p>NJcoast User Profile</p>`;
+                                    document.getElementById("editable_user_modal").innerHTML = "You have made changes to this NJcoast user profile. Would you like to save these changes?";
+                                    document.getElementById("info_user_modal").innerHTML = "Are you sure you would like to delete this NJcoast user profile?";
                                 }
                             }else{
                                 document.getElementById("data_4_decorator").innerHTML = `<span class="fa fa-user-circle fa-5x "></span><p>Municipal Approver Profile</p>`;
                                 document.getElementById("editable_user_decorator").innerHTML = `<span class="fa fa-user-circle fa-5x "></span><p>Municipal Approver Profile</p>`;
+                                document.getElementById("editable_user_modal").innerHTML = "You have made changes to this Municipal Approver user profile. Would you like to save these changes?";
+                                document.getElementById("info_user_modal").innerHTML = "Are you sure you would like to delete this Municipal Approver user profile?";
                             }
                             document.getElementById("data_"+tab_to_return_to).classList.add("hidden");
                             try{
