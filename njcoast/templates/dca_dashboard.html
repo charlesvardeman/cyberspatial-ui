@@ -462,7 +462,7 @@
                                         You have made changes to this NJcoast user profile. Would you like to save these changes?
                                     </div>
                                     <div class="modal-footer">
-                                        <a onclick="save_changes(document.getElementById('edit_username').innerHTML);" class="btn btn-primary" href="#">Yes</a>
+                                        <a name="create_muni_admin" id="save_changes_button" onclick="save_changes(document.getElementById('edit_username').innerHTML, this.name);" class="btn btn-primary" href="#">Yes</a>
                                         <a onclick="$('#saveChanges-1').modal('hide');" class="btn btn-default" href="#">No</a>
                                     </div>
                                 </div>
@@ -482,34 +482,10 @@
 
             <table class="table table-hover admin">
                 <tbody id="dca_approvers_list" >
-                    <tr>
-                        <th>Name</th>
-                        <th>Position</th>
-                        <th>Email</th>
-                        <th</th>
-                    </tr>
-                    <tr>
-                        <td>Sean Thompson</td>
-                        <td>Director</td>
-                        <td><a>Sean.Thompson@dca.nj.gov</a></td>
-                        <td><a href="admin-dca-profile.html"><span class="fa fa-info-circle"></span></a></td>
-                    </tr>
-                    <tr>
-                        <td>Keith Henderson</td>
-                        <td>Director of Policy and Planning</td>
-                        <td><a>Keith.Henderson@dca.nj.gov</a></td>
-                        <td><a href="admin-dca-profile.html"><span class="fa fa-info-circle"></span></a></td>
-                    </tr>
-                    <tr>
-                        <td>Tom Stanuikynas</td>
-                        <td>GIS Analyst/Planner</td>
-                        <td><a>Tom.Stanuikynas@dca.nj.gov</a></td>
-                        <td><a href="admin-dca-profile.html"><span class="fa fa-info-circle"></span></a></td>
-                    </tr>
                 </tbody>
             </table>
 
-            <a href="#" class="btn btn-default btn-md">Add Approver</a>
+            <a onclick="create_new_dca_approver(5, 'Return to DCA Approvers list');" href="#" class="btn btn-default btn-md">Add Approver</a>
         </div>
         <!--END DCA Approvers page------------------------------------------------->
 
@@ -882,14 +858,14 @@ function delete_user(username){
 }
 
 //save user data
-function save_changes(username){
+function save_changes(username, action_if_no_user){
     //set default action
     var action = 'update_all';
 
     //est if create user
     if(username == ""){
         username = document.getElementById("edit_name").value.replace(/\s/g,'').toLowerCase();
-        action = 'create_muni_admin';
+        action = action_if_no_user;
         console.log("Create "+username);
     }else{
         console.log("Update "+username);
@@ -1012,6 +988,42 @@ function user_update(username, user_number, action, role){
 }
 
 //create new user
+function create_new_dca_approver(tab_to_return_to, return_text){
+    //clear edit form
+    document.getElementById("edit_name").value = "";
+    document.getElementById("edit_position").value = "";
+    document.getElementById("edit_address_line_1").value = "";
+    document.getElementById("edit_address_line_2").value = "";
+    document.getElementById("edit_city").value = "";
+    document.getElementById("edit_zip").value = "";
+    document.getElementById("edit_email").value = "";
+    document.getElementById("edit_voice").value = "";
+    document.getElementById("edit_justification").innerHTML = "";
+    document.getElementById("edit_username").innerHTML = "";
+
+    //set code
+    document.getElementById("edit_code").innerHTML = "";
+
+    //set type of creation
+    document.getElementById("save_changes_button").name = "create_dca_admin";
+
+    //flip to edit
+    document.getElementById("info_user").classList.add("hidden");
+    document.getElementById("editable_user").classList.remove("hidden");
+
+    //flip pages to see edit
+    document.getElementById("data_4").classList.remove("hidden");
+    document.getElementById("data_"+tab_to_return_to).classList.add("hidden");
+    try{
+        document.getElementById("data_"+tab_to_return_to+"_notab").classList.add("hidden");
+
+    }catch(err){}
+
+    //set return link
+    document.getElementById("navigation_4").innerHTML = "<a onclick=\"view_user_info('', "+tab_to_return_to+", '');\" href=\"#\"><span class=\"fa fa-chevron-left\"></span> "+return_text;
+}
+
+//create new user
 function create_new_muni_admin(muni, code, tab_to_return_to, return_text){
     //clear edit form
     document.getElementById("edit_name").value = "";
@@ -1035,6 +1047,9 @@ function create_new_muni_admin(muni, code, tab_to_return_to, return_text){
 
     //set code
     document.getElementById("edit_code").innerHTML = code;
+
+    //set type of creation
+    document.getElementById("save_changes_button").name = "create_muni_admin";
 
     //flip to edit
     document.getElementById("info_user").classList.add("hidden");

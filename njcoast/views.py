@@ -765,7 +765,8 @@ def user_approval(request):
                 #flag OK
                 return JsonResponse({'updated': True})
 
-        #update all?
+
+        #create muni admin?
         elif request.POST['action'] == 'create_muni_admin':
             user = Profile.objects.create_user(username=request.POST['user'],
                                  email=request.POST['email'],
@@ -809,6 +810,50 @@ def user_approval(request):
                     #flag error
                     return JsonResponse({'updated': False})
 
+        #create dca admin?
+        elif request.POST['action'] == 'create_dca_admin':
+            user = Profile.objects.create_user(username=request.POST['user'],
+                                 email=request.POST['email'],
+                                 password='glass onion')
+            if user:
+                print "Created", request.POST['user']
+
+                #fields to update
+                namesplit = request.POST['name'].rsplit(' ',1)
+                if len(namesplit) == 2:
+                    print namesplit[0], ",", namesplit[1]
+                    user.first_name = namesplit[0]
+                    user.last_name = namesplit[1]
+
+                #populate
+                user.voice = request.POST['voice']
+                user.njcusermeta.role = NJCRole.objects.get(name=request.POST['role'])
+                user.njcusermeta.municipality = NJCMunicipality.objects.get(name=request.POST['municipality'])
+                user.njcusermeta.address_line_1 = request.POST['address_line_1']
+                user.njcusermeta.address_line_2 = request.POST['address_line_2']
+                user.njcusermeta.city = request.POST['city']
+                user.njcusermeta.zip = request.POST['zip']
+                user.njcusermeta.position = request.POST['position']
+                user.njcusermeta.is_dca_approved = True
+                user.njcusermeta.is_muni_approved = True
+                user.njcusermeta.muni_approval_date = timezone.now()
+                user.njcusermeta.dca_approval_date = timezone.now()
+
+                #save updates
+                user.save()
+
+                #add user to group
+                dca_admin_group = Group.objects.get(name='dca_administrators')
+
+                if dca_admin_group:
+                    dca_admin_group.user_set.add(user)
+
+                    #flag OK
+                    return JsonResponse({'updated': True})
+                else:
+                    #flag error
+                    return JsonResponse({'updated': False})
+
         #decline?
         elif request.POST['action'] == 'decline':
             #load user
@@ -830,7 +875,7 @@ def user_approval(request):
                 #flag OK
                 return JsonResponse({'updated': True})
 
-        #decline?
+        #delete?
         elif request.POST['action'] == 'delete':
             #load user
             user = Profile.objects.get(username=request.POST['user'])
