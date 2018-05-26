@@ -284,7 +284,7 @@
         <!-- account info ----------------------------------------------------->
         <div id="data_4" class="hidden">
             <div id="navigation_4" class="return-to-list">
-                <a id="navigation_4" onclick="view_user_info('', 2, '');" href="#"><span class="fa fa-chevron-left"></span> Return to All NJcoast Users list</a>
+                <a onclick="view_user_info('', 2, '');" href="#"><span class="fa fa-chevron-left"></span> Return to All NJcoast Users list</a>
             </div>
 
             <!--User data presented-------------------------------------------->
@@ -292,7 +292,7 @@
 
                 <div class="row">
                     <div class="col-sm-3">
-                        <div class="lg-list-identifier ">
+                        <div id="data_4_decorator" class="lg-list-identifier ">
                             <span class="fa fa-users fa-5x "></span>
                             <p>NJcoast User Profile</p>
                         </div>
@@ -373,7 +373,7 @@
 
                 <div class="row">
                     <div class="col-sm-3"> <!-- col-md-6 "-->
-                            <div class="lg-list-identifier ">
+                            <div id="editable_user_decorator" class="lg-list-identifier ">
                               <span class="fa fa-users fa-5x "></span>
                               <p>NJcoast User Profile</p>
                             </div>
@@ -1059,7 +1059,10 @@ function create_new_dca_approver(tab_to_return_to, return_text){
     document.getElementById("editable_user").classList.remove("hidden");
 
     //flip pages to see edit
+    document.getElementById("data_4_decorator").innerHTML = `<span class="fa fa-users fa-5x "></span><p>DCA Approver Profile</p>`;
+    document.getElementById("editable_user_decorator").innerHTML = `<span class="fa fa-users fa-5x "></span><p>DCA Approver Profile</p>`;
     document.getElementById("data_4").classList.remove("hidden");
+
     document.getElementById("data_"+tab_to_return_to).classList.add("hidden");
     try{
         document.getElementById("data_"+tab_to_return_to+"_notab").classList.add("hidden");
@@ -1103,6 +1106,8 @@ function create_new_muni_admin(muni, code, tab_to_return_to, return_text){
     document.getElementById("editable_user").classList.remove("hidden");
 
     //flip pages to see edit
+    document.getElementById("data_4_decorator").innerHTML = `<span class="fa fa-user-circle fa-5x "></span><p>Municipal Approver Profile</p>`;
+    document.getElementById("editable_user_decorator").innerHTML = `<span class="fa fa-user-circle fa-5x "></span><p>Municipal Approver Profile</p>`;
     document.getElementById("data_4").classList.remove("hidden");
     document.getElementById("data_"+tab_to_return_to).classList.add("hidden");
 
@@ -1167,14 +1172,27 @@ function view_user_info(username, tab_to_return_to, return_text){
                         }
 
                         //flip pages
-                        document.getElementById("data_4").classList.remove("hidden");
                         if(tab_to_return_to != ""){
+                            //figure out return tab do fix decorator
+                            if(tab_to_return_to == "2"){
+                                if(result.is_muni){    //muni admin?
+                                    decorata_string = `<span class="fa fa-user-circle fa-5x "></span><p>${ result.current_muni } User Profile</p>`;
+                                    document.getElementById("data_4_decorator").innerHTML = decorata_string;
+                                    document.getElementById("editable_user_decorator").innerHTML = decorata_string;
+                                }else{  //or dca?
+                                    document.getElementById("data_4_decorator").innerHTML = `<span class="fa fa-users fa-5x "></span><p>NJcoast User Profile</p>`;
+                                    document.getElementById("editable_user_decorator").innerHTML = `<span class="fa fa-users fa-5x "></span><p>NJcoast User Profile</p>`;
+                                }
+                            }else{
+                                document.getElementById("data_4_decorator").innerHTML = `<span class="fa fa-user-circle fa-5x "></span><p>Municipal Approver Profile</p>`;
+                                document.getElementById("editable_user_decorator").innerHTML = `<span class="fa fa-user-circle fa-5x "></span><p>Municipal Approver Profile</p>`;
+                            }
                             document.getElementById("data_"+tab_to_return_to).classList.add("hidden");
                             try{
                                 document.getElementById("data_"+tab_to_return_to+"_notab").classList.add("hidden");
                             }catch(err){}
                         }
-
+                        document.getElementById("data_4").classList.remove("hidden");
 
                         //set return link
                         if(return_text != ""){
