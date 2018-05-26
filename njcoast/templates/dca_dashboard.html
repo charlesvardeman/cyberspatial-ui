@@ -175,7 +175,6 @@
                                     <th>Name <span class="fa fa-sort"></span></th>
                                     <th>Email</th>
                                     <th>Role <span class="fa fa-sort"></span></th>
-                                    <th>Municipality <span class="fa fa-sort"></span></th>
                                     <th>Status</th>
                                     <th>Notes</th>
                                     <th></th>
@@ -185,7 +184,6 @@
                                     <td>{{ user.first_name }} {{ user.last_name }}</td>
                                     <td><a>{{ user.email }}</a></td>
                                     <td>{{ user.njcusermeta.role }}</td>
-                                    <td>{{ user.njcusermeta.municipality }}</td>
                                     {% if user.is_active %}
                                     <td class="status act">active</td>
                                     <td class="notes">{{ user.njcusermeta.notes }}</td>
@@ -498,6 +496,15 @@
 <script src="{% static 'js/notify.min.js' %}"></script>
 
 <script type=text/javascript>
+//~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$(document).ready(function () {
+    //load main list
+    update_user_list();
+
+    //load munis
+    update_muni_admins();
+});
+
 function flip_main_dcaapprovals(flip_direction, do_flip){
     //flip pages
     if(flip_direction){
@@ -689,30 +696,47 @@ function update_user_list(){
             if(result.updated){
                 //update table
                 table_body = document.getElementById("user_list");
-                table_body.innerHTML =  `   <tr>
-                            <th>Name <span class="fa fa-sort"></span></th>
-                            <th>Email</th>
-                            <th>Role <span class="fa fa-sort"></span></th>
-                            <th>Municipality <span class="fa fa-sort"></span></th>
+                if(result.is_dca){
+                    table_body.innerHTML =  `   <tr>
+                                <th>Name <span class="fa fa-sort"></span></th>
+                                <th>Email</th>
+                                <th>Role <span class="fa fa-sort"></span></th>
+                                <th>Municipality <span class="fa fa-sort"></span></th>
 
-                            <th>Status</th>
-                            <th>Notes</th>
-                            <th></th>
-                        </tr>`;
+                                <th>Status</th>
+                                <th>Notes</th>
+                                <th></th>
+                            </tr>`;
+                }else{
+                    table_body.innerHTML =  `   <tr>
+                                <th>Name <span class="fa fa-sort"></span></th>
+                                <th>Email</th>
+                                <th>Role <span class="fa fa-sort"></span></th>
 
+                                <th>Status</th>
+                                <th>Notes</th>
+                                <th></th>
+                            </tr>`;
+                }
                 //loop over users
                 for(i=0; i<result.data.length; i++){
                     user = result.data[i];
-                    console.log(user.name);
+                    //console.log(user.name);
 
                     //----All NJC users-----------------------------------------
                     //basic user data
-                    html_string = `<tr>
-                                        <td>${ user.name }</td>
-                                        <td><a>${ user.email }</a></td>
-                                        <td>${ user.role }</td>
-                                        <td>${ user.municipality }</td>`;
-
+                    if(result.is_dca){
+                        html_string = `<tr>
+                                            <td>${ user.name }</td>
+                                            <td><a>${ user.email }</a></td>
+                                            <td>${ user.role }</td>
+                                            <td>${ user.municipality }</td>`;
+                    }else{
+                        html_string = `<tr>
+                                            <td>${ user.name }</td>
+                                            <td><a>${ user.email }</a></td>
+                                            <td>${ user.role }</td>`;
+                    }
                     //variable data
                     if(user.active){
                         html_string +=  `<td class="status act">active</td>
@@ -813,13 +837,13 @@ function update_user_list(){
 
 //set muni code after selecting
 function set_municipality_code(code){
-    console.log(code);
+    //console.log(code);
     document.getElementById("edit_code").innerHTML = code;
 }
 
 //delete user data
 function delete_user(username){
-    console.log(username);
+    //console.log(username);
 
     //do Ajax call
     $.ajax({
@@ -1072,7 +1096,7 @@ function create_new_muni_admin(muni, code, tab_to_return_to, return_text){
 
 //view user info
 function view_user_info(username, tab_to_return_to, return_text){
-    console.log("data "+username);
+    //console.log("data "+username);
     if(username != ""){
         //do Ajax call
         $.ajax({
@@ -1087,7 +1111,7 @@ function view_user_info(username, tab_to_return_to, return_text){
                 console.log("USER APPROVAL -- SUCCESS!" + result.updated);
 
                 if(result.updated){
-                    console.log(result.data+","+result.data.name);
+                    //console.log(result.data+","+result.data.name);
                     //put data into html
                     for(user_var in result.data){
                         //info form
@@ -1131,9 +1155,7 @@ function view_user_info(username, tab_to_return_to, return_text){
                         if(tab_to_return_to != ""){
                             document.getElementById("data_"+tab_to_return_to).classList.add("hidden");
                             try{
-                                console.log("Hide "+"data_"+tab_to_return_to+"_notab");
                                 document.getElementById("data_"+tab_to_return_to+"_notab").classList.add("hidden");
-
                             }catch(err){}
                         }
 
@@ -1158,9 +1180,7 @@ function view_user_info(username, tab_to_return_to, return_text){
         if(tab_to_return_to != ""){
             document.getElementById("data_"+tab_to_return_to).classList.remove("hidden");
             try{
-                console.log("Show "+"data_"+tab_to_return_to+"_notab");
                 document.getElementById("data_"+tab_to_return_to+"_notab").classList.remove("hidden");
-
             }catch(err){}
             }
         document.getElementById("data_4").classList.add("hidden");
@@ -1190,9 +1210,6 @@ function flip_tabs(id){
             }catch(err){}
         }
     }
-
-    //print
-    console.log("Clicked "+id);
 }
 
 </script>
