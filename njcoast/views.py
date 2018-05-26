@@ -610,7 +610,7 @@ def user_approval(request):
             #test we got them
             if user:
                 #flag OK and return data
-                return JsonResponse({'updated': True, 'data': user_to_dictionary(user)})
+                return JsonResponse({'updated': True, 'data': user_to_dictionary(user), 'is_muni': is_muni, 'is_dca': is_dca, 'current_muni':current_muni})
 
         elif request.GET['action'] == 'get_users':
             #get users
