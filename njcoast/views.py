@@ -698,6 +698,14 @@ def user_approval(request):
                     #set Active
                     user.is_active = True
 
+                    #add to groups
+                    #create group name
+                    group_name = user.njcusermeta.role.group_name + '-' + user.njcusermeta.municipality.group_name
+                    group, created = Group.objects.get_or_create(name=group_name)
+                    if group:
+                        group.user_set.add(user)
+                    #if created:
+
                 if is_muni:
                     #set muni approved
                     user.njcusermeta.is_muni_approved = True

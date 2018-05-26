@@ -819,7 +819,7 @@ function update_user_list(){
                                             <ul id="account_list_roles_${i}" class="dropdown-menu">
                                             </ul>
                                         </div>
-                                        <button onclick="user_update('${ user.username }', '${ i }}', 'approve', '');" class="btn btn-primary" data-toggle="modal" data-target="">Approve</button>
+                                        <button onclick="user_update('${ user.username }', '${ i }', 'approve', '');" class="btn btn-primary" data-toggle="modal" data-target="">Approve</button>
                                         <button onclick="user_update('${ user.username }', '${ i }', 'decline', '');" class="btn btn-default" data-toggle="modal" data-target="">Decline*</button>
                                         <p class="qualifier" style="margin-top: 10px;">*Any notes entered for a Declined applicant will be shared with the applicant to justify the decision.</p>
                                     </div>
@@ -834,7 +834,7 @@ function update_user_list(){
                         selctr = document.getElementById("edit_role_selector");
                         for(j=0; j<selctr.options.length; j++){
                             role_name = selctr.options[j].text;
-                            list_roles.innerHTML += `<li><a onclick="user_update('${ user.username }', '${ j }', 'update_role', '${ role_name }');" href="#">${ role_name }</a></li>`;
+                            list_roles.innerHTML += `<li><a onclick="user_update('${ user.username }', '${ i }', 'update_role', '${ role_name }');" href="#">${ role_name }</a></li>`;
                         }
                     }
                 }
@@ -1018,6 +1018,8 @@ function show_user_edit(do_edit){
 
 //user approvals
 function user_update(username, user_number, action, role){
+    console.log("Numb "+user_number);
+
     //update role if required
     if(action == 'update_role'){
         document.getElementById("role_"+user_number).innerHTML = role;
