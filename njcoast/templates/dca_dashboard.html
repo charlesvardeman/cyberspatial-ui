@@ -565,8 +565,8 @@ function flip_main_dcaapprovals(flip_direction, do_flip){
                         }
 
                         //new page
+                        show_user_edit(false);
                         document.getElementById("data_4").classList.add("hidden");
-                        document.getElementById("editable_user").classList.add("hidden");
                         document.getElementById("data_5").classList.remove("hidden");
                     }
 
@@ -1218,7 +1218,7 @@ function view_user_info(username, tab_to_return_to, return_text){
             try{
                 document.getElementById("data_"+tab_to_return_to+"_notab").classList.remove("hidden");
             }catch(err){}
-            }
+        }
         document.getElementById("data_4").classList.add("hidden");
 
         //flip out of edit if editing
@@ -1229,6 +1229,7 @@ function view_user_info(username, tab_to_return_to, return_text){
 //flip the tabs and their data
 function flip_tabs(id){
     //hide user info if open
+    show_user_edit(false);
     document.getElementById("data_4").classList.add("hidden");
 
     //clear Active and set new
