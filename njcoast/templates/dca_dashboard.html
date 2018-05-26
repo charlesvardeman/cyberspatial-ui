@@ -15,10 +15,10 @@
 <div class="jumbotron njcoast-image slimmer"></div>
 
 <div class="gray-zone">
-    <div class="container-fluid">
+    <div id="main_page" class="container-fluid">
         <div class="page-header" style="border: none">
             {% if request.user|has_group:"dca_administrators" %}
-            <a href="admin-dca-change.html" class="btn btn-primary btn-md pull-right">Edit DCA Approvers</a>
+            <a onclick="flip_main_dcaapprovals(true);" href="#" class="btn btn-primary btn-md pull-right">Edit DCA Approvers</a>
             <h3>DCA Administrator Controls</h3>
             {% else %}
             <p>{{ admin_municipality}}</p>
@@ -470,8 +470,56 @@
 
         </div>
         <!-- END account info ------------------------------------------------->
-
     </div>
+
+    <!--DCA Approvers page----------------------------------------------------->
+    <div id="dca_approvers" class="container-fluid hidden">
+        <div class="page-header" style="border: none">
+            <h3>Edit DCA Approvers</h3>
+        </div>
+
+        <div class="no-tab-bkgrnd">
+            <div class="return-to-list">
+                <a onclick="flip_main_dcaapprovals(false);" href="#"><span class="fa fa-chevron-left"></span> Return to DCA Administrator Controls</a>
+            </div>
+        </div>
+
+        <div class="table-bkgrnd">
+
+            <table class="table table-hover admin">
+                <tbody id="dca_approvers_list" >
+                    <tr>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th>Email</th>
+                        <th</th>
+                    </tr>
+                    <tr>
+                        <td>Sean Thompson</td>
+                        <td>Director</td>
+                        <td><a>Sean.Thompson@dca.nj.gov</a></td>
+                        <td><a href="admin-dca-profile.html"><span class="fa fa-info-circle"></span></a></td>
+                    </tr>
+                    <tr>
+                        <td>Keith Henderson</td>
+                        <td>Director of Policy and Planning</td>
+                        <td><a>Keith.Henderson@dca.nj.gov</a></td>
+                        <td><a href="admin-dca-profile.html"><span class="fa fa-info-circle"></span></a></td>
+                    </tr>
+                    <tr>
+                        <td>Tom Stanuikynas</td>
+                        <td>GIS Analyst/Planner</td>
+                        <td><a>Tom.Stanuikynas@dca.nj.gov</a></td>
+                        <td><a href="admin-dca-profile.html"><span class="fa fa-info-circle"></span></a></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <a href="#" class="btn btn-default btn-md">Add Approver</a>
+        </div>
+    </div>
+    <!--END DCA Approvers page------------------------------------------------->
+
 </div>
 {% endblock %}
 
@@ -479,6 +527,63 @@
 <script src="{% static 'js/notify.min.js' %}"></script>
 
 <script type=text/javascript>
+function flip_main_dcaapprovals(flip_direction){
+    //do Ajax call
+    $.ajax({
+        type: "GET",
+        url: "/user/settings/",
+        data: {
+            'action': 'get_dca_admins'
+        },
+        dataType: "json",
+        success: function(result) {
+            console.log("USER APPROVAL -- SUCCESS!" + result.updated);
+
+            //success?
+            if(result.updated){
+                //update table
+                table_body = document.getElementById("dca_approvers_list");
+                table_body.innerHTML = `<tr>
+                                            <th>Name</th>
+                                            <th>Position</th>
+                                            <th>Email</th>
+                                            <th</th>
+                                        </tr>`;
+
+                //loop over users
+                for(i=0; i<result.data.length; i++){
+                    dca_admin = result.data[i];
+                    //console.log(muni_admin.name);
+
+                    //----All muni admins---------------------------------------
+                    //basic dca admin data
+                    table_body.innerHTML += `<tr>
+                                                <td>${ dca_admin.name }</td>
+                                                <td>${ dca_admin.position }</td>
+                                                <td><a>${ dca_admin.email }</a></td>
+                                                <td><a href="admin-dca-profile.html"><span class="fa fa-info-circle"></span></a></td>
+                                            </tr>`;
+                }
+
+            }else{
+                //or failure
+            }
+        },
+        error: function(result) {
+            console.log("ERROR:", result)
+        }
+    });
+
+    //flip pages
+    if(flip_direction){
+        document.getElementById("main_page").classList.add("hidden");
+        document.getElementById("dca_approvers").classList.remove("hidden");
+    }else{
+        document.getElementById("main_page").classList.remove("hidden");
+        document.getElementById("dca_approvers").classList.add("hidden");
+    }
+}
+
 // Update muni approved list
 // AJAX call to get up to date information on muni approvers.
 // Will be extended when UI design for pages is available.
