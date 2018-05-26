@@ -35,7 +35,7 @@
             {% endif %}
             <li id="tab_3" onclick="flip_tabs(this.id);"><a href="#"><span class="fa fa-exclamation-circle"></span> Account Requests</a></li>
         </ul>
-        <div id="dca_approver_notab" class="no-tab-bkgrnd hidden">
+        <div id="data_5_notab" class="no-tab-bkgrnd hidden">
             <div class="return-to-list">
                 <a onclick="flip_main_dcaapprovals(false);" href="#"><span class="fa fa-chevron-left"></span> Return to DCA Administrator Controls</a>
             </div>
@@ -478,7 +478,7 @@
         <!-- END account info ------------------------------------------------->
 
         <!--DCA Approvers page----------------------------------------------------->
-        <div id="dca_approvers" class="table-bkgrnd hidden">
+        <div id="data_5" class="table-bkgrnd hidden">
 
             <table class="table table-hover admin">
                 <tbody id="dca_approvers_list" >
@@ -558,7 +558,7 @@ function flip_main_dcaapprovals(flip_direction){
                                                     <td>${ dca_admin.name }</td>
                                                     <td>${ dca_admin.position }</td>
                                                     <td><a>${ dca_admin.email }</a></td>
-                                                    <td><a href="admin-dca-profile.html"><span class="fa fa-info-circle"></span></a></td>
+                                                    <td><a onclick="view_user_info('${ dca_admin.username }', 5, 'Return to DCA Approvers list');" href="#"><span class="fa fa-info-circle"></span></a></td>
                                                 </tr>`;
                     }
 
@@ -567,7 +567,7 @@ function flip_main_dcaapprovals(flip_direction){
 
                     //turn off current pages visible
                     document.getElementById("tabs").classList.add("hidden");
-                    document.getElementById("dca_approver_notab").classList.remove("hidden");
+                    document.getElementById("data_5_notab").classList.remove("hidden");
 
                     //clear Active and set new
                     for(i=1; i<=3; i++){
@@ -580,7 +580,7 @@ function flip_main_dcaapprovals(flip_direction){
                     }
 
                     //new page
-                    document.getElementById("dca_approvers").classList.remove("hidden");
+                    document.getElementById("data_5").classList.remove("hidden");
 
                 }else{
                     //or failure
@@ -597,7 +597,7 @@ function flip_main_dcaapprovals(flip_direction){
 
         //current pages
         document.getElementById("tabs").classList.remove("hidden");
-        document.getElementById("dca_approver_notab").classList.add("hidden");
+        document.getElementById("data_5_notab").classList.add("hidden");
 
         //clear Active and set new
         for(i=1; i<=3; i++){
@@ -610,7 +610,7 @@ function flip_main_dcaapprovals(flip_direction){
         }
 
         //new page
-        document.getElementById("dca_approvers").classList.add("hidden");
+        document.getElementById("data_5").classList.add("hidden");
     }
 }
 
@@ -922,7 +922,7 @@ function save_changes(username){
                 document.getElementById("info_user").classList.remove("hidden");
                 document.getElementById("editable_user").classList.add("hidden");
 
-                //reload view
+                //reload view, get current setting
                 view_user_info(username, 2, "Return to All NJcoast Users list");
 
                 //reload main list
@@ -1105,6 +1105,12 @@ function view_user_info(username, tab_to_return_to, return_text){
                         //flip pages
                         document.getElementById("data_4").classList.remove("hidden");
                         document.getElementById("data_"+tab_to_return_to).classList.add("hidden");
+                        try{
+                            console.log("Hide "+"data_"+tab_to_return_to+"_notab");
+                            document.getElementById("data_"+tab_to_return_to+"_notab").classList.add("hidden");
+
+                        }catch(err){}
+
 
                         //set return link
                         document.getElementById("navigation_4").innerHTML = "<a onclick=\"view_user_info('', "+tab_to_return_to+", '');\" href=\"#\"><span class=\"fa fa-chevron-left\"></span> "+return_text;
@@ -1122,6 +1128,11 @@ function view_user_info(username, tab_to_return_to, return_text){
     }else{
         //flip pages back
         document.getElementById("data_"+tab_to_return_to).classList.remove("hidden");
+        try{
+            console.log("Show "+"data_"+tab_to_return_to+"_notab");
+            document.getElementById("data_"+tab_to_return_to+"_notab").classList.remove("hidden");
+
+        }catch(err){}
         document.getElementById("data_4").classList.add("hidden");
 
         //flip out of edit if editing
