@@ -19,14 +19,14 @@
         <div class="page-header" style="border: none">
             {% if request.user|has_group:"dca_administrators" %}
             <a onclick="flip_main_dcaapprovals(true);" href="#" class="btn btn-primary btn-md pull-right">Edit DCA Approvers</a>
-            <h3>DCA Administrator Controls</h3>
+            <h3 id="main_heading">DCA Administrator Controls</h3>
             {% else %}
             <p>{{ admin_municipality}}</p>
             <h3>Municipal Approver Administrator Controls</h3>
             {% endif %}
         </div>
 
-        <ul class="nav nav-tabs nav-justified admin-tabs">
+        <ul id="tabs" class="nav nav-tabs nav-justified admin-tabs">
             {% if request.user|has_group:"dca_administrators" %}
             <li id="tab_1" onclick="flip_tabs(this.id);" class="active"><a href="#"><span class="fa fa-user-circle"></span> Municipal Approvers</a></li>
             <li id="tab_2" onclick="flip_tabs(this.id);"><a href="#"><span class="fa fa-users"></span> All NJcoast Users</a></li>
@@ -35,6 +35,12 @@
             {% endif %}
             <li id="tab_3" onclick="flip_tabs(this.id);"><a href="#"><span class="fa fa-exclamation-circle"></span> Account Requests</a></li>
         </ul>
+        <div id="dca_approver_notab" class="no-tab-bkgrnd hidden">
+            <div class="return-to-list">
+                <a onclick="flip_main_dcaapprovals(false);" href="#"><span class="fa fa-chevron-left"></span> Return to DCA Administrator Controls</a>
+            </div>
+        </div>
+
 
         <!-- municipalities code ---------------------------------------------->
         <div id="data_1" {% if request.user|has_group:"municipal_administrators" %}class="hidden"{% endif %}>
@@ -470,21 +476,9 @@
 
         </div>
         <!-- END account info ------------------------------------------------->
-    </div>
 
-    <!--DCA Approvers page----------------------------------------------------->
-    <div id="dca_approvers" class="container-fluid hidden">
-        <div class="page-header" style="border: none">
-            <h3>Edit DCA Approvers</h3>
-        </div>
-
-        <div class="no-tab-bkgrnd">
-            <div class="return-to-list">
-                <a onclick="flip_main_dcaapprovals(false);" href="#"><span class="fa fa-chevron-left"></span> Return to DCA Administrator Controls</a>
-            </div>
-        </div>
-
-        <div class="table-bkgrnd">
+        <!--DCA Approvers page----------------------------------------------------->
+        <div id="dca_approvers" class="table-bkgrnd hidden">
 
             <table class="table table-hover admin">
                 <tbody id="dca_approvers_list" >
@@ -517,8 +511,9 @@
 
             <a href="#" class="btn btn-default btn-md">Add Approver</a>
         </div>
+        <!--END DCA Approvers page------------------------------------------------->
+
     </div>
-    <!--END DCA Approvers page------------------------------------------------->
 
 </div>
 {% endblock %}
@@ -528,58 +523,93 @@
 
 <script type=text/javascript>
 function flip_main_dcaapprovals(flip_direction){
-    //do Ajax call
-    $.ajax({
-        type: "GET",
-        url: "/user/settings/",
-        data: {
-            'action': 'get_dca_admins'
-        },
-        dataType: "json",
-        success: function(result) {
-            console.log("USER APPROVAL -- SUCCESS!" + result.updated);
-
-            //success?
-            if(result.updated){
-                //update table
-                table_body = document.getElementById("dca_approvers_list");
-                table_body.innerHTML = `<tr>
-                                            <th>Name</th>
-                                            <th>Position</th>
-                                            <th>Email</th>
-                                            <th</th>
-                                        </tr>`;
-
-                //loop over users
-                for(i=0; i<result.data.length; i++){
-                    dca_admin = result.data[i];
-                    //console.log(muni_admin.name);
-
-                    //----All muni admins---------------------------------------
-                    //basic dca admin data
-                    table_body.innerHTML += `<tr>
-                                                <td>${ dca_admin.name }</td>
-                                                <td>${ dca_admin.position }</td>
-                                                <td><a>${ dca_admin.email }</a></td>
-                                                <td><a href="admin-dca-profile.html"><span class="fa fa-info-circle"></span></a></td>
-                                            </tr>`;
-                }
-
-            }else{
-                //or failure
-            }
-        },
-        error: function(result) {
-            console.log("ERROR:", result)
-        }
-    });
-
     //flip pages
     if(flip_direction){
-        document.getElementById("main_page").classList.add("hidden");
-        document.getElementById("dca_approvers").classList.remove("hidden");
+        //do Ajax call for dca admins
+        $.ajax({
+            type: "GET",
+            url: "/user/settings/",
+            data: {
+                'action': 'get_dca_admins'
+            },
+            dataType: "json",
+            success: function(result) {
+                console.log("USER APPROVAL -- SUCCESS!" + result.updated);
+
+                //success?
+                if(result.updated){
+                    //update table
+                    table_body = document.getElementById("dca_approvers_list");
+                    table_body.innerHTML = `<tr>
+                                                <th>Name</th>
+                                                <th>Position</th>
+                                                <th>Email</th>
+                                                <th</th>
+                                            </tr>`;
+
+                    //loop over users
+                    for(i=0; i<result.data.length; i++){
+                        dca_admin = result.data[i];
+                        //console.log(muni_admin.name);
+
+                        //----All muni admins---------------------------------------
+                        //basic dca admin data
+                        table_body.innerHTML += `<tr>
+                                                    <td>${ dca_admin.name }</td>
+                                                    <td>${ dca_admin.position }</td>
+                                                    <td><a>${ dca_admin.email }</a></td>
+                                                    <td><a href="admin-dca-profile.html"><span class="fa fa-info-circle"></span></a></td>
+                                                </tr>`;
+                    }
+
+                    //new Title
+                    document.getElementById("main_heading").innerHTML = "Edit DCA Approvers";
+
+                    //turn off current pages visible
+                    document.getElementById("tabs").classList.add("hidden");
+                    document.getElementById("dca_approver_notab").classList.remove("hidden");
+
+                    //clear Active and set new
+                    for(i=1; i<=3; i++){
+                        //remove pages
+                        try{
+                            if(document.getElementById("tab_"+i).classList.contains("active")){
+                                document.getElementById("data_"+i).classList.add("hidden");
+                            }
+                        }catch(err){}
+                    }
+
+                    //new page
+                    document.getElementById("dca_approvers").classList.remove("hidden");
+
+                }else{
+                    //or failure
+                }
+            },
+            error: function(result) {
+                console.log("ERROR:", result)
+            }
+        });
+
     }else{
-        document.getElementById("main_page").classList.remove("hidden");
+        //old Title
+        document.getElementById("main_heading").innerHTML = "DCA Administrator Controls";
+
+        //current pages
+        document.getElementById("tabs").classList.remove("hidden");
+        document.getElementById("dca_approver_notab").classList.add("hidden");
+
+        //clear Active and set new
+        for(i=1; i<=3; i++){
+            //remove pages
+            try{
+                if(document.getElementById("tab_"+i).classList.contains("active")){
+                    document.getElementById("data_"+i).classList.remove("hidden");
+                }
+            }catch(err){}
+        }
+
+        //new page
         document.getElementById("dca_approvers").classList.add("hidden");
     }
 }
