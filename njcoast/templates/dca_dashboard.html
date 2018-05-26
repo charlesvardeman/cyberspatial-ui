@@ -923,7 +923,7 @@ function save_changes(username){
                 document.getElementById("editable_user").classList.add("hidden");
 
                 //reload view, get current setting
-                view_user_info(username, 2, "Return to All NJcoast Users list");
+                view_user_info(username, "", "");
 
                 //reload main list
                 update_user_list();
@@ -1104,16 +1104,20 @@ function view_user_info(username, tab_to_return_to, return_text){
 
                         //flip pages
                         document.getElementById("data_4").classList.remove("hidden");
-                        document.getElementById("data_"+tab_to_return_to).classList.add("hidden");
-                        try{
-                            console.log("Hide "+"data_"+tab_to_return_to+"_notab");
-                            document.getElementById("data_"+tab_to_return_to+"_notab").classList.add("hidden");
+                        if(tab_to_return_to != ""){
+                            document.getElementById("data_"+tab_to_return_to).classList.add("hidden");
+                            try{
+                                console.log("Hide "+"data_"+tab_to_return_to+"_notab");
+                                document.getElementById("data_"+tab_to_return_to+"_notab").classList.add("hidden");
 
-                        }catch(err){}
+                            }catch(err){}
+                        }
 
 
                         //set return link
-                        document.getElementById("navigation_4").innerHTML = "<a onclick=\"view_user_info('', "+tab_to_return_to+", '');\" href=\"#\"><span class=\"fa fa-chevron-left\"></span> "+return_text;
+                        if(return_text != ""){
+                            document.getElementById("navigation_4").innerHTML = "<a onclick=\"view_user_info('', "+tab_to_return_to+", '');\" href=\"#\"><span class=\"fa fa-chevron-left\"></span> "+return_text;
+                        }
                         //console.log("variable "+user_var+","+result.data[user_var]);
                     }
                 }else{
@@ -1127,12 +1131,14 @@ function view_user_info(username, tab_to_return_to, return_text){
         });
     }else{
         //flip pages back
-        document.getElementById("data_"+tab_to_return_to).classList.remove("hidden");
-        try{
-            console.log("Show "+"data_"+tab_to_return_to+"_notab");
-            document.getElementById("data_"+tab_to_return_to+"_notab").classList.remove("hidden");
+        if(tab_to_return_to != ""){
+            document.getElementById("data_"+tab_to_return_to).classList.remove("hidden");
+            try{
+                console.log("Show "+"data_"+tab_to_return_to+"_notab");
+                document.getElementById("data_"+tab_to_return_to+"_notab").classList.remove("hidden");
 
-        }catch(err){}
+            }catch(err){}
+            }
         document.getElementById("data_4").classList.add("hidden");
 
         //flip out of edit if editing
