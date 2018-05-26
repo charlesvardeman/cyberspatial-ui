@@ -924,9 +924,18 @@ function save_changes(username, action_if_no_user){
     }
 
     //check data integrity. Name, email
+    //first email
     email = document.getElementById("edit_email").value;
     if(!validateEmail(email)){
         alert("Invalid email, please correct before saving.");
+        //fade out modal
+        $("#saveChanges-1").modal("hide");
+        return;
+    }
+
+    //now name
+    if(username==""){
+        alert("Invalid name, please correct before saving.");
         //fade out modal
         $("#saveChanges-1").modal("hide");
         return;
