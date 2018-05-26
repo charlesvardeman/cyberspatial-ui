@@ -18,7 +18,7 @@
     <div id="main_page" class="container-fluid">
         <div class="page-header" style="border: none">
             {% if request.user|has_group:"dca_administrators" %}
-            <a id="main_heading_button" onclick="flip_main_dcaapprovals(true);" href="#" class="btn btn-primary btn-md pull-right">Edit DCA Approvers</a>
+            <a id="main_heading_button" onclick="flip_main_dcaapprovals(true, true);" href="#" class="btn btn-primary btn-md pull-right">Edit DCA Approvers</a>
             <h3 id="main_heading">DCA Administrator Controls</h3>
             {% else %}
             <p>{{ admin_municipality}}</p>
@@ -37,7 +37,7 @@
         </ul>
         <div id="data_5_notab" class="no-tab-bkgrnd hidden">
             <div class="return-to-list">
-                <a onclick="flip_main_dcaapprovals(false);" href="#"><span class="fa fa-chevron-left"></span> Return to DCA Administrator Controls</a>
+                <a onclick="flip_main_dcaapprovals(false, true);" href="#"><span class="fa fa-chevron-left"></span> Return to DCA Administrator Controls</a>
             </div>
         </div>
 
@@ -498,7 +498,7 @@
 <script src="{% static 'js/notify.min.js' %}"></script>
 
 <script type=text/javascript>
-function flip_main_dcaapprovals(flip_direction){
+function flip_main_dcaapprovals(flip_direction, do_flip){
     //flip pages
     if(flip_direction){
         //do Ajax call for dca admins
@@ -538,26 +538,28 @@ function flip_main_dcaapprovals(flip_direction){
                                                 </tr>`;
                     }
 
-                    //new Title
-                    document.getElementById("main_heading").innerHTML = "Edit DCA Approvers";
-                    document.getElementById("main_heading_button").classList.add("hidden");
+                    if(do_flip){
+                        //new Title
+                        document.getElementById("main_heading").innerHTML = "Edit DCA Approvers";
+                        document.getElementById("main_heading_button").classList.add("hidden");
 
-                    //turn off current pages visible
-                    document.getElementById("tabs").classList.add("hidden");
-                    document.getElementById("data_5_notab").classList.remove("hidden");
+                        //turn off current pages visible
+                        document.getElementById("tabs").classList.add("hidden");
+                        document.getElementById("data_5_notab").classList.remove("hidden");
 
-                    //clear Active and set new
-                    for(i=1; i<=3; i++){
-                        //remove pages
-                        try{
-                            if(document.getElementById("tab_"+i).classList.contains("active")){
-                                document.getElementById("data_"+i).classList.add("hidden");
-                            }
-                        }catch(err){}
+                        //clear Active and set new
+                        for(i=1; i<=3; i++){
+                            //remove pages
+                            try{
+                                if(document.getElementById("tab_"+i).classList.contains("active")){
+                                    document.getElementById("data_"+i).classList.add("hidden");
+                                }
+                            }catch(err){}
+                        }
+
+                        //new page
+                        document.getElementById("data_5").classList.remove("hidden");
                     }
-
-                    //new page
-                    document.getElementById("data_5").classList.remove("hidden");
 
                 }else{
                     //or failure
@@ -569,26 +571,28 @@ function flip_main_dcaapprovals(flip_direction){
         });
 
     }else{
-        //old Title
-        document.getElementById("main_heading").innerHTML = "DCA Administrator Controls";
-        document.getElementById("main_heading_button").classList.remove("hidden");
+        if(do_flip){
+            //old Title
+            document.getElementById("main_heading").innerHTML = "DCA Administrator Controls";
+            document.getElementById("main_heading_button").classList.remove("hidden");
 
-        //current pages
-        document.getElementById("tabs").classList.remove("hidden");
-        document.getElementById("data_5_notab").classList.add("hidden");
+            //current pages
+            document.getElementById("tabs").classList.remove("hidden");
+            document.getElementById("data_5_notab").classList.add("hidden");
 
-        //clear Active and set new
-        for(i=1; i<=3; i++){
-            //remove pages
-            try{
-                if(document.getElementById("tab_"+i).classList.contains("active")){
-                    document.getElementById("data_"+i).classList.remove("hidden");
-                }
-            }catch(err){}
+            //clear Active and set new
+            for(i=1; i<=3; i++){
+                //remove pages
+                try{
+                    if(document.getElementById("tab_"+i).classList.contains("active")){
+                        document.getElementById("data_"+i).classList.remove("hidden");
+                    }
+                }catch(err){}
+            }
+
+            //new page
+            document.getElementById("data_5").classList.add("hidden");
         }
-
-        //new page
-        document.getElementById("data_5").classList.add("hidden");
     }
 }
 
@@ -908,6 +912,9 @@ function save_changes(username, action_if_no_user){
 
                 //reload munis
                 update_muni_admins();
+
+                //update the dca admins?
+                flip_main_dcaapprovals(true, false);
 
                 //flag success
                 $.notify("User updated", "success");
