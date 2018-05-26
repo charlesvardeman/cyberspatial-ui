@@ -17,15 +17,22 @@
 <div class="gray-zone">
     <div class="container-fluid">
         <div class="page-header" style="border: none">
-            <!--<a href="admin-dca-change.html" class="btn btn-primary btn-md pull-right">Edit DCA Approvers</a>-->
+            {% if request.user|has_group:"dca_administrators" %}
+            <a href="admin-dca-change.html" class="btn btn-primary btn-md pull-right">Edit DCA Approvers</a>
             <h3>DCA Administrator Controls</h3>
+            {% else %}
+            <p>{{ admin_municipality}}</p>
+            <h3>Municipal Approver Administrator Controls</h3>
+            {% endif %}
         </div>
 
         <ul class="nav nav-tabs nav-justified admin-tabs">
             {% if request.user|has_group:"dca_administrators" %}
             <li id="tab_1" onclick="flip_tabs(this.id);" class="active"><a href="#"><span class="fa fa-user-circle"></span> Municipal Approvers</a></li>
+            <li id="tab_2" onclick="flip_tabs(this.id);"><a href="#"><span class="fa fa-users"></span> All NJcoast Users</a></li>
+            {% else %}
+            <li id="tab_2" onclick="flip_tabs(this.id);" class="active"><a href="#"><span class="fa fa-users"></span> {{ admin_municipality}} Users</a></li>
             {% endif %}
-            <li id="tab_2" onclick="flip_tabs(this.id);" {% if request.user|has_group:"municipal_administrators" %}class="active"{% endif %}><a href="#"><span class="fa fa-users"></span> All NJcoast Users</a></li>
             <li id="tab_3" onclick="flip_tabs(this.id);"><a href="#"><span class="fa fa-exclamation-circle"></span> Account Requests</a></li>
         </ul>
 
@@ -53,13 +60,13 @@
                     </div>
                     <div class="col-sm-8">
 
-                        <div class="input-group">
+                        <!--<div class="input-group">
                             <input type="text" class="form-control" placeholder="Search table for...">
                             <span class="input-group-btn">
                                 <button class="btn btn-default" type="button">
                                     <span class="fa fa-search"></span></button>
                             </span>
-                        </div>
+                        </div>-->
                         <!-- /input-group -->
 
                     </div>
@@ -123,12 +130,12 @@
                     </div>
                     <div class="col-sm-4">
 
-                        <div class="input-group">
+                        <!--<div class="input-group">
                             <input type="text" class="form-control" placeholder="Search table for...">
                             <span class="input-group-btn">
-                  <button class="btn btn-default" type="button"><span class="fa fa-search"></span></button>
+                                <button class="btn btn-default" type="button"><span class="fa fa-search"></span></button>
                             </span>
-                        </div>
+                        </div>-->
                         <!-- /input-group -->
 
                     </div>

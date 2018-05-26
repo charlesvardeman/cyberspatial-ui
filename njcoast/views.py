@@ -553,6 +553,9 @@ class DCADashboardTemplateView(TemplateView):
         #get roles
         context['roles'] = NJCRole.objects.all().order_by('name').order_by('name')
 
+        #Get admin Municipality
+        context['admin_municipality'] = current_muni
+
         return context
 
 #Parse out user object to dictionary
