@@ -220,7 +220,7 @@
         <!-- account requests ------------------------------------------------->
         <div id="data_3" class="hidden">
             <div class="filter-bkgrnd">
-                <i><span class="fa fa-exclamation-circle"></span> {{ number_to_be_approved }} pending requests</i>
+                <i id="number_to_be_approved"><span class="fa fa-exclamation-circle"></span> {{ number_to_be_approved }} pending requests</i>
             </div>
 
             <div id="account_list" class="table-bkgrnd">
@@ -718,6 +718,10 @@ function update_user_list(){
                                 <th></th>
                             </tr>`;
                 }
+
+                //counter for approvals
+                var approval_count = 0;
+
                 //loop over users
                 for(i=0; i<result.data.length; i++){
                     user = result.data[i];
@@ -767,6 +771,8 @@ function update_user_list(){
 
                     //----Approval list?----------------------------------------
                     if(!user.active && ( (!user.is_dca_approved && result.is_dca) || (!user.is_muni_approved && result.is_muni) )){
+                        approval_count++;
+
                         document.getElementById("account_list").innerHTML =
                                 `<div class="row review-request">
                                     <div class="col-md-5 col-lg-4">
@@ -824,6 +830,10 @@ function update_user_list(){
                         }
                     }
                 }
+
+                //set approvals to be done
+                document.getElementById("number_to_be_approved").innerHTML = `<span class="fa fa-exclamation-circle"></span> ${ approval_count } pending requests`;
+
             }else{
                 //or failure
             }
