@@ -18,7 +18,7 @@
     <div id="main_page" class="container-fluid">
         <div class="page-header" style="border: none">
             {% if request.user|has_group:"dca_administrators" %}
-            <a onclick="flip_main_dcaapprovals(true);" href="#" class="btn btn-primary btn-md pull-right">Edit DCA Approvers</a>
+            <a id="main_heading_button" onclick="flip_main_dcaapprovals(true);" href="#" class="btn btn-primary btn-md pull-right">Edit DCA Approvers</a>
             <h3 id="main_heading">DCA Administrator Controls</h3>
             {% else %}
             <p>{{ admin_municipality}}</p>
@@ -564,6 +564,7 @@ function flip_main_dcaapprovals(flip_direction){
 
                     //new Title
                     document.getElementById("main_heading").innerHTML = "Edit DCA Approvers";
+                    document.getElementById("main_heading_button").classList.add("hidden");
 
                     //turn off current pages visible
                     document.getElementById("tabs").classList.add("hidden");
@@ -594,6 +595,7 @@ function flip_main_dcaapprovals(flip_direction){
     }else{
         //old Title
         document.getElementById("main_heading").innerHTML = "DCA Administrator Controls";
+        document.getElementById("main_heading_button").classList.remove("hidden");
 
         //current pages
         document.getElementById("tabs").classList.remove("hidden");
