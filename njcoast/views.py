@@ -745,6 +745,7 @@ def user_approval(request):
                 #save results
                 user.save()
 
+                # send email to DCA approver once approved
                 if is_muni:
                     #send email
                     #first find admin to approve
@@ -764,6 +765,19 @@ def user_approval(request):
                             #send it
                             dca_admin.email_user(subject, message)
 
+                # send email to user once approved by DCA
+                if is_dca:
+                    #actual email part
+                    current_site = get_current_site(request)
+                    subject = 'Account created on NJcoast'
+                    message = render_to_string('dca_approved_email.html', {
+                        'user': user.first_name+" "+user.last_name,
+                        'domain': current_site.domain,
+                        'municipality': user.njcusermeta.municipality.name,
+                    })
+
+                    #send it
+                    user.email_user(subject, message)
 
                 #flag OK
                 return JsonResponse({'updated': True})
