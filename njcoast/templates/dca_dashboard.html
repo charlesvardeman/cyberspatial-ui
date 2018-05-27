@@ -101,7 +101,7 @@
                             <td class="position">{{ muni_admin.njcusermeta.position }}</td>
                             <td><a>{{ muni_admin.email }}</a></td>
                             <td class="notes">{{ muni_admin.njcusermeta.notes }}</td>
-                            <td><a onclick="view_user_info('{{ muni_admin.username  }}', 1, 'Return to Municipal Approvers list');" href="#"><span class="fa fa-info-circle"></span></a></td>
+                            <td><a onclick="view_user_info('{{ muni_admin.username  }}', 1, 'Return to Municipal Approvers list', '');" href="#"><span class="fa fa-info-circle"></span></a></td>
                         </tr>
                         {% endfor %}
                         {% for muni_without_admin in munis_without_admin %}
@@ -187,12 +187,12 @@
                                     {% if user.is_active %}
                                     <td class="status act">active</td>
                                     <td class="notes">{{ user.njcusermeta.notes }}</td>
-                                    <td><a onclick="view_user_info('{{ user.username }}', 2, 'Return to All NJcoast Users list');" href="#"><span class="fa fa-info-circle"></span></a></td>
+                                    <td><a onclick="view_user_info('{{ user.username }}', 2, 'Return to All NJcoast Users list', '');" href="#"><span class="fa fa-info-circle"></span></a></td>
                                     {% else %}
                                         {% if user.njcusermeta.is_dca_approved %}
                                     <td class="status inact">inactive</td>
                                     <td class="notes">{{ user.njcusermeta.notes }}</td>
-                                    <td><a onclick="view_user_info('{{ user.username }}', 2, 'Return to All NJcoast Users list');" href="#"><span class="fa fa-info-circle"></span></a></td>
+                                    <td><a onclick="view_user_info('{{ user.username }}', 2, 'Return to All NJcoast Users list', '');" href="#"><span class="fa fa-info-circle"></span></a></td>
                                         {% else %}
                                             {% if user.njcusermeta.is_muni_approved and request.user|has_group:"dca_administrators" or not user.njcusermeta.is_muni_approved and request.user|has_group:"municipal_administrators" %}
                                     <td class="status pnd">pending</td>
@@ -200,7 +200,7 @@
                                             {% else %}
                                     <td class="status pnd">pending</td>
                                     <td class="notes">{{ user.njcusermeta.notes }}</td>
-                                    <td><a onclick="view_user_info('{{ user.username }}', 2, 'Return to All NJcoast Users list');" href="#"><span class="fa fa-info-circle"></span></a></td>
+                                    <td><a onclick="view_user_info('{{ user.username }}', 2, 'Return to All NJcoast Users list', '');" href="#"><span class="fa fa-info-circle"></span></a></td>
                                             {% endif %}
                                         {% endif %}
                                     {% endif %}
@@ -284,7 +284,7 @@
         <!-- account info ----------------------------------------------------->
         <div id="data_4" class="hidden">
             <div id="navigation_4" class="return-to-list">
-                <a onclick="view_user_info('', 2, '');" href="#"><span class="fa fa-chevron-left"></span> Return to All NJcoast Users list</a>
+                <a onclick="view_user_info('', 2, '', '');" href="#"><span class="fa fa-chevron-left"></span> Return to All NJcoast Users list</a>
             </div>
 
             <!--User data presented-------------------------------------------->
@@ -301,23 +301,23 @@
 
                         <table class="table">
                             <tbody>
-                                <tr>
+                                <tr id="info_name_row">
                                     <th style="border-top: 0">Full Name</th>
                                     <td id="info_name" style="border-top: 0">Sarah Jones</td>
                                 </tr>
-                                <tr>
+                                <tr id="info_position_row">
                                     <th>Position/Title</th>
                                     <td id="info_position">Planner</td>
                                 </tr>
-                                <tr>
+                                <tr id="info_municipality_row">
                                     <th>Municipality Name</th>
                                     <td id="info_municipality">Berkeley Twp</td>
                                 </tr>
-                                <tr>
+                                <tr id="info_code_row">
                                     <th>Municipality Code</th>
                                     <td id="info_code">1506</td>
                                 </tr>
-                                <tr>
+                                <tr id="info_email_row">
                                     <!--<tr>
                                         <th>Mailing address</th>
                                         <td>627 Pinewald-Keswick Rd<br/>Bayville, NJ 08721</td>
@@ -325,15 +325,15 @@
                                     <th>Email</th>
                                     <td><a id="info_email">sjones@gmail.com</a></td>
                                 </tr>
-                                <tr>
+                                <tr id="info_voice_row">
                                     <th>Phone</th>
                                     <td id="info_voice">732-341-1132</td>
                                 </tr>
-                                <tr>
+                                <tr id="info_role_row">
                                     <th>Role</th>
                                     <td id="info_role">PL - Planning</td>
                                 </tr>
-                                <tr>
+                                <tr id="info_justification_row">
                                     <th>Justification</th>
                                     <td id="info_justification">I am involved in planning for Berkeley, and need the tool for storm projection.</td>
                                 </tr>
@@ -382,7 +382,7 @@
 
                         <table class="table edit-profile">
                             <tbody>
-                                <tr>
+                                <tr id="edit_name_row">
                                     <th style="border-top: 0">Full Name</th>
                                     <td style="border-top: 0"><input type="text" class="form-control" id="edit_name" value="Sarah Jones" placeholder="Jane Smith"></td>
                                 </tr>
@@ -390,7 +390,7 @@
                                     <th>Position/Title</th>
                                     <td><input type="text" class="form-control" id="edit_position" value="Planner" placeholder="Clerk"></td>
                                 </tr>
-                                <tr>
+                                <tr id="edit_municipality_row">
                                     <th>Municipality Name</th>
                                     <!--<td><input type="text" class="form-control" id="edit_municipality" value="Berkeley Twp"></td>-->
                                     <td id="edit_municipality_selector_cell">
@@ -402,12 +402,12 @@
                                     </td>
 
                                 </tr>
-                                <tr>
+                                <tr id="edit_code_row">
                                     <th>Municipality Code</th>
                                     <!-- Should auto-update when Municipality changes -->
                                     <td id="edit_code" style="color:#999">1506</td>
                                 </tr>
-                                <tr>
+                                <tr id="edit_zip_row">
                                     <th>Mailing address</th>
                                     <td>
                                         <input type="text" class="form-control" id="edit_address_line_1" value="627 Pinewald-Keswick Rd" placeholder="Address line 1">
@@ -416,15 +416,15 @@
                                         <input type="text" class="form-control" id="edit_zip" value="08721" placeholder="Zip code">
                                     </td>
                                 </tr>
-                                <tr>
+                                <tr id="edit_email_row">
                                     <th>Email</th>
                                     <td><input type="email" class="form-control" id="edit_email" value="sjones@gmail.com" placeholder="jsmith@nj.gov"></td>
                                 </tr>
-                                <tr>
+                                <tr id="edit_voice_row">
                                     <th>Phone</th>
                                     <td><input type="tel" class="form-control" id="edit_voice" value="732-341-1132" placeholder="123-456-7890"></td>
                                 </tr>
-                                <tr>
+                                <tr id="edit_role_row">
                                     <th>Role</th>
                                     <td>
                                         <select id="edit_role_selector" class="form-control">
@@ -434,7 +434,7 @@
                                         </select>
                                     </td>
                                 </tr>
-                                <tr>
+                                <tr id="edit_justification_row">
                                     <th>Justification</th>
                                     <td id="edit_justification" style="color:#999">I am involved in planning for Berkeley, and need the tool for storm projection.</td>
                                 </tr>
@@ -541,7 +541,7 @@ function flip_main_dcaapprovals(flip_direction, do_flip){
                                                     <td>${ dca_admin.name }</td>
                                                     <td>${ dca_admin.position }</td>
                                                     <td><a>${ dca_admin.email }</a></td>
-                                                    <td><a onclick="view_user_info('${ dca_admin.username }', 5, 'Return to DCA Approvers list');" href="#"><span class="fa fa-info-circle"></span></a></td>
+                                                    <td><a onclick="view_user_info('${ dca_admin.username }', 5, 'Return to DCA Approvers list', '');" href="#"><span class="fa fa-info-circle"></span></a></td>
                                                 </tr>`;
                     }
 
@@ -651,7 +651,7 @@ function update_muni_admins(){
                                         <td class="position">${ muni_admin.position }</td>
                                         <td><a>${ muni_admin.email }</a></td>
                                         <td class="notes">${ muni_admin.notes }</td>
-                                        <td><a onclick="view_user_info('${ muni_admin.username  }', 1, 'Return to Municipal Approvers list');" href="#"><span class="fa fa-info-circle"></span></a></td>
+                                        <td><a onclick="view_user_info('${ muni_admin.username  }', 1, 'Return to Municipal Approvers list', 'justification,role');" href="#"><span class="fa fa-info-circle"></span></a></td>
                                     </tr>`;
                 }
 
@@ -753,12 +753,12 @@ function update_user_list(){
                     if(user.active){
                         html_string +=  `<td class="status act">active</td>
                                         <td class="notes">${ user.notes }</td>
-                                        <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
+                                        <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list', '');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
                     }else{
                         if(user.is_dca_approved){
                             html_string +=  `<td class="status inact">inactive</td>
                                             <td class="notes">${ user.notes }</td>
-                                            <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
+                                            <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list', '');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
                         }else{
                             if( (user.is_muni_approved && result.is_dca) || (!user.is_muni_approved && result.is_muni) ){
                                 html_string +=  `<td class="status pnd">pending</td>
@@ -766,7 +766,7 @@ function update_user_list(){
                             }else{
                                 html_string +=  `<td class="status pnd">pending</td>
                                                 <td class="notes">${ user.notes }</td>
-                                                <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
+                                                <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list', '');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
                             }
                         }
                     }
@@ -971,7 +971,7 @@ function save_changes(username, action_if_no_user){
                 document.getElementById("editable_user").classList.add("hidden");
 
                 //reload view, get current setting
-                view_user_info(username, "", "");
+                view_user_info(username, "", "", "");
 
                 //reload main list
                 update_user_list();
@@ -1100,7 +1100,7 @@ function create_new_dca_approver(tab_to_return_to, return_text){
     }catch(err){}
 
     //set return link
-    document.getElementById("navigation_4").innerHTML = "<a onclick=\"view_user_info('', "+tab_to_return_to+", '');\" href=\"#\"><span class=\"fa fa-chevron-left\"></span> "+return_text;
+    document.getElementById("navigation_4").innerHTML = "<a onclick=\"view_user_info('', "+tab_to_return_to+", '', '');\" href=\"#\"><span class=\"fa fa-chevron-left\"></span> "+return_text;
 }
 
 //create new user
@@ -1144,11 +1144,14 @@ function create_new_muni_admin(muni, code, tab_to_return_to, return_text){
     document.getElementById("data_"+tab_to_return_to).classList.add("hidden");
 
     //set return link
-    document.getElementById("navigation_4").innerHTML = "<a onclick=\"view_user_info('', "+tab_to_return_to+", '');\" href=\"#\"><span class=\"fa fa-chevron-left\"></span> "+return_text;
+    document.getElementById("navigation_4").innerHTML = "<a onclick=\"view_user_info('', "+tab_to_return_to+", '', '');\" href=\"#\"><span class=\"fa fa-chevron-left\"></span> "+return_text;
 }
 
 //view user info
-function view_user_info(username, tab_to_return_to, return_text){
+function view_user_info(username, tab_to_return_to, return_text, exclude_string){
+    //get excludes
+    excludes = exclude_string.split(",");
+
     //console.log("data "+username);
     if(username != ""){
         //do Ajax call
@@ -1171,6 +1174,7 @@ function view_user_info(username, tab_to_return_to, return_text){
                         try {
                             elmt = document.getElementById("info_"+user_var);
                             elmt.innerHTML = result.data[user_var];
+                            document.getElementById("info_"+user_var+"_row").classList.remove("hidden");
                         }
                         catch(err) {
                         }
@@ -1183,6 +1187,7 @@ function view_user_info(username, tab_to_return_to, return_text){
                             }else{
                                 elmt.innerHTML = result.data[user_var];
                             }
+                            document.getElementById("edit_"+user_var+"_row").classList.remove("hidden");
                         }
                         catch(err) {
                         }
@@ -1194,6 +1199,8 @@ function view_user_info(username, tab_to_return_to, return_text){
                                 selctr.value = result.data.role;
                             }
                         }
+                        document.getElementById("edit_role_row").classList.remove("hidden");
+
 
                         //set edit selector for municipality
                         selctr = document.getElementById("edit_municipality_selector");
@@ -1202,6 +1209,7 @@ function view_user_info(username, tab_to_return_to, return_text){
                                 selctr.value = result.data.code;
                             }
                         }
+                        document.getElementById("edit_municipality_row").classList.remove("hidden");
 
                         //flip pages
                         if(tab_to_return_to != ""){
@@ -1234,9 +1242,18 @@ function view_user_info(username, tab_to_return_to, return_text){
 
                         //set return link
                         if(return_text != ""){
-                            document.getElementById("navigation_4").innerHTML = "<a onclick=\"view_user_info('', "+tab_to_return_to+", '');\" href=\"#\"><span class=\"fa fa-chevron-left\"></span> "+return_text;
+                            document.getElementById("navigation_4").innerHTML = "<a onclick=\"view_user_info('', "+tab_to_return_to+", '', '');\" href=\"#\"><span class=\"fa fa-chevron-left\"></span> "+return_text;
                         }
                         //console.log("variable "+user_var+","+result.data[user_var]);
+
+                        //set excludes
+                        for(i=0; i<excludes.length; i++){
+                            try{
+                                console.log("Exc "+excludes[i]);
+                                document.getElementById("info_"+excludes[i]+"_row").classList.add("hidden");
+                                document.getElementById("edit_"+excludes[i]+"_row").classList.add("hidden");
+                            }catch(err){}
+                        }
                     }
                 }else{
                     //or failure
