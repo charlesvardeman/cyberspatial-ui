@@ -1199,8 +1199,11 @@ function view_user_info(username, tab_to_return_to, return_text, exclude_string,
     excludes = exclude_string.split(",");
 
     //get disables
-    console.log("Dis "+disable_edit_string);
-    disable_edit = disable_edit_string.split(",");
+    //console.log("Dis "+disable_edit_string);
+    var disable_edit = [];
+    try{
+        disable_edit = disable_edit_string.split(",");
+    }catch(err){}
 
     //console.log("data "+username);
     if(username != ""){
