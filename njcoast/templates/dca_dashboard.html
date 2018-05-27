@@ -49,16 +49,16 @@
                 <div class="row">
                     <div class="col-sm-4">
 
-                        <span class="f-label">Filters:</span>
+                        <span class="f-label">Filter by County:</span>
 
                         <div class="btn-group">
-                            <button type="button" class="btn btn-default dropdown-toggle"
+                            <button id="county_filter_button" type="button" class="btn btn-default dropdown-toggle"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    County <span class="caret"></span>
+                                    All &nbsp;&nbsp;&nbsp;&nbsp;<span class="caret"></span>
                                         </button>
                             <ul class="dropdown-menu">
                                 {% for county in counties %}
-                                <li><a href="#">{{ county.name }}</a></li>
+                                <li><a onclick="filter_muni_admin_by_county('{{ county.name }}');" href="#">{{ county.name }}</a></li>
                                 {% endfor %}
                             </ul>
                         </div>
@@ -470,7 +470,7 @@
                                         You have made changes to this NJcoast user profile. Would you like to save these changes?
                                     </div>
                                     <div class="modal-footer">
-                                        <a name="create_muni_admin" id="save_changes_button" onclick="save_changes(document.getElementById('edit_username').innerHTML, this.name);" class="btn btn-primary" href="#">Yes</a>
+                                        <a name="create_muni_admin" id="save_changes_button" onclick="save_changes(document.getElementById('edit_username').innerHTML, this.name, '', '');" class="btn btn-primary" href="#">Yes</a>
                                         <a onclick="$('#saveChanges-1').modal('hide');" class="btn btn-default" href="#">No</a>
                                     </div>
                                 </div>

@@ -480,7 +480,7 @@ def signup(request):
 
                 #send email
                 #first find admin to approve
-                muni_admins = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').filter(groups__name='municipal_administrators').filter(njcusermeta__municipality__name=user.njcusermeta.municipality.name).order_by('last_name')
+                muni_admins = Profile.objects.exclude(is_active=False).exclude(username='admin').exclude(username='AnonymousUser').filter(groups__name='municipal_administrators').filter(njcusermeta__municipality__name=user.njcusermeta.municipality.name).order_by('last_name')
 
                 if muni_admins:
                     for muni_admin in muni_admins:
@@ -684,8 +684,14 @@ def user_approval(request):
                 return JsonResponse({'updated': True, 'data': output_array, 'is_muni': is_muni, 'is_dca': is_dca})
 
         elif request.GET['action'] == 'get_muni_admins':
+            #get county if set
+            county = request.GET['county']
+
             #get municipalities
-            municipalities = NJCMunicipality.objects.exclude(name='Statewide').order_by('name')
+            if county == "" or county == "All":
+                municipalities = NJCMunicipality.objects.exclude(name='Statewide').order_by('name')
+            else:
+                municipalities = NJCMunicipality.objects.exclude(name='Statewide').filter(county__name=county).order_by('name')
 
             if municipalities:
                 munis_without_admin = []
@@ -694,7 +700,11 @@ def user_approval(request):
                     munis_without_admin.append({'name': municipality.name, 'code': municipality.code})
 
                 #and muni admins
-                muni_admins = Profile.objects.filter(groups__name='municipal_administrators').order_by('last_name')
+                if county == "" or county == "All":
+                    muni_admins = Profile.objects.exclude(is_active=False).filter(groups__name='municipal_administrators').order_by('last_name')
+                else:
+                    muni_admins = Profile.objects.exclude(is_active=False).filter(njcusermeta__municipality__county__name=county).filter(groups__name='municipal_administrators').order_by('last_name')
+
                 if muni_admins:
                     print "Muni admins",len(muni_admins)
 
@@ -712,7 +722,7 @@ def user_approval(request):
 
         elif request.GET['action'] == 'get_dca_admins':
             #get dca admins
-            dca_admins = Profile.objects.filter(groups__name='dca_administrators').order_by('last_name')
+            dca_admins = Profile.objects.exclude(is_active=False).filter(groups__name='dca_administrators').order_by('last_name')
             if dca_admins:
                 print "DCA admins",len(dca_admins)
 
@@ -772,7 +782,7 @@ def user_approval(request):
                 if is_muni:
                     #send email
                     #first find admin to approve
-                    dca_admins = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').filter(groups__name='dca_administrators').order_by('last_name')
+                    dca_admins = Profile.objects.exclude(is_active=False).exclude(username='admin').exclude(username='AnonymousUser').filter(groups__name='dca_administrators').order_by('last_name')
 
                     if dca_admins:
                         for dca_admin in dca_admins:
