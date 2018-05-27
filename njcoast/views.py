@@ -74,6 +74,7 @@ class MapTemplateView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(MapTemplateView, self).get_context_data(**kwargs)
 
+        user = self.request.user
         keywords = self.request.user.keywords
 
         # map_object, created = NJCMap.objects.get_or_create(
@@ -89,14 +90,20 @@ class MapTemplateView(TemplateView):
 
         # no keywords assigned OR both Keansburg + Berkeley will start the user
         # at Keansburg, as well as the obvious case of just having keansburg
-        if keywords.filter(name="keansburg").exists() or len(keywords.all()) == 0:
-            context['home_latitude'] = "40.4417743"
-            context['home_longitude'] = "-74.1298643"
-            context['zoom_level'] = 14
-        elif keywords.filter(name="berkeley").exists():
-            context['home_latitude'] = "39.9051846"
-            context['home_longitude'] = "-74.1808381"
-            context['zoom_level'] = 13
+        #defaults
+        context['home_latitude'] = "40.4417743"
+        context['home_longitude'] = "-74.1298643"
+        context['zoom_level'] = 14
+
+        # get user's Municipality values
+        try:
+            muni = user.njcusermeta.municipality
+            context['home_latitude'] = muni.home_latitude
+            context['home_longitude'] = muni.home_longitude
+            context['zoom_level'] = muni.zoom_level
+
+        except:
+            pass
 
         #get users
         #find groups I am in!
@@ -122,6 +129,7 @@ class MapExpertTemplateView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(MapExpertTemplateView, self).get_context_data(**kwargs)
 
+        user = self.request.user
         keywords = self.request.user.keywords
 
         # map_object, created = NJCMap.objects.get_or_create(
@@ -135,14 +143,20 @@ class MapExpertTemplateView(TemplateView):
 
         # no keywords assigned OR both Keansburg + Berkeley will start the user
         # at Keansburg, as well as the obvious case of just having keansburg
-        if keywords.filter(name="keansburg").exists() or len(keywords.all()) == 0:
-            context['home_latitude'] = "40.4417743"
-            context['home_longitude'] = "-74.1298643"
-            context['zoom_level'] = 14
-        elif keywords.filter(name="berkeley").exists():
-            context['home_latitude'] = "39.9051846"
-            context['home_longitude'] = "-74.1808381"
-            context['zoom_level'] = 13
+        #defaults
+        context['home_latitude'] = "40.4417743"
+        context['home_longitude'] = "-74.1298643"
+        context['zoom_level'] = 14
+
+        # get user's Municipality values
+        try:
+            muni = user.njcusermeta.municipality
+            context['home_latitude'] = muni.home_latitude
+            context['home_longitude'] = muni.home_longitude
+            context['zoom_level'] = muni.zoom_level
+
+        except:
+            pass
 
         #quiery, select if I am the owner
         context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
