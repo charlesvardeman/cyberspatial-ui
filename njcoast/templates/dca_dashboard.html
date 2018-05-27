@@ -756,6 +756,9 @@ function update_user_list(){
                 //counter for approvals
                 var approval_count = 0;
 
+                //clear out old list
+                document.getElementById("account_list").innerHTML = "";
+
                 //loop over users
                 for(i=0; i<result.data.length; i++){
                     user = result.data[i];
@@ -816,7 +819,7 @@ function update_user_list(){
                     if(!user.active && ( (!user.is_dca_approved && result.is_dca) || (!user.is_muni_approved && result.is_muni) )){
                         approval_count++;
 
-                        document.getElementById("account_list").innerHTML =
+                        document.getElementById("account_list").innerHTML +=
                                 `<div class="row review-request">
                                     <div class="col-md-5 col-lg-4">
                                         <div class="well">
