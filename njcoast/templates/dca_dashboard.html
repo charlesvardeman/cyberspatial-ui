@@ -774,7 +774,7 @@ function update_user_list(){
                                             <td>${ user.name }</td>
                                             <td><a>${ user.email }</a></td>
                                             <td>${ user.rolesf }</td>
-                                            <td>${ user.municipality }</td>`;
+                                            <td><a onclick="view_user_info('${ user.muni_approver }', 2, 'Return to All NJcoast Users list', '', '');" href="#">${ user.municipality }</a></td>`;
                     }else{
                         html_string = `<tr>
                                             <td>${ user.name }</td>

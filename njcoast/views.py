@@ -625,6 +625,15 @@ def user_to_dictionary(user):
     user_dict['city'] = user.njcusermeta.city
     user_dict['zip'] = user.njcusermeta.zip
 
+    #get muni approver username
+    muni_approvers = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').filter(groups__name='municipal_administrators').filter(njcusermeta__municipality__name=user.njcusermeta.municipality).order_by('last_name')
+
+    #grab the first if OK
+    if muni_approvers:
+        user_dict['muni_approver'] = muni_approvers[0].username
+    else:
+        user_dict['muni_approver'] = ""
+
     #Return
     return user_dict
 
