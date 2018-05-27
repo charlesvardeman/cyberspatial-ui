@@ -1031,6 +1031,26 @@ function save_changes(username, action_if_no_user){
                 //flag success
                 $.notify("User updated", "success");
             }else{
+                //check for flagged errors
+                try{
+                    //check for user exists error
+                    if(result.error == 'user exists'){
+                        $("#saveChanges-1").modal("hide");
+
+                        //open new modal to flag error
+                        document.getElementById("info_ok_modal").innerHTML = "Duplicate name, please correct before saving.";
+                        $('#fixInput-1').modal()
+                    }
+
+                    //check for email exists
+                    if(result.error == 'email exists'){
+                        $("#saveChanges-1").modal("hide");
+
+                        //open new modal to flag error
+                        document.getElementById("info_ok_modal").innerHTML = "Duplicate email, please correct before saving.";
+                        $('#fixInput-1').modal()
+                    }
+                }catch(err){}
                 //or failure
                 $.notify("Error updating user", "error");
             }
