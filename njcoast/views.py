@@ -604,6 +604,10 @@ def user_approval(request):
     is_dca = current_user.groups.filter(name='dca_administrators').exists()
     is_muni = current_user.groups.filter(name='municipal_administrators').exists()
 
+    #do we have permissions?
+    if not (is_muni or is_dca):
+        return JsonResponse({'updated': False});
+
     #GET section of the API
     if request.method == "GET":
         print "Action", request.GET['action']
