@@ -466,7 +466,7 @@ def signup(request):
 
                 #send email
                 #first find admin to approve
-                muni_admins = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').exclude(groups__name='municipal_administrators').filter(groups__name='dca_administrators').filter(njcusermeta__municipality__name=user.njcusermeta.municipality.name).order_by('last_name')
+                muni_admins = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').filter(groups__name='municipal_administrators').filter(njcusermeta__municipality__name=user.njcusermeta.municipality.name).order_by('last_name')
 
                 if muni_admins:
                     for muni_admin in muni_admins:
@@ -744,6 +744,26 @@ def user_approval(request):
 
                 #save results
                 user.save()
+
+                if is_muni:
+                    #send email
+                    #first find admin to approve
+                    dca_admins = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').filter(groups__name='dca_administrators').order_by('last_name')
+
+                    if dca_admins:
+                        for dca_admin in dca_admins:
+                            #actual email part
+                            current_site = get_current_site(request)
+                            subject = 'Account created on NJcoast'
+                            message = render_to_string('muni_approved_email.html', {
+                                'user': dca_admin.first_name+" "+dca_admin.last_name,
+                                'domain': current_site.domain,
+                                'municipality': user.njcusermeta.municipality.name,
+                            })
+
+                            #send it
+                            dca_admin.email_user(subject, message)
+
 
                 #flag OK
                 return JsonResponse({'updated': True})
