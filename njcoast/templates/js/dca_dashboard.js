@@ -430,7 +430,7 @@ function validateEmail(email) {
 }
 
 //save user data
-function save_changes(username, action_if_no_user){
+function save_changes(username, action_if_no_user, exclude_string, disable_edit_string){
     //set default action
     var action = 'update_all';
 
@@ -502,7 +502,7 @@ function save_changes(username, action_if_no_user){
                 document.getElementById("editable_user").classList.add("hidden");
 
                 //reload view, get current setting
-                view_user_info(username, "", "", "");
+                view_user_info(username, "", "", exclude_string, disable_edit_string);
 
                 //reload main list
                 update_user_list();
@@ -631,7 +631,16 @@ function create_new_dca_approver(tab_to_return_to, return_text){
     document.getElementById("edit_code").innerHTML = "";
 
     //set type of creation
-    document.getElementById("save_changes_button").name = "create_dca_admin";
+    //document.getElementById("save_changes_button").name = "create_dca_admin";
+    //re-enable as info not called first
+    var re_enable_string = ['name','position','code','email','voice','justification','role','municipality','code','zip'];
+    for(var i=0; i<re_enable_string.length; i++){
+        try{
+            document.getElementById("info_"+re_enable_string[i]+"_row").classList.remove("hidden");
+            document.getElementById("edit_"+re_enable_string[i]+"_row").classList.remove("hidden");
+        }catch(err){}
+    }
+    document.getElementById("save_changes_button").setAttribute( "onClick", "save_changes(document.getElementById('edit_username').innerHTML, 'create_dca_admin', 'justification,role,municipality,code,zip', '');" );
 
     //flip to edit
     document.getElementById("info_user").classList.add("hidden");
@@ -692,7 +701,16 @@ function create_new_muni_admin(muni, code, tab_to_return_to, return_text){
     document.getElementById("edit_code").innerHTML = code;
 
     //set type of creation
-    document.getElementById("save_changes_button").name = "create_muni_admin";
+    //document.getElementById("save_changes_button").name = "create_muni_admin";
+    //re-enable as info not called first
+    var re_enable_string = ['name','position','code','email','voice','justification','role','municipality','code','zip'];
+    for(var i=0; i<re_enable_string.length; i++){
+        try{
+            document.getElementById("info_"+re_enable_string[i]+"_row").classList.remove("hidden");
+            document.getElementById("edit_"+re_enable_string[i]+"_row").classList.remove("hidden");
+        }catch(err){}
+    }
+    document.getElementById("save_changes_button").setAttribute( "onClick", "save_changes(document.getElementById('edit_username').innerHTML, 'create_muni_admin', 'justification,role', 'municipality');" );
 
     //flip to edit
     document.getElementById("info_user").classList.add("hidden");
