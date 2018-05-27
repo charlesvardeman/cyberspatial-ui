@@ -786,6 +786,15 @@ def user_approval(request):
 
         #create muni admin?
         elif request.POST['action'] == 'create_muni_admin':
+            #check user not exist
+            if Profile.objects.filter(username=request.POST['user']).exists():
+                return JsonResponse({'updated': False, 'error': 'user exists'})
+
+            #check email exists
+            exist_count = Profile.objects.filter(email = request.POST['email']).count()
+            if exist_count >= 1:
+                return JsonResponse({'updated': False, 'error': 'email exists'})
+
             #generate random password
             password = Profile.objects.make_random_password()
 
@@ -849,6 +858,15 @@ def user_approval(request):
 
         #create dca admin?
         elif request.POST['action'] == 'create_dca_admin':
+            #check user not exist
+            if Profile.objects.filter(username=request.POST['user']).exists():
+                return JsonResponse({'updated': False, 'error': 'user exists'})
+
+            #check email exists
+            exist_count = Profile.objects.filter(email = request.POST['email']).count()
+            if exist_count >= 1:
+                return JsonResponse({'updated': False, 'error': 'email exists'})
+
             #generate random password
             password = Profile.objects.make_random_password()
 
