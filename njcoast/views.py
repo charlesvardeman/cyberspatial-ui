@@ -464,6 +464,24 @@ def signup(request):
                 #now save everything
                 user.save()
 
+                #send email
+                #first find admin to approve
+                muni_admins = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').exclude(groups__name='municipal_administrators').filter(groups__name='dca_administrators').filter(njcusermeta__municipality__name=user.njcusermeta.municipality.name).order_by('last_name')
+
+                if muni_admins:
+                    for muni_admin in muni_admins:
+                        #actual email part
+                        current_site = get_current_site(request)
+                        subject = 'Account created on NJcoast'
+                        message = render_to_string('account_created_email.html', {
+                            'user': muni_admin.first_name+" "+muni_admin.last_name,
+                            'domain': current_site.domain,
+                            'municipality': user.njcusermeta.municipality.name,
+                        })
+
+                        #send it
+                        muni_admin.email_user(subject, message)
+
                 #back home, or flag that save was successful
                 #messages.success(request, 'Account created successfully')
                 #return redirect('home')
