@@ -1226,6 +1226,8 @@ function view_user_info(username, tab_to_return_to, return_text, exclude_string,
                         document.getElementById("edit_municipality_row").classList.remove("hidden");
                         if(disable_edit.indexOf("municipality") > -1){
                             $('#edit_municipality_selector').prop('disabled', true);
+                        }else{
+                            $('#edit_municipality_selector').prop('disabled', false);
                         }
 
                         //flip pages
