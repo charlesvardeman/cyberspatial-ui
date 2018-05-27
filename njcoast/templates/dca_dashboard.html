@@ -485,7 +485,7 @@
         </div>
         <!-- END account info ------------------------------------------------->
 
-        <!--DCA Approvers page----------------------------------------------------->
+        <!--DCA Approvers page------------------------------------------------->
         <div id="data_5" class="table-bkgrnd hidden">
 
             <table class="table table-hover admin">
@@ -495,7 +495,26 @@
 
             <a onclick="create_new_dca_approver(5, 'Return to DCA Approvers list');" href="#" class="btn btn-default btn-md">Add Approver</a>
         </div>
-        <!--END DCA Approvers page------------------------------------------------->
+        <!--END DCA Approvers page--------------------------------------------->
+
+        <!-- Modal - Info->OK ------------------------------------------------->
+        <div class="modal fade" id="fixInput-1" tabindex="-1" role="dialog" aria-labelledby="fixInput">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="saveChanges">Input Error</h4>
+                    </div>
+                    <div id="info_ok_modal" class="modal-body">
+                        User Email incorrect format! Please correct before proceeding.
+                    </div>
+                    <div class="modal-footer">
+                        <a onclick="$('#fixInput-1').modal('hide');" class="btn btn-default" href="#">OK</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END Modal - Info->OK --------------------------------------------->
 
     </div>
 
@@ -943,17 +962,28 @@ function save_changes(username, action_if_no_user){
     //first email
     email = document.getElementById("edit_email").value;
     if(!validateEmail(email)){
-        alert("Invalid email, please correct before saving.");
+
+        //alert("Invalid email, please correct before saving.");
         //fade out modal
         $("#saveChanges-1").modal("hide");
+
+        //open new modal to flag error
+        document.getElementById("info_ok_modal").innerHTML = "Invalid email, please correct before saving.";
+        $('#fixInput-1').modal()
+
         return;
     }
 
     //now name
     if(username==""){
-        alert("Invalid name, please correct before saving.");
+        //alert("Invalid name, please correct before saving.");
         //fade out modal
         $("#saveChanges-1").modal("hide");
+
+        //open new modal to flag error
+        document.getElementById("info_ok_modal").innerHTML = "Invalid name, please correct before saving.";
+        $('#fixInput-1').modal()
+
         return;
     }
 
