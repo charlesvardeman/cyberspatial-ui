@@ -994,6 +994,16 @@ def user_approval(request):
                 #save results
                 user.save()
 
+                #send email to tell user our decision
+                current_site = get_current_site(request)
+                subject = 'Account rejected for NJcoast'
+                message = render_to_string('account_rejected_email.html', {
+                    'user': user.first_name+" "+user.last_name,
+                    'municipality': user.njcusermeta.municipality.name,
+                    'notes': user.njcusermeta.notes,
+                })
+                user.email_user(subject, message)
+
                 #flag OK
                 return JsonResponse({'updated': True})
 
