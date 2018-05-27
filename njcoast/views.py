@@ -22,6 +22,9 @@ from django import forms
 from django.db import IntegrityError
 from geonode.people.models import Profile
 from django.utils import timezone
+from django.core.mail import EmailMessage
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.loader import render_to_string
 
 '''
   This function is used to respond to ajax requests for which layers should be
@@ -783,9 +786,13 @@ def user_approval(request):
 
         #create muni admin?
         elif request.POST['action'] == 'create_muni_admin':
+            #generate random password
+            password = Profile.objects.make_random_password()
+
+            #create user
             user = Profile.objects.create_user(username=request.POST['user'],
                                  email=request.POST['email'],
-                                 password='glass onion')
+                                 password=password)
             if user:
                 print "Created", request.POST['user']
 
@@ -819,6 +826,21 @@ def user_approval(request):
                 if muni_admin_group:
                     muni_admin_group.user_set.add(user)
 
+                    #send email
+                    current_site = get_current_site(request)
+                    subject = 'Account created on NJcoast'
+                    message = render_to_string('muni_admin_account_created_email.html', {
+                        'user': request.POST['name'],
+                        'username': user.username,
+                        'domain': current_site.domain,
+                        'password': password,
+                        'municipality': user.njcusermeta.municipality.name,
+                    })
+                    user.email_user(subject, message)
+
+                    #email = EmailMessage(subject, message, to=[request.POST['email']])
+                    #email.send()
+
                     #flag OK
                     return JsonResponse({'updated': True})
                 else:
@@ -827,9 +849,13 @@ def user_approval(request):
 
         #create dca admin?
         elif request.POST['action'] == 'create_dca_admin':
+            #generate random password
+            password = Profile.objects.make_random_password()
+
+            #create user
             user = Profile.objects.create_user(username=request.POST['user'],
                                  email=request.POST['email'],
-                                 password='glass onion')
+                                 password=password)
             if user:
                 print "Created", request.POST['user']
 
@@ -862,6 +888,17 @@ def user_approval(request):
 
                 if dca_admin_group:
                     dca_admin_group.user_set.add(user)
+
+                    #send email
+                    current_site = get_current_site(request)
+                    subject = 'Account created on NJcoast'
+                    message = render_to_string('dca_admin_account_created_email.html', {
+                        'user': request.POST['name'],
+                        'username': user.username,
+                        'domain': current_site.domain,
+                        'password': password,
+                    })
+                    user.email_user(subject, message)
 
                     #flag OK
                     return JsonResponse({'updated': True})

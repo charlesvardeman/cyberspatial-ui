@@ -100,3 +100,10 @@ TEMPLATES[0]['DIRS'].insert(0, os.path.join(LOCAL_ROOT, "templates"))
 
 # Handle Exported Variables
 TEMPLATES[0]['OPTIONS']['context_processors'].append('njcoast.context_processors.export_vars')
+
+#email Settings
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'django.sweet@gmail.com'
+EMAIL_HOST_PASSWORD = 'WLt53fPBsG2222zq'
+EMAIL_PORT = 587
