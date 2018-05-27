@@ -22,6 +22,10 @@ class NJCUserMeta(models.Model):
     dca_approval_date = models.DateTimeField(blank=True,null=True)
     muni_approval_date = models.DateTimeField(blank=True,null=True)
     notes = models.TextField(blank=True,null=True)
+    address_line_1 = models.CharField(max_length=50, blank=True,null=True)
+    address_line_2 = models.CharField(max_length=50, blank=True,null=True)
+    city = models.CharField(max_length=50, blank=True,null=True)
+    zip = models.CharField(max_length=20, blank=True,null=True)
 
 # need to do this to add the addendum to GeoNode Profile
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)

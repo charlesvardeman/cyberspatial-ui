@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load staticfiles %}
 {% load base_tags %}
+{% load njcoast_extras %}
 
 {% block body_class %}home{% endblock %}
 
@@ -14,20 +15,35 @@
 <div class="jumbotron njcoast-image slimmer"></div>
 
 <div class="gray-zone">
-    <div class="container-fluid">
+    <div id="main_page" class="container-fluid">
         <div class="page-header" style="border: none">
-            <!--<a href="admin-dca-change.html" class="btn btn-primary btn-md pull-right">Edit DCA Approvers</a>-->
-            <h3>DCA Administrator Controls</h3>
+            {% if request.user|has_group:"dca_administrators" %}
+            <a id="main_heading_button" onclick="flip_main_dcaapprovals(true, true);" href="#" class="btn btn-primary btn-md pull-right">Edit DCA Approvers</a>
+            <h3 id="main_heading">DCA Administrator Controls</h3>
+            {% else %}
+            <p>{{ admin_municipality}}</p>
+            <h3>Municipal Approver Administrator Controls</h3>
+            {% endif %}
         </div>
 
-        <ul class="nav nav-tabs nav-justified admin-tabs">
-            <li id="tab_1" onclick="flip_tabs(this);" class="active"><a href="#"><span class="fa fa-user-circle"></span> Municipal Approvers</a></li>
-            <li id="tab_2" onclick="flip_tabs(this);"><a href="#"><span class="fa fa-users"></span> All NJcoast Users</a></li>
-            <li id="tab_3" onclick="flip_tabs(this);"><a href="#"><span class="fa fa-exclamation-circle"></span> Account Requests</a></li>
+        <ul id="tabs" class="nav nav-tabs nav-justified admin-tabs">
+            {% if request.user|has_group:"dca_administrators" %}
+            <li id="tab_1" onclick="flip_tabs(this.id);" class="active"><a href="#"><span class="fa fa-user-circle"></span> Municipal Approvers</a></li>
+            <li id="tab_2" onclick="flip_tabs(this.id);"><a href="#"><span class="fa fa-users"></span> All NJcoast Users</a></li>
+            {% else %}
+            <li id="tab_2" onclick="flip_tabs(this.id);" class="active"><a href="#"><span class="fa fa-users"></span> {{ admin_municipality}} Users</a></li>
+            {% endif %}
+            <li id="tab_3" onclick="flip_tabs(this.id);"><a href="#"><span class="fa fa-exclamation-circle"></span> Account Requests</a></li>
         </ul>
+        <div id="data_5_notab" class="no-tab-bkgrnd hidden">
+            <div class="return-to-list">
+                <a onclick="flip_main_dcaapprovals(false, true);" href="#"><span class="fa fa-chevron-left"></span> Return to DCA Administrator Controls</a>
+            </div>
+        </div>
+
 
         <!-- municipalities code ---------------------------------------------->
-        <div id="data_1">
+        <div id="data_1" {% if request.user|has_group:"municipal_administrators" %}class="hidden"{% endif %}>
             <div class="filter-bkgrnd">
 
                 <div class="row">
@@ -41,22 +57,22 @@
                                     County <span class="caret"></span>
                                         </button>
                             <ul class="dropdown-menu">
-                                <li><a href="#">Atlantic</a></li>
-                                <li><a href="#">Bergen</a></li>
-                                <li><a href="#">Burlington</a></li>
-                                <li><a href="#">Camden</a></li>
+                                {% for county in counties %}
+                                <li><a href="#">{{ county.name }}</a></li>
+                                {% endfor %}
                             </ul>
                         </div>
 
                     </div>
                     <div class="col-sm-8">
 
-                        <div class="input-group">
+                        <!--<div class="input-group">
                             <input type="text" class="form-control" placeholder="Search table for...">
                             <span class="input-group-btn">
-              <button class="btn btn-default" type="button"><span class="fa fa-search"></span></button>
+                                <button class="btn btn-default" type="button">
+                                    <span class="fa fa-search"></span></button>
                             </span>
-                        </div>
+                        </div>-->
                         <!-- /input-group -->
 
                     </div>
@@ -67,7 +83,7 @@
             <div class="table-bkgrnd">
 
                 <table class="table table-hover admin">
-                    <tbody>
+                    <tbody id="muni_admin_list">
                         <tr>
                             <th>Code <span class="fa fa-sort"></span></th>
                             <th>Municipality <span class="fa fa-sort"></span></th>
@@ -77,51 +93,28 @@
                             <th>Notes</th>
                             <th</th>
                         </tr>
+                        {% for muni_admin in muni_admins %}
                         <tr>
-                            <td>1506</td>
-                            <td>Berkeley Twp</td>
-                            <td>John Camera</td>
-                            <td class="position">Township Administrator</td>
-                            <td><a>jcamera@twp.berkeley.nj.us</a></td>
-                            <td class="notes">Approved 2-2-2018 by sthompson; Second note added later</td>
-                            <td><a href="admin-ma-profile.html"><span class="fa fa-info-circle"></span></a></td>
+                            <td>{{ muni_admin.njcusermeta.municipality.code }}</td>
+                            <td>{{ muni_admin.njcusermeta.municipality }}</td>
+                            <td>{{ muni_admin.first_name }} {{ muni_admin.last_name }}</td>
+                            <td class="position">{{ muni_admin.njcusermeta.position }}</td>
+                            <td><a>{{ muni_admin.email }}</a></td>
+                            <td class="notes">{{ muni_admin.njcusermeta.notes }}</td>
+                            <td><a onclick="view_user_info('{{ muni_admin.username  }}', 1, 'Return to Municipal Approvers list', '', '');" href="#"><span class="fa fa-info-circle"></span></a></td>
                         </tr>
+                        {% endfor %}
+                        {% for muni_without_admin in munis_without_admin %}
                         <tr>
-                            <td>1323</td>
-                            <td>Keansburg Boro</td>
-                            <td>Edward P. Striedl</td>
-                            <td class="position">Construction / Code Enforcement / Zoning Officer, Floodplain Manager</td>
-                            <td><a>ed.striedl@keansburg-nj.us</a></td>
-                            <td class="notes">Approved 12-14-2017 by khenderson</td>
-                            <td><a href="admin-ma-profile.html"><span class="fa fa-info-circle"></span></a></td>
-                        </tr>
-                        <tr>
-                            <td>0101</td>
-                            <td>Absecon City</td>
+                            <td>{{ muni_without_admin.code }}</td>
+                            <td>{{ muni_without_admin.name }}</td>
                             <td class="null">n/a</td>
                             <td class="position null">n/a</td>
                             <td class="null">n/a</td>
                             <td class="notes"></td>
-                            <td><a href="admin-ma-profile-null.html"><span class="fa fa-info-circle"></span></a></td>
+                            <td><a onclick="create_new_muni_admin('{{ muni_without_admin.name }}', '{{ muni_without_admin.code }}', 1, 'Return to Municipal Approvers list');" href="#"><span class="fa fa-info-circle"></span></a></td>
                         </tr>
-                        <tr>
-                            <td>0102</td>
-                            <td>Atlantic City</td>
-                            <td class="null">n/a</td>
-                            <td class="position null">n/a</td>
-                            <td class="null">n/a</td>
-                            <td class="notes"></td>
-                            <td><a href="admin-ma-profile-null.html"><span class="fa fa-info-circle"></span></a></td>
-                        </tr>
-                        <tr>
-                            <td>0103</td>
-                            <td>Brigantine City</td>
-                            <td class="null">n/a</td>
-                            <td class="position null">n/a</td>
-                            <td class="null">n/a</td>
-                            <td class="notes"></td>
-                            <td><a href="admin-ma-profile-null.html"><span class="fa fa-info-circle"></span></a></td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
 
@@ -130,7 +123,7 @@
         <!-- END munivcipalities code ----------------------------------------->
 
         <!-- njcoast users ---------------------------------------------------->
-        <div id="data_2" class="hidden">
+        <div id="data_2" {% if request.user|has_group:"dca_administrators" %}class="hidden"{% endif %}>
             <div class="filter-bkgrnd">
                 <div class="row">
                     <div class="col-sm-8">
@@ -143,12 +136,12 @@
                     </div>
                     <div class="col-sm-4">
 
-                        <div class="input-group">
+                        <!--<div class="input-group">
                             <input type="text" class="form-control" placeholder="Search table for...">
                             <span class="input-group-btn">
-                  <button class="btn btn-default" type="button"><span class="fa fa-search"></span></button>
+                                <button class="btn btn-default" type="button"><span class="fa fa-search"></span></button>
                             </span>
-                        </div>
+                        </div>-->
                         <!-- /input-group -->
 
                     </div>
@@ -177,70 +170,43 @@
 
                     <div class="col-sm-10">
                         <table class="table table-hover admin-user">
-                            <tbody>
+                            <tbody id=user_list>
                                 <tr>
                                     <th>Name <span class="fa fa-sort"></span></th>
                                     <th>Email</th>
                                     <th>Role <span class="fa fa-sort"></span></th>
-                                    <th>Municipality <span class="fa fa-sort"></span></th>
                                     <th>Status</th>
                                     <th>Notes</th>
                                     <th></th>
                                 </tr>
+                                {% for user in users %}
                                 <tr>
-                                    <td>Bethany Ambrose</td>
-                                    <td><a>bambrose@gmail.com</a></td>
-                                    <td>FR</td>
-                                    <td><a href="admin-ma-profile.html">Berkeley Twp</a></td>
+                                    <td>{{ user.first_name }} {{ user.last_name }}</td>
+                                    <td><a>{{ user.email }}</a></td>
+                                    <td>{{ user.njcusermeta.role }}</td>
+                                    {% if user.is_active %}
+                                    <td class="status act">active</td>
+                                    <td class="notes">{{ user.njcusermeta.notes }}</td>
+                                    <td><a onclick="view_user_info('{{ user.username }}', 2, 'Return to All NJcoast Users list', '', '');" href="#"><span class="fa fa-info-circle"></span></a></td>
+                                    {% else %}
+                                        {% if user.njcusermeta.is_dca_approved %}
+                                    <td class="status inact">inactive</td>
+                                    <td class="notes">{{ user.njcusermeta.notes }}</td>
+                                    <td><a onclick="view_user_info('{{ user.username }}', 2, 'Return to All NJcoast Users list', '', '');" href="#"><span class="fa fa-info-circle"></span></a></td>
+                                        {% else %}
+                                            {% if user.njcusermeta.is_muni_approved and request.user|has_group:"dca_administrators" or not user.njcusermeta.is_muni_approved and request.user|has_group:"municipal_administrators" %}
                                     <td class="status pnd">pending</td>
-                                    <td><a href="admin-dca-acct-req.html" class="btn btn-warning btn-sm btn-block">View Request</a></td>
+                                    <td><a onclick="flip_tabs('tab_3');" href="#" class="btn btn-warning btn-sm btn-block">View Request</a></td>
+                                            {% else %}
+                                    <td class="status pnd">pending</td>
+                                    <td class="notes">{{ user.njcusermeta.notes }}</td>
+                                    <td><a onclick="view_user_info('{{ user.username }}', 2, 'Return to All NJcoast Users list', '', '');" href="#"><span class="fa fa-info-circle"></span></a></td>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endif %}
                                     <td></td>
                                 </tr>
-                                <tr>
-                                    <td>Sarah Jones</td>
-                                    <td><a>sjones@gmail.com</a></td>
-                                    <td>PL</td>
-                                    <td><a href="admin-ma-profile.html">Berkeley Twp</a></td>
-                                    <td class="status act">active</td>
-                                    <td class="notes">Muni approval 2-1-2018 by mjensen; DCA approval 2-2-2018 by esheridan</td>
-                                    <td><a href="admin-user-profile.html"><span class="fa fa-info-circle"></span></a></td>
-                                </tr>
-                                <tr>
-                                    <td>Mark DeSoto</td>
-                                    <td><a>mdesoto@gmail.com</a></td>
-                                    <td>PL</td>
-                                    <td><a href="admin-ma-profile.html">Berkeley Twp</a></td>
-                                    <td class="status act">active</td>
-                                    <td class="notes">Muni approval 2-8-2018 by mjensen; DCA approval 2-12-2018 by esheridan</td>
-                                    <td><a href="admin-user-profile.html"><span class="fa fa-info-circle"></span></a></td>
-                                </tr>
-                                <tr>
-                                    <td>Martin Lawrence</td>
-                                    <td><a>mlawrence@gmail.com</a></td>
-                                    <td>EM</td>
-                                    <td><a href="admin-ma-profile.html">Berkeley Twp</a></td>
-                                    <td class="status act">active</td>
-                                    <td class="notes">Muni approval 12-12-2017 by mjensen; DCA approval 12-14-2017 by esheridan</td>
-                                    <td><a href="admin-user-profile.html"><span class="fa fa-info-circle"></span></a></td>
-                                </tr>
-                                <tr>
-                                    <td>Marcia Delgato</td>
-                                    <td><a>mdelgato@gmail.com</a></td>
-                                    <td>EM</td>
-                                    <td><a href="admin-ma-profile.html">Berkeley Twp</a></td>
-                                    <td class="status act">active</td>
-                                    <td class="notes">Muni approval 12-12-2017 by mjensen; DCA approval 12-14-2017 by esheridan</td>
-                                    <td><a href="admin-user-profile.html"><span class="fa fa-info-circle"></span></a></td>
-                                </tr>
-                                <tr>
-                                    <td>Sam Elkins</td>
-                                    <td><a>selkins@gmail.com</a></td>
-                                    <td>PL</td>
-                                    <td><a href="admin-ma-profile.html">Berkeley Twp</a></td>
-                                    <td class="status inact">inactive</td>
-                                    <td class="notes">Muni decline 2-18-2018 by mjensen: Not affiliated with NJ</td>
-                                    <td><a href="admin-user-profile.html"><span class="fa fa-info-circle"></span></a></td>
-                                </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -254,11 +220,13 @@
         <!-- account requests ------------------------------------------------->
         <div id="data_3" class="hidden">
             <div class="filter-bkgrnd">
-                <i><span class="fa fa-exclamation-circle"></span> 2 pending requests</i>
+                <i id="number_to_be_approved"><span class="fa fa-exclamation-circle"></span> {{ number_to_be_approved }} pending requests</i>
             </div>
 
-            <div class="table-bkgrnd">
-
+            <div id="account_list" class="table-bkgrnd">
+                {% for user in users %}
+                    {% if not user.is_active %}
+                        {% if not user.njcusermeta.is_dca_approved and request.user|has_group:"dca_administrators" or not user.njcusermeta.is_muni_approved and request.user|has_group:"municipal_administrators" %}
                 <div class="row review-request">
                     <div class="col-md-5 col-lg-4">
                         <div class="well">
@@ -266,123 +234,294 @@
                                 <tbody>
                                     <tr>
                                         <th style="border-top: 0">Name</th>
-                                        <td style="border-top: 0">Bethany Ambrose</td>
+                                        <td style="border-top: 0">{{ user.first_name }} {{ user.last_name }}</td>
                                     </tr>
                                     <tr>
                                         <th>Title</th>
-                                        <td>Deputy Sherriff</td>
+                                        <td>{{ user.njcusermeta.position }}</td>
                                     </tr>
                                     <tr>
                                         <th>Municipality</th>
-                                        <td><a href="admin-ma-profile.html">Berkeley Twp</a></td>
+                                        <td>{{ user.njcusermeta.municipality }}</td>
                                     </tr>
                                     <tr>
                                         <th>Role</th>
-                                        <td>First Responder</td>
+                                        <td id="role_{{ forloop.counter }}" >{{ user.njcusermeta.role }}</td>
                                     </tr>
                                 </tbody>
                             </table>
-                            <p><b>Justification:</b> I am the newly appointed Deputy Sherriff and would like to use NJcoast in emergencies.</p>
+                            <p><b>Justification:</b>{{ user.njcusermeta.justification }}</p>
                         </div>
                     </div>
                     <div class="col-md-7 col-lg-8">
-                        <p class="qualifier" style="margin-top: 10px;">Received: 2-5-2018; Muni Approval: John Camera 2-6-2018</p>
-                        <textarea class="form-control" placeholder="Notes..." rows="7"></textarea>
+                        <p class="qualifier" style="margin-top: 10px;">Received: {{ user.date_joined }}; Muni Approval: {{ user.muni_approval_date }}</p>
+                        <textarea id="text_{{ forloop.counter }}" class="form-control" placeholder="" rows="7">{{ user.njcusermeta.notes }}</textarea>
                         <div class="btn-group">
                             <button type="button" class="btn btn-default dropdown-toggle"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Change Role <span class="caret"></span>
                                         </button>
                             <ul class="dropdown-menu">
-                                <li><a href="#">Planner</a></li>
-                                <li><a href="#">Emergency Manager</a></li>
-                                <li><a href="#">First Responder</a></li>
+                                {% for role in roles %}
+                                <li><a onclick="user_update('{{ user.username }}', '{{ forloop.parentloop.counter }}', 'update_role', '{{ role.name }}');" href="#">{{ role.name }}</a></li>
+                                {% endfor %}
                             </ul>
                         </div>
-                        <button class="btn btn-primary" data-toggle="modal" data-target="">Approve</button>
-                        <button class="btn btn-default" data-toggle="modal" data-target="">Decline*</button>
+                        <button onclick="user_update('{{ user.username }}', '{{ forloop.counter }}', 'approve', '');" class="btn btn-primary" data-toggle="modal" data-target="">Approve</button>
+                        <button onclick="user_update('{{ user.username }}', '{{ forloop.counter }}', 'decline', '');" class="btn btn-default" data-toggle="modal" data-target="">Decline*</button>
                         <p class="qualifier" style="margin-top: 10px;">*Any notes entered for a Declined applicant will be shared with the applicant to justify the decision.</p>
                     </div>
-
                 </div>
-
                 <hr/>
-
-                <div class="row review-request">
-                    <div class="col-md-5 col-lg-4">
-                        <div class="well">
-                            <table class="table">
-                                <tbody>
-                                    <tr>
-                                        <th style="border-top: 0">Name</th>
-                                        <td style="border-top: 0">Xavier Rhodes</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Title</th>
-                                        <td>Ocean County Planner</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Municipality</th>
-                                        <td>Statewide</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Role</th>
-                                        <td>Planner</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <p><b>Justification:</b> I participate in planning activities for Ocean County and would like to be able to access data in one place and run storm simulations.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-7 col-lg-8">
-                        <p class="qualifier" style="margin-top: 10px;">Received: 2-6-2018</p>
-                        <textarea class="form-control" placeholder="Notes..." rows="7"></textarea>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-default dropdown-toggle"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Change Role <span class="caret"></span>
-                                        </button>
-                            <ul class="dropdown-menu">
-                                <li><a href="#">Planner</a></li>
-                                <li><a href="#">Emergency Manager</a></li>
-                                <li><a href="#">First Responder</a></li>
-                            </ul>
-                        </div>
-                        <button class="btn btn-primary" data-toggle="modal" data-target="">Approve</button>
-                        <button class="btn btn-default" data-toggle="modal" data-target="">Decline*</button>
-                        <p class="qualifier" style="margin-top: 10px;">*Any notes entered for a Declined applicant will be shared with the applicant to justify the decision.</p>
-                    </div>
-
-                </div>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
 
             </div>
         </div>
-        <!-- END account requests -------------------------------------------->
+        <!-- END account requests --------------------------------------------->
+
+        <!-- account info ----------------------------------------------------->
+        <div id="data_4" class="hidden">
+            <div id="navigation_4" class="return-to-list">
+                <a onclick="view_user_info('', 2, '', '', '');" href="#"><span class="fa fa-chevron-left"></span> Return to All NJcoast Users list</a>
+            </div>
+
+            <!--User data presented-------------------------------------------->
+            <div id="info_user" class="table-bkgrnd">
+
+                <div class="row">
+                    <div class="col-sm-3">
+                        <div id="data_4_decorator" class="lg-list-identifier ">
+                            <span class="fa fa-users fa-5x "></span>
+                            <p>NJcoast User Profile</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-9">
+
+                        <table class="table">
+                            <tbody>
+                                <tr id="info_name_row">
+                                    <th style="border-top: 0">Full Name</th>
+                                    <td id="info_name" style="border-top: 0">Sarah Jones</td>
+                                </tr>
+                                <tr id="info_position_row">
+                                    <th>Position/Title</th>
+                                    <td id="info_position">Planner</td>
+                                </tr>
+                                <tr id="info_municipality_row">
+                                    <th>Municipality Name</th>
+                                    <td id="info_municipality">Berkeley Twp</td>
+                                </tr>
+                                <tr id="info_code_row">
+                                    <th>Municipality Code</th>
+                                    <td id="info_code">1506</td>
+                                </tr>
+                                <tr id="info_zip_row">
+                                    <th>Mailing address</th>
+                                    <td>
+                                        <div id="info_address_line_1">529 Travers Cir</div>
+                                        <div id="info_address_line_2">+</div>
+                                        <div id="info_city">Mishawaka</div>
+                                        <div id="info_zip">46545</div>
+                                    </td>
+                                </tr>
+
+                                <tr id="info_email_row">
+                                    <!--<tr>
+                                        <th>Mailing address</th>
+                                        <td>627 Pinewald-Keswick Rd<br/>Bayville, NJ 08721</td>
+                                    </tr>-->
+                                    <th>Email</th>
+                                    <td><a id="info_email">sjones@gmail.com</a></td>
+                                </tr>
+                                <tr id="info_voice_row">
+                                    <th>Phone</th>
+                                    <td id="info_voice">732-341-1132</td>
+                                </tr>
+                                <tr id="info_role_row">
+                                    <th>Role</th>
+                                    <td id="info_role">PL - Planning</td>
+                                </tr>
+                                <tr id="info_justification_row">
+                                    <th>Justification</th>
+                                    <td id="info_justification">I am involved in planning for Berkeley, and need the tool for storm projection.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <a onclick="show_user_edit(true);" href="#" class="btn btn-primary">Edit</a>
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#myModal">
+                                          Delete
+                                        </button>
+                    </div>
+                </div>
+
+                <!-- Modal -->
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="myModalLabel">Delete NJcoast User Profile</h4>
+                            </div>
+                            <div id="info_user_modal" class="modal-body">
+                                Are you sure you would like to delete this NJcoast user profile?
+                            </div>
+                            <div class="modal-footer">
+                                <a onclick="delete_user(document.getElementById('edit_username').innerHTML);" class="btn btn-primary" href="#">Yes</a>
+                                <a onclick="$('#myModal').modal('hide');" class="btn btn-default" href="#">No</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!--END of data presented------------------------------------------>
+
+            <!--Editable version----------------------------------------------->
+            <div id="editable_user" class="table-bkgrnd hidden">
+
+                <div class="row">
+                    <div class="col-sm-3"> <!-- col-md-6 "-->
+                            <div id="editable_user_decorator" class="lg-list-identifier ">
+                              <span class="fa fa-users fa-5x "></span>
+                              <p>NJcoast User Profile</p>
+                            </div>
+                          </div>
+                          <div class="col-sm-9 "> <!-- col-md-6"-->
+
+                        <table class="table edit-profile">
+                            <tbody>
+                                <tr id="edit_name_row">
+                                    <th style="border-top: 0">Full Name</th>
+                                    <td style="border-top: 0"><input type="text" class="form-control" id="edit_name" value="Sarah Jones" placeholder="Jane Smith"></td>
+                                </tr>
+                                <tr>
+                                    <th>Position/Title</th>
+                                    <td><input type="text" class="form-control" id="edit_position" value="Planner" placeholder="Clerk"></td>
+                                </tr>
+                                <tr id="edit_municipality_row">
+                                    <th>Municipality Name</th>
+                                    <!--<td><input type="text" class="form-control" id="edit_municipality" value="Berkeley Twp"></td>-->
+                                    <td id="edit_municipality_selector_cell">
+                                        <select id="edit_municipality_selector" onchange="set_municipality_code(this.value);" class="form-control">
+                                            {% for municipality in municipalities %}
+                                            <option value="{{ municipality.code }}">{{ municipality.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+
+                                </tr>
+                                <tr id="edit_code_row">
+                                    <th>Municipality Code</th>
+                                    <!-- Should auto-update when Municipality changes -->
+                                    <td id="edit_code" style="color:#999">1506</td>
+                                </tr>
+                                <tr id="edit_zip_row">
+                                    <th>Mailing address</th>
+                                    <td>
+                                        <input type="text" class="form-control" id="edit_address_line_1" value="627 Pinewald-Keswick Rd" placeholder="Address line 1">
+                                        <input type="text" class="form-control" id="edit_address_line_2" placeholder="Address line 2">
+                                        <input type="text" class="form-control" id="edit_city" value="Bayville" placeholder="City">
+                                        <input type="text" class="form-control" id="edit_zip" value="08721" placeholder="Zip code">
+                                    </td>
+                                </tr>
+                                <tr id="edit_email_row">
+                                    <th>Email</th>
+                                    <td><input type="email" class="form-control" id="edit_email" value="sjones@gmail.com" placeholder="jsmith@nj.gov"></td>
+                                </tr>
+                                <tr id="edit_voice_row">
+                                    <th>Phone</th>
+                                    <td><input type="tel" class="form-control" id="edit_voice" value="732-341-1132" placeholder="123-456-7890"></td>
+                                </tr>
+                                <tr id="edit_role_row">
+                                    <th>Role</th>
+                                    <td>
+                                        <select id="edit_role_selector" class="form-control">
+                                            {% for role in roles %}
+                                            <option value="{{ role.name }}">{{ role.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr id="edit_justification_row">
+                                    <th>Justification</th>
+                                    <td id="edit_justification" style="color:#999">I am involved in planning for Berkeley, and need the tool for storm projection.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="hidden" id="edit_username"></div>
+
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#saveChanges-1">
+                              Save changes
+                            </button>
+                        <a onclick="show_user_edit(false);" href="#" class="btn btn-default">Cancel</a>
+
+
+                        <!-- Modal - Save changes button -->
+                        <div class="modal fade" id="saveChanges-1" tabindex="-1" role="dialog" aria-labelledby="saveChanges">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title" id="saveChanges">Save changes</h4>
+                                    </div>
+                                    <div id="editable_user_modal" class="modal-body">
+                                        You have made changes to this NJcoast user profile. Would you like to save these changes?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <a name="create_muni_admin" id="save_changes_button" onclick="save_changes(document.getElementById('edit_username').innerHTML, this.name);" class="btn btn-primary" href="#">Yes</a>
+                                        <a onclick="$('#saveChanges-1').modal('hide');" class="btn btn-default" href="#">No</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!--END Editable version------------------------------------------->
+
+        </div>
+        <!-- END account info ------------------------------------------------->
+
+        <!--DCA Approvers page------------------------------------------------->
+        <div id="data_5" class="table-bkgrnd hidden">
+
+            <table class="table table-hover admin">
+                <tbody id="dca_approvers_list" >
+                </tbody>
+            </table>
+
+            <a onclick="create_new_dca_approver(5, 'Return to DCA Approvers list');" href="#" class="btn btn-default btn-md">Add Approver</a>
+        </div>
+        <!--END DCA Approvers page--------------------------------------------->
+
+        <!-- Modal - Info->OK ------------------------------------------------->
+        <div class="modal fade" id="fixInput-1" tabindex="-1" role="dialog" aria-labelledby="fixInput">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="saveChanges">Input Error</h4>
+                    </div>
+                    <div id="info_ok_modal" class="modal-body">
+                        User Email incorrect format! Please correct before proceeding.
+                    </div>
+                    <div class="modal-footer">
+                        <a onclick="$('#fixInput-1').modal('hide');" class="btn btn-default" href="#">OK</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END Modal - Info->OK --------------------------------------------->
 
     </div>
+
 </div>
 {% endblock %}
 
 {% block extra_script %}
-<script type=text/javascript>
-
-//flip the tabs and their data
-function flip_tabs(object){
-    //clear Active
-    for(i=1; i<=3; i++){
-        //remove active
-        if("tab_"+i != object.id){
-            document.getElementById("tab_"+i).classList.remove("active");
-            document.getElementById("data_"+i).classList.add("hidden");
-        }else{ //add active
-            object.classList.add("active");
-            document.getElementById("data_"+i).classList.remove("hidden");
-        }
-    }
-
-    //print
-    console.log("Clicked "+object.id);
-}
-
-</script>
+<script src="{% static 'js/notify.min.js' %}"></script>
+<script src="{% static 'js/template_js/dca_dashboard.js' %}"></script>
 {% endblock extra_script %}

@@ -4,7 +4,7 @@ from django.conf import settings
 from geonode.layers.models import Layer
 from django.views.generic import TemplateView
 import json
-from models import NJCMap, NJCMapAnnotation, NJCMapExpert, NJCMunicipality, NJCRole
+from models import NJCMap, NJCMapAnnotation, NJCMapExpert, NJCMunicipality, NJCRole, NJCCounty
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -20,6 +20,11 @@ from .forms import SignUpForm
 from .models import NJCUserMeta
 from django import forms
 from django.db import IntegrityError
+from geonode.people.models import Profile
+from django.utils import timezone
+from django.core.mail import EmailMessage
+from django.contrib.sites.shortcuts import get_current_site
+from django.template.loader import render_to_string
 
 '''
   This function is used to respond to ajax requests for which layers should be
@@ -69,6 +74,7 @@ class MapTemplateView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(MapTemplateView, self).get_context_data(**kwargs)
 
+        user = self.request.user
         keywords = self.request.user.keywords
 
         # map_object, created = NJCMap.objects.get_or_create(
@@ -84,14 +90,20 @@ class MapTemplateView(TemplateView):
 
         # no keywords assigned OR both Keansburg + Berkeley will start the user
         # at Keansburg, as well as the obvious case of just having keansburg
-        if keywords.filter(name="keansburg").exists() or len(keywords.all()) == 0:
-            context['home_latitude'] = "40.4417743"
-            context['home_longitude'] = "-74.1298643"
-            context['zoom_level'] = 14
-        elif keywords.filter(name="berkeley").exists():
-            context['home_latitude'] = "39.9051846"
-            context['home_longitude'] = "-74.1808381"
-            context['zoom_level'] = 13
+        #defaults
+        context['home_latitude'] = "40.4417743"
+        context['home_longitude'] = "-74.1298643"
+        context['zoom_level'] = 14
+
+        # get user's Municipality values
+        try:
+            muni = user.njcusermeta.municipality
+            context['home_latitude'] = muni.home_latitude
+            context['home_longitude'] = muni.home_longitude
+            context['zoom_level'] = muni.zoom_level
+
+        except:
+            pass
 
         #get users
         #find groups I am in!
@@ -117,6 +129,7 @@ class MapExpertTemplateView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(MapExpertTemplateView, self).get_context_data(**kwargs)
 
+        user = self.request.user
         keywords = self.request.user.keywords
 
         # map_object, created = NJCMap.objects.get_or_create(
@@ -130,14 +143,20 @@ class MapExpertTemplateView(TemplateView):
 
         # no keywords assigned OR both Keansburg + Berkeley will start the user
         # at Keansburg, as well as the obvious case of just having keansburg
-        if keywords.filter(name="keansburg").exists() or len(keywords.all()) == 0:
-            context['home_latitude'] = "40.4417743"
-            context['home_longitude'] = "-74.1298643"
-            context['zoom_level'] = 14
-        elif keywords.filter(name="berkeley").exists():
-            context['home_latitude'] = "39.9051846"
-            context['home_longitude'] = "-74.1808381"
-            context['zoom_level'] = 13
+        #defaults
+        context['home_latitude'] = "40.4417743"
+        context['home_longitude'] = "-74.1298643"
+        context['zoom_level'] = 14
+
+        # get user's Municipality values
+        try:
+            muni = user.njcusermeta.municipality
+            context['home_latitude'] = muni.home_latitude
+            context['home_longitude'] = muni.home_longitude
+            context['zoom_level'] = muni.zoom_level
+
+        except:
+            pass
 
         #quiery, select if I am the owner
         context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
@@ -459,6 +478,24 @@ def signup(request):
                 #now save everything
                 user.save()
 
+                #send email
+                #first find admin to approve
+                muni_admins = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').filter(groups__name='municipal_administrators').filter(njcusermeta__municipality__name=user.njcusermeta.municipality.name).order_by('last_name')
+
+                if muni_admins:
+                    for muni_admin in muni_admins:
+                        #actual email part
+                        current_site = get_current_site(request)
+                        subject = 'Account created on NJcoast'
+                        message = render_to_string('account_created_email.html', {
+                            'user': muni_admin.first_name+" "+muni_admin.last_name,
+                            'domain': current_site.domain,
+                            'municipality': user.njcusermeta.municipality.name,
+                        })
+
+                        #send it
+                        muni_admin.email_user(subject, message)
+
                 #back home, or flag that save was successful
                 #messages.success(request, 'Account created successfully')
                 #return redirect('home')
@@ -483,15 +520,534 @@ def signup(request):
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form, 'error_data': ''})
 
+#DCA admin dashboard
 class DCADashboardTemplateView(TemplateView):
     template_name = 'dca_dashboard.html'
 
     def get_context_data(self, **kwargs):
         context = super(DCADashboardTemplateView, self).get_context_data(**kwargs)
 
-        #quiery, select if I am the owner
-        context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+        #get current user
+        current_user = self.request.user
+        current_muni = current_user.njcusermeta.municipality.name
+        is_dca = current_user.groups.filter(name='dca_administrators').exists()
+        is_muni = current_user.groups.filter(name='municipal_administrators').exists()
 
-        #quiery, select if I an in the list of shared_with__contains
-        context['shared_maps_for_user'] = NJCMap.objects.filter(shared_with__contains = self.request.user)
+        print "User", current_user.username, is_dca, is_muni
+
+        #get users
+        if is_dca:
+            users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').filter(njcusermeta__is_muni_approved=True).order_by('last_name')
+        elif is_muni:
+            users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').exclude(groups__name='municipal_administrators').exclude(groups__name='dca_administrators').filter(njcusermeta__municipality__name=current_muni).order_by('last_name')
+
+        total_users = len(users)
+        count_requests = 0
+        for user in users:
+            print user.username, user.voice, user.username
+            #find number to be approved
+            if not user.is_active and not user.njcusermeta.is_dca_approved:
+                count_requests = count_requests + 1
+
+        #print data and add to context
+        print count_requests, total_users
+        context['number_to_be_approved'] = count_requests
+        context['total_users'] = total_users
+
+        #quiery, select all users
+        context['users'] = users
+
+        #get municipalities
+        municipalities = NJCMunicipality.objects.exclude(name='Statewide').order_by('name')
+
+        munis_without_admin = []
+        for municipality in municipalities:
+            print municipality.name
+            munis_without_admin.append(municipality)
+
+        #full list
+        context['municipalities'] = NJCMunicipality.objects.order_by('name') #exclude(name='Statewide').
+
+        if is_dca:
+            #and muni admins
+            muni_admins = Profile.objects.filter(groups__name='municipal_administrators').order_by('last_name')
+            print "Muni admins",len(muni_admins)
+            context['muni_admins'] = muni_admins
+
+            #get definative list of munis without admins
+            for muni_admin in muni_admins:
+                try:
+                    munis_without_admin.remove(muni_admin.njcusermeta.municipality)
+                except:
+                    pass
+            context['munis_without_admin'] = munis_without_admin
+
+        #get counties
+        context['counties'] = NJCCounty.objects.all().order_by('name')
+
+        #get roles
+        context['roles'] = NJCRole.objects.all().order_by('name').order_by('name')
+
+        #Get admin Municipality
+        context['admin_municipality'] = current_muni
+
         return context
+
+#Parse out user object to dictionary
+def user_to_dictionary(user):
+    #convert user data
+    user_dict = {}
+    user_dict['username'] = user.username
+    user_dict['name'] = user.first_name + " " + user.last_name
+    user_dict['email'] = user.email
+    user_dict['active'] = user.is_active
+    user_dict['date_joined'] = user.date_joined
+
+    #additional user fields for NJC
+    user_dict['municipality'] = user.njcusermeta.municipality.name
+    user_dict['position'] = user.njcusermeta.position
+    user_dict['code'] = user.njcusermeta.municipality.code
+    user_dict['justification'] = user.njcusermeta.justification
+    user_dict['voice'] = user.voice
+    user_dict['notes'] = user.njcusermeta.notes
+    user_dict['role'] = user.njcusermeta.role.name
+    user_dict['rolesf'] = "".join(item[0].upper() for item in user.njcusermeta.role.name.split())
+    if user_dict['rolesf'] == "P":
+        user_dict['rolesf'] = "PL"
+    user_dict['is_dca_approved'] = user.njcusermeta.is_dca_approved
+    user_dict['is_muni_approved'] = user.njcusermeta.is_muni_approved
+    user_dict['dca_approval_date'] = user.njcusermeta.dca_approval_date.__str__()
+    user_dict['muni_approval_date'] = user.njcusermeta.muni_approval_date.__str__()
+
+    #mailing address data
+    user_dict['address_line_1'] = user.njcusermeta.address_line_1
+    user_dict['address_line_2'] = user.njcusermeta.address_line_2
+    user_dict['city'] = user.njcusermeta.city
+    user_dict['zip'] = user.njcusermeta.zip
+
+    #get muni approver username
+    muni_approvers = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').filter(groups__name='municipal_administrators').filter(njcusermeta__municipality__name=user.njcusermeta.municipality).order_by('last_name')
+
+    #grab the first if OK
+    if muni_approvers:
+        user_dict['muni_approver'] = muni_approvers[0].username
+    else:
+        user_dict['muni_approver'] = ""
+
+    #Return
+    return user_dict
+
+'''
+  Ajax calls to approve or modify users from DCA dashboard.
+'''
+@login_required
+def user_approval(request):
+    #get current user
+    current_user = request.user
+    current_muni = current_user.njcusermeta.municipality.name
+    is_dca = current_user.groups.filter(name='dca_administrators').exists()
+    is_muni = current_user.groups.filter(name='municipal_administrators').exists()
+
+    #do we have permissions?
+    if not (is_muni or is_dca):
+        return JsonResponse({'updated': False});
+
+    #GET section of the API
+    if request.method == "GET":
+        print "Action", request.GET['action']
+        #find required action
+        if request.GET['action'] == 'get_user':
+            user = Profile.objects.get(username=request.GET['user'])
+            #test we got them
+            if user:
+                #flag OK and return data
+                return JsonResponse({'updated': True, 'data': user_to_dictionary(user), 'is_muni': is_muni, 'is_dca': is_dca, 'current_muni':current_muni})
+
+        elif request.GET['action'] == 'get_users':
+            #get users
+            if is_dca:
+                users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').filter(njcusermeta__is_muni_approved=True).order_by('last_name')
+            elif is_muni:
+                users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').exclude(groups__name='municipal_administrators').exclude(groups__name='dca_administrators').filter(njcusermeta__municipality__name=current_muni).order_by('last_name')
+            else:
+                print "Not a valid user!"
+
+            #test we got them
+            if users:
+                output_array = []
+
+                #get each user
+                for user in users:
+                    output_array.append(user_to_dictionary(user))
+
+                #flag OK and return data
+                return JsonResponse({'updated': True, 'data': output_array, 'is_muni': is_muni, 'is_dca': is_dca})
+
+        elif request.GET['action'] == 'get_muni_admins':
+            #get municipalities
+            municipalities = NJCMunicipality.objects.exclude(name='Statewide').order_by('name')
+
+            if municipalities:
+                munis_without_admin = []
+                for municipality in municipalities:
+                    print municipality.name
+                    munis_without_admin.append({'name': municipality.name, 'code': municipality.code})
+
+                #and muni admins
+                muni_admins = Profile.objects.filter(groups__name='municipal_administrators').order_by('last_name')
+                if muni_admins:
+                    print "Muni admins",len(muni_admins)
+
+                    #get definative list of munis without admins
+                    output_array = []
+                    for muni_admin in muni_admins:
+                        output_array.append(user_to_dictionary(muni_admin))
+                        try:
+                            munis_without_admin.remove({'name': muni_admin.njcusermeta.municipality.name, 'code': muni_admin.njcusermeta.municipality.code})
+                        except:
+                            pass
+
+                    #flag OK and return data
+                    return JsonResponse({'updated': True, 'data': output_array, 'munis': munis_without_admin})
+
+        elif request.GET['action'] == 'get_dca_admins':
+            #get dca admins
+            dca_admins = Profile.objects.filter(groups__name='dca_administrators').order_by('last_name')
+            if dca_admins:
+                print "DCA admins",len(dca_admins)
+
+                output_array = []
+
+                #get each user
+                for dca_admin in dca_admins:
+                    output_array.append(user_to_dictionary(dca_admin))
+
+                #flag OK and return data
+                return JsonResponse({'updated': True, 'data': output_array})
+
+        else:
+            print "Action not recognized", request.GET['action']
+
+    #POST section of the API
+    elif request.method == "POST":
+        print "Action", request.POST['action']
+
+        #test action
+        #approve?
+        if request.POST['action'] == 'approve':
+            #load user
+            user = Profile.objects.get(username=request.POST['user'])
+
+            #test we got them
+            if user:
+                print "Approve",user.username
+                #approve according to my rights
+                if is_dca:
+                    #set dca approved
+                    user.njcusermeta.is_dca_approved = True
+                    user.njcusermeta.dca_approval_date = timezone.now()
+                    #set Active
+                    user.is_active = True
+
+                    #add to groups
+                    #create group name
+                    group_name = user.njcusermeta.role.group_name + '-' + user.njcusermeta.municipality.group_name
+                    group, created = Group.objects.get_or_create(name=group_name)
+                    if group:
+                        group.user_set.add(user)
+                    #if created:
+
+                if is_muni:
+                    #set muni approved
+                    user.njcusermeta.is_muni_approved = True
+                    user.njcusermeta.muni_approval_date = timezone.now()
+
+                #set notes
+                user.njcusermeta.notes = request.POST['notes']
+
+                #save results
+                user.save()
+
+                # send email to DCA approver once approved
+                if is_muni:
+                    #send email
+                    #first find admin to approve
+                    dca_admins = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').filter(groups__name='dca_administrators').order_by('last_name')
+
+                    if dca_admins:
+                        for dca_admin in dca_admins:
+                            #actual email part
+                            current_site = get_current_site(request)
+                            subject = 'Account created on NJcoast'
+                            message = render_to_string('muni_approved_email.html', {
+                                'user': dca_admin.first_name+" "+dca_admin.last_name,
+                                'domain': current_site.domain,
+                                'municipality': user.njcusermeta.municipality.name,
+                            })
+
+                            #send it
+                            dca_admin.email_user(subject, message)
+
+                # send email to user once approved by DCA
+                if is_dca:
+                    #actual email part
+                    current_site = get_current_site(request)
+                    subject = 'Account created on NJcoast'
+                    message = render_to_string('dca_approved_email.html', {
+                        'user': user.first_name+" "+user.last_name,
+                        'domain': current_site.domain,
+                        'municipality': user.njcusermeta.municipality.name,
+                    })
+
+                    #send it
+                    user.email_user(subject, message)
+
+                #flag OK
+                return JsonResponse({'updated': True})
+
+        #update notes and role?
+        elif request.POST['action'] == 'update_role':
+            #load user
+            user = Profile.objects.get(username=request.POST['user'])
+
+            #test we got them
+            if user:
+                print "Role update",user.username
+                #set notes
+                user.njcusermeta.notes = request.POST['notes']
+
+                #role
+                user.njcusermeta.role = NJCRole.objects.get(name=request.POST['role'])
+
+                #save results
+                user.save()
+
+                #flag OK
+                return JsonResponse({'updated': True})
+
+        #update all?
+        elif request.POST['action'] == 'update_all':
+            #load user
+            user = Profile.objects.get(username=request.POST['user'])
+
+            #test we got them
+            if user:
+                print "Update all",user.username, request.POST['role'], request.POST['municipality']
+
+                #fields to update
+                namesplit = request.POST['name'].rsplit(' ',1)
+                if len(namesplit) == 2:
+                    #print namesplit[0], ",", namesplit[1]
+                    user.first_name = namesplit[0]
+                    user.last_name = namesplit[1]
+
+                #name
+                user.email = request.POST['email']
+                user.voice = request.POST['voice']
+                user.njcusermeta.role = NJCRole.objects.get(name=request.POST['role'])
+                user.njcusermeta.municipality = NJCMunicipality.objects.get(name=request.POST['municipality'])
+                user.njcusermeta.address_line_1 = request.POST['address_line_1']
+                user.njcusermeta.address_line_2 = request.POST['address_line_2']
+                user.njcusermeta.city = request.POST['city']
+                user.njcusermeta.zip = request.POST['zip']
+                user.njcusermeta.position = request.POST['position']
+
+                #save results
+                user.save()
+
+                #flag OK
+                return JsonResponse({'updated': True})
+
+
+        #create muni admin?
+        elif request.POST['action'] == 'create_muni_admin':
+            #check user not exist
+            if Profile.objects.filter(username=request.POST['user']).exists():
+                return JsonResponse({'updated': False, 'error': 'user exists'})
+
+            #check email exists
+            exist_count = Profile.objects.filter(email = request.POST['email']).count()
+            if exist_count >= 1:
+                return JsonResponse({'updated': False, 'error': 'email exists'})
+
+            #generate random password
+            password = Profile.objects.make_random_password()
+
+            #create user
+            user = Profile.objects.create_user(username=request.POST['user'],
+                                 email=request.POST['email'],
+                                 password=password)
+            if user:
+                print "Created", request.POST['user']
+
+                #fields to update
+                namesplit = request.POST['name'].rsplit(' ',1)
+                if len(namesplit) == 2:
+                    print namesplit[0], ",", namesplit[1]
+                    user.first_name = namesplit[0]
+                    user.last_name = namesplit[1]
+
+                #populate
+                user.voice = request.POST['voice']
+                user.njcusermeta.role = NJCRole.objects.get(name=request.POST['role'])
+                user.njcusermeta.municipality = NJCMunicipality.objects.get(name=request.POST['municipality'])
+                user.njcusermeta.address_line_1 = request.POST['address_line_1']
+                user.njcusermeta.address_line_2 = request.POST['address_line_2']
+                user.njcusermeta.city = request.POST['city']
+                user.njcusermeta.zip = request.POST['zip']
+                user.njcusermeta.position = request.POST['position']
+                user.njcusermeta.is_dca_approved = True
+                user.njcusermeta.is_muni_approved = True
+                user.njcusermeta.muni_approval_date = timezone.now()
+                user.njcusermeta.dca_approval_date = timezone.now()
+
+                #save updates
+                user.save()
+
+                #add user to group
+                muni_admin_group = Group.objects.get(name='municipal_administrators')
+
+                if muni_admin_group:
+                    muni_admin_group.user_set.add(user)
+
+                    #send email
+                    current_site = get_current_site(request)
+                    subject = 'Account created on NJcoast'
+                    message = render_to_string('muni_admin_account_created_email.html', {
+                        'user': request.POST['name'],
+                        'username': user.username,
+                        'domain': current_site.domain,
+                        'password': password,
+                        'municipality': user.njcusermeta.municipality.name,
+                    })
+                    user.email_user(subject, message)
+
+                    #email = EmailMessage(subject, message, to=[request.POST['email']])
+                    #email.send()
+
+                    #flag OK
+                    return JsonResponse({'updated': True})
+                else:
+                    #flag error
+                    return JsonResponse({'updated': False})
+
+        #create dca admin?
+        elif request.POST['action'] == 'create_dca_admin':
+            #check user not exist
+            if Profile.objects.filter(username=request.POST['user']).exists():
+                return JsonResponse({'updated': False, 'error': 'user exists'})
+
+            #check email exists
+            exist_count = Profile.objects.filter(email = request.POST['email']).count()
+            if exist_count >= 1:
+                return JsonResponse({'updated': False, 'error': 'email exists'})
+
+            #generate random password
+            password = Profile.objects.make_random_password()
+
+            #create user
+            user = Profile.objects.create_user(username=request.POST['user'],
+                                 email=request.POST['email'],
+                                 password=password)
+            if user:
+                print "Created", request.POST['user']
+
+                #fields to update
+                namesplit = request.POST['name'].rsplit(' ',1)
+                if len(namesplit) == 2:
+                    print namesplit[0], ",", namesplit[1]
+                    user.first_name = namesplit[0]
+                    user.last_name = namesplit[1]
+
+                #populate
+                user.voice = request.POST['voice']
+                user.njcusermeta.role = NJCRole.objects.get(name=request.POST['role'])
+                user.njcusermeta.municipality = NJCMunicipality.objects.get(name=request.POST['municipality'])
+                user.njcusermeta.address_line_1 = request.POST['address_line_1']
+                user.njcusermeta.address_line_2 = request.POST['address_line_2']
+                user.njcusermeta.city = request.POST['city']
+                user.njcusermeta.zip = request.POST['zip']
+                user.njcusermeta.position = request.POST['position']
+                user.njcusermeta.is_dca_approved = True
+                user.njcusermeta.is_muni_approved = True
+                user.njcusermeta.muni_approval_date = timezone.now()
+                user.njcusermeta.dca_approval_date = timezone.now()
+
+                #save updates
+                user.save()
+
+                #add user to group
+                dca_admin_group = Group.objects.get(name='dca_administrators')
+
+                if dca_admin_group:
+                    dca_admin_group.user_set.add(user)
+
+                    #send email
+                    current_site = get_current_site(request)
+                    subject = 'Account created on NJcoast'
+                    message = render_to_string('dca_admin_account_created_email.html', {
+                        'user': request.POST['name'],
+                        'username': user.username,
+                        'domain': current_site.domain,
+                        'password': password,
+                    })
+                    user.email_user(subject, message)
+
+                    #flag OK
+                    return JsonResponse({'updated': True})
+                else:
+                    #flag error
+                    return JsonResponse({'updated': False})
+
+        #decline?
+        elif request.POST['action'] == 'decline':
+            #load user
+            user = Profile.objects.get(username=request.POST['user'])
+
+            #test we got them
+            if user:
+                print "Decline",user.username
+                #set notes
+                user.njcusermeta.notes = request.POST['notes']
+
+                #set dca approved/is_muni_approved, with not active this means INACTIVE
+                user.njcusermeta.is_dca_approved = True
+                user.njcusermeta.is_muni_approved = True
+
+                #save results
+                user.save()
+
+                #send email to tell user our decision
+                current_site = get_current_site(request)
+                subject = 'Account rejected for NJcoast'
+                message = render_to_string('account_rejected_email.html', {
+                    'user': user.first_name+" "+user.last_name,
+                    'municipality': user.njcusermeta.municipality.name,
+                    'notes': user.njcusermeta.notes,
+                })
+                user.email_user(subject, message)
+
+                #flag OK
+                return JsonResponse({'updated': True})
+
+        #delete?
+        elif request.POST['action'] == 'delete':
+            #load user
+            user = Profile.objects.get(username=request.POST['user'])
+
+            #test we got them
+            if user:
+                print "Delete",user.username
+
+                user.is_active = False
+
+                #save results
+                user.save()
+
+                #flag OK
+                return JsonResponse({'updated': True})
+
+        else:
+            print "Action not recognized", request.POST['action']
+
+        return JsonResponse({'updated': False})
