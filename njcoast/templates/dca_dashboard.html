@@ -541,7 +541,7 @@ function flip_main_dcaapprovals(flip_direction, do_flip){
                                                     <td>${ dca_admin.name }</td>
                                                     <td>${ dca_admin.position }</td>
                                                     <td><a>${ dca_admin.email }</a></td>
-                                                    <td><a onclick="view_user_info('${ dca_admin.username }', 5, 'Return to DCA Approvers list', '');" href="#"><span class="fa fa-info-circle"></span></a></td>
+                                                    <td><a onclick="view_user_info('${ dca_admin.username }', 5, 'Return to DCA Approvers list', 'justification,role,municipality,code,zip');" href="#"><span class="fa fa-info-circle"></span></a></td>
                                                 </tr>`;
                     }
 
@@ -1249,9 +1249,9 @@ function view_user_info(username, tab_to_return_to, return_text, exclude_string)
                         //set excludes
                         for(i=0; i<excludes.length; i++){
                             try{
-                                console.log("Exc "+excludes[i]);
-                                document.getElementById("info_"+excludes[i]+"_row").classList.add("hidden");
+                                //console.log("Exc "+excludes[i]);
                                 document.getElementById("edit_"+excludes[i]+"_row").classList.add("hidden");
+                                document.getElementById("info_"+excludes[i]+"_row").classList.add("hidden");
                             }catch(err){}
                         }
                     }
