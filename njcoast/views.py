@@ -577,6 +577,8 @@ def user_to_dictionary(user):
     user_dict['notes'] = user.njcusermeta.notes
     user_dict['role'] = user.njcusermeta.role.name
     user_dict['rolesf'] = "".join(item[0].upper() for item in user.njcusermeta.role.name.split())
+    if user_dict['rolesf'] == "P":
+        user_dict['rolesf'] = "PL"
     user_dict['is_dca_approved'] = user.njcusermeta.is_dca_approved
     user_dict['is_muni_approved'] = user.njcusermeta.is_muni_approved
     user_dict['dca_approval_date'] = user.njcusermeta.dca_approval_date.__str__()
