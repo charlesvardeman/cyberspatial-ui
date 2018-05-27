@@ -11,9 +11,20 @@ $(document).ready(function () {
     update_user_list();
 
     //load munis
-    update_muni_admins();
+    update_muni_admins("");
 });
 
+//filter muni admins by county
+function filter_muni_admin_by_county(county){
+    //set screen <li>Berkeley Twp <span class="fa fa-times"></span></li>
+    document.getElementById("county_filter_button").innerHTML = county + " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+
+    //reload munis
+    update_muni_admins(county);
+
+}
+
+//flip main screen from tabs (muni admin. user, approvals) to DCA admin screen
 function flip_main_dcaapprovals(flip_direction, do_flip){
     //flip pages
     if(flip_direction){
@@ -117,13 +128,14 @@ function flip_main_dcaapprovals(flip_direction, do_flip){
 // Update muni approved list
 // AJAX call to get up to date information on muni approvers.
 // Will be extended when UI design for pages is available.
-function update_muni_admins(){
+function update_muni_admins(county){
     //do Ajax call
     $.ajax({
         type: "GET",
         url: "/user/settings/",
         data: {
-            'action': 'get_muni_admins'
+            'action': 'get_muni_admins',
+            'county': county
         },
         dataType: "json",
         success: function(result) {
@@ -410,7 +422,7 @@ function delete_user(username){
             update_user_list();
 
             //reload munis
-            update_muni_admins();
+            update_muni_admins("");
         },
         error: function(result) {
             console.log("ERROR:", result)
@@ -508,7 +520,7 @@ function save_changes(username, action_if_no_user, exclude_string, disable_edit_
                 update_user_list();
 
                 //reload munis
-                update_muni_admins();
+                update_muni_admins("");
 
                 //update the dca admins?
                 flip_main_dcaapprovals(true, false);
@@ -598,7 +610,7 @@ function user_update(username, user_number, action, role){
                 update_user_list();
 
                 //reload munis
-                update_muni_admins();
+                update_muni_admins("");
 
             }else{
                 //or failure
