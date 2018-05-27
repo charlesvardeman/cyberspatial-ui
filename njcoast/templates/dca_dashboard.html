@@ -101,7 +101,7 @@
                             <td class="position">{{ muni_admin.njcusermeta.position }}</td>
                             <td><a>{{ muni_admin.email }}</a></td>
                             <td class="notes">{{ muni_admin.njcusermeta.notes }}</td>
-                            <td><a onclick="view_user_info('{{ muni_admin.username  }}', 1, 'Return to Municipal Approvers list', '');" href="#"><span class="fa fa-info-circle"></span></a></td>
+                            <td><a onclick="view_user_info('{{ muni_admin.username  }}', 1, 'Return to Municipal Approvers list', '', '');" href="#"><span class="fa fa-info-circle"></span></a></td>
                         </tr>
                         {% endfor %}
                         {% for muni_without_admin in munis_without_admin %}
@@ -187,12 +187,12 @@
                                     {% if user.is_active %}
                                     <td class="status act">active</td>
                                     <td class="notes">{{ user.njcusermeta.notes }}</td>
-                                    <td><a onclick="view_user_info('{{ user.username }}', 2, 'Return to All NJcoast Users list', '');" href="#"><span class="fa fa-info-circle"></span></a></td>
+                                    <td><a onclick="view_user_info('{{ user.username }}', 2, 'Return to All NJcoast Users list', '', '');" href="#"><span class="fa fa-info-circle"></span></a></td>
                                     {% else %}
                                         {% if user.njcusermeta.is_dca_approved %}
                                     <td class="status inact">inactive</td>
                                     <td class="notes">{{ user.njcusermeta.notes }}</td>
-                                    <td><a onclick="view_user_info('{{ user.username }}', 2, 'Return to All NJcoast Users list', '');" href="#"><span class="fa fa-info-circle"></span></a></td>
+                                    <td><a onclick="view_user_info('{{ user.username }}', 2, 'Return to All NJcoast Users list', '', '');" href="#"><span class="fa fa-info-circle"></span></a></td>
                                         {% else %}
                                             {% if user.njcusermeta.is_muni_approved and request.user|has_group:"dca_administrators" or not user.njcusermeta.is_muni_approved and request.user|has_group:"municipal_administrators" %}
                                     <td class="status pnd">pending</td>
@@ -200,7 +200,7 @@
                                             {% else %}
                                     <td class="status pnd">pending</td>
                                     <td class="notes">{{ user.njcusermeta.notes }}</td>
-                                    <td><a onclick="view_user_info('{{ user.username }}', 2, 'Return to All NJcoast Users list', '');" href="#"><span class="fa fa-info-circle"></span></a></td>
+                                    <td><a onclick="view_user_info('{{ user.username }}', 2, 'Return to All NJcoast Users list', '', '');" href="#"><span class="fa fa-info-circle"></span></a></td>
                                             {% endif %}
                                         {% endif %}
                                     {% endif %}
@@ -284,7 +284,7 @@
         <!-- account info ----------------------------------------------------->
         <div id="data_4" class="hidden">
             <div id="navigation_4" class="return-to-list">
-                <a onclick="view_user_info('', 2, '', '');" href="#"><span class="fa fa-chevron-left"></span> Return to All NJcoast Users list</a>
+                <a onclick="view_user_info('', 2, '', '', '');" href="#"><span class="fa fa-chevron-left"></span> Return to All NJcoast Users list</a>
             </div>
 
             <!--User data presented-------------------------------------------->
@@ -551,7 +551,7 @@ function flip_main_dcaapprovals(flip_direction, do_flip){
                                                     <td>${ dca_admin.name }</td>
                                                     <td>${ dca_admin.position }</td>
                                                     <td><a>${ dca_admin.email }</a></td>
-                                                    <td><a onclick="view_user_info('${ dca_admin.username }', 5, 'Return to DCA Approvers list', 'justification,role,municipality,code,zip');" href="#"><span class="fa fa-info-circle"></span></a></td>
+                                                    <td><a onclick="view_user_info('${ dca_admin.username }', 5, 'Return to DCA Approvers list', 'justification,role,municipality,code,zip', '');" href="#"><span class="fa fa-info-circle"></span></a></td>
                                                 </tr>`;
                     }
 
@@ -661,7 +661,7 @@ function update_muni_admins(){
                                         <td class="position">${ muni_admin.position }</td>
                                         <td><a>${ muni_admin.email }</a></td>
                                         <td class="notes">${ muni_admin.notes }</td>
-                                        <td><a onclick="view_user_info('${ muni_admin.username  }', 1, 'Return to Municipal Approvers list', 'justification,role');" href="#"><span class="fa fa-info-circle"></span></a></td>
+                                        <td><a onclick="view_user_info('${ muni_admin.username  }', 1, 'Return to Municipal Approvers list', 'justification,role', 'municipality');" href="#"><span class="fa fa-info-circle"></span></a></td>
                                     </tr>`;
                 }
 
@@ -763,12 +763,12 @@ function update_user_list(){
                     if(user.active){
                         html_string +=  `<td class="status act">active</td>
                                         <td class="notes">${ user.notes }</td>
-                                        <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list', '');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
+                                        <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list', '', '');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
                     }else{
                         if(user.is_dca_approved){
                             html_string +=  `<td class="status inact">inactive</td>
                                             <td class="notes">${ user.notes }</td>
-                                            <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list', '');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
+                                            <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list', '', '');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
                         }else{
                             if( (user.is_muni_approved && result.is_dca) || (!user.is_muni_approved && result.is_muni) ){
                                 html_string +=  `<td class="status pnd">pending</td>
@@ -776,7 +776,7 @@ function update_user_list(){
                             }else{
                                 html_string +=  `<td class="status pnd">pending</td>
                                                 <td class="notes">${ user.notes }</td>
-                                                <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list', '');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
+                                                <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list', '', '');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
                             }
                         }
                     }
@@ -1110,7 +1110,7 @@ function create_new_dca_approver(tab_to_return_to, return_text){
     }catch(err){}
 
     //set return link
-    document.getElementById("navigation_4").innerHTML = "<a onclick=\"view_user_info('', "+tab_to_return_to+", '', '');\" href=\"#\"><span class=\"fa fa-chevron-left\"></span> "+return_text;
+    document.getElementById("navigation_4").innerHTML = "<a onclick=\"view_user_info('', "+tab_to_return_to+", '', '', '');\" href=\"#\"><span class=\"fa fa-chevron-left\"></span> "+return_text;
 }
 
 //create new user
@@ -1154,13 +1154,17 @@ function create_new_muni_admin(muni, code, tab_to_return_to, return_text){
     document.getElementById("data_"+tab_to_return_to).classList.add("hidden");
 
     //set return link
-    document.getElementById("navigation_4").innerHTML = "<a onclick=\"view_user_info('', "+tab_to_return_to+", '', '');\" href=\"#\"><span class=\"fa fa-chevron-left\"></span> "+return_text;
+    document.getElementById("navigation_4").innerHTML = "<a onclick=\"view_user_info('', "+tab_to_return_to+", '', '', '');\" href=\"#\"><span class=\"fa fa-chevron-left\"></span> "+return_text;
 }
 
 //view user info
-function view_user_info(username, tab_to_return_to, return_text, exclude_string){
+function view_user_info(username, tab_to_return_to, return_text, exclude_string, disable_edit_string){
     //get excludes
     excludes = exclude_string.split(",");
+
+    //get disables
+    console.log("Dis "+disable_edit_string);
+    disable_edit = disable_edit_string.split(",");
 
     //console.log("data "+username);
     if(username != ""){
@@ -1220,6 +1224,9 @@ function view_user_info(username, tab_to_return_to, return_text, exclude_string)
                             }
                         }
                         document.getElementById("edit_municipality_row").classList.remove("hidden");
+                        if(disable_edit.indexOf("municipality") > -1){
+                            $('#edit_municipality_selector').prop('disabled', true);
+                        }
 
                         //flip pages
                         if(tab_to_return_to != ""){
@@ -1252,7 +1259,7 @@ function view_user_info(username, tab_to_return_to, return_text, exclude_string)
 
                         //set return link
                         if(return_text != ""){
-                            document.getElementById("navigation_4").innerHTML = "<a onclick=\"view_user_info('', "+tab_to_return_to+", '', '');\" href=\"#\"><span class=\"fa fa-chevron-left\"></span> "+return_text;
+                            document.getElementById("navigation_4").innerHTML = "<a onclick=\"view_user_info('', "+tab_to_return_to+", '', '', '');\" href=\"#\"><span class=\"fa fa-chevron-left\"></span> "+return_text;
                         }
                         //console.log("variable "+user_var+","+result.data[user_var]);
 
