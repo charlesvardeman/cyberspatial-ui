@@ -179,13 +179,10 @@
                                 </select>
                             </ul>
                             <li id="role_button" onclick="user_filter(this);">Role <span class="fa fa-chevron-right pull-right"></span></li>
-                            <ul id="role_button_panel" class="form-group hidden">
-                                <select class="form-control" id="select_role">
-                                    <option>All</option>
-                                    {% for role in roles %}
-                                    <option>{{ role.name }}</option>
-                                    {% endfor %}
-                                </select>
+                            <ul id="role_button_panel" class="hidden">
+                                {% for role in roles %}
+                                <li><input type="checkbox" checked> {{ role.name }}</li>
+                                {% endfor %}
                             </ul>
                         </ul>
 
