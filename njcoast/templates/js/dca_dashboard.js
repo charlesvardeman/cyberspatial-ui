@@ -847,7 +847,7 @@ function view_user_info(username, tab_to_return_to, return_text, exclude_string,
                         //flip pages
                         if(tab_to_return_to != ""){
                             //figure out return tab do fix decorator
-                            if(tab_to_return_to == "2"){
+                            if(tab_to_return_to == "2"){    //NJcoast users if returning to 2
                                 if(result.is_muni){    //muni admin?
                                     var decorata_string = `<span class="fa fa-user-circle fa-5x "></span><p>${ result.current_muni } User Profile</p>`;
                                     document.getElementById("data_4_decorator").innerHTML = decorata_string;
@@ -860,11 +860,16 @@ function view_user_info(username, tab_to_return_to, return_text, exclude_string,
                                     document.getElementById("editable_user_modal").innerHTML = "You have made changes to this NJcoast user profile. Would you like to save these changes?";
                                     document.getElementById("info_user_modal").innerHTML = "Are you sure you would like to delete this NJcoast user profile?";
                                 }
-                            }else{
+                            }else if(tab_to_return_to == "1"){  //If returning to 1 then Muni approvers
                                 document.getElementById("data_4_decorator").innerHTML = `<span class="fa fa-user-circle fa-5x "></span><p>Municipal Approver Profile</p>`;
                                 document.getElementById("editable_user_decorator").innerHTML = `<span class="fa fa-user-circle fa-5x "></span><p>Municipal Approver Profile</p>`;
                                 document.getElementById("editable_user_modal").innerHTML = "You have made changes to this Municipal Approver user profile. Would you like to save these changes?";
                                 document.getElementById("info_user_modal").innerHTML = "Are you sure you would like to delete this Municipal Approver user profile?";
+                            }else{ //If returning to 5 then DCA approvers
+                                document.getElementById("data_4_decorator").innerHTML = `<span class="fa fa-user-circle fa-5x "></span><p>DCA Approver Profile</p>`;
+                                document.getElementById("editable_user_decorator").innerHTML = `<span class="fa fa-user-circle fa-5x "></span><p>DCA Approver Profile</p>`;
+                                document.getElementById("editable_user_modal").innerHTML = "You have made changes to this DCA Approver user profile. Would you like to save these changes?";
+                                document.getElementById("info_user_modal").innerHTML = "Are you sure you would like to delete this DCA Approver user profile?";
                             }
                             document.getElementById("data_"+tab_to_return_to).classList.add("hidden");
                             try{
