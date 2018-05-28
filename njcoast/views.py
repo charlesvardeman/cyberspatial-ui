@@ -494,7 +494,10 @@ def signup(request):
                         })
 
                         #send it
-                        muni_admin.email_user(subject, message)
+                        try:
+                            muni_admin.email_user(subject, message)
+                        except:
+                            pass
 
                 #back home, or flag that save was successful
                 #messages.success(request, 'Account created successfully')
@@ -796,7 +799,10 @@ def user_approval(request):
                             })
 
                             #send it
-                            dca_admin.email_user(subject, message)
+                            try:
+                                dca_admin.email_user(subject, message)
+                            except:
+                                pass
 
                 # send email to user once approved by DCA
                 if is_dca:
@@ -810,7 +816,10 @@ def user_approval(request):
                     })
 
                     #send it
-                    user.email_user(subject, message)
+                    try:
+                        user.email_user(subject, message)
+                    except:
+                        pass
 
                 #flag OK
                 return JsonResponse({'updated': True})
@@ -930,7 +939,12 @@ def user_approval(request):
                         'password': password,
                         'municipality': user.njcusermeta.municipality.name,
                     })
-                    user.email_user(subject, message)
+
+                    #actual send
+                    try:
+                        user.email_user(subject, message)
+                    except:
+                        pass
 
                     #email = EmailMessage(subject, message, to=[request.POST['email']])
                     #email.send()
@@ -1001,7 +1015,12 @@ def user_approval(request):
                         'domain': current_site.domain,
                         'password': password,
                     })
-                    user.email_user(subject, message)
+
+                    #actual send
+                    try:
+                        user.email_user(subject, message)
+                    except:
+                        pass
 
                     #flag OK
                     return JsonResponse({'updated': True})
@@ -1035,7 +1054,12 @@ def user_approval(request):
                     'municipality': user.njcusermeta.municipality.name,
                     'notes': user.njcusermeta.notes,
                 })
-                user.email_user(subject, message)
+
+                #actual send
+                try:
+                    user.email_user(subject, message)
+                except:
+                    pass
 
                 #flag OK
                 return JsonResponse({'updated': True})

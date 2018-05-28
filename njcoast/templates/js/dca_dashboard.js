@@ -14,6 +14,27 @@ $(document).ready(function () {
     update_muni_admins("");
 });
 
+//filter for users
+function user_filter(object){
+    //figure out button clicked and find its panel
+    var panel_name = object.id + '_panel';
+    var panel = document.getElementById(panel_name);
+
+    //get name of section
+    var inner_str = object.innerHTML;
+    var n = inner_str.indexOf("<span");
+    var object_name = inner_str.substring(0, n);
+
+    //test if hidden
+    if(panel.classList.contains('hidden')){
+        panel.classList.remove("hidden");
+        object.innerHTML = object_name + " <span class='fa fa-chevron-down pull-right'>";
+    }else{
+        panel.classList.add("hidden");
+        object.innerHTML = object_name + " <span class='fa fa-chevron-right pull-right'>";
+    }
+}
+
 //filter muni admins by county
 function filter_muni_admin_by_county(county){
     //set screen <li>Berkeley Twp <span class="fa fa-times"></span></li>
@@ -294,7 +315,7 @@ function update_user_list(){
                         }else{
                             if( (user.is_muni_approved && result.is_dca) || (!user.is_muni_approved && result.is_muni) ){
                                 html_string +=  `<td class="status pnd">pending</td>
-                                                <td><a onclick="flip_tabs('tab_3');" href="#" class="btn btn-warning btn-sm btn-block">View Request</a></td>`;
+                                                <td><a onclick="flip_tabs('tab_3');" href="#${ user.username }" class="btn btn-warning btn-sm btn-block">View Request</a></td>`;
                             }else{
                                 html_string +=  `<td class="status pnd">pending</td>
                                                 <td class="notes">${ user.notes }</td>
@@ -314,7 +335,8 @@ function update_user_list(){
                         approval_count++;
 
                         document.getElementById("account_list").innerHTML +=
-                                `<div class="row review-request">
+                                `<a class="anchor" id="${ user.username }"></a>
+                                 <div class="row review-request">
                                     <div class="col-md-5 col-lg-4">
                                         <div class="well">
                                             <table class="table">
@@ -423,6 +445,10 @@ function delete_user(username){
 
             //reload munis
             update_muni_admins("");
+
+            //update the dca admins?
+            flip_main_dcaapprovals(true, false);
+
         },
         error: function(result) {
             console.log("ERROR:", result)
@@ -611,6 +637,9 @@ function user_update(username, user_number, action, role){
 
                 //reload munis
                 update_muni_admins("");
+
+                //update the dca admins?
+                flip_main_dcaapprovals(true, false);
 
             }else{
                 //or failure
@@ -825,7 +854,7 @@ function view_user_info(username, tab_to_return_to, return_text, exclude_string,
                         //flip pages
                         if(tab_to_return_to != ""){
                             //figure out return tab do fix decorator
-                            if(tab_to_return_to == "2"){
+                            if(tab_to_return_to == "2"){    //NJcoast users if returning to 2
                                 if(result.is_muni){    //muni admin?
                                     var decorata_string = `<span class="fa fa-user-circle fa-5x "></span><p>${ result.current_muni } User Profile</p>`;
                                     document.getElementById("data_4_decorator").innerHTML = decorata_string;
@@ -838,11 +867,16 @@ function view_user_info(username, tab_to_return_to, return_text, exclude_string,
                                     document.getElementById("editable_user_modal").innerHTML = "You have made changes to this NJcoast user profile. Would you like to save these changes?";
                                     document.getElementById("info_user_modal").innerHTML = "Are you sure you would like to delete this NJcoast user profile?";
                                 }
-                            }else{
+                            }else if(tab_to_return_to == "1"){  //If returning to 1 then Muni approvers
                                 document.getElementById("data_4_decorator").innerHTML = `<span class="fa fa-user-circle fa-5x "></span><p>Municipal Approver Profile</p>`;
                                 document.getElementById("editable_user_decorator").innerHTML = `<span class="fa fa-user-circle fa-5x "></span><p>Municipal Approver Profile</p>`;
                                 document.getElementById("editable_user_modal").innerHTML = "You have made changes to this Municipal Approver user profile. Would you like to save these changes?";
                                 document.getElementById("info_user_modal").innerHTML = "Are you sure you would like to delete this Municipal Approver user profile?";
+                            }else{ //If returning to 5 then DCA approvers
+                                document.getElementById("data_4_decorator").innerHTML = `<span class="fa fa-user-circle fa-5x "></span><p>DCA Approver Profile</p>`;
+                                document.getElementById("editable_user_decorator").innerHTML = `<span class="fa fa-user-circle fa-5x "></span><p>DCA Approver Profile</p>`;
+                                document.getElementById("editable_user_modal").innerHTML = "You have made changes to this DCA Approver user profile. Would you like to save these changes?";
+                                document.getElementById("info_user_modal").innerHTML = "Are you sure you would like to delete this DCA Approver user profile?";
                             }
                             document.getElementById("data_"+tab_to_return_to).classList.add("hidden");
                             try{
@@ -896,6 +930,17 @@ function flip_tabs(id){
     show_user_edit(false);
     document.getElementById("data_4").classList.add("hidden");
 
+    if(id == "tab_1"){
+        //reload munis
+        update_muni_admins("");
+    }else if(id == "tab_2" || id == "tab_3"){
+        //reload main list (and approval list)
+        update_user_list();
+    }
+
+    //update the dca admins?
+    //flip_main_dcaapprovals(true, false);
+
     //clear Active and set new
     for(var i=1; i<=3; i++){
         //remove active
@@ -911,4 +956,5 @@ function flip_tabs(id){
             }catch(err){}
         }
     }
+
 }
