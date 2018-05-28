@@ -699,12 +699,13 @@ def user_approval(request):
 
             #test we got them
             if users:
-                #filters
-                if request.GET['filter_county'] != 'All':
-                    users = users.filter(njcusermeta__municipality__county__name=request.GET['filter_county'])
+                #county/municipality filters if DCA
+                if is_dca:
+                    if request.GET['filter_county'] != 'All':
+                        users = users.filter(njcusermeta__municipality__county__name=request.GET['filter_county'])
 
-                if request.GET['filter_municipality'] != 'All':
-                    users = users.filter(njcusermeta__municipality__name=request.GET['filter_municipality'])
+                    if request.GET['filter_municipality'] != 'All':
+                        users = users.filter(njcusermeta__municipality__name=request.GET['filter_municipality'])
 
                 output_array = []
 

@@ -161,6 +161,7 @@
                                 <li><input type="checkbox" checked> Active</li>
                                 <li><input type="checkbox" checked> Inactive</li>
                             </ul>
+                            {% if request.user|has_group:"dca_administrators" %}
                             <li id="county_button" onclick="user_filter(this);">County <span class="fa fa-chevron-right pull-right"></span></li>
                             <ul id="county_button_panel" class="form-group hidden">
                                 <select onchange="load_munis_in_county(this);" class="form-control" id="select_county">
@@ -178,6 +179,7 @@
                                     {% endfor %}
                                 </select>
                             </ul>
+                            {% endif %}
                             <li id="role_button" onclick="user_filter(this);">Role <span class="fa fa-chevron-right pull-right"></span></li>
                             <ul id="role_button_panel" class="hidden">
                                 {% for role in roles %}
