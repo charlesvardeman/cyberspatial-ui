@@ -7,11 +7,11 @@
 
 //~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $(document).ready(function () {
-    //load main list
-    update_user_list();
-
     //reload approvals list
     update_approval_list();
+
+    //load main list
+    update_user_list();
 
     //load munis
     update_muni_admins("");
@@ -235,7 +235,7 @@ function update_approval_list(){
         type: "GET",
         url: "/user/settings/",
         data: {
-            'action': 'get_users'
+            'action': 'get_approvers'
         },
         dataType: "json",
         success: function(result) {
@@ -246,74 +246,80 @@ function update_approval_list(){
                 //counter for approvals
                 var approval_count = 0;
 
+                //get approver container
+                var approver_container = document.getElementById("account_list");
+
+                //clear out old list
+                approver_container.innerHTML = "";
+
                 //loop over users
                 for(var i=0; i<result.data.length; i++){
                     var user = result.data[i];
                     //console.log(user.name);
 
-                    //get approver container
-                    var approver_container = document.getElementById("account_list");
+                    //basic user data
+                    if(user.notes == null){
+                        user.notes = "";
+                    }
 
                     //----Approval list?----------------------------------------
-                    if(!user.active && ( (!user.is_dca_approved && result.is_dca) || (!user.is_muni_approved && result.is_muni) )){
-                        approval_count++;
+                    approval_count++;
 
-                        approver_container.innerHTML +=
-                                `<a class="anchor" id="${ user.username }"></a>
-                                 <div class="row review-request">
-                                    <div class="col-md-5 col-lg-4">
-                                        <div class="well">
-                                            <table class="table">
-                                                <tbody>
-                                                    <tr>
-                                                        <th style="border-top: 0">Name</th>
-                                                        <td style="border-top: 0">${ user.name }</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Title</th>
-                                                        <td>${ user.position }</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Municipality</th>
-                                                        <td>${ user.municipality }</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Role</th>
-                                                        <td id="role_${i}" >${ user.role }</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <p><b>Justification:</b>${ user.justification }</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-7 col-lg-8">
-                                        <p class="qualifier" style="margin-top: 10px;">Received: ${ user.date_joined }; Muni Approval: ${ user.muni_approval_date }</p>
-                                        <textarea id="text_${i}" class="form-control" placeholder="" rows="7">${ user.notes }</textarea>
-                                        <div class="btn-group">
-                                            <button type="button" class="btn btn-default dropdown-toggle"
-                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    Change Role <span class="caret"></span>
-                                                        </button>
-                                            <ul id="account_list_roles_${i}" class="dropdown-menu">
-                                            </ul>
-                                        </div>
-                                        <button onclick="user_update('${ user.username }', '${ i }', 'approve', '');" class="btn btn-primary" data-toggle="modal" data-target="">Approve</button>
-                                        <button onclick="user_update('${ user.username }', '${ i }', 'decline', '');" class="btn btn-default" data-toggle="modal" data-target="">Decline*</button>
-                                        <p class="qualifier" style="margin-top: 10px;">*Any notes entered for a Declined applicant will be shared with the applicant to justify the decision.</p>
+                    approver_container.innerHTML +=
+                            `<a class="anchor" id="${ user.username }"></a>
+                             <div class="row review-request">
+                                <div class="col-md-5 col-lg-4">
+                                    <div class="well">
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <th style="border-top: 0">Name</th>
+                                                    <td style="border-top: 0">${ user.name }</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Title</th>
+                                                    <td>${ user.position }</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Municipality</th>
+                                                    <td>${ user.municipality }</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Role</th>
+                                                    <td id="role_${i}" >${ user.role }</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <p><b>Justification:</b>${ user.justification }</p>
                                     </div>
                                 </div>
-                                <hr/>`;
+                                <div class="col-md-7 col-lg-8">
+                                    <p class="qualifier" style="margin-top: 10px;">Received: ${ user.date_joined }; Muni Approval: ${ user.muni_approval_date }</p>
+                                    <textarea id="text_${i}" class="form-control" placeholder="" rows="7">${ user.notes }</textarea>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-default dropdown-toggle"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Change Role <span class="caret"></span>
+                                                    </button>
+                                        <ul id="account_list_roles_${i}" class="dropdown-menu">
+                                        </ul>
+                                    </div>
+                                    <button onclick="user_update('${ user.username }', '${ i }', 'approve', '');" class="btn btn-primary" data-toggle="modal" data-target="">Approve</button>
+                                    <button onclick="user_update('${ user.username }', '${ i }', 'decline', '');" class="btn btn-default" data-toggle="modal" data-target="">Decline*</button>
+                                    <p class="qualifier" style="margin-top: 10px;">*Any notes entered for a Declined applicant will be shared with the applicant to justify the decision.</p>
+                                </div>
+                            </div>
+                            <hr/>`;
 
-                        //create roles list
-                        var list_roles = document.getElementById("account_list_roles_"+i);
-                        list_roles.innerHTML = "";
+                    //create roles list
+                    var list_roles = document.getElementById("account_list_roles_"+i);
+                    list_roles.innerHTML = "";
 
-                        //get edit selector for role
-                        var selctr = document.getElementById("edit_role_selector");
-                        for(var j=0; j<selctr.options.length; j++){
-                            var role_name = selctr.options[j].text;
-                            list_roles.innerHTML += `<li><a onclick="user_update('${ user.username }', '${ i }', 'update_role', '${ role_name }');" href="#">${ role_name }</a></li>`;
-                        }
+                    //get edit selector for role
+                    var selctr = document.getElementById("edit_role_selector");
+                    for(var j=0; j<selctr.options.length; j++){
+                        var role_name = selctr.options[j].text;
+                        list_roles.innerHTML += `<li><a onclick="user_update('${ user.username }', '${ i }', 'update_role', '${ role_name }');" href="#">${ role_name }</a></li>`;
                     }
                 }
 
@@ -372,9 +378,6 @@ function update_user_list(){
                                 <th></th>
                             </tr>`;
                 }
-
-                //clear out old list
-                document.getElementById("account_list").innerHTML = "";
 
                 //loop over users
                 for(var i=0; i<result.data.length; i++){
@@ -478,11 +481,11 @@ function delete_user(username){
             //fade out modal
             $("#myModal").modal("hide");
 
-            //reload main list
-            update_user_list();
-
             //reload approvals list
             update_approval_list();
+
+            //reload main list
+            update_user_list();
 
             //reload munis
             update_muni_admins("");
@@ -583,11 +586,11 @@ function save_changes(username, action_if_no_user, exclude_string, disable_edit_
                 //reload view, get current setting
                 view_user_info(username, "", "", exclude_string, disable_edit_string);
 
-                //reload main list
-                update_user_list();
-
                 //reload approvals list
                 update_approval_list();
+
+                //reload main list
+                update_user_list();
 
                 //reload munis
                 update_muni_admins("");
@@ -676,11 +679,11 @@ function user_update(username, user_number, action, role){
                 //flag success
                 $.notify("User updated", "success");
 
-                //reload main list
-                update_user_list();
-
                 //reload approvals list
                 update_approval_list();
+
+                //reload main list
+                update_user_list();
 
                 //reload munis
                 update_muni_admins("");
