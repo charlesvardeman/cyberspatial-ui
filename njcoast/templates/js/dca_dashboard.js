@@ -315,7 +315,7 @@ function update_user_list(){
                         }else{
                             if( (user.is_muni_approved && result.is_dca) || (!user.is_muni_approved && result.is_muni) ){
                                 html_string +=  `<td class="status pnd">pending</td>
-                                                <td><a onclick="flip_tabs('tab_3');" href="#" class="btn btn-warning btn-sm btn-block">View Request</a></td>`;
+                                                <td><a onclick="flip_tabs('tab_3');" href="#${ user.username }" class="btn btn-warning btn-sm btn-block">View Request</a></td>`;
                             }else{
                                 html_string +=  `<td class="status pnd">pending</td>
                                                 <td class="notes">${ user.notes }</td>
@@ -335,7 +335,8 @@ function update_user_list(){
                         approval_count++;
 
                         document.getElementById("account_list").innerHTML +=
-                                `<div class="row review-request">
+                                `<a class="anchor" id="${ user.username }"></a>
+                                 <div class="row review-request">
                                     <div class="col-md-5 col-lg-4">
                                         <div class="well">
                                             <table class="table">

@@ -187,6 +187,12 @@ ul.user-filters ul li {
   font-size: 18px;
 }
 
+a.anchor {
+    display: block;
+    position: relative;
+    top: -100px;
+    visibility: hidden;
+}
 
 @media screen and (max-width: 768px) {
 
