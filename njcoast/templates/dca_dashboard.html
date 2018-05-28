@@ -155,15 +155,38 @@
                     <div class="col-sm-2">
 
                         <ul class="user-filters">
-                            <li>Status <span class="fa fa-chevron-down pull-right"></span></li>
-                            <ul>
-                                <li><input type="checkbox"> Pending</li>
-                                <li><input type="checkbox"> Active</li>
-                                <li><input type="checkbox"> Inactive</li>
+                            <li id="status_button" onclick="user_filter(this);">Status <span class="fa fa-chevron-right pull-right"></span></li>
+                            <ul id="status_button_panel" class="hidden">
+                                <li><input type="checkbox" checked> Pending</li>
+                                <li><input type="checkbox" checked> Active</li>
+                                <li><input type="checkbox" checked> Inactive</li>
                             </ul>
-                            <li>County <span class="fa fa-chevron-right pull-right"></span></li>
-                            <li>Municipality <span class="fa fa-chevron-right pull-right"></span></li>
-                            <li>Role <span class="fa fa-chevron-right pull-right"></span></li>
+                            <li id="county_button" onclick="user_filter(this);">County <span class="fa fa-chevron-right pull-right"></span></li>
+                            <ul id="county_button_panel" class="form-group hidden">
+                                <select class="form-control" id="select_county">
+                                    {% for county in counties %}
+                                    <option>{{ county.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </ul>
+                            <li id="municipality_button" onclick="user_filter(this);">Municipality <span class="fa fa-chevron-right pull-right"></span></li>
+                            <ul id="municipality_button_panel" class="form-group hidden">
+                                <select class="form-control" id="select_municipality">
+                                    <option>All</option>
+                                    {% for municipality in municipalities %}
+                                    <option>{{ municipality.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </ul>
+                            <li id="role_button" onclick="user_filter(this);">Role <span class="fa fa-chevron-right pull-right"></span></li>
+                            <ul id="role_button_panel" class="form-group hidden">
+                                <select class="form-control" id="select_role">
+                                    <option>All</option>
+                                    {% for role in roles %}
+                                    <option>{{ role.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </ul>
                         </ul>
 
                     </div>
