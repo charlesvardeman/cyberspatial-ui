@@ -666,6 +666,28 @@ def user_approval(request):
                 #flag OK and return data
                 return JsonResponse({'updated': True, 'data': user_to_dictionary(user), 'is_muni': is_muni, 'is_dca': is_dca, 'current_muni':current_muni})
 
+        #find munis in county
+        elif request.GET['action'] == 'load_munis_in_county':
+            #get county if set
+            county = request.GET['county']
+
+            #get municipalities
+            if county == "" or county == "All":
+                municipalities = NJCMunicipality.objects.exclude(name='Statewide').order_by('name')
+            else:
+                municipalities = NJCMunicipality.objects.exclude(name='Statewide').filter(county__name=county).order_by('name')
+
+            #test we got them
+            if municipalities:
+                munis_in_county = []
+                for municipality in municipalities:
+                    print municipality.name
+                    munis_in_county.append({'name': municipality.name})
+
+                #flag OK and return data
+                return JsonResponse({'updated': True, 'data': munis_in_county})
+
+        #get users data
         elif request.GET['action'] == 'get_users':
             #get users
             if is_dca:
@@ -677,6 +699,13 @@ def user_approval(request):
 
             #test we got them
             if users:
+                #filters
+                if request.GET['filter_county'] != 'All':
+                    users = users.filter(njcusermeta__municipality__county__name=request.GET['filter_county'])
+
+                if request.GET['filter_municipality'] != 'All':
+                    users = users.filter(njcusermeta__municipality__name=request.GET['filter_municipality'])
+
                 output_array = []
 
                 #get each user
@@ -686,6 +715,7 @@ def user_approval(request):
                 #flag OK and return data
                 return JsonResponse({'updated': True, 'data': output_array, 'is_muni': is_muni, 'is_dca': is_dca})
 
+        #get list of users to be approved
         elif request.GET['action'] == 'get_approvers':
             #get users
             if is_dca:
@@ -706,6 +736,7 @@ def user_approval(request):
                 #flag OK and return data
                 return JsonResponse({'updated': True, 'data': output_array, 'is_muni': is_muni, 'is_dca': is_dca})
 
+        # get the muni administrators
         elif request.GET['action'] == 'get_muni_admins':
             #get county if set
             county = request.GET['county']
@@ -743,6 +774,7 @@ def user_approval(request):
                     #flag OK and return data
                     return JsonResponse({'updated': True, 'data': output_array, 'munis': munis_without_admin})
 
+        # get the DCA administrators
         elif request.GET['action'] == 'get_dca_admins':
             #get dca admins
             dca_admins = Profile.objects.exclude(is_active=False).filter(groups__name='dca_administrators').order_by('last_name')

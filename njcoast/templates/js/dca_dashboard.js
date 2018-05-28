@@ -17,6 +17,48 @@ $(document).ready(function () {
     update_muni_admins("");
 });
 
+//do ajax load of munis in selected county
+function load_munis_in_county(object){
+    var county = object.options[object.selectedIndex].value;
+
+    //do Ajax call to get munis in county
+    $.ajax({
+        type: "GET",
+        url: "/user/settings/",
+        data: {
+            'county': county,
+            'action': 'load_munis_in_county'
+        },
+        dataType: "json",
+        success: function(result) {
+            console.log("USER APPROVAL -- SUCCESS!" + result.updated);
+
+            if(result.updated){
+                //flag success
+                var select = document.getElementById('select_municipality');
+                select.innerHTML = `<option>All</option>`;
+
+                for(var i = 0; i<result.data.length; i++){
+                    var opt = document.createElement('option');
+                    opt.value = result.data[i].name;
+                    opt.innerHTML = result.data[i].name;
+                    select.appendChild(opt);
+                }
+
+                //load main list
+                update_user_list();
+            }else{
+                //or failure
+            }
+
+        },
+        error: function(result) {
+            console.log("ERROR:", result)
+        }
+    });
+
+}
+
 //filter for users
 function user_filter(object){
     //figure out button clicked and find its panel
@@ -341,12 +383,19 @@ function update_approval_list(){
 // AJAX call to get up to date information on users.
 // Will be extended when UI design for pages is available.
 function update_user_list(){
+    //console.log("County "+document.getElementById("select_county").options[document.getElementById("select_county").selectedIndex].value);
+    //collect filter data
+    var county = document.getElementById("select_county").options[document.getElementById("select_county").selectedIndex].value;
+    var municipality = document.getElementById("select_municipality").options[document.getElementById("select_municipality").selectedIndex].value;
+
     //do Ajax call
     $.ajax({
         type: "GET",
         url: "/user/settings/",
         data: {
-            'action': 'get_users'
+            'action': 'get_users',
+            'filter_county': county,
+            'filter_municipality': municipality
         },
         dataType: "json",
         success: function(result) {
