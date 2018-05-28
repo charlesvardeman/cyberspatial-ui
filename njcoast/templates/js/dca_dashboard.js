@@ -930,6 +930,17 @@ function flip_tabs(id){
     show_user_edit(false);
     document.getElementById("data_4").classList.add("hidden");
 
+    if(id == "tab_1"){
+        //reload munis
+        update_muni_admins("");
+    }else if(id == "tab_2" || id == "tab_3"){
+        //reload main list (and approval list)
+        update_user_list();
+    }
+
+    //update the dca admins?
+    //flip_main_dcaapprovals(true, false);
+
     //clear Active and set new
     for(var i=1; i<=3; i++){
         //remove active
@@ -945,4 +956,5 @@ function flip_tabs(id){
             }catch(err){}
         }
     }
+
 }
