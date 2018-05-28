@@ -655,10 +655,10 @@ def user_approval(request):
     if not (is_muni or is_dca):
         return JsonResponse({'updated': False});
 
-    #GET section of the API
+    ####GET section of the API##################################################
     if request.method == "GET":
         print "Action", request.GET['action']
-        #find required action, get user?
+        #~~~~find required action, get user?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         if request.GET['action'] == 'get_user':
             user = Profile.objects.get(username=request.GET['user'])
             #test we got them
@@ -666,7 +666,7 @@ def user_approval(request):
                 #flag OK and return data
                 return JsonResponse({'updated': True, 'data': user_to_dictionary(user), 'is_muni': is_muni, 'is_dca': is_dca, 'current_muni':current_muni})
 
-        #find munis in county
+        #~~~~find munis in county~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         elif request.GET['action'] == 'load_munis_in_county':
             #get county if set
             county = request.GET['county']
@@ -687,7 +687,7 @@ def user_approval(request):
                 #flag OK and return data
                 return JsonResponse({'updated': True, 'data': munis_in_county})
 
-        #get users data
+        #~~~~get users data~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         elif request.GET['action'] == 'get_users':
             #get users
             if is_dca:
@@ -716,7 +716,7 @@ def user_approval(request):
                 #flag OK and return data
                 return JsonResponse({'updated': True, 'data': output_array, 'is_muni': is_muni, 'is_dca': is_dca})
 
-        #get list of users to be approved
+        #~~~~get list of users to be approved~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         elif request.GET['action'] == 'get_approvers':
             #get users
             if is_dca:
@@ -737,7 +737,7 @@ def user_approval(request):
                 #flag OK and return data
                 return JsonResponse({'updated': True, 'data': output_array, 'is_muni': is_muni, 'is_dca': is_dca})
 
-        # get the muni administrators
+        #~~~~get the muni administrators~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         elif request.GET['action'] == 'get_muni_admins':
             #get county if set
             county = request.GET['county']
@@ -775,7 +775,7 @@ def user_approval(request):
                     #flag OK and return data
                     return JsonResponse({'updated': True, 'data': output_array, 'munis': munis_without_admin})
 
-        # get the DCA administrators
+        #~~~~get the DCA administrators~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         elif request.GET['action'] == 'get_dca_admins':
             #get dca admins
             dca_admins = Profile.objects.exclude(is_active=False).filter(groups__name='dca_administrators').order_by('last_name')
@@ -794,12 +794,12 @@ def user_approval(request):
         else:
             print "Action not recognized", request.GET['action']
 
-    #POST section of the API
+    ####POST section of the API#################################################
     elif request.method == "POST":
         print "Action", request.POST['action']
 
         #test action
-        #approve?
+        #~~~~approve?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         if request.POST['action'] == 'approve':
             #load user
             user = Profile.objects.get(username=request.POST['user'])
@@ -877,7 +877,7 @@ def user_approval(request):
                 #flag OK
                 return JsonResponse({'updated': True})
 
-        #update notes and role?
+        #~~~~update notes and role?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         elif request.POST['action'] == 'update_role':
             #load user
             user = Profile.objects.get(username=request.POST['user'])
@@ -897,7 +897,7 @@ def user_approval(request):
                 #flag OK
                 return JsonResponse({'updated': True})
 
-        #update all?
+        #~~~~update all?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         elif request.POST['action'] == 'update_all':
             #load user
             user = Profile.objects.get(username=request.POST['user'])
@@ -931,7 +931,7 @@ def user_approval(request):
                 return JsonResponse({'updated': True})
 
 
-        #create muni admin?
+        #~~~~create muni admin?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         elif request.POST['action'] == 'create_muni_admin':
             #check user not exist
             if Profile.objects.filter(username=request.POST['user']).exists():
@@ -1008,7 +1008,7 @@ def user_approval(request):
                     #flag error
                     return JsonResponse({'updated': False})
 
-        #create dca admin?
+        #~~~~create dca admin?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         elif request.POST['action'] == 'create_dca_admin':
             #check user not exist
             if Profile.objects.filter(username=request.POST['user']).exists():
@@ -1081,7 +1081,7 @@ def user_approval(request):
                     #flag error
                     return JsonResponse({'updated': False})
 
-        #decline?
+        #~~~~decline?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         elif request.POST['action'] == 'decline':
             #load user
             user = Profile.objects.get(username=request.POST['user'])
@@ -1133,7 +1133,7 @@ def user_approval(request):
 
                 #flag OK
                 return JsonResponse({'updated': True})
-
+        #~~~~Action not recognized~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         else:
             print "Action not recognized", request.POST['action']
 
