@@ -445,6 +445,10 @@ function delete_user(username){
 
             //reload munis
             update_muni_admins("");
+
+            //update the dca admins?
+            flip_main_dcaapprovals(true, false);
+
         },
         error: function(result) {
             console.log("ERROR:", result)
@@ -633,6 +637,9 @@ function user_update(username, user_number, action, role){
 
                 //reload munis
                 update_muni_admins("");
+
+                //update the dca admins?
+                flip_main_dcaapprovals(true, false);
 
             }else{
                 //or failure
