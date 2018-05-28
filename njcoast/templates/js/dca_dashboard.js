@@ -10,6 +10,9 @@ $(document).ready(function () {
     //load main list
     update_user_list();
 
+    //reload approvals list
+    update_approval_list();
+
     //load munis
     update_muni_admins("");
 });
@@ -224,10 +227,9 @@ function update_muni_admins(county){
     });
 }
 
-// Update user info list
+// Update approval pending list
 // AJAX call to get up to date information on users.
-// Will be extended when UI design for pages is available.
-function update_user_list(){
+function update_approval_list(){
     //do Ajax call
     $.ajax({
         type: "GET",
@@ -237,104 +239,26 @@ function update_user_list(){
         },
         dataType: "json",
         success: function(result) {
-            console.log("USER APPROVAL -- SUCCESS!" + result.updated);
+            console.log("GET USER APPROVALS -- SUCCESS!" + result.updated);
 
             //success?
             if(result.updated){
-                //update table
-                var table_body = document.getElementById("user_list");
-                if(result.is_dca){
-                    table_body.innerHTML =  `   <tr>
-                                <th>Name <span class="fa fa-sort"></span></th>
-                                <th>Email</th>
-                                <th>Role <span class="fa fa-sort"></span></th>
-                                <th>Municipality <span class="fa fa-sort"></span></th>
-
-                                <th>Status</th>
-                                <th>Notes</th>
-                                <th></th>
-                            </tr>`;
-                }else{
-                    table_body.innerHTML =  `   <tr>
-                                <th>Name <span class="fa fa-sort"></span></th>
-                                <th>Email</th>
-                                <th>Role <span class="fa fa-sort"></span></th>
-
-                                <th>Status</th>
-                                <th>Notes</th>
-                                <th></th>
-                            </tr>`;
-                }
-
                 //counter for approvals
                 var approval_count = 0;
-
-                //clear out old list
-                document.getElementById("account_list").innerHTML = "";
 
                 //loop over users
                 for(var i=0; i<result.data.length; i++){
                     var user = result.data[i];
                     //console.log(user.name);
 
-                    //----All NJC users-----------------------------------------
-                    //basic user data
-                    if(user.notes == null){
-                        user.notes = "";
-                    }
-
-                    var html_string;
-                    if(result.is_dca){
-                        html_string = `<tr>
-                                            <td>${ user.name }</td>
-                                            <td><a>${ user.email }</a></td>
-                                            <td>${ user.rolesf }</td>
-                                            <td><a onclick="view_user_info('${ user.muni_approver }', 2, 'Return to All NJcoast Users list', '', '');" href="#">${ user.municipality }</a></td>`;
-                    }else{
-                        html_string = `<tr>
-                                            <td>${ user.name }</td>
-                                            <td><a>${ user.email }</a></td>
-                                            <td>${ user.rolesf }</td>`;
-                    }
-                    //variable data
-                    if(user.active){
-                        if(result.is_dca){
-                            html_string +=  `<td class="status act">active</td>
-                                            <td class="notes">${ user.notes }</td>
-                                            <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list', '', '');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
-                        }else{
-                            html_string +=  `<td class="status act">active</td>
-                                            <td class="notes">${ user.notes }</td>
-                                            <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All Municipal Approvers list', '', 'municipality');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
-                        }
-                    }else{
-                        if(user.is_dca_approved){
-                            html_string +=  `<td class="status inact">inactive</td>
-                                            <td class="notes">${ user.notes }</td>
-                                            <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list', '', '');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
-                        }else{
-                            if( (user.is_muni_approved && result.is_dca) || (!user.is_muni_approved && result.is_muni) ){
-                                html_string +=  `<td class="status pnd">pending</td>
-                                                <td><a onclick="flip_tabs('tab_3');" href="#${ user.username }" class="btn btn-warning btn-sm btn-block">View Request</a></td>`;
-                            }else{
-                                html_string +=  `<td class="status pnd">pending</td>
-                                                <td class="notes">${ user.notes }</td>
-                                                <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list', '', '');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
-                            }
-                        }
-                    }
-
-                    //end row
-                    html_string +=  `   <td></td>
-                                    </tr>`;
-                    //combine string into html
-                    table_body.innerHTML += html_string;
+                    //get approver container
+                    var approver_container = document.getElementById("account_list");
 
                     //----Approval list?----------------------------------------
                     if(!user.active && ( (!user.is_dca_approved && result.is_dca) || (!user.is_muni_approved && result.is_muni) )){
                         approval_count++;
 
-                        document.getElementById("account_list").innerHTML +=
+                        approver_container.innerHTML +=
                                 `<a class="anchor" id="${ user.username }"></a>
                                  <div class="row review-request">
                                     <div class="col-md-5 col-lg-4">
@@ -407,6 +331,120 @@ function update_user_list(){
 
 }
 
+// Update user info list
+// AJAX call to get up to date information on users.
+// Will be extended when UI design for pages is available.
+function update_user_list(){
+    //do Ajax call
+    $.ajax({
+        type: "GET",
+        url: "/user/settings/",
+        data: {
+            'action': 'get_users'
+        },
+        dataType: "json",
+        success: function(result) {
+            console.log("USER APPROVAL -- SUCCESS!" + result.updated);
+
+            //success?
+            if(result.updated){
+                //update table
+                var table_body = document.getElementById("user_list");
+                if(result.is_dca){
+                    table_body.innerHTML =  `   <tr>
+                                <th>Name <span class="fa fa-sort"></span></th>
+                                <th>Email</th>
+                                <th>Role <span class="fa fa-sort"></span></th>
+                                <th>Municipality <span class="fa fa-sort"></span></th>
+
+                                <th>Status</th>
+                                <th>Notes</th>
+                                <th></th>
+                            </tr>`;
+                }else{
+                    table_body.innerHTML =  `   <tr>
+                                <th>Name <span class="fa fa-sort"></span></th>
+                                <th>Email</th>
+                                <th>Role <span class="fa fa-sort"></span></th>
+
+                                <th>Status</th>
+                                <th>Notes</th>
+                                <th></th>
+                            </tr>`;
+                }
+
+                //clear out old list
+                document.getElementById("account_list").innerHTML = "";
+
+                //loop over users
+                for(var i=0; i<result.data.length; i++){
+                    var user = result.data[i];
+                    //console.log(user.name);
+
+                    //----All NJC users-----------------------------------------
+                    //basic user data
+                    if(user.notes == null){
+                        user.notes = "";
+                    }
+
+                    var html_string;
+                    if(result.is_dca){
+                        html_string = `<tr>
+                                            <td>${ user.name }</td>
+                                            <td><a>${ user.email }</a></td>
+                                            <td>${ user.rolesf }</td>
+                                            <td><a onclick="view_user_info('${ user.muni_approver }', 2, 'Return to All NJcoast Users list', '', '');" href="#">${ user.municipality }</a></td>`;
+                    }else{
+                        html_string = `<tr>
+                                            <td>${ user.name }</td>
+                                            <td><a>${ user.email }</a></td>
+                                            <td>${ user.rolesf }</td>`;
+                    }
+                    //variable data
+                    if(user.active){
+                        if(result.is_dca){
+                            html_string +=  `<td class="status act">active</td>
+                                            <td class="notes">${ user.notes }</td>
+                                            <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list', '', '');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
+                        }else{
+                            html_string +=  `<td class="status act">active</td>
+                                            <td class="notes">${ user.notes }</td>
+                                            <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All Municipal Approvers list', '', 'municipality');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
+                        }
+                    }else{
+                        if(user.is_dca_approved){
+                            html_string +=  `<td class="status inact">inactive</td>
+                                            <td class="notes">${ user.notes }</td>
+                                            <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list', '', '');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
+                        }else{
+                            if( (user.is_muni_approved && result.is_dca) || (!user.is_muni_approved && result.is_muni) ){
+                                html_string +=  `<td class="status pnd">pending</td>
+                                                <td><a onclick="flip_tabs('tab_3');" href="#${ user.username }" class="btn btn-warning btn-sm btn-block">View Request</a></td>`;
+                            }else{
+                                html_string +=  `<td class="status pnd">pending</td>
+                                                <td class="notes">${ user.notes }</td>
+                                                <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list', '', '');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
+                            }
+                        }
+                    }
+
+                    //end row
+                    html_string +=  `   <td></td>
+                                    </tr>`;
+                    //combine string into html
+                    table_body.innerHTML += html_string;
+                }
+            }else{
+                //or failure
+            }
+        },
+        error: function(result) {
+            console.log("ERROR:", result)
+        }
+    });
+
+}
+
 //set muni code after selecting
 function set_municipality_code(code){
     //console.log(code);
@@ -442,6 +480,9 @@ function delete_user(username){
 
             //reload main list
             update_user_list();
+
+            //reload approvals list
+            update_approval_list();
 
             //reload munis
             update_muni_admins("");
@@ -545,6 +586,9 @@ function save_changes(username, action_if_no_user, exclude_string, disable_edit_
                 //reload main list
                 update_user_list();
 
+                //reload approvals list
+                update_approval_list();
+
                 //reload munis
                 update_muni_admins("");
 
@@ -634,6 +678,9 @@ function user_update(username, user_number, action, role){
 
                 //reload main list
                 update_user_list();
+
+                //reload approvals list
+                update_approval_list();
 
                 //reload munis
                 update_muni_admins("");
@@ -930,13 +977,15 @@ function flip_tabs(id){
     show_user_edit(false);
     document.getElementById("data_4").classList.add("hidden");
 
-    if(id == "tab_1"){
+    /*if(id == "tab_1"){
         //reload munis
         update_muni_admins("");
     }else if(id == "tab_2" || id == "tab_3"){
         //reload main list (and approval list)
         update_user_list();
-    }
+        //reload approvals list
+        update_approval_list();
+    }*/
 
     //update the dca admins?
     //flip_main_dcaapprovals(true, false);
