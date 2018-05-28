@@ -385,8 +385,10 @@ function update_approval_list(){
 function update_user_list(){
     //console.log("County "+document.getElementById("select_county").options[document.getElementById("select_county").selectedIndex].value);
     //collect filter data
-    var county = document.getElementById("select_county").options[document.getElementById("select_county").selectedIndex].value;
-    var municipality = document.getElementById("select_municipality").options[document.getElementById("select_municipality").selectedIndex].value;
+    try{
+        var county = document.getElementById("select_county").options[document.getElementById("select_county").selectedIndex].value;
+        var municipality = document.getElementById("select_municipality").options[document.getElementById("select_municipality").selectedIndex].value;
+    }catch(err){}
 
     //do Ajax call
     $.ajax({
@@ -431,7 +433,22 @@ function update_user_list(){
                 //loop over users
                 for(var i=0; i<result.data.length; i++){
                     var user = result.data[i];
-                    //console.log(user.name);
+
+                    //test for status filters
+                    //active
+                    if(user.active && !document.getElementById("status_button_active").checked){
+                        continue;
+                    }
+
+                    //inactive
+                    if(!user.active && user.is_dca_approved && !document.getElementById("status_button_inactive").checked){
+                        continue;
+                    }
+
+                    //pending
+                    if(!user.active && !user.is_dca_approved && !document.getElementById("status_button_pending").checked){
+                        continue;
+                    }
 
                     //----All NJC users-----------------------------------------
                     //basic user data

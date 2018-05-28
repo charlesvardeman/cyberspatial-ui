@@ -658,7 +658,7 @@ def user_approval(request):
     #GET section of the API
     if request.method == "GET":
         print "Action", request.GET['action']
-        #find required action
+        #find required action, get user?
         if request.GET['action'] == 'get_user':
             user = Profile.objects.get(username=request.GET['user'])
             #test we got them

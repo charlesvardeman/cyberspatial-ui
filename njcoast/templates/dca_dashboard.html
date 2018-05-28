@@ -157,9 +157,9 @@
                         <ul class="user-filters">
                             <li id="status_button" onclick="user_filter(this);">Status <span class="fa fa-chevron-right pull-right"></span></li>
                             <ul id="status_button_panel" class="hidden">
-                                <li><input type="checkbox" checked> Pending</li>
-                                <li><input type="checkbox" checked> Active</li>
-                                <li><input type="checkbox" checked> Inactive</li>
+                                <li><input onchange="update_user_list();" id="status_button_pending" type="checkbox" checked> Pending</li>
+                                <li><input onchange="update_user_list();" id="status_button_active" type="checkbox" checked> Active</li>
+                                <li><input onchange="update_user_list();" id="status_button_inactive" type="checkbox" checked> Inactive</li>
                             </ul>
                             {% if request.user|has_group:"dca_administrators" %}
                             <li id="county_button" onclick="user_filter(this);">County <span class="fa fa-chevron-right pull-right"></span></li>
