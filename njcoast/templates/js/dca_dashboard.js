@@ -14,6 +14,27 @@ $(document).ready(function () {
     update_muni_admins("");
 });
 
+//filter for users
+function user_filter(object){
+    //figure out button clicked and find its panel
+    var panel_name = object.id + '_panel';
+    var panel = document.getElementById(panel_name);
+
+    //get name of section
+    var inner_str = object.innerHTML;
+    var n = inner_str.indexOf("<span");
+    var object_name = inner_str.substring(0, n);
+
+    //test if hidden
+    if(panel.classList.contains('hidden')){
+        panel.classList.remove("hidden");
+        object.innerHTML = object_name + " <span class='fa fa-chevron-down pull-right'>";
+    }else{
+        panel.classList.add("hidden");
+        object.innerHTML = object_name + " <span class='fa fa-chevron-right pull-right'>";
+    }
+}
+
 //filter muni admins by county
 function filter_muni_admin_by_county(county){
     //set screen <li>Berkeley Twp <span class="fa fa-times"></span></li>
