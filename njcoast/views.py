@@ -727,15 +727,18 @@ def user_approval(request):
                 print "Not a valid user!"
 
             #test we got them
-            if users:
-                output_array = []
+            output_array = []
 
+            if users:
                 #get each user
                 for user in users:
                     output_array.append(user_to_dictionary(user))
 
                 #flag OK and return data
                 return JsonResponse({'updated': True, 'data': output_array, 'is_muni': is_muni, 'is_dca': is_dca})
+            else:
+                #flag OK and return data
+                return JsonResponse({'updated': True, 'data': output_array, 'is_muni': is_muni, 'is_dca': is_dca})                
 
         #~~~~get the muni administrators~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         elif request.GET['action'] == 'get_muni_admins':
