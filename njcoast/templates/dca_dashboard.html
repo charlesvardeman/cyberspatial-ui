@@ -128,10 +128,10 @@
                 <div class="row">
                     <div class="col-sm-8">
 
-                        <ul class="selected">
+                        <!--<ul class="selected">
                             <li>Your selection:</li>
                             <li>Berkeley Twp <span class="fa fa-times"></span></li>
-                        </ul>
+                        </ul>-->
 
                     </div>
                     <div class="col-sm-4">
@@ -183,7 +183,7 @@
                             <li id="role_button" onclick="user_filter(this);">Role <span class="fa fa-chevron-right pull-right"></span></li>
                             <ul id="role_button_panel" class="hidden">
                                 {% for role in roles %}
-                                <li><input type="checkbox" checked> {{ role.name }}</li>
+                                <li id="role_button_li_{{ forloop.counter }}"><input onchange="update_user_list();" id="role_button_{{ forloop.counter }}" type="checkbox" checked> {{ role.name }}</li>
                                 {% endfor %}
                             </ul>
                         </ul>

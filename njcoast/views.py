@@ -706,6 +706,12 @@ def user_approval(request):
 
                     if request.GET['filter_municipality'] != 'All':
                         users = users.filter(njcusermeta__municipality__name=request.GET['filter_municipality'])
+                #role filters for dca and muni
+                role_array = json.loads(request.GET['filter_roles'])
+                if len(role_array) > 0:
+                    for role in role_array:
+                        print "Role",role
+                        users = users.exclude(njcusermeta__role__name=role)
 
                 output_array = []
 
@@ -738,7 +744,7 @@ def user_approval(request):
                 return JsonResponse({'updated': True, 'data': output_array, 'is_muni': is_muni, 'is_dca': is_dca})
             else:
                 #flag OK and return data
-                return JsonResponse({'updated': True, 'data': output_array, 'is_muni': is_muni, 'is_dca': is_dca})                
+                return JsonResponse({'updated': True, 'data': output_array, 'is_muni': is_muni, 'is_dca': is_dca})
 
         #~~~~get the muni administrators~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         elif request.GET['action'] == 'get_muni_admins':

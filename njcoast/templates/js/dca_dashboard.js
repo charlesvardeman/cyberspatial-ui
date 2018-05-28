@@ -390,6 +390,23 @@ function update_user_list(){
         var municipality = document.getElementById("select_municipality").options[document.getElementById("select_municipality").selectedIndex].value;
     }catch(err){}
 
+    //load role filter set (I assume less than 10 roles)
+    var role_filter = [];
+    for(var j=1; j<10; j++){
+        try{
+            var elmt = document.getElementById("role_button_"+j);
+            var elmt2 = document.getElementById("role_button_li_"+j);
+            if(!elmt.checked){
+                var li_text = elmt2.innerHTML;
+                var n = li_text.indexOf(">");
+                var role_name = li_text.substring(n+2);
+                role_filter.push(role_name);
+            }
+        }catch(err){
+            j=10;
+        }
+    }
+
     //do Ajax call
     $.ajax({
         type: "GET",
@@ -397,7 +414,8 @@ function update_user_list(){
         data: {
             'action': 'get_users',
             'filter_county': county,
-            'filter_municipality': municipality
+            'filter_municipality': municipality,
+            'filter_roles': JSON.stringify(role_filter)
         },
         dataType: "json",
         success: function(result) {
