@@ -445,6 +445,29 @@ class DashboardTemplateView(TemplateView):
 
         #quiery, select if I an in the list of shared_with__contains
         context['shared_maps_for_user'] = NJCMap.objects.filter(shared_with__contains = self.request.user)
+
+        #get users groups
+        current_user = self.request.user
+        group_name = current_user.njcusermeta.role.group_name + "-" + current_user.njcusermeta.municipality.group_name
+        print "GN",group_name
+        group = Group.objects.get(name=group_name)
+        tempList = group.user_set.exclude(pk=self.request.user.pk)
+        context['main_group_membership_len'] = len(tempList) + 1
+        context['main_group_membership'] = tempList
+
+        #admin?
+        if current_user.groups.filter(name='dca_administrators').exists():
+            dcausers = current_user.groups.get(name='dca_administrators').user_set.exclude(pk=self.request.user.pk)
+            context['dca_group_membership_len'] = len(dcausers) + 1
+            context['dca_group_membership'] = dcausers
+
+        if current_user.groups.filter(name='municipal_administrators').exists():
+            muniusers = current_user.groups.get(name='municipal_administrators').user_set.exclude(pk=self.request.user.pk)
+            context['muni_group_membership_len'] = len(muniusers) + 1
+            context['muni_group_membership'] = muniusers
+
+
+        #context['dca_group_membership'] = len(Group.objects.all())
         return context
 
 class ExploreTemplateView(TemplateView):
