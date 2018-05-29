@@ -10,8 +10,8 @@
 
 <div class="gray-zone">
     <div class="container-fluid">
-        <div class="page-header overlay-div">
-            <div class="dropdown show">
+        <div class="page-header">
+            <!--<div class="dropdown show">
                 <a class="dropdown-toggle" id="muniRoleToggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             keansburg <span>|</span> planning<i class="fa fa-caret-down" style="margin-left: 10px" aria-hidden="true"></i>
           </a>
@@ -19,14 +19,14 @@
                     <a class="dropdown-item" href="#">Berkeley</a>
                     <a class="dropdown-item" href="#">Keansburg</a>
                 </div>
-            </div>
+            </div>-->
             <h3>Planning & Service Delivery Dashboard</h3>
         </div>
         <div class="row">
 
 
             <div class="col-sm-6 col-md-4">
-                <div class="overlay-div">
+                <!--<div class="overlay-div">-->
                     <ul class="list-group">
                         <li class="list-group-item">
                             <h4 class="list-group-item-heading"><i class="fa fa-user" aria-hidden="true"></i>Profile</h4>
@@ -34,23 +34,23 @@
                                 <tbody>
                                     <tr>
                                         <th style="border-top: 0">Name</th>
-                                        <td style="border-top: 0">Jane Marquette</td>
+                                        <td style="border-top: 0">{{ user.first_name }} {{ user.last_name }}</td>
                                     </tr>
                                     <tr>
                                         <th>Title</th>
-                                        <td>Municipal Planner</td>
+                                        <td>{{ user.njcusermeta.position }}</td>
                                     </tr>
                                     <tr>
                                         <th>Municipality</th>
-                                        <td>Keansburg</td>
+                                        <td>{{ user.njcusermeta.municipality }}</td>
                                     </tr>
                                     <tr>
                                         <th>Role</th>
-                                        <td>Planner</td>
+                                        <td>{{ user.njcusermeta.role }}</td>
                                     </tr>
                                     <tr>
                                         <th>Username</th>
-                                        <td>j.marquette</td>
+                                        <td>{{ user.username }}</td>
                                     </tr>
                                     <tr>
                                         <th>Password</th>
@@ -58,7 +58,7 @@
                                     </tr>
                                 </tbody>
                             </table>
-                            <button class="btn btn-secondary btn-md btn-block" data-toggle="modal" data-target="">Edit Profile Information</button>
+                            <button class="btn btn-secondary btn-md btn-block" data-toggle="modal" data-target="">Edit Password</button>
                         </li>
                     </ul>
                     <ul class="list-group">
@@ -79,7 +79,7 @@
                             <button class="btn btn-secondary btn-md btn-block" data-toggle="modal" data-target="">Create New Group</button>
                         </li>
                     </ul>
-                </div>
+                <!--</div>-->
             </div>
 
             <div class="col-sm-6 col-md-4">
@@ -119,12 +119,12 @@
                             <li class="list-group-item">
                                 <h4 class="list-group-item-heading"><i class="fa fa-cogs" aria-hidden="true"></i>Tools</h4>
                                 <p>Generate additional GIS data to view on the map alongside existing layers.</p>
-                                <div class="overlay-div">
+                                <!--<div class="overlay-div">
                                 <button class="btn btn-secondary btn-md btn-block" data-toggle="modal" data-target="">Browse Available Tools</button>
-                                </div>
+                            </div>-->
                             </li>
                             <li class="list-group-item">
-                                <i class="fa fa-times pull-right" aria-hidden="true"></i>
+                                <!--<i class="fa fa-times pull-right" aria-hidden="true"></i>-->
                                 <h5 class="list-group-item-heading">Storm Hazard Projection (SHP) Tool </h5>
                                 <p>Evaluate exposure to natural hazards like strong winds, waves and surge for user-defined scenarios. <!--<a href="">Learn more</a>--></p>
                                 <div class="well rss-auto">
@@ -151,14 +151,14 @@
                                 <a href="/expert" class="btn btn-primary btn-md btn-block" role="button">Run New Simulation</a>
                                 <a href="#" class="btn btn-secondary btn-md btn-block disabled" role="button">Explore Simulations</a>
                             </li>
-                            <li class="list-group-item">
+                            <!--<li class="list-group-item">
                                 <div class="overlay-div">
                                 <i class="fa fa-times pull-right" aria-hidden="true"></i>
                                 <h5 class="list-group-item-heading">Another New Tool</h5>
                                 <p>Tool that runs some other kind of simulation to generate new GIS layers. <a href="">Learn more</a></p>
                                 <button class="btn btn-primary btn-md btn-block" data-toggle="modal" data-target="">Use This Tool</button>
                                 </div>
-                            </li>
+                            </li>-->
                         </ul>
                 </div>
 
@@ -166,4 +166,6 @@
                 <!-- close row -->
             </div>
         </div>
+    </div>
+</div>
 {% endblock middle %}
