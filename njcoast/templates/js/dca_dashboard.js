@@ -7,12 +7,86 @@
 
 //~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $(document).ready(function () {
+    //reload approvals list
+    update_approval_list();
+
     //load main list
     update_user_list();
 
     //load munis
     update_muni_admins("");
 });
+
+//sort users
+function sort_users(criterion){
+    console.log("Sorting "+criterion);
+
+    //look for session data
+    var sortBy= sessionStorage.getItem('sortBy');
+
+    //if exists update with direction
+    if (sortBy !== null) {
+        if(sortBy != criterion){
+            sessionStorage.setItem('sortBy', criterion);
+            sessionStorage.setItem('sortByDir', '+');
+        }else{
+            var sortByDir = sessionStorage.getItem('sortByDir');
+            if(sortByDir == '+'){
+                sessionStorage.setItem('sortByDir', '-');
+            }else{
+                sessionStorage.setItem('sortByDir', '+');
+            }
+        }
+    }else{ //else do first create
+        sessionStorage.setItem('sortBy', criterion);
+        sessionStorage.setItem('sortByDir', '+');
+    }
+
+    //load main list
+    update_user_list();
+}
+
+//do ajax load of munis in selected county
+function load_munis_in_county(object){
+    var county = object.options[object.selectedIndex].value;
+
+    //do Ajax call to get munis in county
+    $.ajax({
+        type: "GET",
+        url: "/user/settings/",
+        data: {
+            'county': county,
+            'action': 'load_munis_in_county'
+        },
+        dataType: "json",
+        success: function(result) {
+            console.log("USER APPROVAL -- SUCCESS!" + result.updated);
+
+            if(result.updated){
+                //flag success
+                var select = document.getElementById('select_municipality');
+                select.innerHTML = `<option>All</option>`;
+
+                for(var i = 0; i<result.data.length; i++){
+                    var opt = document.createElement('option');
+                    opt.value = result.data[i].name;
+                    opt.innerHTML = result.data[i].name;
+                    select.appendChild(opt);
+                }
+
+                //load main list
+                update_user_list();
+            }else{
+                //or failure
+            }
+
+        },
+        error: function(result) {
+            console.log("ERROR:", result)
+        }
+    });
+
+}
 
 //filter for users
 function user_filter(object){
@@ -224,16 +298,167 @@ function update_muni_admins(county){
     });
 }
 
-// Update user info list
+// Update approval pending list
 // AJAX call to get up to date information on users.
-// Will be extended when UI design for pages is available.
-function update_user_list(){
+function update_approval_list(){
     //do Ajax call
     $.ajax({
         type: "GET",
         url: "/user/settings/",
         data: {
-            'action': 'get_users'
+            'action': 'get_approvers'
+        },
+        dataType: "json",
+        success: function(result) {
+            console.log("GET USER APPROVALS -- SUCCESS!" + result.updated);
+
+            //success?
+            if(result.updated){
+                //counter for approvals
+                var approval_count = 0;
+
+                //get approver container
+                var approver_container = document.getElementById("account_list");
+
+                //clear out old list
+                approver_container.innerHTML = "";
+
+                //loop over users
+                for(var i=0; i<result.data.length; i++){
+                    var user = result.data[i];
+                    //console.log(user.name);
+
+                    //basic user data
+                    if(user.notes == null){
+                        user.notes = "";
+                    }
+
+                    //----Approval list?----------------------------------------
+                    approval_count++;
+
+                    approver_container.innerHTML +=
+                            `<a class="anchor" id="${ user.username }"></a>
+                             <div class="row review-request">
+                                <div class="col-md-5 col-lg-4">
+                                    <div class="well">
+                                        <table class="table">
+                                            <tbody>
+                                                <tr>
+                                                    <th style="border-top: 0">Name</th>
+                                                    <td style="border-top: 0">${ user.name }</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Title</th>
+                                                    <td>${ user.position }</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Municipality</th>
+                                                    <td>${ user.municipality }</td>
+                                                </tr>
+                                                <tr>
+                                                    <th>Role</th>
+                                                    <td id="role_${i}" >${ user.role }</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <p><b>Justification:</b>${ user.justification }</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-7 col-lg-8">
+                                    <p class="qualifier" style="margin-top: 10px;">Received: ${ user.date_joined }; Muni Approval: ${ user.muni_approval_date }</p>
+                                    <textarea id="text_${i}" class="form-control" placeholder="" rows="7">${ user.notes }</textarea>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-default dropdown-toggle"
+                                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                Change Role <span class="caret"></span>
+                                                    </button>
+                                        <ul id="account_list_roles_${i}" class="dropdown-menu">
+                                        </ul>
+                                    </div>
+                                    <button onclick="user_update('${ user.username }', '${ i }', 'approve', '');" class="btn btn-primary" data-toggle="modal" data-target="">Approve</button>
+                                    <button onclick="user_update('${ user.username }', '${ i }', 'decline', '');" class="btn btn-default" data-toggle="modal" data-target="">Decline*</button>
+                                    <p class="qualifier" style="margin-top: 10px;">*Any notes entered for a Declined applicant will be shared with the applicant to justify the decision.</p>
+                                </div>
+                            </div>
+                            <hr/>`;
+
+                    //create roles list
+                    var list_roles = document.getElementById("account_list_roles_"+i);
+                    list_roles.innerHTML = "";
+
+                    //get edit selector for role
+                    var selctr = document.getElementById("edit_role_selector");
+                    for(var j=0; j<selctr.options.length; j++){
+                        var role_name = selctr.options[j].text;
+                        list_roles.innerHTML += `<li><a onclick="user_update('${ user.username }', '${ i }', 'update_role', '${ role_name }');" href="#">${ role_name }</a></li>`;
+                    }
+                }
+
+                //set approvals to be done
+                document.getElementById("number_to_be_approved").innerHTML = `<span class="fa fa-exclamation-circle"></span> ${ approval_count } pending requests`;
+
+            }else{
+                //or failure
+            }
+        },
+        error: function(result) {
+            console.log("ERROR:", result)
+        }
+    });
+
+}
+
+// Update user info list
+// AJAX call to get up to date information on users.
+// Will be extended when UI design for pages is available.
+function update_user_list(){
+    //console.log("County "+document.getElementById("select_county").options[document.getElementById("select_county").selectedIndex].value);
+    //collect filter data
+    try{
+        var county = document.getElementById("select_county").options[document.getElementById("select_county").selectedIndex].value;
+        var municipality = document.getElementById("select_municipality").options[document.getElementById("select_municipality").selectedIndex].value;
+    }catch(err){}
+
+    //load role filter set (I assume less than 10 roles)
+    var role_filter = [];
+    for(var j=1; j<10; j++){
+        try{
+            var elmt = document.getElementById("role_button_"+j);
+            var elmt2 = document.getElementById("role_button_li_"+j);
+            if(!elmt.checked){
+                var li_text = elmt2.innerHTML;
+                var n = li_text.indexOf(">");
+                var role_name = li_text.substring(n+2);
+                role_filter.push(role_name);
+            }
+        }catch(err){
+            j=10;
+        }
+    }
+
+    //get session data for sorting
+    //look for session data
+    var sortBy= sessionStorage.getItem('sortBy');
+    if(sortBy == null){
+        sortBy = 'last_name';
+    }else{
+        var sortByDir = sessionStorage.getItem('sortByDir');
+        if(sortByDir == '-'){
+            sortBy = '-'+sortBy;
+        }
+    }
+
+    console.log("Sorti "+sortBy);
+    //do Ajax call
+    $.ajax({
+        type: "GET",
+        url: "/user/settings/",
+        data: {
+            'action': 'get_users',
+            'filter_county': county,
+            'filter_municipality': municipality,
+            'filter_roles': JSON.stringify(role_filter),
+            'sortby': sortBy
         },
         dataType: "json",
         success: function(result) {
@@ -245,10 +470,10 @@ function update_user_list(){
                 var table_body = document.getElementById("user_list");
                 if(result.is_dca){
                     table_body.innerHTML =  `   <tr>
-                                <th>Name <span class="fa fa-sort"></span></th>
+                                <th onclick="sort_users('last_name');">Name <span class="fa fa-sort"></span></th>
                                 <th>Email</th>
-                                <th>Role <span class="fa fa-sort"></span></th>
-                                <th>Municipality <span class="fa fa-sort"></span></th>
+                                <th onclick="sort_users('njcusermeta__role__name');">Role <span class="fa fa-sort"></span></th>
+                                <th onclick="sort_users('njcusermeta__municipality__name');">Municipality <span class="fa fa-sort"></span></th>
 
                                 <th>Status</th>
                                 <th>Notes</th>
@@ -256,9 +481,9 @@ function update_user_list(){
                             </tr>`;
                 }else{
                     table_body.innerHTML =  `   <tr>
-                                <th>Name <span class="fa fa-sort"></span></th>
+                                <th onclick="sort_users('last_name');">Name <span class="fa fa-sort"></span></th>
                                 <th>Email</th>
-                                <th>Role <span class="fa fa-sort"></span></th>
+                                <th onclick="sort_users('njcusermeta__role__name');">Role <span class="fa fa-sort"></span></th>
 
                                 <th>Status</th>
                                 <th>Notes</th>
@@ -266,16 +491,25 @@ function update_user_list(){
                             </tr>`;
                 }
 
-                //counter for approvals
-                var approval_count = 0;
-
-                //clear out old list
-                document.getElementById("account_list").innerHTML = "";
-
                 //loop over users
                 for(var i=0; i<result.data.length; i++){
                     var user = result.data[i];
-                    //console.log(user.name);
+
+                    //test for status filters
+                    //active
+                    if(user.active && !document.getElementById("status_button_active").checked){
+                        continue;
+                    }
+
+                    //inactive
+                    if(!user.active && user.is_dca_approved && !document.getElementById("status_button_inactive").checked){
+                        continue;
+                    }
+
+                    //pending
+                    if(!user.active && !user.is_dca_approved && !document.getElementById("status_button_pending").checked){
+                        continue;
+                    }
 
                     //----All NJC users-----------------------------------------
                     //basic user data
@@ -329,73 +563,7 @@ function update_user_list(){
                                     </tr>`;
                     //combine string into html
                     table_body.innerHTML += html_string;
-
-                    //----Approval list?----------------------------------------
-                    if(!user.active && ( (!user.is_dca_approved && result.is_dca) || (!user.is_muni_approved && result.is_muni) )){
-                        approval_count++;
-
-                        document.getElementById("account_list").innerHTML +=
-                                `<a class="anchor" id="${ user.username }"></a>
-                                 <div class="row review-request">
-                                    <div class="col-md-5 col-lg-4">
-                                        <div class="well">
-                                            <table class="table">
-                                                <tbody>
-                                                    <tr>
-                                                        <th style="border-top: 0">Name</th>
-                                                        <td style="border-top: 0">${ user.name }</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Title</th>
-                                                        <td>${ user.position }</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Municipality</th>
-                                                        <td>${ user.municipality }</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th>Role</th>
-                                                        <td id="role_${i}" >${ user.role }</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <p><b>Justification:</b>${ user.justification }</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-7 col-lg-8">
-                                        <p class="qualifier" style="margin-top: 10px;">Received: ${ user.date_joined }; Muni Approval: ${ user.muni_approval_date }</p>
-                                        <textarea id="text_${i}" class="form-control" placeholder="" rows="7">${ user.notes }</textarea>
-                                        <div class="btn-group">
-                                            <button type="button" class="btn btn-default dropdown-toggle"
-                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    Change Role <span class="caret"></span>
-                                                        </button>
-                                            <ul id="account_list_roles_${i}" class="dropdown-menu">
-                                            </ul>
-                                        </div>
-                                        <button onclick="user_update('${ user.username }', '${ i }', 'approve', '');" class="btn btn-primary" data-toggle="modal" data-target="">Approve</button>
-                                        <button onclick="user_update('${ user.username }', '${ i }', 'decline', '');" class="btn btn-default" data-toggle="modal" data-target="">Decline*</button>
-                                        <p class="qualifier" style="margin-top: 10px;">*Any notes entered for a Declined applicant will be shared with the applicant to justify the decision.</p>
-                                    </div>
-                                </div>
-                                <hr/>`;
-
-                        //create roles list
-                        var list_roles = document.getElementById("account_list_roles_"+i);
-                        list_roles.innerHTML = "";
-
-                        //get edit selector for role
-                        var selctr = document.getElementById("edit_role_selector");
-                        for(var j=0; j<selctr.options.length; j++){
-                            var role_name = selctr.options[j].text;
-                            list_roles.innerHTML += `<li><a onclick="user_update('${ user.username }', '${ i }', 'update_role', '${ role_name }');" href="#">${ role_name }</a></li>`;
-                        }
-                    }
                 }
-
-                //set approvals to be done
-                document.getElementById("number_to_be_approved").innerHTML = `<span class="fa fa-exclamation-circle"></span> ${ approval_count } pending requests`;
-
             }else{
                 //or failure
             }
@@ -439,6 +607,9 @@ function delete_user(username){
 
             //fade out modal
             $("#myModal").modal("hide");
+
+            //reload approvals list
+            update_approval_list();
 
             //reload main list
             update_user_list();
@@ -542,6 +713,9 @@ function save_changes(username, action_if_no_user, exclude_string, disable_edit_
                 //reload view, get current setting
                 view_user_info(username, "", "", exclude_string, disable_edit_string);
 
+                //reload approvals list
+                update_approval_list();
+
                 //reload main list
                 update_user_list();
 
@@ -631,6 +805,9 @@ function user_update(username, user_number, action, role){
             if(result.updated){
                 //flag success
                 $.notify("User updated", "success");
+
+                //reload approvals list
+                update_approval_list();
 
                 //reload main list
                 update_user_list();
@@ -930,13 +1107,15 @@ function flip_tabs(id){
     show_user_edit(false);
     document.getElementById("data_4").classList.add("hidden");
 
-    if(id == "tab_1"){
+    /*if(id == "tab_1"){
         //reload munis
         update_muni_admins("");
     }else if(id == "tab_2" || id == "tab_3"){
         //reload main list (and approval list)
         update_user_list();
-    }
+        //reload approvals list
+        update_approval_list();
+    }*/
 
     //update the dca admins?
     //flip_main_dcaapprovals(true, false);
