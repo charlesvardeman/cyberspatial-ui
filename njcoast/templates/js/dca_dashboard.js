@@ -385,6 +385,13 @@ function update_approval_list(){
                     //----Approval list?----------------------------------------
                     approval_count++;
 
+                    //create user muni section
+                    var user_muni = user.municipality;
+
+                    if(result.is_dca){
+                        user_muni = "<a onclick=\"view_user_info('" + user.muni_approver + "', 3, 'Return to All NJcoast Users list', '', '');\" href=\"#\">"+user.municipality+"</a>";
+                    }
+
                     approver_container.innerHTML +=
                             `<a class="anchor" id="${ user.username }"></a>
                              <div class="row review-request">
@@ -402,7 +409,7 @@ function update_approval_list(){
                                                 </tr>
                                                 <tr>
                                                     <th>Municipality</th>
-                                                    <td>${ user.municipality }</td>
+                                                    <td>${ user_muni }</td>
                                                 </tr>
                                                 <tr>
                                                     <th>Role</th>
