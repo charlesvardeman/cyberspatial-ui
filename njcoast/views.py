@@ -762,14 +762,23 @@ def user_approval(request):
                 sortby = 'last_name'
             print "Sort", sortby
 
+            #do we need to sort municipalities?
+            muni_sort = 'name'
+            if sortby == '-njcusermeta__municipality__name':
+                muni_sort = '-name'
+            elif sortby == 'njcusermeta__municipality__code':
+                muni_sort = 'code'
+            elif sortby == '-njcusermeta__municipality__code':
+                muni_sort = '-code'
+
             #get county if set
             county = request.GET['county']
 
             #get municipalities
             if county == "" or county == "All":
-                municipalities = NJCMunicipality.objects.exclude(name='Statewide').order_by('name')
+                municipalities = NJCMunicipality.objects.exclude(name='Statewide').order_by(muni_sort)
             else:
-                municipalities = NJCMunicipality.objects.exclude(name='Statewide').filter(county__name=county).order_by('name')
+                municipalities = NJCMunicipality.objects.exclude(name='Statewide').filter(county__name=county).order_by(muni_sort)
 
             if municipalities:
                 munis_without_admin = []
