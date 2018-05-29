@@ -6,7 +6,17 @@
 {% block body_class %}home{% endblock %}
 
 {% block middle %}
+
 <div class="jumbotron njcoast-image slimmer"></div>
+
+{% if messages %}
+  {% for msg in messages %}
+    <div class="alert alert-info alert-dismissable">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+      {{msg.message}}
+    </div>
+  {% endfor %}
+{% endif %}
 
 <div class="gray-zone">
     <div class="container-fluid">
@@ -58,7 +68,9 @@
                                     </tr>
                                 </tbody>
                             </table>
-                            <button class="btn btn-secondary btn-md btn-block" data-toggle="modal" data-target="">Edit Password</button>
+                            <a href="{% url "change_password" %}">
+                                <button class="btn btn-secondary btn-md btn-block" data-toggle="modal" data-target="">Change Password</button>
+                            </a>
                         </li>
                     </ul>
                     <ul class="list-group">
