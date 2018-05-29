@@ -17,6 +17,35 @@ $(document).ready(function () {
     update_muni_admins("");
 });
 
+//sort users
+function sort_users(criterion){
+    console.log("Sorting "+criterion);
+
+    //look for session data
+    var sortBy= sessionStorage.getItem('sortBy');
+
+    //if exists update with direction
+    if (sortBy !== null) {
+        if(sortBy != criterion){
+            sessionStorage.setItem('sortBy', criterion);
+            sessionStorage.setItem('sortByDir', '+');
+        }else{
+            var sortByDir = sessionStorage.getItem('sortByDir');
+            if(sortByDir == '+'){
+                sessionStorage.setItem('sortByDir', '-');
+            }else{
+                sessionStorage.setItem('sortByDir', '+');
+            }
+        }
+    }else{ //else do first create
+        sessionStorage.setItem('sortBy', criterion);
+        sessionStorage.setItem('sortByDir', '+');
+    }
+
+    //load main list
+    update_user_list();
+}
+
 //do ajax load of munis in selected county
 function load_munis_in_county(object){
     var county = object.options[object.selectedIndex].value;
@@ -407,6 +436,19 @@ function update_user_list(){
         }
     }
 
+    //get session data for sorting
+    //look for session data
+    var sortBy= sessionStorage.getItem('sortBy');
+    if(sortBy == null){
+        sortBy = 'last_name';
+    }else{
+        var sortByDir = sessionStorage.getItem('sortByDir');
+        if(sortByDir == '-'){
+            sortBy = '-'+sortBy;
+        }
+    }
+
+    console.log("Sorti "+sortBy);
     //do Ajax call
     $.ajax({
         type: "GET",
@@ -415,7 +457,8 @@ function update_user_list(){
             'action': 'get_users',
             'filter_county': county,
             'filter_municipality': municipality,
-            'filter_roles': JSON.stringify(role_filter)
+            'filter_roles': JSON.stringify(role_filter),
+            'sortby': sortBy
         },
         dataType: "json",
         success: function(result) {
@@ -427,10 +470,10 @@ function update_user_list(){
                 var table_body = document.getElementById("user_list");
                 if(result.is_dca){
                     table_body.innerHTML =  `   <tr>
-                                <th>Name <span class="fa fa-sort"></span></th>
+                                <th onclick="sort_users('last_name');">Name <span class="fa fa-sort"></span></th>
                                 <th>Email</th>
-                                <th>Role <span class="fa fa-sort"></span></th>
-                                <th>Municipality <span class="fa fa-sort"></span></th>
+                                <th onclick="sort_users('njcusermeta__role__name');">Role <span class="fa fa-sort"></span></th>
+                                <th onclick="sort_users('njcusermeta__municipality__name');">Municipality <span class="fa fa-sort"></span></th>
 
                                 <th>Status</th>
                                 <th>Notes</th>
@@ -438,9 +481,9 @@ function update_user_list(){
                             </tr>`;
                 }else{
                     table_body.innerHTML =  `   <tr>
-                                <th>Name <span class="fa fa-sort"></span></th>
+                                <th onclick="sort_users('last_name');">Name <span class="fa fa-sort"></span></th>
                                 <th>Email</th>
-                                <th>Role <span class="fa fa-sort"></span></th>
+                                <th onclick="sort_users('njcusermeta__role__name');">Role <span class="fa fa-sort"></span></th>
 
                                 <th>Status</th>
                                 <th>Notes</th>
