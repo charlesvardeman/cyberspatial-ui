@@ -990,6 +990,36 @@ def user_approval(request):
                 #flag OK
                 return JsonResponse({'updated': True})
 
+        #~~~~update all?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        elif request.POST['action'] == 'update_profile':
+            #load user
+            user = Profile.objects.get(username=request.POST['user'])
+
+            #test we got them
+            if user:
+                print "Update profile",user.username
+
+                #fields to update
+                namesplit = request.POST['name'].rsplit(' ',1)
+                if len(namesplit) == 2:
+                    #print namesplit[0], ",", namesplit[1]
+                    user.first_name = namesplit[0]
+                    user.last_name = namesplit[1]
+
+                #name
+                user.email = request.POST['email']
+                user.voice = request.POST['voice']
+                user.njcusermeta.address_line_1 = request.POST['address_line_1']
+                user.njcusermeta.address_line_2 = request.POST['address_line_2']
+                user.njcusermeta.city = request.POST['city']
+                user.njcusermeta.zip = request.POST['zip']
+                user.njcusermeta.position = request.POST['position']
+
+                #save results
+                user.save()
+
+                #flag OK
+                return JsonResponse({'updated': True})
 
         #~~~~create muni admin?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         elif request.POST['action'] == 'create_muni_admin':

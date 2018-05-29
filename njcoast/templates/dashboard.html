@@ -40,7 +40,7 @@
         </div>
 
         <!---Main section------------------------------------------------------>
-        <div id="main_section" class="row">
+        <div id="main_section" class="row ">
 
             <div class="col-sm-6 col-md-4">
                 <!--<div class="overlay-div">-->
@@ -51,11 +51,11 @@
                                 <tbody>
                                     <tr>
                                         <th style="border-top: 0">Name</th>
-                                        <td style="border-top: 0">{{ user.first_name }} {{ user.last_name }}</td>
+                                        <td id="info_name" style="border-top: 0">{{ user.first_name }} {{ user.last_name }}</td>
                                     </tr>
                                     <tr>
                                         <th>Title</th>
-                                        <td>{{ user.njcusermeta.position }}</td>
+                                        <td id="info_position">{{ user.njcusermeta.position }}</td>
                                     </tr>
                                     <tr>
                                         <th>Municipality</th>
@@ -92,9 +92,8 @@
                                     </tr>-->
                                 </tbody>
                             </table>
-                            <a href="{% url "change_password" %}">
-                                <button class="btn btn-secondary btn-md btn-block" data-toggle="modal" data-target="">Change Password</button>
-                            </a>
+                            <a href="{% url "change_password" %}" class="btn btn-secondary btn-md btn-block" role="button">Change Password</a>
+                            <a onclick="flip_edit_main(true);" href="#" class="btn btn-secondary btn-md btn-block" role="button">Edit Profile</a>
                         </li>
                     </ul>
                     <ul class="list-group">
@@ -265,7 +264,7 @@
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#saveChanges-1">
                                       Save changes
                                     </button>
-                <a onclick="show_user_edit(false);" href="#" class="btn btn-default">Cancel</a>
+                <a onclick="flip_edit_main(false);" href="#" class="btn btn-default">Cancel</a>
 
 
                 <!-- Modal - Save changes button -->
@@ -277,10 +276,10 @@
                                 <h4 class="modal-title" id="saveChanges">Save changes</h4>
                             </div>
                             <div id="editable_user_modal" class="modal-body">
-                                You have made changes to this NJcoast user profile. Would you like to save these changes?
+                                You have made changes to your profile. Would you like to save these changes?
                             </div>
                             <div class="modal-footer">
-                                <a name="create_muni_admin" id="save_changes_button" onclick="save_changes(document.getElementById('edit_username').innerHTML, this.name, '', '');" class="btn btn-primary" href="#">Yes</a>
+                                <a name="create_muni_admin" id="save_changes_button" onclick="save_changes('{{ user.username }}');" class="btn btn-primary" href="#">Yes</a>
                                 <a onclick="$('#saveChanges-1').modal('hide');" class="btn btn-default" href="#">No</a>
                             </div>
                         </div>
@@ -291,11 +290,32 @@
         </div>
         <!---END of Edit section----------------------------------------------->
 
+        <!-- Modal - Info->OK ------------------------------------------------->
+        <div class="modal fade" id="fixInput-1" tabindex="-1" role="dialog" aria-labelledby="fixInput">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="saveChanges">Input Error</h4>
+                    </div>
+                    <div id="info_ok_modal" class="modal-body">
+                        User Email incorrect format! Please correct before proceeding.
+                    </div>
+                    <div class="modal-footer">
+                        <a onclick="$('#fixInput-1').modal('hide');" class="btn btn-default" href="#">OK</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END Modal - Info->OK --------------------------------------------->
+
     </div>
 </div>
 {% endblock middle %}
 
 {% block extra_script %}
+<script src="{% static 'js/notify.min.js' %}"></script>
+
 <script>
 //function to open group membership
 function open_membership(object_name){
@@ -312,6 +332,96 @@ function open_membership(object_name){
         caret.classList.remove("fa-caret-right");
         caret.classList.add("fa-caret-down");
     }
+}
+
+//function to flip between main and edit
+function flip_edit_main(edit){
+    if(edit){
+        document.getElementById("main_section").classList.add("hidden");
+        document.getElementById("edit_section").classList.remove("hidden");
+    }else{
+        document.getElementById("main_section").classList.remove("hidden");
+        document.getElementById("edit_section").classList.add("hidden");
+    }
+}
+
+//check email input OK
+function validateEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+}
+
+//save user data
+function save_changes(username){
+    //check data integrity. Email
+    //first email
+    var email = document.getElementById("edit_email").value;
+    if(!validateEmail(email)){
+
+        //fade out modal
+        $("#saveChanges-1").modal("hide");
+
+        //open new modal to flag error
+        document.getElementById("info_ok_modal").innerHTML = "Invalid email, please correct before saving.";
+        $('#fixInput-1').modal()
+
+        return;
+    }
+
+    //do Ajax call
+    $.ajax({
+        type: "POST",
+        url: "/user/settings/",
+        data: {
+            'position': document.getElementById("edit_position").value,
+            'name': document.getElementById("edit_name").value,
+            'email': document.getElementById("edit_email").value,
+            'voice': document.getElementById("edit_voice").value,
+            'address_line_1': document.getElementById("edit_address_line_1").value,
+            'address_line_2': document.getElementById("edit_address_line_2").value,
+            'city': document.getElementById("edit_city").value,
+            'zip': document.getElementById("edit_zip").value,
+            'user': username,
+            'action': 'update_profile'
+        },
+        dataType: "json",
+        success: function(result) {
+            console.log("USER APPROVAL -- SUCCESS!" + result.updated);
+
+            if(result.updated){
+                //copy over data if success
+                document.getElementById("info_position").innerHTML = document.getElementById("edit_position").value;
+                document.getElementById("info_name").innerHTML = document.getElementById("edit_name").value;
+                document.getElementById("info_email").innerHTML = document.getElementById("edit_email").value;
+                document.getElementById("info_voice").innerHTML = document.getElementById("edit_voice").value;
+                document.getElementById("info_address_line_1").innerHTML = document.getElementById("edit_address_line_1").value;
+                document.getElementById("info_address_line_2").innerHTML = document.getElementById("edit_address_line_2").value;
+                document.getElementById("info_city").innerHTML = document.getElementById("edit_city").value;
+                document.getElementById("info_zip").innerHTML = document.getElementById("edit_zip").value;
+
+                //flip back to view
+                flip_edit_main(false);
+
+                //flag success
+                $.notify("User updated", "success");
+            }else{
+                //or failure
+                $.notify("Error updating user", "error");
+            }
+
+            //fade out modal
+            $("#saveChanges-1").modal("hide");
+
+        },
+        error: function(result) {
+            console.log("ERROR:", result)
+            $.notify("Error updating user", "error");
+
+            //fade out modal
+            $("#saveChanges-1").modal("hide");
+        }
+    });
+
 }
 
 </script>
