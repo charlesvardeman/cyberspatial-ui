@@ -755,14 +755,30 @@ def user_approval(request):
 
         #~~~~get the muni administrators~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         elif request.GET['action'] == 'get_muni_admins':
+            #sorting?
+            if request.GET['sortby'] != '':
+                sortby = request.GET['sortby']
+            else:
+                sortby = 'last_name'
+            print "Sort", sortby
+
+            #do we need to sort municipalities?
+            muni_sort = 'name'
+            if sortby == '-njcusermeta__municipality__name':
+                muni_sort = '-name'
+            elif sortby == 'njcusermeta__municipality__code':
+                muni_sort = 'code'
+            elif sortby == '-njcusermeta__municipality__code':
+                muni_sort = '-code'
+
             #get county if set
             county = request.GET['county']
 
             #get municipalities
             if county == "" or county == "All":
-                municipalities = NJCMunicipality.objects.exclude(name='Statewide').order_by('name')
+                municipalities = NJCMunicipality.objects.exclude(name='Statewide').order_by(muni_sort)
             else:
-                municipalities = NJCMunicipality.objects.exclude(name='Statewide').filter(county__name=county).order_by('name')
+                municipalities = NJCMunicipality.objects.exclude(name='Statewide').filter(county__name=county).order_by(muni_sort)
 
             if municipalities:
                 munis_without_admin = []
@@ -772,9 +788,9 @@ def user_approval(request):
 
                 #and muni admins
                 if county == "" or county == "All":
-                    muni_admins = Profile.objects.exclude(is_active=False).filter(groups__name='municipal_administrators').order_by('last_name')
+                    muni_admins = Profile.objects.exclude(is_active=False).filter(groups__name='municipal_administrators').order_by(sortby,'last_name')
                 else:
-                    muni_admins = Profile.objects.exclude(is_active=False).filter(njcusermeta__municipality__county__name=county).filter(groups__name='municipal_administrators').order_by('last_name')
+                    muni_admins = Profile.objects.exclude(is_active=False).filter(njcusermeta__municipality__county__name=county).filter(groups__name='municipal_administrators').order_by(sortby,'last_name')
 
                 if muni_admins:
                     print "Muni admins",len(muni_admins)
