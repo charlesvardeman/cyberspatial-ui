@@ -14,8 +14,37 @@ $(document).ready(function () {
     update_user_list();
 
     //load munis
-    update_muni_admins("");
+    update_muni_admins();
 });
+
+//sort sort_muni_admins
+function sort_muni_admins(criterion){
+    console.log("Sorting Muni "+criterion);
+
+    //look for session data
+    var sortMuniBy= sessionStorage.getItem('sortMuniBy');
+
+    //if exists update with direction
+    if (sortMuniBy !== null) {
+        if(sortMuniBy != criterion){
+            sessionStorage.setItem('sortMuniBy', criterion);
+            sessionStorage.setItem('sortMuniByDir', '+');
+        }else{
+            var sortMuniByDir = sessionStorage.getItem('sortMuniByDir');
+            if(sortMuniByDir == '+'){
+                sessionStorage.setItem('sortMuniByDir', '-');
+            }else{
+                sessionStorage.setItem('sortMuniByDir', '+');
+            }
+        }
+    }else{ //else do first create
+        sessionStorage.setItem('sortMuniBy', criterion);
+        sessionStorage.setItem('sortMuniByDir', '+');
+    }
+
+    //reload munis
+    update_muni_admins();
+}
 
 //sort users
 function sort_users(criterion){
@@ -112,10 +141,10 @@ function user_filter(object){
 //filter muni admins by county
 function filter_muni_admin_by_county(county){
     //set screen <li>Berkeley Twp <span class="fa fa-times"></span></li>
-    document.getElementById("county_filter_button").innerHTML = county + " &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+    document.getElementById("county_filter_button").innerHTML = county+`<span class="caret">`;
 
     //reload munis
-    update_muni_admins(county);
+    update_muni_admins();
 
 }
 
@@ -223,14 +252,34 @@ function flip_main_dcaapprovals(flip_direction, do_flip){
 // Update muni approved list
 // AJAX call to get up to date information on muni approvers.
 // Will be extended when UI design for pages is available.
-function update_muni_admins(county){
+function update_muni_admins(){
+    //get county
+    var inner_str = document.getElementById("county_filter_button").innerHTML;
+    var n = inner_str.indexOf("<span");
+    var county = inner_str.substring(0, n);
+
+    //get session data for sorting
+    //look for session data
+    var sortMuniBy= sessionStorage.getItem('sortMuniBy');
+    if(sortMuniBy == null){
+        sortMuniBy = 'last_name';
+    }else{
+        var sortMuniByDir = sessionStorage.getItem('sortMuniByDir');
+        if(sortMuniByDir == '-'){
+            sortMuniBy = '-'+sortMuniBy;
+        }
+    }
+
+    console.log("Sorti "+sortMuniBy);
+
     //do Ajax call
     $.ajax({
         type: "GET",
         url: "/user/settings/",
         data: {
             'action': 'get_muni_admins',
-            'county': county
+            'county': county,
+            'sortby': sortMuniBy
         },
         dataType: "json",
         success: function(result) {
@@ -241,10 +290,10 @@ function update_muni_admins(county){
                 //update table
                 var table_body = document.getElementById("muni_admin_list");
                 table_body.innerHTML = `<tr>
-                                            <th>Code <span class="fa fa-sort"></span></th>
-                                            <th>Municipality <span class="fa fa-sort"></span></th>
-                                            <th>Name <span class="fa fa-sort"></span></th>
-                                            <th>Position <span class="fa fa-sort"></span></th>
+                                            <th onclick="sort_muni_admins('njcusermeta__municipality__code');">Code <span class="fa fa-sort"></span></th>
+                                            <th onclick="sort_muni_admins('njcusermeta__municipality__name');">Municipality <span class="fa fa-sort"></span></th>
+                                            <th onclick="sort_muni_admins('last_name');">Name <span class="fa fa-sort"></span></th>
+                                            <th onclick="sort_muni_admins('njcusermeta__position');">Position <span class="fa fa-sort"></span></th>
                                             <th>Email</th>
                                             <th>Notes</th>
                                             <th</th>
@@ -448,7 +497,7 @@ function update_user_list(){
         }
     }
 
-    console.log("Sorti "+sortBy);
+    //console.log("Sorti "+sortBy);
     //do Ajax call
     $.ajax({
         type: "GET",
@@ -615,7 +664,7 @@ function delete_user(username){
             update_user_list();
 
             //reload munis
-            update_muni_admins("");
+            update_muni_admins();
 
             //update the dca admins?
             flip_main_dcaapprovals(true, false);
@@ -720,7 +769,7 @@ function save_changes(username, action_if_no_user, exclude_string, disable_edit_
                 update_user_list();
 
                 //reload munis
-                update_muni_admins("");
+                update_muni_admins();
 
                 //update the dca admins?
                 flip_main_dcaapprovals(true, false);
@@ -813,7 +862,7 @@ function user_update(username, user_number, action, role){
                 update_user_list();
 
                 //reload munis
-                update_muni_admins("");
+                update_muni_admins();
 
                 //update the dca admins?
                 flip_main_dcaapprovals(true, false);

@@ -755,6 +755,13 @@ def user_approval(request):
 
         #~~~~get the muni administrators~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         elif request.GET['action'] == 'get_muni_admins':
+            #sorting?
+            if request.GET['sortby'] != '':
+                sortby = request.GET['sortby']
+            else:
+                sortby = 'last_name'
+            print "Sort", sortby
+
             #get county if set
             county = request.GET['county']
 
@@ -772,9 +779,9 @@ def user_approval(request):
 
                 #and muni admins
                 if county == "" or county == "All":
-                    muni_admins = Profile.objects.exclude(is_active=False).filter(groups__name='municipal_administrators').order_by('last_name')
+                    muni_admins = Profile.objects.exclude(is_active=False).filter(groups__name='municipal_administrators').order_by(sortby,'last_name')
                 else:
-                    muni_admins = Profile.objects.exclude(is_active=False).filter(njcusermeta__municipality__county__name=county).filter(groups__name='municipal_administrators').order_by('last_name')
+                    muni_admins = Profile.objects.exclude(is_active=False).filter(njcusermeta__municipality__county__name=county).filter(groups__name='municipal_administrators').order_by(sortby,'last_name')
 
                 if muni_admins:
                     print "Muni admins",len(muni_admins)
