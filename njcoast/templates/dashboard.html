@@ -6,6 +6,11 @@
 
 {% block body_class %}home{% endblock %}
 
+{% block extra_head %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/fontawesome-all.min.css" %}" media="screen" />
+    <link rel="stylesheet" type="text/css" href="{% static "css/njcoast-admin-style.css" %}" media="screen" />
+{% endblock extra_head %}
+
 {% block middle %}
 
 <div class="jumbotron njcoast-image slimmer"></div>
@@ -33,8 +38,9 @@
             </div>-->
             <h3>Planning & Service Delivery Dashboard</h3>
         </div>
-        <div class="row">
 
+        <!---Main section------------------------------------------------------>
+        <div id="main_section" class="row">
 
             <div class="col-sm-6 col-md-4">
                 <!--<div class="overlay-div">-->
@@ -63,6 +69,23 @@
                                         <th>Username</th>
                                         <td>{{ user.username }}</td>
                                     </tr>
+                                    <tr>
+                                        <th>Mailing address</th>
+                                        <td>
+                                            <div id="info_address_line_1">{{ user.njcusermeta.address_line_1 }}</div>
+                                            <div id="info_address_line_2">{{ user.njcusermeta.address_line_2 }}</div>
+                                            <div id="info_city">{{ user.njcusermeta.city }}</div>
+                                            <div id="info_zip">{{ user.njcusermeta.zip }}</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Phone</th>
+                                        <td id="info_voice">{{ user.voice }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Email</th>
+                                        <td id="info_email">{{ user.email }}</td>
+                                    </tr>
                                     <!--<tr>
                                         <th>Password</th>
                                         <td>•••••••</td>
@@ -82,7 +105,7 @@
                                 <li>
                                     <a onclick="open_membership('main_membership');" href="#" ><span class="status">{{ main_group_membership_len }} mem <span id="main_membership_caret" class="fa fa-caret-down"></span></span></a>{{ user.njcusermeta.municipality.name }} {{ user.njcusermeta.role.name }}s
                                     <p>All {{ user.njcusermeta.municipality.name }} users with the {{ user.njcusermeta.role.name }} role</p>
-                                    <ul id="main_membership" class="hidden">
+                                    <ul id="main_membership" style="list-style-type: none;" class="hidden">
                                         {% for main_group_user in main_group_membership %}
                                         <li>{{ main_group_user.first_name}} {{ main_group_user.last_name}}</li>
                                         {% endfor %}
@@ -92,7 +115,7 @@
                                 <li>
                                     <a onclick="open_membership('muni_membership');" href="#" ><span class="status">{{ muni_group_membership_len }} mem <span id="muni_membership_caret" class="fa fa-caret-down"></span></span></a>Municipal Administrators
                                     <p>Municipal administrators team</p>
-                                    <ul id="muni_membership" class="hidden">
+                                    <ul id="muni_membership" style="list-style-type: none;" class="hidden">
                                         {% for muni_group_user in muni_group_membership %}
                                         <li>{{ muni_group_user.first_name}} {{ muni_group_user.last_name}}</li>
                                         {% endfor %}
@@ -103,7 +126,7 @@
                                 <li>
                                     <a onclick="open_membership('dca_membership');" href="#" ><span class="status">{{ dca_group_membership_len }} mem <span id="dca_membership_caret" class="fa fa-caret-down"></span></span></a>DCA Administrators
                                     <p>DCA administrators team</p>
-                                    <ul id="dca_membership" class="hidden">
+                                    <ul id="dca_membership" style="list-style-type: none;" class="hidden">
                                         {% for dca_group_user in dca_group_membership %}
                                         <li>{{ dca_group_user.first_name}} {{ dca_group_user.last_name}}</li>
                                         {% endfor %}
@@ -202,6 +225,72 @@
                 <!-- close row -->
             </div>
         </div>
+        <!---END of main section----------------------------------------------->
+
+        <!---Edit section------------------------------------------------------>
+        <div id="edit_section" class="row hidden">
+
+            <div class="col-sm-3 col-md-6">    <!-- col-md-6"-->
+                <table class="table edit-profile">
+                    <tbody>
+                        <tr id="edit_name_row">
+                            <th style="border-top: 0">Full Name</th>
+                            <td style="border-top: 0"><input type="text" class="form-control" id="edit_name" value="{{ user.first_name }} {{ user.last_name }}" placeholder="Jane Smith"></td>
+                        </tr>
+                        <tr>
+                            <th>Position/Title</th>
+                            <td><input type="text" class="form-control" id="edit_position" value="{{ user.njcusermeta.position }}" placeholder="Clerk"></td>
+                        </tr>
+                        <tr id="edit_zip_row">
+                            <th>Mailing address</th>
+                            <td>
+                                <input type="text" class="form-control" id="edit_address_line_1" value="{{ user.njcusermeta.address_line_1 }}" placeholder="Address line 1">
+                                <input type="text" class="form-control" id="edit_address_line_2" value="{{ user.njcusermeta.address_line_2 }}" placeholder="Address line 2">
+                                <input type="text" class="form-control" id="edit_city" value="{{ user.njcusermeta.city }}" placeholder="City">
+                                <input type="text" class="form-control" id="edit_zip" value="{{ user.njcusermeta.zip }}" placeholder="Zip code">
+                            </td>
+                        </tr>
+                        <tr id="edit_email_row">
+                            <th>Email</th>
+                            <td><input type="email" class="form-control" id="edit_email" value="{{ user.email }}" placeholder="jsmith@nj.gov"></td>
+                        </tr>
+                        <tr id="edit_voice_row">
+                            <th>Phone</th>
+                            <td><input type="tel" class="form-control" id="edit_voice" value="{{ user.voice}}" placeholder="123-456-7890"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="hidden" id="edit_username"></div>
+
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#saveChanges-1">
+                                      Save changes
+                                    </button>
+                <a onclick="show_user_edit(false);" href="#" class="btn btn-default">Cancel</a>
+
+
+                <!-- Modal - Save changes button -->
+                <div class="modal fade" id="saveChanges-1" tabindex="-1" role="dialog" aria-labelledby="saveChanges">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="saveChanges">Save changes</h4>
+                            </div>
+                            <div id="editable_user_modal" class="modal-body">
+                                You have made changes to this NJcoast user profile. Would you like to save these changes?
+                            </div>
+                            <div class="modal-footer">
+                                <a name="create_muni_admin" id="save_changes_button" onclick="save_changes(document.getElementById('edit_username').innerHTML, this.name, '', '');" class="btn btn-primary" href="#">Yes</a>
+                                <a onclick="$('#saveChanges-1').modal('hide');" class="btn btn-default" href="#">No</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!---END of Edit section----------------------------------------------->
+
     </div>
 </div>
 {% endblock middle %}
