@@ -44,186 +44,184 @@
 
             <div class="col-sm-6 col-md-4">
                 <!--<div class="overlay-div">-->
-                    <ul class="list-group">
-                        <li class="list-group-item">
-                            <h4 class="list-group-item-heading"><i class="fa fa-user" aria-hidden="true"></i>Profile</h4>
-                            <table class="table" style="margin-top: 10px">
-                                <tbody>
-                                    <tr>
-                                        <th style="border-top: 0">Name</th>
-                                        <td id="info_name" style="border-top: 0">{{ user.first_name }} {{ user.last_name }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Title</th>
-                                        <td id="info_position">{{ user.njcusermeta.position }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Municipality</th>
-                                        <td>{{ user.njcusermeta.municipality }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Role</th>
-                                        <td>{{ user.njcusermeta.role }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Username</th>
-                                        <td>{{ user.username }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Mailing address</th>
-                                        <td>
-                                            <div id="info_address_line_1">{{ user.njcusermeta.address_line_1 }}</div>
-                                            <div id="info_address_line_2">{{ user.njcusermeta.address_line_2 }}</div>
-                                            <div id="info_city">{{ user.njcusermeta.city }}</div>
-                                            <div id="info_zip">{{ user.njcusermeta.zip }}</div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>Phone</th>
-                                        <td id="info_voice">{{ user.voice }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Email</th>
-                                        <td id="info_email">{{ user.email }}</td>
-                                    </tr>
-                                    <!--<tr>
-                                        <th>Password</th>
-                                        <td>•••••••</td>
-                                    </tr>-->
-                                </tbody>
-                            </table>
-                            <a href="{% url "change_password" %}" class="btn btn-secondary btn-md btn-block" role="button">Change Password</a>
-                            <a onclick="flip_edit_main(true);" href="#" class="btn btn-secondary btn-md btn-block" role="button">Edit Profile</a>
-                        </li>
-                    </ul>
-                    <ul class="list-group">
-                        <li class="list-group-item">
-                            <h4 class="list-group-item-heading"><i class="fa fa-users" aria-hidden="true"></i>Groups</h4>
-                            <p>Groups for which you have membership.</p>
-                            <ul class="dashboard-list">
-                                <li>
-                                    <a onclick="open_membership('main_membership');" href="#" ><span class="status">{{ main_group_membership_len }} mem <span id="main_membership_caret" class="fa fa-caret-down"></span></span></a>{{ user.njcusermeta.municipality.name }} {{ user.njcusermeta.role.name }}s
-                                    <p>All {{ user.njcusermeta.municipality.name }} users with the {{ user.njcusermeta.role.name }} role</p>
-                                    <ul id="main_membership" style="list-style-type: none;" class="hidden">
-                                        {% for main_group_user in main_group_membership %}
-                                        <li>{{ main_group_user.first_name}} {{ main_group_user.last_name}}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </li>
-                                {% if request.user|has_group:"municipal_administrators" %}
-                                <li>
-                                    <a onclick="open_membership('muni_membership');" href="#" ><span class="status">{{ muni_group_membership_len }} mem <span id="muni_membership_caret" class="fa fa-caret-down"></span></span></a>Municipal Administrators
-                                    <p>Municipal administrators team</p>
-                                    <ul id="muni_membership" style="list-style-type: none;" class="hidden">
-                                        {% for muni_group_user in muni_group_membership %}
-                                        <li>{{ muni_group_user.first_name}} {{ muni_group_user.last_name}}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </li>
-                                {% endif %}
-                                {% if request.user|has_group:"dca_administrators" %}
-                                <li>
-                                    <a onclick="open_membership('dca_membership');" href="#" ><span class="status">{{ dca_group_membership_len }} mem <span id="dca_membership_caret" class="fa fa-caret-down"></span></span></a>DCA Administrators
-                                    <p>DCA administrators team</p>
-                                    <ul id="dca_membership" style="list-style-type: none;" class="hidden">
-                                        {% for dca_group_user in dca_group_membership %}
-                                        <li>{{ dca_group_user.first_name}} {{ dca_group_user.last_name}}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </li>
-                                {% endif %}
-                            </ul>
-                            <!--<button class="btn btn-secondary btn-md btn-block" data-toggle="modal" data-target="">Explore Groups</button>
-                            <button class="btn btn-secondary btn-md btn-block" data-toggle="modal" data-target="">Create New Group</button>-->
-                        </li>
-                    </ul>
-                <!--</div>-->
-            </div>
-
-            <div class="col-sm-6 col-md-4">
                 <ul class="list-group">
-                    <li class="list-group-item" id="map-item">
-                        <a href="{% url 'new_njc_map' %}" class="btn btn-primary btn-lg btn-block">Create New Map</a>
-                    </li>
                     <li class="list-group-item">
-                        <h4 class="list-group-item-heading"><i class="fa fa-map-o" aria-hidden="true"></i>Maps</h4>
-                        <p>Explore all available GIS layers on the standard planning map, or interact with a custom saved version or maps shared by other users.</p>
-                        <ul class="dashboard-list">
-                            {% for map in maps_for_user %}
-                            <li>
-                                <a href="{% url 'map_annotate' map.id %}"><span class="status">private</span>{{ map.name }}</a>
-                            </li>
-                            {% endfor %} {% for map in shared_maps_for_user %}
-                            <li>
-                                <a href="{% url 'map_annotate' map.id %}"><span class="status">shared</span>{{ map.name }}</a>
-                            </li>
-                            {% endfor %}
-                        </ul>
+                        <h4 class="list-group-item-heading"><i class="fa fa-user" aria-hidden="true"></i>Profile</h4>
+                        <table class="table" style="margin-top: 10px">
+                            <tbody>
+                                <tr>
+                                    <th style="border-top: 0">Name</th>
+                                    <td id="info_name" style="border-top: 0">{{ user.first_name }} {{ user.last_name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Title</th>
+                                    <td id="info_position">{{ user.njcusermeta.position }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Municipality</th>
+                                    <td>{{ user.njcusermeta.municipality }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Role</th>
+                                    <td>{{ user.njcusermeta.role }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Username</th>
+                                    <td>{{ user.username }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Mailing address</th>
+                                    <td>
+                                        <div id="info_address_line_1">{{ user.njcusermeta.address_line_1 }}</div>
+                                        <div id="info_address_line_2">{{ user.njcusermeta.address_line_2 }}</div>
+                                        <div id="info_city">{{ user.njcusermeta.city }}</div>
+                                        <div id="info_zip">{{ user.njcusermeta.zip }}</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Phone</th>
+                                    <td id="info_voice">{{ user.voice }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Email</th>
+                                    <td id="info_email">{{ user.email }}</td>
+                                </tr>
+                                <!--<tr>
+                                    <th>Password</th>
+                                    <td>•••••••</td>
+                                </tr>-->
+                            </tbody>
+                        </table>
+                        <a href="{% url "change_password" %}" class="btn btn-secondary btn-md btn-block" role="button">Change Password</a>
+                        <a onclick="flip_edit_main(true);" href="#" class="btn btn-secondary btn-md btn-block" role="button">Edit Profile</a>
                     </li>
                 </ul>
                 <ul class="list-group">
-                    <div class="overlay-div">
-                        <li class="list-group-item">
-                            <h4 class="list-group-item-heading"><i class="fa fa-database" aria-hidden="true"></i>Layers</h4>
-                            <p>Browse descriptions of the GIS layers available on the Standard Planning Map, as well as layers shared by other users.</p>
-                            <a href="#" class="btn btn-secondary btn-md btn-block">Explore Layers</a>
-                        </li>
-                        <div class="overlay-div">
-                </ul>
-                </div>
-
-                <div class="col-sm-6 col-md-4">
-                        <ul class="list-group">
-                            <li class="list-group-item">
-                                <h4 class="list-group-item-heading"><i class="fa fa-cogs" aria-hidden="true"></i>Tools</h4>
-                                <p>Generate additional GIS data to view on the map alongside existing layers.</p>
-                                <!--<div class="overlay-div">
-                                <button class="btn btn-secondary btn-md btn-block" data-toggle="modal" data-target="">Browse Available Tools</button>
-                            </div>-->
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading"><i class="fa fa-users" aria-hidden="true"></i>Groups</h4>
+                        <p>Groups for which you have membership.</p>
+                        <ul class="dashboard-list">
+                            <li>
+                                <a onclick="open_membership('main_membership');" href="#" ><span class="status">{{ main_group_membership_len }} mem <span id="main_membership_caret" class="fa fa-caret-down"></span></span></a>{{ user.njcusermeta.municipality.name }} {{ user.njcusermeta.role.name }}s
+                                <p>All {{ user.njcusermeta.municipality.name }} users with the {{ user.njcusermeta.role.name }} role</p>
+                                <ul id="main_membership" style="list-style-type: none;" class="hidden">
+                                    {% for main_group_user in main_group_membership %}
+                                    <li>{{ main_group_user.first_name}} {{ main_group_user.last_name}}</li>
+                                    {% endfor %}
+                                </ul>
                             </li>
-                            <li class="list-group-item">
-                                <!--<i class="fa fa-times pull-right" aria-hidden="true"></i>-->
-                                <h5 class="list-group-item-heading">Storm Hazard Projection (SHP) Tool </h5>
-                                <p>Evaluate exposure to natural hazards like strong winds, waves and surge for user-defined scenarios. <!--<a href="">Learn more</a>--></p>
-                                <div class="well rss-auto">
-                                    <div class="overlay-div">
-                                    <div class="shp-cat-title auto">Active Storms
-                                        <div class="shp-cat" title="Based on latest track from NHC/NWS">active</div>
-                                    </div>
-                                    <div class="map-layer-group-heading auto">
-                                        <a href="">
-                                            <div class="h-badge">H</div>Hurricane Jose</a><span title="Unfollow"><a href=""><i class="fa fa-minus-circle" aria-hidden="true"></i></a></span>
-                                    </div>
-                                    <p class="follow-unfollow">following</p>
-                                    <div class="map-layer-group-heading auto">
-                                        <a href="">
-                                            <div class="h-badge">H</div>Hurricane Kaitlin</a><span title="Unfollow"><a href=""><i class="fa fa-minus-circle" aria-hidden="true"></i></a></span>
-                                    </div>
-                                    <p class="follow-unfollow">following</p>
-                                    <div class="map-layer-group-heading auto not-following">
-                                        <div class="h-badge">H</div>Hurricane Liam <span title="Follow"><a href=""><i class="fa fa-plus-circle" aria-hidden="true"></i></a></span>
-                                    </div>
-                                    <p class="follow-unfollow">not following</p>
-                                    </div>
-                                </div>
-                                <a href="/expert" class="btn btn-primary btn-md btn-block" role="button">Run New Simulation</a>
-                                <a href="#" class="btn btn-secondary btn-md btn-block disabled" role="button">Explore Simulations</a>
+                            {% if request.user|has_group:"municipal_administrators" %}
+                            <li>
+                                <a onclick="open_membership('muni_membership');" href="#" ><span class="status">{{ muni_group_membership_len }} mem <span id="muni_membership_caret" class="fa fa-caret-down"></span></span></a>Municipal Administrators
+                                <p>Municipal administrators team</p>
+                                <ul id="muni_membership" style="list-style-type: none;" class="hidden">
+                                    {% for muni_group_user in muni_group_membership %}
+                                    <li>{{ muni_group_user.first_name}} {{ muni_group_user.last_name}}</li>
+                                    {% endfor %}
+                                </ul>
                             </li>
-                            <!--<li class="list-group-item">
-                                <div class="overlay-div">
-                                <i class="fa fa-times pull-right" aria-hidden="true"></i>
-                                <h5 class="list-group-item-heading">Another New Tool</h5>
-                                <p>Tool that runs some other kind of simulation to generate new GIS layers. <a href="">Learn more</a></p>
-                                <button class="btn btn-primary btn-md btn-block" data-toggle="modal" data-target="">Use This Tool</button>
-                                </div>
-                            </li>-->
+                            {% endif %}
+                            {% if request.user|has_group:"dca_administrators" %}
+                            <li>
+                                <a onclick="open_membership('dca_membership');" href="#" ><span class="status">{{ dca_group_membership_len }} mem <span id="dca_membership_caret" class="fa fa-caret-down"></span></span></a>DCA Administrators
+                                <p>DCA administrators team</p>
+                                <ul id="dca_membership" style="list-style-type: none;" class="hidden">
+                                    {% for dca_group_user in dca_group_membership %}
+                                    <li>{{ dca_group_user.first_name}} {{ dca_group_user.last_name}}</li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            {% endif %}
                         </ul>
-                </div>
-
-                </div>
-                <!-- close row -->
-            </div>
+                        <!--<button class="btn btn-secondary btn-md btn-block" data-toggle="modal" data-target="">Explore Groups</button>
+                        <button class="btn btn-secondary btn-md btn-block" data-toggle="modal" data-target="">Create New Group</button>-->
+                    </li>
+                </ul>
+            <!--</div>-->
         </div>
+
+        <div class="col-sm-6 col-md-4">
+            <ul class="list-group">
+                <li class="list-group-item" id="map-item">
+                    <a href="{% url 'new_njc_map' %}" class="btn btn-primary btn-lg btn-block">Create New Map</a>
+                </li>
+                <li class="list-group-item">
+                    <h4 class="list-group-item-heading"><i class="fa fa-map-o" aria-hidden="true"></i>Maps</h4>
+                    <p>Explore all available GIS layers on the standard planning map, or interact with a custom saved version or maps shared by other users.</p>
+                    <ul class="dashboard-list">
+                        {% for map in maps_for_user %}
+                        <li>
+                            <a href="{% url 'map_annotate' map.id %}"><span class="status">private</span>{{ map.name }}</a>
+                        </li>
+                        {% endfor %} {% for map in shared_maps_for_user %}
+                        <li>
+                            <a href="{% url 'map_annotate' map.id %}"><span class="status">shared</span>{{ map.name }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ul>
+            <ul class="list-group">
+                <div class="overlay-div">
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading"><i class="fa fa-database" aria-hidden="true"></i>Layers</h4>
+                        <p>Browse descriptions of the GIS layers available on the Standard Planning Map, as well as layers shared by other users.</p>
+                        <a href="#" class="btn btn-secondary btn-md btn-block">Explore Layers</a>
+                    </li>
+                </div>
+            </ul>
+        </div>
+
+        <div class="col-sm-6 col-md-4">
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <h4 class="list-group-item-heading"><i class="fa fa-cogs" aria-hidden="true"></i>Tools</h4>
+                            <p>Generate additional GIS data to view on the map alongside existing layers.</p>
+                            <!--<div class="overlay-div">
+                            <button class="btn btn-secondary btn-md btn-block" data-toggle="modal" data-target="">Browse Available Tools</button>
+                        </div>-->
+                        </li>
+                        <li class="list-group-item">
+                            <!--<i class="fa fa-times pull-right" aria-hidden="true"></i>-->
+                            <h5 class="list-group-item-heading">Storm Hazard Projection (SHP) Tool </h5>
+                            <p>Evaluate exposure to natural hazards like strong winds, waves and surge for user-defined scenarios. <!--<a href="">Learn more</a>--></p>
+                            <div class="well rss-auto">
+                                <div class="overlay-div">
+                                <div class="shp-cat-title auto">Active Storms
+                                    <div class="shp-cat" title="Based on latest track from NHC/NWS">active</div>
+                                </div>
+                                <div class="map-layer-group-heading auto">
+                                    <a href="">
+                                        <div class="h-badge">H</div>Hurricane Jose</a><span title="Unfollow"><a href=""><i class="fa fa-minus-circle" aria-hidden="true"></i></a></span>
+                                </div>
+                                <p class="follow-unfollow">following</p>
+                                <div class="map-layer-group-heading auto">
+                                    <a href="">
+                                        <div class="h-badge">H</div>Hurricane Kaitlin</a><span title="Unfollow"><a href=""><i class="fa fa-minus-circle" aria-hidden="true"></i></a></span>
+                                </div>
+                                <p class="follow-unfollow">following</p>
+                                <div class="map-layer-group-heading auto not-following">
+                                    <div class="h-badge">H</div>Hurricane Liam <span title="Follow"><a href=""><i class="fa fa-plus-circle" aria-hidden="true"></i></a></span>
+                                </div>
+                                <p class="follow-unfollow">not following</p>
+                                </div>
+                            </div>
+                            <a href="/expert" class="btn btn-primary btn-md btn-block" role="button">Run New Simulation</a>
+                            <a href="#" class="btn btn-secondary btn-md btn-block disabled" role="button">Explore Simulations</a>
+                        </li>
+                        <!--<li class="list-group-item">
+                            <div class="overlay-div">
+                            <i class="fa fa-times pull-right" aria-hidden="true"></i>
+                            <h5 class="list-group-item-heading">Another New Tool</h5>
+                            <p>Tool that runs some other kind of simulation to generate new GIS layers. <a href="">Learn more</a></p>
+                            <button class="btn btn-primary btn-md btn-block" data-toggle="modal" data-target="">Use This Tool</button>
+                            </div>
+                        </li>-->
+                    </ul>
+            </div>
+
+        </div>
+        <!-- close row -->
         <!---END of main section----------------------------------------------->
 
         <!---Edit section------------------------------------------------------>
