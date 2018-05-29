@@ -80,19 +80,34 @@
                             <p>Groups for which you have membership.</p>
                             <ul class="dashboard-list">
                                 <li>
-                                    <span class="status">{{ main_group_membership_len }} mem</span>{{ user.njcusermeta.municipality.name }} {{ user.njcusermeta.role.name }}s
+                                    <a onclick="open_membership('main_membership');" href="#" ><span class="status">{{ main_group_membership_len }} mem <span id="main_membership_caret" class="fa fa-caret-down"></span></span></a>{{ user.njcusermeta.municipality.name }} {{ user.njcusermeta.role.name }}s
                                     <p>All {{ user.njcusermeta.municipality.name }} users with the {{ user.njcusermeta.role.name }} role</p>
+                                    <ul id="main_membership" class="hidden">
+                                        {% for main_group_user in main_group_membership %}
+                                        <li>{{ main_group_user.first_name}} {{ main_group_user.last_name}}</li>
+                                        {% endfor %}
+                                    </ul>
                                 </li>
                                 {% if request.user|has_group:"municipal_administrators" %}
                                 <li>
-                                    <span class="status">{{ muni_group_membership_len }} mem</span>Municipal Administrators
+                                    <a onclick="open_membership('muni_membership');" href="#" ><span class="status">{{ muni_group_membership_len }} mem <span id="muni_membership_caret" class="fa fa-caret-down"></span></span></a>Municipal Administrators
                                     <p>Municipal administrators team</p>
+                                    <ul id="muni_membership" class="hidden">
+                                        {% for muni_group_user in muni_group_membership %}
+                                        <li>{{ muni_group_user.first_name}} {{ muni_group_user.last_name}}</li>
+                                        {% endfor %}
+                                    </ul>
                                 </li>
                                 {% endif %}
                                 {% if request.user|has_group:"dca_administrators" %}
                                 <li>
-                                    <span class="status">{{ dca_group_membership_len }} mem</span>DCA Administrators
+                                    <a onclick="open_membership('dca_membership');" href="#" ><span class="status">{{ dca_group_membership_len }} mem <span id="dca_membership_caret" class="fa fa-caret-down"></span></span></a>DCA Administrators
                                     <p>DCA administrators team</p>
+                                    <ul id="dca_membership" class="hidden">
+                                        {% for dca_group_user in dca_group_membership %}
+                                        <li>{{ dca_group_user.first_name}} {{ dca_group_user.last_name}}</li>
+                                        {% endfor %}
+                                    </ul>
                                 </li>
                                 {% endif %}
                             </ul>
@@ -190,3 +205,25 @@
     </div>
 </div>
 {% endblock middle %}
+
+{% block extra_script %}
+<script>
+//function to open group membership
+function open_membership(object_name){
+    var member_list = document.getElementById(object_name);
+    var caret = document.getElementById(object_name+'_caret');
+
+    //test if hidden
+    if(member_list.classList.contains('hidden')){
+        member_list.classList.remove("hidden");
+        caret.classList.remove("fa-caret-down");
+        caret.classList.add("fa-caret-right");
+    }else{
+        member_list.classList.add("hidden");
+        caret.classList.remove("fa-caret-right");
+        caret.classList.add("fa-caret-down");
+    }
+}
+
+</script>
+{% endblock extra_script %}
