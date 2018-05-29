@@ -422,7 +422,7 @@ function update_approval_list(){
                                 </div>
                                 <div class="col-md-7 col-lg-8">
                                     <p class="qualifier" style="margin-top: 10px;">Received: ${ user.date_joined }; Muni Approval: ${ user.muni_approval_date }</p>
-                                    <textarea id="text_${i}" class="form-control" placeholder="" rows="7">${ user.notes }</textarea>
+                                    <textarea id="text_${i}" class="form-control" placeholder="Notes..." rows="7">${ user.notes }</textarea>
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-default dropdown-toggle"
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
