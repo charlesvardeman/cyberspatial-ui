@@ -695,3 +695,21 @@ var redIcon = new L.Icon({
     popupAnchor: [1, -34],
     shadowSize: [41, 41]
 });
+
+//function to clear all of the annotationes owned by the user
+function clear_annotations(){
+    console.log("Clear annotations");
+
+    //loop over the current annotation elements
+    annotationLayer.eachLayer(function(layer) {
+        //console.log("Found " + layer.myCustomID + ", " + layer.owned + ", " + layer.owner);
+
+        //if we own the layer
+        if (layer.owned) {
+            //delete it
+            deleteObject(layer);
+        }
+    });
+
+    $("#clearAnnotations-1").modal("hide");
+}
