@@ -102,6 +102,8 @@ TEMPLATES[0]['DIRS'].insert(0, os.path.join(LOCAL_ROOT, "templates"))
 TEMPLATES[0]['OPTIONS']['context_processors'].append('njcoast.context_processors.export_vars')
 
 # Setup Emails
+DEFAULT_FROM_EMAIL = 'jsweet@nd.edu'
+SERVER_EMAIL = 'jsweet@nd.edu'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'email-smtp.us-east-1.amazonaws.com'
 EMAIL_PORT = 587
