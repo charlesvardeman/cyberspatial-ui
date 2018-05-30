@@ -14,6 +14,7 @@ class NJCUserMeta(models.Model):
     is_dca_approved = models.BooleanField(default=False)
     is_muni_approved = models.BooleanField(default=False)
     region_level = models.ForeignKey('NJCRegionLevel',blank=True,null=True)
+    county = models.ForeignKey('NJCCounty',blank=True,null=True)
     municipality = models.ForeignKey('NJCMunicipality',
                         on_delete=models.CASCADE,blank=True,null=True)
     role = models.ForeignKey('NJCRole',

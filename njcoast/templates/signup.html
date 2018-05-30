@@ -23,3 +23,32 @@
  <button type="submit">Sign up</button>
 </form>
 {% endblock %}
+
+{% block extra_script %}
+<script>
+    $("#id_county").prop( "disabled", true );
+    $("#id_municipality").prop( "disabled", true );
+    $("#id_municipality").help_text= "hi";
+
+    $("#id_region_level").change(function () {
+        var text = $("#id_region_level option:selected").text();
+        console.log( "Hi "+text );
+
+        if(text == 'County'){
+            $("#id_municipality").prop( "disabled", true );
+            $("#id_municipality").val("");
+            $("#id_county").prop( "disabled", false );
+        }else if(text == 'Municipal') {
+            $("#id_municipality").prop( "disabled", false );
+            $("#id_county").prop( "disabled", true );
+            $("#id_county").val("");
+        }else if(text == 'Statewide') {
+            $("#id_municipality").prop( "disabled", true );
+            $("#id_municipality").val("");
+            $("#id_county").prop( "disabled", true );
+            $("#id_county").val("");
+        }
+
+    });
+</script>
+{% endblock extra_script %}
