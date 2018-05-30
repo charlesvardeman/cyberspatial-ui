@@ -236,6 +236,12 @@
                 </div>
 
             </div>
+            {% if request.user|has_group:"municipal_administrators" %}
+            <div class="muni-info">
+                <p>To add a new user, please ask the individual to complete the form the Account Request page at <a href="https://dev.njcoast.us/signup/">https://dev.njcoat.us/signup/</a>.</p>
+            </div>
+            {% endif %}
+
         </div>
         <!-- END njcoast users ------------------------------------------------>
 
@@ -300,6 +306,12 @@
                 {% endfor %}
 
             </div>
+            {% if request.user|has_group:"municipal_administrators" %}
+            <div class="muni-info">
+                <p>To add a new user, please ask the individual to complete the form the Account Request page at <a href="https://dev.njcoast.us/signup/">https://dev.njcoat.us/signup/</a>.</p>
+            </div>
+            {% endif %}
+
         </div>
         <!-- END account requests --------------------------------------------->
 

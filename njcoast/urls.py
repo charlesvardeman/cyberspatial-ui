@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 
 from geonode.urls import urlpatterns
 from .views import my_gis_layers, MapTemplateView, DashboardTemplateView, MapExpertTemplateView, ExploreTemplateView, DCADashboardTemplateView
-from njcoast.views import map_annotations, new_njc_map_view, map_expert_simulations, map_settings, signup, user_approval
+from njcoast.views import map_annotations, new_njc_map_view, map_expert_simulations, map_settings, signup, user_approval, change_password
 
 urlpatterns = patterns('',
                        url(r'^/?$', TemplateView.as_view(template_name='site_index.html'), name='home'),
@@ -24,4 +24,5 @@ urlpatterns = patterns('',
                        url(r'^api/my_layers/$', my_gis_layers, name='my_gis_layers'),
                        url(r'^signup/$', signup, name='signup'),
                        url(r'^user/settings/$', user_approval, name='user_approval'),
+                       url(r'^password/$', change_password, name='change_password'),
                        ) + urlpatterns

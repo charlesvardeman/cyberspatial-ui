@@ -26,6 +26,11 @@ from django.core.mail import EmailMessage
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+from django.shortcuts import render, redirect
+
 '''
   This function is used to respond to ajax requests for which layers should be
   visible for a given user. Borrowed a lot of this from the GeoNode base code
@@ -440,6 +445,29 @@ class DashboardTemplateView(TemplateView):
 
         #quiery, select if I an in the list of shared_with__contains
         context['shared_maps_for_user'] = NJCMap.objects.filter(shared_with__contains = self.request.user)
+
+        #get users groups
+        current_user = self.request.user
+        group_name = current_user.njcusermeta.role.group_name + "-" + current_user.njcusermeta.municipality.group_name
+        print "GN",group_name
+        group = Group.objects.get(name=group_name)
+        tempList = group.user_set.exclude(pk=self.request.user.pk)
+        context['main_group_membership_len'] = len(tempList) + 1
+        context['main_group_membership'] = tempList
+
+        #admin?
+        if current_user.groups.filter(name='dca_administrators').exists():
+            dcausers = current_user.groups.get(name='dca_administrators').user_set.exclude(pk=self.request.user.pk)
+            context['dca_group_membership_len'] = len(dcausers) + 1
+            context['dca_group_membership'] = dcausers
+
+        if current_user.groups.filter(name='municipal_administrators').exists():
+            muniusers = current_user.groups.get(name='municipal_administrators').user_set.exclude(pk=self.request.user.pk)
+            context['muni_group_membership_len'] = len(muniusers) + 1
+            context['muni_group_membership'] = muniusers
+
+
+        #context['dca_group_membership'] = len(Group.objects.all())
         return context
 
 class ExploreTemplateView(TemplateView):
@@ -962,6 +990,36 @@ def user_approval(request):
                 #flag OK
                 return JsonResponse({'updated': True})
 
+        #~~~~update all?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        elif request.POST['action'] == 'update_profile':
+            #load user
+            user = Profile.objects.get(username=request.POST['user'])
+
+            #test we got them
+            if user:
+                print "Update profile",user.username
+
+                #fields to update
+                namesplit = request.POST['name'].rsplit(' ',1)
+                if len(namesplit) == 2:
+                    #print namesplit[0], ",", namesplit[1]
+                    user.first_name = namesplit[0]
+                    user.last_name = namesplit[1]
+
+                #name
+                user.email = request.POST['email']
+                user.voice = request.POST['voice']
+                user.njcusermeta.address_line_1 = request.POST['address_line_1']
+                user.njcusermeta.address_line_2 = request.POST['address_line_2']
+                user.njcusermeta.city = request.POST['city']
+                user.njcusermeta.zip = request.POST['zip']
+                user.njcusermeta.position = request.POST['position']
+
+                #save results
+                user.save()
+
+                #flag OK
+                return JsonResponse({'updated': True})
 
         #~~~~create muni admin?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         elif request.POST['action'] == 'create_muni_admin':
@@ -1170,3 +1228,22 @@ def user_approval(request):
             print "Action not recognized", request.POST['action']
 
         return JsonResponse({'updated': False})
+
+'''
+    Change password form
+'''
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('dashboard')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'change_password.html', {
+        'form': form
+    })
