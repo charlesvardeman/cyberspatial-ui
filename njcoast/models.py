@@ -13,6 +13,7 @@ class NJCUserMeta(models.Model):
     user = models.OneToOneField(Profile, on_delete=models.CASCADE)
     is_dca_approved = models.BooleanField(default=False)
     is_muni_approved = models.BooleanField(default=False)
+    region_level = models.ForeignKey('NJCRegionLevel',blank=True,null=True)
     municipality = models.ForeignKey('NJCMunicipality',
                         on_delete=models.CASCADE,blank=True,null=True)
     role = models.ForeignKey('NJCRole',
@@ -104,6 +105,12 @@ class NJCRole(models.Model):
         return self.name
 
 class NJCCounty(models.Model):
+    name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
+
+class NJCRegionLevel(models.Model):
     name = models.CharField(max_length=20)
 
     def __str__(self):
