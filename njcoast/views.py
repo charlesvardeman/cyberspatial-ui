@@ -455,7 +455,7 @@ class DashboardTemplateView(TemplateView):
                 group_name = current_user.njcusermeta.role.group_name + "-" + current_user.njcusermeta.county.group_name
             else:
                 group_name = current_user.njcusermeta.role.group_name + "-" + current_user.njcusermeta.region_level.group_name
-                                
+
         print "GN",group_name
         group = Group.objects.get(name=group_name)
         tempList = group.user_set.exclude(pk=self.request.user.pk)
@@ -606,7 +606,11 @@ class DCADashboardTemplateView(TemplateView):
 
         #get current user
         current_user = self.request.user
-        current_muni = current_user.njcusermeta.municipality.name
+        if current_user.njcusermeta.municipality:
+            current_muni = current_user.njcusermeta.municipality.name
+        else:
+            current_muni = ""
+
         is_dca = current_user.groups.filter(name='dca_administrators').exists()
         is_muni = current_user.groups.filter(name='municipal_administrators').exists()
 
@@ -737,7 +741,10 @@ def user_to_dictionary(user):
 def user_approval(request):
     #get current user
     current_user = request.user
-    current_muni = current_user.njcusermeta.municipality.name
+    if current_user.njcusermeta.municipality:
+        current_muni = current_user.njcusermeta.municipality.name
+    else:
+        current_muni = ""
     is_dca = current_user.groups.filter(name='dca_administrators').exists()
     is_muni = current_user.groups.filter(name='municipal_administrators').exists()
 
@@ -980,13 +987,17 @@ def user_approval(request):
 
                     if dca_admins:
                         for dca_admin in dca_admins:
+                            if user.njcusermeta.municipality:
+                                muni_name = user.njcusermeta.municipality.name
+                            else:
+                                muni_name = ""
                             #actual email part
                             current_site = get_current_site(request)
                             subject = 'Account created on NJcoast'
                             message = render_to_string('muni_approved_email.html', {
                                 'user': dca_admin.first_name+" "+dca_admin.last_name,
                                 'domain': current_site.domain,
-                                'municipality': user.njcusermeta.municipality.name,
+                                'municipality': muni_name,
                             })
 
                             #send it
@@ -1047,7 +1058,7 @@ def user_approval(request):
 
             #test we got them
             if user:
-                print "Update all",user.username, request.POST['role'], request.POST['municipality']
+                print "Update all",user.username, request.POST['role']
 
                 #fields to update
                 namesplit = request.POST['name'].rsplit(' ',1)
@@ -1136,6 +1147,7 @@ def user_approval(request):
                 user.voice = request.POST['voice']
                 user.njcusermeta.role = NJCRole.objects.get(name=request.POST['role'])
                 user.njcusermeta.municipality = NJCMunicipality.objects.get(name=request.POST['municipality'])
+                user.njcusermeta.region_level = NJCRegionLevel.objects.get(name='Municipal')
                 user.njcusermeta.address_line_1 = request.POST['address_line_1']
                 user.njcusermeta.address_line_2 = request.POST['address_line_2']
                 user.njcusermeta.city = request.POST['city']
@@ -1155,6 +1167,11 @@ def user_approval(request):
                 if muni_admin_group:
                     muni_admin_group.user_set.add(user)
 
+                    if user.njcusermeta.municipality:
+                        muni_name = user.njcusermeta.municipality.name
+                    else:
+                        muni_name = ""
+
                     #send email
                     current_site = get_current_site(request)
                     subject = 'Account created on NJcoast'
@@ -1163,7 +1180,7 @@ def user_approval(request):
                         'username': user.username,
                         'domain': current_site.domain,
                         'password': password,
-                        'municipality': user.njcusermeta.municipality.name,
+                        'municipality': muni_name,
                     })
 
                     #actual send
@@ -1273,11 +1290,16 @@ def user_approval(request):
                 user.save()
 
                 #send email to tell user our decision
+                if user.njcusermeta.municipality:
+                    muni_name = user.njcusermeta.municipality.name
+                else:
+                    muni_name = ""
+
                 current_site = get_current_site(request)
                 subject = 'Account rejected for NJcoast'
                 message = render_to_string('account_rejected_email.html', {
                     'user': user.first_name+" "+user.last_name,
-                    'municipality': user.njcusermeta.municipality.name,
+                    'municipality': muni_name,
                     'notes': user.njcusermeta.notes,
                 })
 
