@@ -960,13 +960,18 @@ def user_approval(request):
 
                 # send email to user once approved by DCA
                 if is_dca:
+                    #check for muni
+                    if user.njcusermeta.municipality:
+                        muni_name = user.njcusermeta.municipality.name
+                    else:
+                        muni_name = ""
                     #actual email part
                     current_site = get_current_site(request)
                     subject = 'Account created on NJcoast'
                     message = render_to_string('dca_approved_email.html', {
                         'user': user.first_name+" "+user.last_name,
                         'domain': current_site.domain,
-                        'municipality': user.njcusermeta.municipality.name,
+                        'municipality': muni_name,
                     })
 
                     #send it
