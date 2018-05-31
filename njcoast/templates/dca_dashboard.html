@@ -165,6 +165,7 @@
                             <li id="county_button" onclick="user_filter(this);">County <span class="fa fa-chevron-right pull-right"></span></li>
                             <ul id="county_button_panel" class="form-group hidden">
                                 <select onchange="load_munis_in_county(this);" class="form-control" id="select_county">
+                                    <option>All</option>
                                     {% for county in counties %}
                                     <option value="{{ county.name }}">{{ county.name }}</option>
                                     {% endfor %}

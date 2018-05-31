@@ -448,7 +448,14 @@ class DashboardTemplateView(TemplateView):
 
         #get users groups
         current_user = self.request.user
-        group_name = current_user.njcusermeta.role.group_name + "-" + current_user.njcusermeta.municipality.group_name
+        if current_user.njcusermeta.municipality:
+            group_name = current_user.njcusermeta.role.group_name + "-" + current_user.njcusermeta.municipality.group_name
+        else:
+            if current_user.njcusermeta.county:
+                group_name = current_user.njcusermeta.role.group_name + "-" + current_user.njcusermeta.county.group_name
+            else:
+                group_name = current_user.njcusermeta.role.group_name + "-" + current_user.njcusermeta.region_level.group_name
+                                
         print "GN",group_name
         group = Group.objects.get(name=group_name)
         tempList = group.user_set.exclude(pk=self.request.user.pk)
@@ -674,9 +681,25 @@ def user_to_dictionary(user):
     user_dict['date_joined'] = user.date_joined
 
     #additional user fields for NJC
-    user_dict['municipality'] = user.njcusermeta.municipality.name
+    if user.njcusermeta.municipality:
+        user_dict['municipality'] = user.njcusermeta.municipality.name
+        user_dict['code'] = user.njcusermeta.municipality.code
+    else:
+        user_dict['municipality'] = ""
+        user_dict['code'] = ""
+
+    if user.njcusermeta.county:
+        user_dict['county'] = user.njcusermeta.county.name
+    else:
+        user_dict['county'] = ""
+
+    #get region but allow for legacy user
+    if user.njcusermeta.region_level:
+        user_dict['region_level'] = user.njcusermeta.region_level.name
+    else:
+        user_dict['region_level'] = "Municipal"
+
     user_dict['position'] = user.njcusermeta.position
-    user_dict['code'] = user.njcusermeta.municipality.code
     user_dict['justification'] = user.njcusermeta.justification
     user_dict['voice'] = user.voice
     user_dict['notes'] = user.njcusermeta.notes
@@ -776,7 +799,8 @@ def user_approval(request):
                 #county/municipality filters if DCA
                 if is_dca:
                     if request.GET['filter_county'] != 'All':
-                        users = users.filter(njcusermeta__municipality__county__name=request.GET['filter_county'])
+                        users_m = users.filter(njcusermeta__municipality__county__name=request.GET['filter_county'])
+                        users = users_m | users.filter(njcusermeta__county__name=request.GET['filter_county'])
 
                     if request.GET['filter_municipality'] != 'All':
                         users = users.filter(njcusermeta__municipality__name=request.GET['filter_municipality'])
