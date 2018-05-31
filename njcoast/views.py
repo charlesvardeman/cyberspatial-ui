@@ -923,6 +923,19 @@ def user_approval(request):
                         if group:
                             group.user_set.add(user)
                         #if created:
+                    else:
+                        #county based groups
+                        if user.njcusermeta.county:
+                            group_name = user.njcusermeta.role.group_name + '-' + user.njcusermeta.county.group_name
+                            group, created = Group.objects.get_or_create(name=group_name)
+                            if group:
+                                group.user_set.add(user)
+                        #otherwise region based
+                        else:
+                            group_name = user.njcusermeta.role.group_name + '-' + user.njcusermeta.region_level.group_name
+                            group, created = Group.objects.get_or_create(name=group_name)
+                            if group:
+                                group.user_set.add(user)
 
                 if is_muni:
                     #set muni approved
