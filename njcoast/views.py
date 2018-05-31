@@ -504,15 +504,20 @@ def signup(request):
 
                 #new additions for region Level
                 region_level = form.cleaned_data.get('region_level')
-
                 user.njcusermeta.region_level = NJCRegionLevel.objects.get(name=region_level)
-                print region_level, form.cleaned_data.get('county'), form.cleaned_data.get('municipality')
+
+                #save dependent models
+                #print region_level, form.cleaned_data.get('county'), form.cleaned_data.get('municipality')
                 if form.cleaned_data.get('county'):
                     print "County",form.cleaned_data.get('county')
                     user.njcusermeta.county = NJCCounty.objects.get(name=form.cleaned_data.get('county'))
                 if form.cleaned_data.get('municipality'):
                     print "Muni", form.cleaned_data.get('municipality')
                     user.njcusermeta.municipality = NJCMunicipality.objects.get(name=form.cleaned_data.get('municipality'))
+                else:
+                    #if not muni then skip muni approval
+                    user.njcusermeta.is_muni_approved = True
+                    user.njcusermeta.muni_approval_date = timezone.now()
 
                 #now save everything
                 user.save()
@@ -537,6 +542,27 @@ def signup(request):
                             #send it
                             try:
                                 muni_admin.email_user(subject, message)
+                            except:
+                                pass
+                else:
+                    #send email to dca admins
+                    #first find admin to approve
+                    dca_admins = Profile.objects.exclude(is_active=False).exclude(username='admin').exclude(username='AnonymousUser').filter(groups__name='dca_administrators').order_by('last_name')
+
+                    if dca_admins:
+                        for dca_admin in dca_admins:
+                            #actual email part
+                            current_site = get_current_site(request)
+                            subject = 'Account created on NJcoast'
+                            message = render_to_string('account_created_email.html', {
+                                'user': dca_admin.first_name+" "+dca_admin.last_name,
+                                'domain': current_site.domain,
+                                'municipality': '',
+                            })
+
+                            #send it
+                            try:
+                                dca_admin.email_user(subject, message)
                             except:
                                 pass
 
