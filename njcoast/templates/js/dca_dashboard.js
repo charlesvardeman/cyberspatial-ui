@@ -900,6 +900,7 @@ function create_new_dca_approver(tab_to_return_to, return_text){
     document.getElementById("edit_voice").value = "";
     document.getElementById("edit_justification").innerHTML = "";
     document.getElementById("edit_username").innerHTML = "";
+    document.getElementById("edit_municipality").innerHTML = "";
 
     //set code
     document.getElementById("edit_code").innerHTML = "";

@@ -1229,7 +1229,8 @@ def user_approval(request):
                 #populate
                 user.voice = request.POST['voice']
                 user.njcusermeta.role = NJCRole.objects.get(name=request.POST['role'])
-                user.njcusermeta.municipality = NJCMunicipality.objects.get(name=request.POST['municipality'])
+                #user.njcusermeta.municipality = NJCMunicipality.objects.get(name=request.POST['municipality'])
+                user.njcusermeta.region_level = NJCRegionLevel.objects.get(name='Statewide')
                 user.njcusermeta.address_line_1 = request.POST['address_line_1']
                 user.njcusermeta.address_line_2 = request.POST['address_line_2']
                 user.njcusermeta.city = request.POST['city']
