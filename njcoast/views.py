@@ -4,7 +4,7 @@ from django.conf import settings
 from geonode.layers.models import Layer
 from django.views.generic import TemplateView
 import json
-from models import NJCMap, NJCMapAnnotation, NJCMapExpert, NJCMunicipality, NJCRole, NJCCounty
+from models import NJCMap, NJCMapAnnotation, NJCMapExpert, NJCMunicipality, NJCRole, NJCCounty, NJCRegionLevel
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -498,34 +498,47 @@ def signup(request):
 
                 #now we can populate the additional fields
                 #user.njcusermeta.is_dca_approved = True
-                user.njcusermeta.municipality = NJCMunicipality.objects.get(name=form.cleaned_data.get('municipality'))
                 user.njcusermeta.role = NJCRole.objects.get(name=form.cleaned_data.get('role'))
                 user.njcusermeta.justification = form.cleaned_data.get('justification')
                 user.njcusermeta.position = form.cleaned_data.get('position')
 
+                #new additions for region Level
+                region_level = form.cleaned_data.get('region_level')
+
+                user.njcusermeta.region_level = NJCRegionLevel.objects.get(name=region_level)
+                print region_level, form.cleaned_data.get('county'), form.cleaned_data.get('municipality')
+                if form.cleaned_data.get('county'):
+                    print "County",form.cleaned_data.get('county')
+                    user.njcusermeta.county = NJCCounty.objects.get(name=form.cleaned_data.get('county'))
+                if form.cleaned_data.get('municipality'):
+                    print "Muni", form.cleaned_data.get('municipality')
+                    user.njcusermeta.municipality = NJCMunicipality.objects.get(name=form.cleaned_data.get('municipality'))
+
                 #now save everything
                 user.save()
 
+                #if has a muni
                 #send email
-                #first find admin to approve
-                muni_admins = Profile.objects.exclude(is_active=False).exclude(username='admin').exclude(username='AnonymousUser').filter(groups__name='municipal_administrators').filter(njcusermeta__municipality__name=user.njcusermeta.municipality.name).order_by('last_name')
+                if user.njcusermeta.municipality:
+                    #first find admin to approve
+                    muni_admins = Profile.objects.exclude(is_active=False).exclude(username='admin').exclude(username='AnonymousUser').filter(groups__name='municipal_administrators').filter(njcusermeta__municipality__name=user.njcusermeta.municipality.name).order_by('last_name')
 
-                if muni_admins:
-                    for muni_admin in muni_admins:
-                        #actual email part
-                        current_site = get_current_site(request)
-                        subject = 'Account created on NJcoast'
-                        message = render_to_string('account_created_email.html', {
-                            'user': muni_admin.first_name+" "+muni_admin.last_name,
-                            'domain': current_site.domain,
-                            'municipality': user.njcusermeta.municipality.name,
-                        })
+                    if muni_admins:
+                        for muni_admin in muni_admins:
+                            #actual email part
+                            current_site = get_current_site(request)
+                            subject = 'Account created on NJcoast'
+                            message = render_to_string('account_created_email.html', {
+                                'user': muni_admin.first_name+" "+muni_admin.last_name,
+                                'domain': current_site.domain,
+                                'municipality': user.njcusermeta.municipality.name,
+                            })
 
-                        #send it
-                        try:
-                            muni_admin.email_user(subject, message)
-                        except:
-                            pass
+                            #send it
+                            try:
+                                muni_admin.email_user(subject, message)
+                            except:
+                                pass
 
                 #back home, or flag that save was successful
                 #messages.success(request, 'Account created successfully')
