@@ -1298,7 +1298,7 @@ def user_approval(request):
                     muni_name = ""
 
                 current_site = get_current_site(request)
-                subject = 'Account rejected for NJcoast'
+                subject = 'NJcoast Account Status'
                 message = render_to_string('account_rejected_email.html', {
                     'user': user.first_name+" "+user.last_name,
                     'municipality': muni_name,
