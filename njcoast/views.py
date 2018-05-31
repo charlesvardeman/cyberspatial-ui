@@ -914,7 +914,7 @@ def user_approval(request):
                     #set Active
                     user.is_active = True
 
-                    #add to groups
+                    #add to groups ##TODO## add groups is county level or statewide level
                     #create group name
                     if user.njcusermeta.municipality:
                         #muni based groups
@@ -922,7 +922,7 @@ def user_approval(request):
                         group, created = Group.objects.get_or_create(name=group_name)
                         if group:
                             group.user_set.add(user)
-                        #if created:                        
+                        #if created:
 
                 if is_muni:
                     #set muni approved
