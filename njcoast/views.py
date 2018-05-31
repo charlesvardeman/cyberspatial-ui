@@ -539,10 +539,10 @@ def signup(request):
                         for muni_admin in muni_admins:
                             #actual email part
                             current_site = get_current_site(request)
-                            subject = 'Account created on NJcoast'
+                            subject = 'NJcoast Account Request'
                             message = render_to_string('account_created_email.html', {
-                                'user': muni_admin.first_name+" "+muni_admin.last_name,
-                                'domain': current_site.domain,
+                                'user': user.first_name+" "+user.last_name,
+                                'domain': current_site.domain + "/dca_dashboard/",
                                 'municipality': user.njcusermeta.municipality.name,
                             })
 
@@ -993,10 +993,10 @@ def user_approval(request):
                                 muni_name = ""
                             #actual email part
                             current_site = get_current_site(request)
-                            subject = 'Account created on NJcoast'
+                            subject = 'New NJcoast Account Request'
                             message = render_to_string('muni_approved_email.html', {
-                                'user': dca_admin.first_name+" "+dca_admin.last_name,
-                                'domain': current_site.domain,
+                                'user': user.first_name+" "+user.last_name,
+                                'domain': current_site.domain + "/dca_dashboard/",
                                 'municipality': muni_name,
                             })
 
@@ -1015,11 +1015,12 @@ def user_approval(request):
                         muni_name = ""
                     #actual email part
                     current_site = get_current_site(request)
-                    subject = 'Account created on NJcoast'
+                    subject = 'NJcoast Account Status'
                     message = render_to_string('dca_approved_email.html', {
                         'user': user.first_name+" "+user.last_name,
                         'domain': current_site.domain,
                         'municipality': muni_name,
+                        'role': user.njcusermeta.role.name,
                     })
 
                     #send it
