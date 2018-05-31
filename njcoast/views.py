@@ -916,11 +916,13 @@ def user_approval(request):
 
                     #add to groups
                     #create group name
-                    group_name = user.njcusermeta.role.group_name + '-' + user.njcusermeta.municipality.group_name
-                    group, created = Group.objects.get_or_create(name=group_name)
-                    if group:
-                        group.user_set.add(user)
-                    #if created:
+                    if user.njcusermeta.municipality:
+                        #muni based groups
+                        group_name = user.njcusermeta.role.group_name + '-' + user.njcusermeta.municipality.group_name
+                        group, created = Group.objects.get_or_create(name=group_name)
+                        if group:
+                            group.user_set.add(user)
+                        #if created:                        
 
                 if is_muni:
                     #set muni approved
