@@ -6,7 +6,7 @@
 {% block body %}
 <h2>Sign up</h2>
 <p style="color: red">{{ error_data }}</p>
-<form method="post">
+<form id="user_form" method="post">
  {% csrf_token %}
  {% for field in form %}
    <p>
@@ -20,35 +20,64 @@
      {% endfor %}
    </p>
  {% endfor %}
- <button type="submit">Sign up</button>
+
 </form>
+
+<button onclick="form_submitted()">Sign up</button>
 {% endblock %}
 
 {% block extra_script %}
 <script>
-    $("#id_county").prop( "disabled", true );
-    $("#id_municipality").prop( "disabled", true );
-    $("#id_municipality").help_text= "hi";
+$("#id_county").prop( "disabled", true );
+$("#id_municipality").prop( "disabled", true );
 
-    $("#id_region_level").change(function () {
-        var text = $("#id_region_level option:selected").text();
-        console.log( "Hi "+text );
+//enable/disable dropdowns
+$("#id_region_level").change(function () {
+    var text = $("#id_region_level option:selected").text();
+    console.log( "Hi "+text );
 
-        if(text == 'County'){
-            $("#id_municipality").prop( "disabled", true );
-            $("#id_municipality").val("");
-            $("#id_county").prop( "disabled", false );
-        }else if(text == 'Municipal') {
-            $("#id_municipality").prop( "disabled", false );
-            $("#id_county").prop( "disabled", true );
-            $("#id_county").val("");
-        }else if(text == 'Statewide') {
-            $("#id_municipality").prop( "disabled", true );
-            $("#id_municipality").val("");
-            $("#id_county").prop( "disabled", true );
-            $("#id_county").val("");
-        }
+    if(text == 'County'){
+        $("#id_municipality").prop( "disabled", true );
+        $("#id_municipality").val("");
+        $("#id_county").prop( "disabled", false );
+    }else if(text == 'Municipal') {
+        $("#id_municipality").prop( "disabled", false );
+        $("#id_county").prop( "disabled", true );
+        $("#id_county").val("");
+    }else if(text == 'Statewide') {
+        $("#id_municipality").prop( "disabled", true );
+        $("#id_municipality").val("");
+        $("#id_county").prop( "disabled", true );
+        $("#id_county").val("");
+    }
 
-    });
+});
+
+//check new fields before submitting
+function form_submitted(){
+    console.log("test");
+    if($("#id_region_level option:selected").text() == "County" && $("#id_county option:selected").text() == "---------"){
+        console.log("County not set ");
+        var pnode = document.getElementById("id_county").parentNode;
+        var para = document.createElement("P");
+        para.style.color = "red";                    // Create a <p> element
+        var t = document.createTextNode("The County field is required.");      // Create a text node
+        para.appendChild(t);                                          // Append the text to <p>
+        pnode.appendChild(para);
+        //<p style="color: red">This field is required.</p>
+    }else if($("#id_region_level option:selected").text() == "Municipal" && $("#id_municipality option:selected").text() == "---------"){
+        console.log("County not set ");
+        var pnode = document.getElementById("id_municipality").parentNode;
+        var para = document.createElement("P");
+        para.style.color = "red";                    // Create a <p> element
+        var t = document.createTextNode("The Municipality field is required.");      // Create a text node
+        para.appendChild(t);                                          // Append the text to <p>
+        pnode.appendChild(para);
+    }else{
+        document.getElementById("user_form").submit();
+    }
+}
+
+
 </script>
 {% endblock extra_script %}
