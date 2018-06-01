@@ -729,6 +729,8 @@ def user_to_dictionary(user):
     user_dict['is_muni_approved'] = user.njcusermeta.is_muni_approved
     user_dict['dca_approval_date'] = user.njcusermeta.dca_approval_date.__str__()
     user_dict['muni_approval_date'] = user.njcusermeta.muni_approval_date.__str__()
+    user_dict['dca_approver_name'] = user.njcusermeta.dca_approver
+    user_dict['muni_approver_name'] = user.njcusermeta.muni_approver
 
     #mailing address data
     user_dict['address_line_1'] = user.njcusermeta.address_line_1
@@ -956,6 +958,7 @@ def user_approval(request):
                     #set dca approved
                     user.njcusermeta.is_dca_approved = True
                     user.njcusermeta.dca_approval_date = timezone.now()
+                    user.njcusermeta.dca_approver = current_user.first_name + " " + current_user.last_name
                     #set Active
                     user.is_active = True
 
@@ -986,6 +989,7 @@ def user_approval(request):
                     #set muni approved
                     user.njcusermeta.is_muni_approved = True
                     user.njcusermeta.muni_approval_date = timezone.now()
+                    user.njcusermeta.muni_approver = current_user.first_name + " " + current_user.last_name
 
                 #set notes
                 user.njcusermeta.notes = request.POST['notes']
