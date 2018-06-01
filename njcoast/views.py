@@ -727,8 +727,12 @@ def user_to_dictionary(user):
         user_dict['rolesf'] = "PL"
     user_dict['is_dca_approved'] = user.njcusermeta.is_dca_approved
     user_dict['is_muni_approved'] = user.njcusermeta.is_muni_approved
-    user_dict['dca_approval_date'] = user.njcusermeta.dca_approval_date.__str__()
-    user_dict['muni_approval_date'] = user.njcusermeta.muni_approval_date.replace(microsecond=0).__str__()
+
+    if user.njcusermeta.dca_approval_date:
+        user_dict['dca_approval_date'] = user.njcusermeta.dca_approval_date.replace(microsecond=0).__str__()
+    if user.njcusermeta.muni_approval_date:
+        user_dict['muni_approval_date'] = user.njcusermeta.muni_approval_date.replace(microsecond=0).__str__()
+        
     user_dict['dca_approver_name'] = user.njcusermeta.dca_approver
     user_dict['muni_approver_name'] = user.njcusermeta.muni_approver
 
