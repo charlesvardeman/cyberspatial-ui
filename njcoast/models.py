@@ -107,6 +107,10 @@ class NJCRole(models.Model):
 
 class NJCCounty(models.Model):
     name = models.CharField(max_length=20)
+    home_latitude = models.CharField(max_length=20, default="")
+    home_longitude = models.CharField(max_length=20, default="")
+    zoom_level = models.PositiveIntegerField(default=0)
+    code = models.PositiveIntegerField(default=0)
     group_name = models.CharField(max_length=20, default="")
 
     def __str__(self):

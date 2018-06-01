@@ -102,10 +102,16 @@ class MapTemplateView(TemplateView):
 
         # get user's Municipality values
         try:
-            muni = user.njcusermeta.municipality
-            context['home_latitude'] = muni.home_latitude
-            context['home_longitude'] = muni.home_longitude
-            context['zoom_level'] = muni.zoom_level
+            if user.njcusermeta.municipality:
+                muni = user.njcusermeta.municipality
+                context['home_latitude'] = muni.home_latitude
+                context['home_longitude'] = muni.home_longitude
+                context['zoom_level'] = muni.zoom_level
+            elif user.njcusermeta.county:
+                county = user.njcusermeta.county
+                context['home_latitude'] = county.home_latitude
+                context['home_longitude'] = county.home_longitude
+                context['zoom_level'] = county.zoom_level
 
         except:
             pass
@@ -155,10 +161,16 @@ class MapExpertTemplateView(TemplateView):
 
         # get user's Municipality values
         try:
-            muni = user.njcusermeta.municipality
-            context['home_latitude'] = muni.home_latitude
-            context['home_longitude'] = muni.home_longitude
-            context['zoom_level'] = muni.zoom_level
+            if user.njcusermeta.municipality:
+                muni = user.njcusermeta.municipality
+                context['home_latitude'] = muni.home_latitude
+                context['home_longitude'] = muni.home_longitude
+                context['zoom_level'] = muni.zoom_level
+            elif user.njcusermeta.county:
+                county = user.njcusermeta.county
+                context['home_latitude'] = county.home_latitude
+                context['home_longitude'] = county.home_longitude
+                context['zoom_level'] = county.zoom_level
 
         except:
             pass
@@ -694,6 +706,8 @@ def user_to_dictionary(user):
 
     if user.njcusermeta.county:
         user_dict['county'] = user.njcusermeta.county.name
+        user_dict['municipality'] = "All in " + user.njcusermeta.county.name + " Cnty"
+        user_dict['code'] = user.njcusermeta.county.code
     else:
         user_dict['county'] = ""
 
