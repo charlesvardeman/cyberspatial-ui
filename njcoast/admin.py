@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import NJCMap, NJCMapAnnotation, NJCMapExpert, NJCUserMeta, NJCMunicipality, NJCRole, NJCCounty
+from .models import NJCMap, NJCMapAnnotation, NJCMapExpert, NJCUserMeta, NJCMunicipality, NJCRole, NJCCounty, NJCRegionLevel
 from geonode.people.admin import ProfileAdmin as BaseProfileAdmin
 from geonode.people.models import Profile
 
@@ -11,6 +11,7 @@ admin.site.register(NJCMapExpert)
 admin.site.register(NJCMunicipality)
 admin.site.register(NJCRole)
 admin.site.register(NJCCounty)
+admin.site.register(NJCRegionLevel)
 
 # Define an inline admin descriptor for Employee model
 # which acts a bit like a singleton

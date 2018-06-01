@@ -118,7 +118,7 @@ function load_popup_html(text, length){
                 <tr>
                     <th style="text-align: right;padding-top: 3px;">
                         <button id="edit_text" type="button" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title="Edit" onclick="startEdit()"><span class="fas fa-pencil-alt fa-fw"></span></button>
-                        <button id="trash_text" type="button" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title="Delete" onclick="deleteObject()"><span class="fas fa-trash-alt"></span></button>
+                        <button id="trash_text" type="button" class="btn btn-default btn-xs" data-toggle="tooltip" data-placement="top" title="Delete" onclick="deleteObject(current_popup_marker)"><span class="fas fa-trash-alt"></span></button>
                         <button id="save_text" type="button" class="btn btn-default btn-xs disabled" data-toggle="tooltip" data-placement="top" title="Save" onclick="finishedEdit()"><span class="fas fa-save"></span></button>
                         <button id="cancel_text" type="button" class="btn btn-default btn-xs disabled" data-toggle="tooltip" data-placement="top" title="Cancel" onclick="canceledEdit()"><span class="fas fa-ban"></span></button>
                     </th>
@@ -140,16 +140,16 @@ mymap.on('popupopen', function(e) {
 //functions called from popup html
 
 //remove object
-function deleteObject() {
+function deleteObject(popup_marker) {
     //local
-    annotationLayer.removeLayer(current_popup_marker);
+    annotationLayer.removeLayer(popup_marker);
 
     //remote
     if(annotate_map_id) {
         var socket_frame = {
             type: 'delete',
             data: {
-                id: current_popup_marker.myCustomID
+                id: popup_marker.myCustomID
             }
         }
         socket.send(JSON.stringify(socket_frame));
@@ -166,7 +166,7 @@ function deleteObject() {
 
     }
 
-    console.log("Delete " + current_popup_marker.myCustomID);
+    console.log("Delete " + popup_marker.myCustomID);
 }
 
 function startEdit() {

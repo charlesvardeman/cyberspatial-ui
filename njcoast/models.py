@@ -13,6 +13,8 @@ class NJCUserMeta(models.Model):
     user = models.OneToOneField(Profile, on_delete=models.CASCADE)
     is_dca_approved = models.BooleanField(default=False)
     is_muni_approved = models.BooleanField(default=False)
+    region_level = models.ForeignKey('NJCRegionLevel',blank=True,null=True)
+    county = models.ForeignKey('NJCCounty',blank=True,null=True)
     municipality = models.ForeignKey('NJCMunicipality',
                         on_delete=models.CASCADE,blank=True,null=True)
     role = models.ForeignKey('NJCRole',
@@ -26,6 +28,8 @@ class NJCUserMeta(models.Model):
     address_line_2 = models.CharField(max_length=50, blank=True,null=True)
     city = models.CharField(max_length=50, blank=True,null=True)
     zip = models.CharField(max_length=20, blank=True,null=True)
+    dca_approver = models.CharField(max_length=50, blank=True,null=True)
+    muni_approver = models.CharField(max_length=50, blank=True,null=True)
 
 # need to do this to add the addendum to GeoNode Profile
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
@@ -105,6 +109,18 @@ class NJCRole(models.Model):
 
 class NJCCounty(models.Model):
     name = models.CharField(max_length=20)
+    home_latitude = models.CharField(max_length=20, default="")
+    home_longitude = models.CharField(max_length=20, default="")
+    zoom_level = models.PositiveIntegerField(default=0)
+    code = models.PositiveIntegerField(default=0)
+    group_name = models.CharField(max_length=20, default="")
+
+    def __str__(self):
+        return self.name
+
+class NJCRegionLevel(models.Model):
+    name = models.CharField(max_length=20)
+    group_name = models.CharField(max_length=20, default="")
 
     def __str__(self):
         return self.name

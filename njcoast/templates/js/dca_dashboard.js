@@ -421,7 +421,7 @@ function update_approval_list(){
                                     </div>
                                 </div>
                                 <div class="col-md-7 col-lg-8">
-                                    <p class="qualifier" style="margin-top: 10px;">Received: ${ user.date_joined }; Muni Approval: ${ user.muni_approval_date }</p>
+                                    <p class="qualifier" style="margin-top: 10px;">Received: ${ user.date_joined }; Muni Approval: ${ user.muni_approver_name } ${ user.muni_approval_date|date:"Y-m-d" }</p>
                                     <textarea id="text_${i}" class="form-control" placeholder="Notes..." rows="7">${ user.notes }</textarea>
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-default dropdown-toggle"
@@ -900,6 +900,7 @@ function create_new_dca_approver(tab_to_return_to, return_text){
     document.getElementById("edit_voice").value = "";
     document.getElementById("edit_justification").innerHTML = "";
     document.getElementById("edit_username").innerHTML = "";
+    document.getElementById("edit_municipality").innerHTML = "";
 
     //set code
     document.getElementById("edit_code").innerHTML = "";

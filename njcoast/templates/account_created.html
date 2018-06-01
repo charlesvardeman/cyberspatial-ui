@@ -3,7 +3,28 @@
 {% load staticfiles %}
 {% load base_tags %}
 
-{% block body %}
-<p>Your account application has now been submitted for review.</br>
-You will recive a response from the administrator within 1 week.</p>
-{% endblock %}
+{% block body_class %}home{% endblock %}
+
+{% block middle %}
+<div class="jumbotron njcoast-image slimmer"></div>
+    <div class="container-fluid">
+
+        <div class="gray-zone-symmetric">
+            <div class="container">
+                <div class="row emphasis full-page-message">
+                    <div class="col-md-2"></div>
+                    <div class="col-sm-2">
+                        <img class="img-responsive remove-on-mobile" src="/static/images/njcoast-logo_no-text.png" />
+                    </div>
+                    <div class="col-sm-10 col-md-6">
+                        <h3 style="margin-top:0">Account Request</h3>
+                        <p>Thank you for submitting your NJcoast account request. Your application has been forwarded to the account administrator. You will receive a follow up email with further instructions once your application has been reviewed.</p>
+                    </div>
+                    <div class="col-md-2"></div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+{% endblock middle %}
