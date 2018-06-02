@@ -143,7 +143,7 @@
                                 <ul class="dashboard-list">
                                   {% for user in users_in_group %}
                                   <li>
-                                    <p><input id="sharemodal-{{ forloop.counter }}" name="{{ user }}" type="checkbox" value="on" data-toggle="popover" data-placement="right"> {{ user.first_name }} {{ user.last_name }}</p>
+                                    <p><input id="sharemodal-{{ forloop.counter }}" name="{{ user }}" type="checkbox" value="on" data-toggle="popover" data-placement="right"> {{ user.first_name }} {{ user.last_name }}, {{ user.njcusermeta.role.name }}</p>
                                   </li>
                                   {% endfor %}
                                 </ul>
