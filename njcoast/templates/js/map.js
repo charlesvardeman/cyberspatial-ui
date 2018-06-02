@@ -403,8 +403,9 @@ function apply_settings(data){
       document.getElementById("map_description").innerHTML = data.description;
   }
 
-  //load users shared with
+   //load users shared with
   if("shared_with" in data){
+
       //console.log("Shares "+data.shared_with[0]);
       for(var i=0; i<data.shared_with.length;i++){
           //get list of users
@@ -413,7 +414,7 @@ function apply_settings(data){
 
           //loop until end of list
           do{
-             more_elmts = document.getElementById('share-'+counter++);
+             more_elmts = document.getElementById('sharemodal-'+counter++);
 
              //if exists and checked then save
              if(more_elmts){
@@ -532,7 +533,7 @@ function save_shared_with(){
 
   //loop until end of list
   do{
-      more_elmts = document.getElementById('share-'+counter++);
+      more_elmts = document.getElementById('sharemodal-'+counter++);
 
       //if exists and checked then save
       if(more_elmts){
@@ -555,6 +556,10 @@ function save_shared_with(){
       dataType: "json",
       success: function(result) {
           console.log("SETTING SHARES -- SUCCESS!" + result.saved);
+
+          //fade out modal
+          $("#shareMap-1").modal("hide");
+
           //now auto save so dont flag
           $.notify("Shares saved", "success");
       },
@@ -614,7 +619,7 @@ function load_simulation_data(sim_id){
                   runup = "";
                   runup_file = data.runup_file;
               }
-              
+
               var modified = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(Date.parse(result.data.modified));
 
               //generate html
