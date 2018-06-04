@@ -343,8 +343,13 @@ def map_settings(request, map_id):
                     #get settings
                     settings = json.loads(map_objs[0].settings)
 
-                    #append new simulation to simulations
+                    #remove new simulation from simulations
                     settings.setdefault('simulations', []).remove(request.POST['sim_id'])
+
+                    #remove layers?
+                    if request.POST['sim_id']+"_surge" in settings['layers_selected']:
+                        print "In layers", request.POST['sim_id']+"_surge"
+                        settings.setdefault('layers_selected', []).remove(request.POST['sim_id']+"_surge")
 
                     #save it
                     map_objs[0].settings = json.dumps(settings)
