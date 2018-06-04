@@ -634,6 +634,13 @@ function save_simulation() {
         return;
     }
 
+    //do actual save if we get here
+    save_simulation_ajax(sim_desc, "");
+}
+
+//save expert simulation data to back end via ajax
+function save_simulation_ajax(sim_desc, sim_name) {
+
     /*//test
     //create unique id to tag socket comms
     sim_id = Math.random().toString(36).substr(2, 9);
