@@ -101,21 +101,20 @@
                 </div>
             </div>
 
-            <div class="map-control-item">
-                <p class="qualifier" style="margin-top: 10px">Save current map configuration (e.g. active layers and annotations), copy the map and save with a new name, or download the map.</p>
-                <button id="save_map" class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="" onclick="save_map();">Save Map</button>
-                <button id="load_map" class="btn btn-secondary btn-md btn-block disabled" disabled data-toggle="popover" data-target="" onclick="load_map();">Load Map</button>
+            <!--<div class="map-control-item">-->
+                <!--<h4 class="map-control-item-heading">Map Save/Load</h4>
+                <p class="qualifier" style="margin-top: 10px">Save or load current map configuration (e.g. active layers and annotations).</p>
+                <button id="save_map" class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="" onclick="save_map(true);">Save Map</button>
+                <button id="load_map" class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="" onclick="load_map();">Load Map</button>-->
                 <!--<button id="load_map" class="btn btn-primary btn-md btn-block disabled" data-toggle="popover" data-target="" onclick="load_annotation_elements();">Load Map</button>-->
-                <div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Download Map
-                        </button></div>
-
-                {% if map_id %}
-                <a data-toggle="collapse" href="#users" aria-expanded="false" aria-controls="users">
-                    <h4 class="map-control-item-heading">Sharing<i class="fa fa-chevron-down pull-right"
-                                                                               aria-hidden="true"></i></h4>
-                    <p class="qualifier" style="margin-bottom: 0">Share maps with other users</p>
-                </a>
-                <div class="collapse" id="users">
+                <!--<div class="beta-feature-not-available"><button disabled class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="">Download Map
+                </button></div>-->
+            <!--</div>-->
+            {% if map_id %}
+            <div class="map-control-item">
+                <h4 class="map-control-item-heading">Sharing</h4>
+                    <!--<p class="qualifier" style="margin-bottom: 0">Share maps with other users</p>-->
+                <!--<div class="collapse" id="users">
                     <p style="margin-top: 10px"><button id="share_map" class="btn btn-secondary btn-md btn-block" data-toggle="popover" data-target="" onclick="save_shared_with();">Share Map</button></p>
                     <p class="qualifier" style="margin-top: 10px">Select users in my group to share with</p>
                     <ul class="dashboard-list">
@@ -125,9 +124,40 @@
                       </li>
                       {% endfor %}
                     </ul>
+                </div>-->
+
+                <button type="button" class="btn btn-secondary btn-md btn-block" data-toggle="modal" data-target="#shareMap-1">
+                      Share map with users
+                </button>
+
+                <!-- Modal - Save changes button -->
+                <div class="modal fade" id="shareMap-1" tabindex="-1" role="dialog" aria-labelledby="shareMap">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="shareMap">Share Map</h4>
+                            </div>
+                            <div id="editable_user_modal" class="modal-body">
+                                Please select users you would like to share this map with.
+                                <ul class="dashboard-list">
+                                  {% for user in users_in_group %}
+                                  <li>
+                                    <p><input id="sharemodal-{{ forloop.counter }}" name="{{ user }}" type="checkbox" value="on" data-toggle="popover" data-placement="right"> {{ user.first_name }} {{ user.last_name }}, {{ user.njcusermeta.role.name }}</p>
+                                  </li>
+                                  {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="modal-footer">
+                                <a id="share_map_button" onclick="save_shared_with();" class="btn btn-primary" href="#">Update Shares</a>
+                                <a onclick="$('#shareMap-1').modal('hide');" class="btn btn-default" href="#">Cancel</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                {% endif %}
+
             </div>
+            {% endif %}
         </div>
 
     </div>
@@ -139,7 +169,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="saveChanges">Save changes</h4>
+                <h4 class="modal-title" id="shareMap">Save changes</h4>
             </div>
             <div id="editable_user_modal" class="modal-body">
                 Do you want to delete all of your annotations?</br>

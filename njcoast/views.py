@@ -127,10 +127,10 @@ class MapTemplateView(TemplateView):
             if tempList:
                 for user in tempList:
                     print user
-                    usersList.add(user.username)
+                    usersList.add(user)
 
         #send to client
-        context['users_in_group'] = list(usersList)
+        context['users_in_group'] = usersList
 
         return context
 
@@ -278,12 +278,13 @@ def map_settings(request, map_id):
         if len(map_objs) > 0:
             if len(map_objs[0]['settings']) > 0:
                 data_dict = json.loads(map_objs[0]['settings'])
-                try:
-                    data_dict['shared_with'] = json.loads(map_objs[0]['shared_with'])
-                except:
-                    data_dict['shared_with'] = []
             else:
                 data_dict = {}
+
+            if len(map_objs[0]['shared_with']) > 0:
+                data_dict['shared_with'] = json.loads(map_objs[0]['shared_with'])
+            else:
+                data_dict['shared_with'] = []
 
             data_dict['description'] = map_objs[0]['description']
             data_dict['name'] = map_objs[0]['name']
@@ -732,7 +733,7 @@ def user_to_dictionary(user):
         user_dict['dca_approval_date'] = user.njcusermeta.dca_approval_date.replace(microsecond=0).__str__()
     if user.njcusermeta.muni_approval_date:
         user_dict['muni_approval_date'] = user.njcusermeta.muni_approval_date.replace(microsecond=0).__str__()
-        
+
     user_dict['dca_approver_name'] = user.njcusermeta.dca_approver
     user_dict['muni_approver_name'] = user.njcusermeta.muni_approver
 
