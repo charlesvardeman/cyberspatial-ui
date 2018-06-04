@@ -311,19 +311,22 @@ def map_settings(request, map_id):
                 map_objs[0].save()
 
             elif request.POST['action'] == 'add_simulation': #or simulation to add
+                #get settings
+                try:
+                    settings = json.loads(map_objs[0].settings)
+                except:
+                    settings = {}
+
                 #test if it is already there
-                if request.POST['sim_id'] not in map_objs[0].settings:
-                    #get settings
-                    try:
-                        settings = json.loads(map_objs[0].settings)
-                    except:
-                        settings = {}
+                #if request.POST['sim_id'] not in map_objs[0].settings:
+                if request.POST['sim_id'] not in settings['simulations']:
 
                     #append new simulation to simulations
                     settings.setdefault('simulations', []).append(request.POST['sim_id'])
 
                     #append to layers?
-                    settings.setdefault('layers_selected', []).append(request.POST['sim_id']+"_surge")
+                    if request.POST['sim_id']+"_surge" not in settings['layers_selected']:
+                        settings.setdefault('layers_selected', []).append(request.POST['sim_id']+"_surge")
 
                     #save it
                     map_objs[0].settings = json.dumps(settings)
