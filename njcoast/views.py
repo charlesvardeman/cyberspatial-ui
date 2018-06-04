@@ -30,6 +30,7 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import render, redirect
+from django.db import connection
 
 '''
   This function is used to respond to ajax requests for which layers should be
@@ -178,6 +179,9 @@ class MapExpertTemplateView(TemplateView):
         #quiery, select if I am the owner
         context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
 
+        # next id?
+        context['next_id'] = 56
+
         return context
 
 '''
@@ -311,19 +315,22 @@ def map_settings(request, map_id):
                 map_objs[0].save()
 
             elif request.POST['action'] == 'add_simulation': #or simulation to add
+                #get settings
+                try:
+                    settings = json.loads(map_objs[0].settings)
+                except:
+                    settings = {}
+
                 #test if it is already there
-                if request.POST['sim_id'] not in map_objs[0].settings:
-                    #get settings
-                    try:
-                        settings = json.loads(map_objs[0].settings)
-                    except:
-                        settings = {}
+                #if request.POST['sim_id'] not in map_objs[0].settings:
+                if request.POST['sim_id'] not in settings['simulations']:
 
                     #append new simulation to simulations
                     settings.setdefault('simulations', []).append(request.POST['sim_id'])
 
                     #append to layers?
-                    settings.setdefault('layers_selected', []).append(request.POST['sim_id']+"_surge")
+                    if request.POST['sim_id']+"_surge" not in settings['layers_selected']:
+                        settings.setdefault('layers_selected', []).append(request.POST['sim_id']+"_surge")
 
                     #save it
                     map_objs[0].settings = json.dumps(settings)
@@ -340,8 +347,13 @@ def map_settings(request, map_id):
                     #get settings
                     settings = json.loads(map_objs[0].settings)
 
-                    #append new simulation to simulations
+                    #remove new simulation from simulations
                     settings.setdefault('simulations', []).remove(request.POST['sim_id'])
+
+                    #remove layers?
+                    if request.POST['sim_id']+"_surge" in settings['layers_selected']:
+                        print "In layers", request.POST['sim_id']+"_surge"
+                        settings.setdefault('layers_selected', []).remove(request.POST['sim_id']+"_surge")
 
                     #save it
                     map_objs[0].settings = json.dumps(settings)
@@ -408,6 +420,7 @@ def map_expert_simulations(request):
             for dat in db_data:
                 inner_dict = {}
                 inner_dict['sim_id'] = dat.sim_id
+                inner_dict['sim_name'] = dat.sim_name
                 inner_dict['user_name'] = dat.user_name
                 inner_dict['description'] = dat.description
                 inner_dict['data'] = json.loads(dat.data)
@@ -431,7 +444,8 @@ def map_expert_simulations(request):
                 'description' : request.POST['description'],
                 'user_id': request.POST['user_id'],
                 'user_name': request.user.get_full_name(),
-                'modified': timezone.now()
+                'modified': timezone.now(),
+                'sim_name': request.POST['sim_name']
             }
         )
         if created:
@@ -443,6 +457,7 @@ def map_expert_simulations(request):
                 obj.description = request.POST['description']
                 obj.user_id = request.POST['user_id']
                 obj.modified = timezone.now()
+                obj.sim_name = request.POST['user_name']
                 obj.save()
 
         return JsonResponse({'saved': True})

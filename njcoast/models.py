@@ -77,6 +77,7 @@ class NJCMapExpert(models.Model):
         null=True
     )
     sim_id = models.CharField(max_length=20)
+    sim_name = models.CharField(max_length=50, blank=True)
     user_id = models.CharField(max_length=10)
     catagory = models.CharField(max_length=20, blank=True)
     type = models.CharField(max_length=20, blank=True)

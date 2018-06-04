@@ -606,8 +606,11 @@ function load_simulation_data(sim_id){
               //get JSON data
               var data = JSON.parse(result.data.data);
 
-              //storm heading
+              //storm heading, use newer name if exists
               var sim_heading = data.storm_type + " Run #" + result.data.id;
+              if(result.data.sim_name){
+                  sim_heading = result.data.sim_name;
+              }
 
               var badge = 'n-badge';
               if(data.storm_type.toLowerCase() == "hurricane"){
