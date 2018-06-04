@@ -735,11 +735,16 @@ function remove_simulation(name){
 //function to track map changes and save
 function map_changed(){
     save_map(false);
-    console.log("Map has changed");
+    //console.log("Map has changed");
 }
 
-//update map cahnged
+//update map changed with zoom
 mymap.on('zoomend', function (event) {
     if(!initial_load) map_changed();
     //console.log("Map has zoomed");
+});
+
+mymap.on('dragend', function() {
+    //console.log("Map has panned");
+    if(!initial_load) map_changed();
 });
