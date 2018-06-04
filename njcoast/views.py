@@ -408,6 +408,7 @@ def map_expert_simulations(request):
             for dat in db_data:
                 inner_dict = {}
                 inner_dict['sim_id'] = dat.sim_id
+                inner_dict['sim_name'] = dat.sim_name
                 inner_dict['user_name'] = dat.user_name
                 inner_dict['description'] = dat.description
                 inner_dict['data'] = json.loads(dat.data)
