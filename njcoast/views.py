@@ -30,6 +30,7 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import render, redirect
+from django.db import connection
 
 '''
   This function is used to respond to ajax requests for which layers should be
@@ -177,6 +178,9 @@ class MapExpertTemplateView(TemplateView):
 
         #quiery, select if I am the owner
         context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+
+        # next id?
+        context['next_id'] = 56
 
         return context
 

@@ -627,19 +627,28 @@ function save_simulation() {
         return;
     }
 
-    var sim_desc = prompt("Please enter a simulation description", "Simulation " + sim_id);
+    //var sim_desc = prompt("Please enter a simulation description", "Simulation " + sim_id);
 
-    if (sim_desc == null || sim_desc == "") {
+    //preset values and open modal
+    document.getElementById("sim_description").value = "Simulation " + sim_id;
+
+    $('#saveSim-1').modal('show');
+
+    /*if (sim_desc == null || sim_desc == "") {
         console.log("User cancelled the prompt.");
         return;
     }
 
     //do actual save if we get here
-    save_simulation_ajax(sim_desc, "");
+    save_simulation_ajax(sim_desc, "");*/
 }
 
 //save expert simulation data to back end via ajax
-function save_simulation_ajax(sim_desc, sim_name) {
+function save_simulation_ajax() {
+
+    //get inputs from Modal
+    var sim_desc = document.getElementById("sim_description").value;
+    var sim_name = document.getElementById("sim_name").value;
 
     /*//test
     //create unique id to tag socket comms
@@ -669,7 +678,8 @@ function save_simulation_ajax(sim_desc, sim_name) {
             'data': JSON.stringify(data),
             'user_id': owner.toString(),
             'sim_id': sim_id,
-            'description': sim_desc
+            'description': sim_desc,
+            'sim_name': sim_name
         },
         //dataType: "json",
         success: function (result) {
