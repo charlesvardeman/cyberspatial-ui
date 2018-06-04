@@ -486,9 +486,10 @@ class DashboardTemplateView(TemplateView):
 
         print "GN",group_name
         group = Group.objects.get(name=group_name)
-        tempList = group.user_set.exclude(pk=self.request.user.pk)
-        context['main_group_membership_len'] = len(tempList) + 1
-        context['main_group_membership'] = tempList
+        if group:
+            tempList = group.user_set.exclude(pk=self.request.user.pk)
+            context['main_group_membership_len'] = len(tempList) + 1
+            context['main_group_membership'] = tempList
 
         #admin?
         if current_user.groups.filter(name='dca_administrators').exists():
