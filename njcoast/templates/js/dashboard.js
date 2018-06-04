@@ -20,6 +20,8 @@ function open_membership(object_name){
         caret.classList.remove("fa-caret-right");
         caret.classList.add("fa-caret-down");
     }
+
+    return false;
 }
 
 //function to flip between main and edit
