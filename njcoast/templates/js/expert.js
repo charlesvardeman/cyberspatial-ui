@@ -650,8 +650,8 @@ function save_simulation_ajax() {
     var sim_desc = document.getElementById("sim_description").value;
     var sim_name = document.getElementById("sim_name").value;
 
-    /*//test
-    //create unique id to tag socket comms
+    //test
+    /*//create unique id to tag socket comms
     sim_id = Math.random().toString(36).substr(2, 9);
 
     //preset data
@@ -668,7 +668,7 @@ function save_simulation_ajax() {
       "tide": 0,
       "surge_file": "heatmap.json",
       "workspace_file": ""
-    };*/
+  };*/
 
     //store data
     $.ajax({
@@ -684,6 +684,8 @@ function save_simulation_ajax() {
         //dataType: "json",
         success: function (result) {
             console.log("SIMULATION STORE -- SUCCESS!");
+
+            $('#saveSim-1').modal('hide');
             $.notify("Simulation data saved", "success");
 
             //flag saved
@@ -691,6 +693,8 @@ function save_simulation_ajax() {
         },
         error: function (result) {
             console.log("SIMULATION STORE ERROR:", result)
+
+            $('#saveSim-1').modal('hide');
             $.notify("Simulation data was not saved", "error");
         }
     });
