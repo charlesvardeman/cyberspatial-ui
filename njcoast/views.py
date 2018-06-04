@@ -444,7 +444,8 @@ def map_expert_simulations(request):
                 'description' : request.POST['description'],
                 'user_id': request.POST['user_id'],
                 'user_name': request.user.get_full_name(),
-                'modified': timezone.now()
+                'modified': timezone.now(),
+                'sim_name': request.POST['sim_name']
             }
         )
         if created:
@@ -456,6 +457,7 @@ def map_expert_simulations(request):
                 obj.description = request.POST['description']
                 obj.user_id = request.POST['user_id']
                 obj.modified = timezone.now()
+                obj.sim_name = request.POST['user_name']
                 obj.save()
 
         return JsonResponse({'saved': True})
