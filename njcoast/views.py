@@ -32,6 +32,9 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import render, redirect
 from django.db import connection
 
+import logging
+logger = logging.getLogger(__name__)
+
 '''
   This function is used to respond to ajax requests for which layers should be
   visible for a given user. Borrowed a lot of this from the GeoNode base code
@@ -484,12 +487,14 @@ class DashboardTemplateView(TemplateView):
             else:
                 group_name = current_user.njcusermeta.role.group_name + "-" + current_user.njcusermeta.region_level.group_name
 
-        print "GN",group_name
-        group = Group.objects.get(name=group_name)
-        if group:
+        try:
+            group =  Group.objects.get(name=group_name)
             tempList = group.user_set.exclude(pk=self.request.user.pk)
             context['main_group_membership_len'] = len(tempList) + 1
             context['main_group_membership'] = tempList
+        except Group.DoesNotExist:
+            logger.info("Attempted to test if missing group existed - %s", group_name)
+            return False
 
         #admin?
         if current_user.groups.filter(name='dca_administrators').exists():
