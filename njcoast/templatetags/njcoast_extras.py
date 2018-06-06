@@ -5,10 +5,8 @@ register = template.Library()
 
 @register.filter(name='has_group')
 def has_group(user, group_name):
-    group =  Group.objects.get(name=group_name)
-
-    # check group exists
-    if group:
+    try:
+        group =  Group.objects.get(name=group_name)
         return group in user.groups.all()
-    else:
+    except Group.DoesNotExist:
         return False
