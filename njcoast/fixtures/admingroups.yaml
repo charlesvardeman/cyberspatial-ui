@@ -1,0 +1,10 @@
+- model: auth.group
+  pk: 2
+  fields:
+    name: dca_administrators
+    permissions: []
+- model: auth.group
+  pk: 3
+  fields:
+    name: municipal_administrators
+    permissions: []
