@@ -12,5 +12,5 @@ def has_group(user, group_name):
         group =  Group.objects.get(name=group_name)
         return group in user.groups.all()
     except Group.DoesNotExist:
-        logger.info("Attempted to test if missing group existed - %s", group_name)
+        logger.warn("Attempted to test if missing group existed - %s", group_name)
         return False

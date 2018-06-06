@@ -493,7 +493,7 @@ class DashboardTemplateView(TemplateView):
             context['main_group_membership_len'] = len(tempList) + 1
             context['main_group_membership'] = tempList
         except Group.DoesNotExist:
-            logger.info("Attempted to test if missing group existed - %s", group_name)
+            logger.warn("Attempted to test if missing group existed - %s", group_name)
             return False
 
         #admin?
