@@ -1,0 +1,15 @@
+- model: njcoast.njcrole
+  pk: 1
+  fields:
+    name: "Emergency Manager"
+    group_name: "eom"
+- model: njcoast.njcrole
+  pk: 2
+  fields:
+    name: "Planner"
+    group_name: "pl"
+- model: njcoast.njcrole
+  pk: 3
+  fields:
+    name: "First Responder"
+    group_name: "fr"
