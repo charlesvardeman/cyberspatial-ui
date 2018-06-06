@@ -1,0 +1,168 @@
+- model: njcoast.NJCCounty
+  pk: 1
+  fields:
+    name: "Monmouth"
+    home_latitude: "40.406513"
+    home_longitude: "-74.225327"
+    zoom_level: 10
+    group_name: "monmouth"
+- model: njcoast.NJCCounty
+  pk: 2
+  fields:
+    name: "Atlantic"
+    home_latitude: "39.489090"
+    home_longitude: "-74.680300"
+    zoom_level: 10
+    group_name: "atlantic"
+- model: njcoast.NJCCounty
+  pk: 3
+  fields:
+    name: "Hunterdon"
+    home_latitude: "40.595199"
+    home_longitude: "-75.052355"
+    zoom_level: 10
+    group_name: "hunterdon"
+- model: njcoast.NJCCounty
+  pk: 4
+  fields:
+    name: "Warren"
+    home_latitude: "40.869650"
+    home_longitude: "-74.849700"
+    zoom_level: 10
+    group_name: "warren"
+- model: njcoast.NJCCounty
+  pk: 5
+  fields:
+    name: "Bergen"
+    home_latitude: "41.017450"
+    home_longitude: "-74.062800"
+    zoom_level: 10
+    group_name: "bergen"
+- model: njcoast.NJCCounty
+  pk: 6
+  fields:
+    name: "Salem"
+    home_latitude: "39.559080"
+    home_longitude: "-75.350600"
+    zoom_level: 10
+    group_name: "salem"
+- model: njcoast.NJCCounty
+  pk: 7
+  fields:
+    name: "Sussex"
+    home_latitude: "40.986880"
+    home_longitude: "-74.742299"
+    zoom_level: 10
+    group_name: "sussex"
+- model: njcoast.NJCCounty
+  pk: 8
+  fields:
+    name: "Camden"
+    home_latitude: "39.828350"
+    home_longitude: "-74.994600"
+    zoom_level: 10
+    group_name: "camden"
+- model: njcoast.NJCCounty
+  pk: 9
+  fields:
+    name: "Cape May"
+    home_latitude: "39.112030"
+    home_longitude: "-74.731400"
+    zoom_level: 10
+    group_name: "cape_may"
+- model: njcoast.NJCCounty
+  pk: 10
+  fields:
+    name: "Ocean"
+    home_latitude: "39.751210"
+    home_longitude: "-74.114600"
+    zoom_level: 10
+    group_name: "ocean"
+- model: njcoast.NJCCounty
+  pk: 11
+  fields:
+    name: "Burlington"
+    home_latitude: "39.592990"
+    home_longitude: "-74.451357"
+    zoom_level: 10
+    group_name: "burlington"
+- model: njcoast.NJCCounty
+  pk: 12
+  fields:
+    name: "Hudson"
+    home_latitude: "40.670860"
+    home_longitude: "-74.109500"
+    zoom_level: 10
+    group_name: "hudson"
+- model: njcoast.NJCCounty
+  pk: 13
+  fields:
+    name: "Somerset"
+    home_latitude: "40.659150"
+    home_longitude: "-74.676800"
+    zoom_level: 10
+    group_name: "somerset"
+- model: njcoast.NJCCounty
+  pk: 14
+  fields:
+    name: "Essex"
+    home_latitude: "40.786216"
+    home_longitude: "-74.152632"
+    zoom_level: 10
+    group_name: "essex"
+- model: njcoast.NJCCounty
+  pk: 15
+  fields:
+    name: "Union"
+    home_latitude: "40.675450"
+    home_longitude: "-74.422200"
+    zoom_level: 10
+    group_name: "union"
+- model: njcoast.NJCCounty
+  pk: 16
+  fields:
+    name: "Passaic"
+    home_latitude: "41.023410"
+    home_longitude: "-74.334400"
+    zoom_level: 10
+    group_name: "passaic"
+- model: njcoast.NJCCounty
+  pk: 17
+  fields:
+    name: "Morris"
+    home_latitude: "40.904747"
+    home_longitude: "-74.409369"
+    zoom_level: 10
+    group_name: "morris"
+- model: njcoast.NJCCounty
+  pk: 18
+  fields:
+    name: "Cumberland"
+    home_latitude: "39.376200"
+    home_longitude: "-75.161700"
+    zoom_level: 10
+    group_name: "cumberland"
+- model: njcoast.NJCCounty
+  pk: 19
+  fields:
+    name: "Middlesex"
+    home_latitude: "40.583200"
+    home_longitude: "-74.234800"
+    zoom_level: 10
+    group_name: "middlesex"
+- model: njcoast.NJCCounty
+  pk: 20
+  fields:
+    name: "Gloucester"
+    home_latitude: "39.653530"
+    home_longitude: "-75.078600"
+    zoom_level: 10
+    group_name: "gloucester"
+- model: njcoast.NJCCounty
+  pk: 21
+  fields:
+    name: "Mercer"
+    home_latitude: "40.264296"
+    home_longitude: "-74.541731"
+    zoom_level: 10
+    group_name: "mercer"
