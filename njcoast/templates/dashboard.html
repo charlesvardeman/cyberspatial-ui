@@ -148,7 +148,7 @@
                 <li class="list-group-item">
                     <h4 class="list-group-item-heading"><i class="fa fa-map-o" aria-hidden="true"></i>Maps</h4>
                     <p>Explore all available GIS layers on the standard planning map, or interact with a custom saved version or maps shared by other users.</p>
-                    <ul class="dashboard-list">
+                    <ul class="dashboard-list scroll-maps" >
                         {% for map in maps_for_user %}
                         <li>
                             <a href="{% url 'map_annotate' map.id %}"><span class="status">private</span>{{ map.name }}</a>
@@ -233,7 +233,7 @@
                             <b>Map name</b></br>
                             <input type="text" class="form-control" id="map_name" value="{{ user.username }}'s Map #{{ next_map_for_user }}" ></br>
                             <b>Map description</b></br>
-                            <input type="text" class="form-control" id="map_description" value="NJ Coast auto-generated map for {{ user.username }}" ></br>                            
+                            <input type="text" class="form-control" id="map_description" value="NJ Coast auto-generated map for {{ user.username }}" ></br>
                         </div>
                         <div class="modal-footer">
                             <a id="create_map_button" onclick="create_map();" class="btn btn-primary" href="#">Create</a>

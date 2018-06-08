@@ -199,6 +199,11 @@ a.anchor {
   padding-bottom: 60px;
 }
 
+.scroll-maps {
+    max-height: 230px;
+    overflow: auto;
+}
+
 @media screen and (max-width: 768px) {
 
 
