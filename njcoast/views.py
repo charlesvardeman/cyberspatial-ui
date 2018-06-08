@@ -198,14 +198,22 @@ class MapExpertTemplateView(TemplateView):
 '''
 @login_required
 def new_njc_map_view(request):
-    # TODO: The user should have the option to name the map when they create it
-    next_user_map_count = len(NJCMap.objects.filter(owner = request.user)) + 1
-    map_object = NJCMap.objects.create(
-        owner = request.user,
-        name = "%s's Map #%d" % (request.user, next_user_map_count),
-        description = 'NJ Coast auto-generated map for %s' % request.user
-    )
-    return HttpResponseRedirect(reverse('map_annotate', args=[map_object.id]))
+    if request.method == "POST":
+        #print request.POST['name'], request.POST['description']
+        # TODO: The user should have the option to name the map when they create it
+        #next_user_map_count = len(NJCMap.objects.filter(owner = request.user)) + 1
+        map_object = NJCMap.objects.create(
+            owner = request.user,
+            name = request.POST['name'],
+            description = request.POST['description']
+        )
+        if map_object:
+            return JsonResponse({'created': True, 'id': map_object.id})
+        else:
+            return JsonResponse({'created': False})
+
+    return JsonResponse({'created': False})
+    #return HttpResponseRedirect(reverse('map_annotate', args=[map_object.id]))
 
 '''
   API-ish view for annotation ajax calls from the map page.
@@ -478,6 +486,10 @@ class DashboardTemplateView(TemplateView):
 
         #quiery, select if I am the owner
         context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+        if context['maps_for_user']:
+            context['next_map_for_user'] = len(context['maps_for_user']) + 1
+        else:
+            context['next_map_for_user'] = 1
 
         #quiery, select if I an in the list of shared_with__contains
         context['shared_maps_for_user'] = NJCMap.objects.filter(shared_with__contains = self.request.user)
