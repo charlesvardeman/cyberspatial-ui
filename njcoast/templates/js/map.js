@@ -351,9 +351,9 @@ function apply_settings(data){
 
   //test if I own the map
   if(data.owner == 'other'){
-      console.log("not mine");
+      //console.log("not mine");
       //diasble save map and share
-      document.getElementById("save_map").classList.add("disabled");
+      //document.getElementById("save_map").classList.add("disabled");
       document.getElementById("share_map").classList.add("disabled");
   }
 
@@ -431,8 +431,11 @@ function apply_settings(data){
       }
   }
 
-  //flag end of initial load
-  initial_load = false;
+  //test if I own the map and set end of initial load if so
+  if(data.owner != 'other'){
+      //flag end of initial load
+      initial_load = false;
+  }
 
 }
 
