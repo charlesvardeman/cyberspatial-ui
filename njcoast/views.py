@@ -183,24 +183,51 @@ class MapExpertTemplateView(TemplateView):
         context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
 
         # next id?
-        context['next_id'] = 56
+        context['next_id'] = 0
+        try:
+            context['next_id'] = NJCMapExpert.objects.last().id + 1
+        except:
+            pass
 
+        print context['next_id']
         return context
 
 '''
   Function view that simply creates a new object and then redirects the user to
   the proper map template view based on that new map object
+  Hijacked by Chris for real functionality 6/8/18
 '''
 @login_required
-def new_njc_map_view(request):
-    # TODO: The user should have the option to name the map when they create it
-    next_user_map_count = len(NJCMap.objects.filter(owner = request.user)) + 1
-    map_object = NJCMap.objects.create(
-        owner = request.user,
-        name = "%s's Map #%d" % (request.user, next_user_map_count),
-        description = 'NJ Coast auto-generated map for %s' % request.user
-    )
-    return HttpResponseRedirect(reverse('map_annotate', args=[map_object.id]))
+def njc_map_utilities(request):
+    #create
+    if request.method == "POST":
+        #print request.POST['name'], request.POST['description']
+        # TODO: The user should have the option to name the map when they create it
+        #next_user_map_count = len(NJCMap.objects.filter(owner = request.user)) + 1
+        map_object = NJCMap.objects.create(
+            owner = request.user,
+            name = request.POST['name'],
+            description = request.POST['description']
+        )
+        if map_object:
+            return JsonResponse({'created': True, 'id': map_object.id})
+        else:
+            return JsonResponse({'created': False})
+    #delete
+    elif request.method == "GET":
+        print "delete", request.GET['id']
+
+        #delete object
+        object_to_delete = NJCMap.objects.get(id = request.GET['id'])
+        if object_to_delete:
+            object_to_delete.delete()
+
+            return JsonResponse({'deleted': True})
+        else:
+            return JsonResponse({'deleted': False})
+
+    return JsonResponse({'created': False, 'deleted': False})
+    #return HttpResponseRedirect(reverse('map_annotate', args=[map_object.id]))
 
 '''
   API-ish view for annotation ajax calls from the map page.
@@ -473,6 +500,10 @@ class DashboardTemplateView(TemplateView):
 
         #quiery, select if I am the owner
         context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+        if context['maps_for_user']:
+            context['next_map_for_user'] = len(context['maps_for_user']) + 1
+        else:
+            context['next_map_for_user'] = 1
 
         #quiery, select if I an in the list of shared_with__contains
         context['shared_maps_for_user'] = NJCMap.objects.filter(shared_with__contains = self.request.user)
@@ -525,6 +556,7 @@ class ExploreTemplateView(TemplateView):
 #signup new users.
 def signup(request):
     if request.method == 'POST':
+        print "POST signup"
         form = SignUpForm(request.POST)
         try:
             if form.is_valid():
@@ -628,6 +660,7 @@ def signup(request):
             print "Undefined error!"
 
     else:
+        print "GET signup"
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form, 'error_data': ''})
 
