@@ -195,9 +195,11 @@ class MapExpertTemplateView(TemplateView):
 '''
   Function view that simply creates a new object and then redirects the user to
   the proper map template view based on that new map object
+  Hijacked by Chris for real functionality 6/8/18
 '''
 @login_required
-def new_njc_map_view(request):
+def njc_map_utilities(request):
+    #create
     if request.method == "POST":
         #print request.POST['name'], request.POST['description']
         # TODO: The user should have the option to name the map when they create it
@@ -211,8 +213,20 @@ def new_njc_map_view(request):
             return JsonResponse({'created': True, 'id': map_object.id})
         else:
             return JsonResponse({'created': False})
+    #delete
+    elif request.method == "GET":
+        print "delete", request.GET['id']
 
-    return JsonResponse({'created': False})
+        #delete object
+        object_to_delete = NJCMap.objects.get(id = request.GET['id'])
+        if object_to_delete:
+            object_to_delete.delete()
+
+            return JsonResponse({'deleted': True})
+        else:
+            return JsonResponse({'deleted': False})
+
+    return JsonResponse({'created': False, 'deleted': False})
     #return HttpResponseRedirect(reverse('map_annotate', args=[map_object.id]))
 
 '''

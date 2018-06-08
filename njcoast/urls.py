@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 
 from geonode.urls import urlpatterns
 from .views import my_gis_layers, MapTemplateView, DashboardTemplateView, MapExpertTemplateView, ExploreTemplateView, DCADashboardTemplateView
-from njcoast.views import map_annotations, new_njc_map_view, map_expert_simulations, map_settings, signup, user_approval, change_password
+from njcoast.views import map_annotations, njc_map_utilities, map_expert_simulations, map_settings, signup, user_approval, change_password
 
 urlpatterns = patterns('',
                        url(r'^/?$', TemplateView.as_view(template_name='site_index.html'), name='home'),
@@ -17,7 +17,7 @@ urlpatterns = patterns('',
                        url(r'^store/$', map_expert_simulations, name='map_expert_simulations_api'),
                        url(r'^dashboard/$', login_required(DashboardTemplateView.as_view()), name='dashboard'),
                        url(r'^dca_dashboard/$', login_required(DCADashboardTemplateView.as_view()), name='dca_dashboard'),
-                       url(r'^maps/new/$', new_njc_map_view, name='new_njc_map'),
+                       url(r'^maps/new/$', njc_map_utilities, name='njc_map_utilities'),
                        url(r'^map/(?P<map_id>[a-zA-Z0-9_]+)/$', login_required(MapTemplateView.as_view()), name='map_annotate'),
                        url(r'^map/(?P<map_id>[a-zA-Z0-9_]+)/settings/$', map_settings, name='map_settings_api'),
                        url(r'^map/(?P<map_id>[a-zA-Z0-9_]+)/annotations/$', map_annotations, name='map_annotations_api'),
