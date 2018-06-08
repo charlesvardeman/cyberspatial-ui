@@ -183,8 +183,13 @@ class MapExpertTemplateView(TemplateView):
         context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
 
         # next id?
-        context['next_id'] = 56
+        context['next_id'] = 0
+        try:
+            context['next_id'] = NJCMapExpert.objects.last().id + 1
+        except:
+            pass
 
+        print context['next_id']
         return context
 
 '''
@@ -525,6 +530,7 @@ class ExploreTemplateView(TemplateView):
 #signup new users.
 def signup(request):
     if request.method == 'POST':
+        print "POST signup"
         form = SignUpForm(request.POST)
         try:
             if form.is_valid():
@@ -628,6 +634,7 @@ def signup(request):
             print "Undefined error!"
 
     else:
+        print "GET signup"
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form, 'error_data': ''})
 
