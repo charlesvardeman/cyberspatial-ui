@@ -150,8 +150,8 @@
                     <p>Explore all available GIS layers on the standard planning map, or interact with a custom saved version or maps shared by other users.</p>
                     <ul class="dashboard-list scroll-maps" >
                         {% for map in maps_for_user %}
-                        <li>
-                            <a href="{% url 'map_annotate' map.id %}"><span class="status">private</span>{{ map.name }}</a>
+                        <li id="list_{{ map.id }}" >
+                            <a id="list_name_{{ map.id }}" href="{% url 'map_annotate' map.id %}">{{ map.name }}</a><i onclick="delete_map('{{ map.id }}');" style="float: right;color: #000;padding: 0 0 0 4px;" class="fa fa-remove"></i><span class="status">private</span>
                         </li>
                         {% endfor %} {% for map in shared_maps_for_user %}
                         <li>
@@ -238,6 +238,25 @@
                         <div class="modal-footer">
                             <a id="create_map_button" onclick="create_map();" class="btn btn-primary" href="#">Create</a>
                             <a onclick="$('#createMap-1').modal('hide');" class="btn btn-default" href="#">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal - Delete map -->
+            <div class="modal fade" id="deleteMap-1" tabindex="-1" role="dialog" aria-labelledby="deleteMap">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="saveChanges">Delete map</h4>
+                        </div>
+                        <div id="editable_delete_modal" class="modal-body">
+                            Do you want to delete map?
+                        </div>
+                        <div class="modal-footer">
+                            <a id="delete_map_button" name="" onclick="delete_map_ajax(this.name);" class="btn btn-primary" href="#">Delete</a>
+                            <a onclick="$('#deleteMap-1').modal('hide');" class="btn btn-default" href="#">Cancel</a>
                         </div>
                     </div>
                 </div>
