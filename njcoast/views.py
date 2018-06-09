@@ -556,10 +556,12 @@ class ExploreTemplateView(TemplateView):
 #signup new users.
 def signup(request):
     if request.method == 'POST':
-        print "POST signup"
+        print "POST signup",request.POST
         form = SignUpForm(request.POST)
+        print "Post form"
         try:
             if form.is_valid():
+                print "Form valid!"
                 #create user/profile
                 user = form.save(commit=False)
 
@@ -662,6 +664,8 @@ def signup(request):
     else:
         print "GET signup"
         form = SignUpForm()
+
+    print "here!",form
     return render(request, 'signup.html', {'form': form, 'error_data': ''})
 
 #DCA admin dashboard
@@ -1431,3 +1435,23 @@ def change_password(request):
     return render(request, 'change_password.html', {
         'form': form
     })
+
+'''
+    get municipalities in county
+'''
+def municipalities_in_county(request):
+    if request.GET['county']:
+        municipalities = NJCMunicipality.objects.filter(county__name=request.GET['county']).order_by('name')
+        print "munis", len(municipalities)
+        if municipalities:
+            munis_in_county = []
+            muni_keys = []
+            for municipality in municipalities:
+                munis_in_county.append(municipality.name)
+                muni_keys.append(municipality.id)
+
+            #flag OK
+            return JsonResponse({'status': True, 'data': munis_in_county, 'ids': muni_keys})
+
+    #catch all response
+    return JsonResponse({'status': False})
