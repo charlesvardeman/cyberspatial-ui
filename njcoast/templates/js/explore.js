@@ -224,7 +224,7 @@ function load_simulation_data(order_by) {
                                                                 <button class="dropdown-toggle" style="margin-top: 5px;font-size: 14px;" id="dropdownMenuAddToMap_${count}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                                     Add Results to Map ... <i href="#"  class="fa fa-caret-up" style="margin-left: 10px" aria-hidden="true"></i>
                                                                 </button>
-                                                                <div id="add_${result.data[i].sim_id}" class="dropdown-menu" aria-labelledby="dropdownMenuAddToMap_${count}">
+                                                                <div id="add_${result.data[i].sim_id}" style="height: 250px;overflow: auto;" class="dropdown-menu" aria-labelledby="dropdownMenuAddToMap_${count}">
                                                                 </div>
                                                             </div>
                                                         </td>
