@@ -709,8 +709,16 @@ class DCADashboardTemplateView(TemplateView):
         #quiery, select all users
         context['users'] = users
 
+        #get counties
+        context['counties'] = NJCCounty.objects.all().order_by('name')
+        if context['counties']:
+            context['selected_county'] = context['counties'][0]
+            selected_county = context['counties'][0].name
+        else:
+            selected_county = "Ocean"
+
         #get municipalities
-        municipalities = NJCMunicipality.objects.exclude(name='Statewide').order_by('name')
+        municipalities = NJCMunicipality.objects.filter(county__name=selected_county).order_by('name')
 
         munis_without_admin = []
         for municipality in municipalities:
@@ -722,7 +730,7 @@ class DCADashboardTemplateView(TemplateView):
 
         if is_dca:
             #and muni admins
-            muni_admins = Profile.objects.filter(groups__name='municipal_administrators').order_by('last_name')
+            muni_admins = Profile.objects.filter(groups__name='municipal_administrators').filter(njcusermeta__municipality__county__name=selected_county).order_by('last_name')
             print "Muni admins",len(muni_admins)
             context['muni_admins'] = muni_admins
 
@@ -733,9 +741,6 @@ class DCADashboardTemplateView(TemplateView):
                 except:
                     pass
             context['munis_without_admin'] = munis_without_admin
-
-        #get counties
-        context['counties'] = NJCCounty.objects.all().order_by('name')
 
         #get roles
         context['roles'] = NJCRole.objects.all().order_by('name').order_by('name')
