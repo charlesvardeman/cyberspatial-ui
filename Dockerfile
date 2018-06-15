@@ -1,4 +1,4 @@
-FROM python:2.7
+FROM python:2.7-jessie
 
 ENV PYTHONUNBUFFERED 1
 
@@ -6,19 +6,21 @@ ENV PYTHONUNBUFFERED 1
 RUN export DEBIAN_FRONTEND=noninteractive
 
 # This section is borrowed from the official Django image but adds GDAL and others
-RUN apt-get update && apt-get install -y \
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
+     apt-get update && apt-get install -y \
 		gcc \
 		gettext \
 		postgresql-client libpq-dev \
 		sqlite3 \
-    python-gdal python-psycopg2 \
-    python-imaging python-lxml \
-    python-dev libgdal-dev \
-    python-ldap \
-    libmemcached-dev libsasl2-dev zlib1g-dev \
-    python-pylibmc \
-    curl npm nodejs\
-	--no-install-recommends && rm -rf /var/lib/apt/lists/* && ln -s /usr/bin/nodejs /usr/bin/node
+        python-gdal python-psycopg2 \
+        python-imaging python-lxml \
+        python-dev libgdal-dev \
+        python-ldap \
+        libmemcached-dev libsasl2-dev zlib1g-dev \
+        python-pylibmc \
+        curl nodejs\
+	    --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/*
 
 # Upgrade pip
 RUN pip install --upgrade pip

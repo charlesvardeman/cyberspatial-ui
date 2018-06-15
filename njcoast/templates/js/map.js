@@ -14,6 +14,9 @@ var simulations = [];
 //disctionary of selected layers
 var layers_selected = [];
 
+//flag to stop map re-load during initialization
+var initial_load = true;
+
 /*
 Base Map -- Centered on Keansburg, NJ
 WMS Tile Layers
@@ -296,6 +299,7 @@ function add_layer_to_menu(layer, ul_id) {
                     console.log("found matching layer: " + this.id);
                     layers_selected.push(this.id);
                     layer_list[i].maplayer.addTo(mymap);
+                    if(!initial_load) map_changed();
                 }
             }
         } else {
@@ -305,6 +309,7 @@ function add_layer_to_menu(layer, ul_id) {
                     var index = layers_selected.indexOf(this.id);
                     if (index !== -1) layers_selected.splice(index, 1);
                     mymap.removeLayer(layer_list[i].maplayer);
+                    if(!initial_load) map_changed();
                 }
             }
         }
@@ -346,9 +351,9 @@ function apply_settings(data){
 
   //test if I own the map
   if(data.owner == 'other'){
-      console.log("not mine");
+      //console.log("not mine");
       //diasble save map and share
-      document.getElementById("save_map").classList.add("disabled");
+      //document.getElementById("save_map").classList.add("disabled");
       document.getElementById("share_map").classList.add("disabled");
   }
 
@@ -403,8 +408,9 @@ function apply_settings(data){
       document.getElementById("map_description").innerHTML = data.description;
   }
 
-  //load users shared with
+   //load users shared with
   if("shared_with" in data){
+
       //console.log("Shares "+data.shared_with[0]);
       for(var i=0; i<data.shared_with.length;i++){
           //get list of users
@@ -413,7 +419,7 @@ function apply_settings(data){
 
           //loop until end of list
           do{
-             more_elmts = document.getElementById('share-'+counter++);
+             more_elmts = document.getElementById('sharemodal-'+counter++);
 
              //if exists and checked then save
              if(more_elmts){
@@ -424,6 +430,13 @@ function apply_settings(data){
           }while(more_elmts)
       }
   }
+
+  //test if I own the map and set end of initial load if so
+  if(data.owner != 'other'){
+      //flag end of initial load
+      initial_load = false;
+  }
+
 }
 
 //load simulation heatmap if clicked
@@ -437,6 +450,7 @@ function load_simulation(user_id, object){
       var index = layers_selected.indexOf(object.id);
       if (index == -1){
           layers_selected.push(object.id);
+          if(!initial_load) map_changed();
       }
   }
 
@@ -448,6 +462,7 @@ function load_simulation(user_id, object){
       var index = layers_selected.indexOf(object.id);
       if (index !== -1){
           layers_selected.splice(index, 1);
+          if(!initial_load) map_changed();
           console.log("Removed "+object.name+","+object.id);
       }
   }
@@ -485,7 +500,7 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type){
 }
 
 //save current map
-function save_map(){
+function save_map(notify){
   //save map state
   var map_data = {
       'latitude': mymap.getCenter().lat,
@@ -512,11 +527,15 @@ function save_map(){
       success: function(result) {
           console.log("SETTING STORE -- SUCCESS!" + result.saved);
           //now auto save so dont flag
-          $.notify("Settings saved", "success");
+          if(notify){
+            $.notify("Settings saved", "success");
+          }
       },
       error: function(result) {
           console.log("ERROR:", result)
-          $.notify("Error saving map settings", "error");
+          if(notify){
+              $.notify("Error saving map settings", "error");
+          }
       }
   });
 
@@ -532,7 +551,7 @@ function save_shared_with(){
 
   //loop until end of list
   do{
-      more_elmts = document.getElementById('share-'+counter++);
+      more_elmts = document.getElementById('sharemodal-'+counter++);
 
       //if exists and checked then save
       if(more_elmts){
@@ -555,6 +574,10 @@ function save_shared_with(){
       dataType: "json",
       success: function(result) {
           console.log("SETTING SHARES -- SUCCESS!" + result.saved);
+
+          //fade out modal
+          $("#shareMap-1").modal("hide");
+
           //now auto save so dont flag
           $.notify("Shares saved", "success");
       },
@@ -586,8 +609,11 @@ function load_simulation_data(sim_id){
               //get JSON data
               var data = JSON.parse(result.data.data);
 
-              //storm heading
+              //storm heading, use newer name if exists
               var sim_heading = data.storm_type + " Run #" + result.data.id;
+              if(result.data.sim_name){
+                  sim_heading = result.data.sim_name;
+              }
 
               var badge = 'n-badge';
               if(data.storm_type.toLowerCase() == "hurricane"){
@@ -614,7 +640,7 @@ function load_simulation_data(sim_id){
                   runup = "";
                   runup_file = data.runup_file;
               }
-              
+
               var modified = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(Date.parse(result.data.modified));
 
               //generate html
@@ -699,6 +725,9 @@ function remove_simulation(name){
       dataType: "json",
       success: function(result) {
           console.log("REMOVING FROM MAP -- SUCCESS!" + result.saved);
+
+          if(!initial_load) map_changed();
+
           //now auto save so dont flag
           $.notify("Simulation removed from map " + name, "success");
       },
@@ -707,5 +736,21 @@ function remove_simulation(name){
           $.notify("Error removing simulation from map", "error");
       }
   });
-
 }
+
+//function to track map changes and save
+function map_changed(){
+    save_map(false);
+    //console.log("Map has changed");
+}
+
+//update map changed with zoom
+mymap.on('zoomend', function (event) {
+    if(!initial_load) map_changed();
+    //console.log("Map has zoomed");
+});
+
+mymap.on('dragend', function() {
+    //console.log("Map has panned");
+    if(!initial_load) map_changed();
+});

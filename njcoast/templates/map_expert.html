@@ -190,7 +190,7 @@
                 </ul>
             </div>
             <div class="map-control-item">
-                <button id="save_button" href="" class="btn btn-primary btn-md btn-block disabled" style="margin-top: 10px" onclick="save_simulation();">Save Results</button>
+                <button id="save_button" href="#" class="btn btn-primary btn-md btn-block disabled" style="margin-top: 10px" onclick="save_simulation();" >Save Results</button><!-- disabled,data-toggle="modal" data-target="#saveSim-1", onclick="save_simulation();", simulation-->
                 <div class="dropup show">
                     <button class="btn btn-block btn-secondary dropdown-toggle disabled" style="margin-top: 5px" id="dropdownMenuAddToMap" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Add Results to Map ... <i class="fa fa-caret-up" style="margin-left: 10px" aria-hidden="true"></i>
@@ -208,6 +208,29 @@
         </div>
         <!-- close column -->
         <!-- Enf tools RHS menu -->
+
+        <!-- Modal - Save changes button -->
+        <div class="modal fade" id="saveSim-1" tabindex="-1" role="dialog" aria-labelledby="saveSim">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="saveSim">Save simulation</h4>
+                    </div>
+                    <div id="editable_user_modal" class="modal-body">
+                        Please enter the following information:</br>
+                        <b>Simulation name</b></br>
+                        <input type="text" class="form-control" id="sim_name" value="Hurricane Run #{{ next_id }}" ></br>
+                        <b>Simulation description</b></br>
+                        <input type="text" class="form-control" id="sim_description" value="Simulation" ></br>
+                    </div>
+                    <div class="modal-footer">
+                        <a id="save_simulation_button" onclick="save_simulation_ajax();" class="btn btn-primary" href="#">Save</a>
+                        <a onclick="$('#saveSim-1').modal('hide');" class="btn btn-default" href="#">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div>
 </div>

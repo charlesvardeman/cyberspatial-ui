@@ -1,0 +1,165 @@
+{% extends 'site_base.html' %}
+{% load i18n %}
+{% load staticfiles %}
+{% load base_tags %}
+
+{% block body %}
+<h2>Sign up</h2>
+<p style="color: red">{{ error_data }}</p>
+<form id="user_form" method="post">
+ {% csrf_token %}
+ {% for field in form %}
+   <p>
+     {{ field.label_tag }}<br>
+     {{ field }}
+     {% if field.help_text %}
+       <small style="color: grey">{{ field.help_text }}</small>
+     {% endif %}
+     {% for error in field.errors %}
+       <p style="color: red">{{ error }}</p>
+     {% endfor %}
+   </p>
+ {% endfor %}
+
+</form>
+
+<button class="btn btn-primary" onclick="form_submitted()">Sign up</button>
+{% endblock %}
+
+{% block extra_script %}
+<script>
+
+//store muni value if post gets rejected
+var current_muni_val = "";
+
+//once ready, re-load the muni dropdown
+$(document).ready(function() {
+    //remove county disable if region is selected for muni or county
+    if($("#id_region_level :selected").val() != ""){
+        var text = $("#id_region_level option:selected").text();
+
+        if(text == 'County' || text == 'Municipal'){
+            $("#id_county").prop( "disabled", false );
+        }
+    }
+
+    //get selected value for muni IF selected and county selected
+    if($("#id_county :selected").val() != "" && $('#id_municipality :selected').val() != ""){
+
+        //save it
+        current_muni_val = $('#id_municipality :selected').val();
+
+        //and do load of data
+        // Create a new 'change' event
+        var event = new Event('change');
+
+        // Dispatch it.
+        document.getElementById("id_county").dispatchEvent(event);
+    }
+});
+
+$("#id_county").prop( "disabled", true );
+$("#id_municipality").prop( "disabled", true );
+
+//enable/disable dropdowns
+$("#id_region_level").change(function () {
+    var text = $("#id_region_level option:selected").text();
+
+    //set drop down status based on choice of region
+    if(text == 'County'){
+        $("#id_municipality").prop( "disabled", true );
+        $("#id_municipality").val("");
+        $("#id_county").prop( "disabled", false );
+        $("#id_county").val("");
+    }else if(text == 'Municipal') {
+        //$("#id_municipality").prop( "disabled", false );
+        $("#id_municipality").val("");
+        $("#id_county").prop( "disabled", false );
+        $("#id_county").val("");
+    }else if(text == 'Statewide') {
+        $("#id_municipality").prop( "disabled", true );
+        $("#id_municipality").val("");
+        $("#id_county").prop( "disabled", true );
+        $("#id_county").val("");
+    }
+
+});
+
+//check new fields before submitting
+function form_submitted(){
+    //console.log("test");
+    if(($("#id_region_level option:selected").text() == "County" || $("#id_region_level option:selected").text() == "Municipal") && $("#id_county option:selected").text() == "---------"){
+        //console.log("County not set ");
+        var pnode = document.getElementById("id_county").parentNode;
+        var para = document.createElement("P");
+        para.style.color = "red";                    // Create a <p> element
+        var t = document.createTextNode("The County field is required.");      // Create a text node
+        para.appendChild(t);                                          // Append the text to <p>
+        pnode.appendChild(para);
+        //<p style="color: red">This field is required.</p>
+    }else if($("#id_region_level option:selected").text() == "Municipal" && $("#id_municipality option:selected").text() == "---------"){
+        //console.log("Municipality not set ");
+        var pnode = document.getElementById("id_municipality").parentNode;
+        var para = document.createElement("P");
+        para.style.color = "red";                    // Create a <p> element
+        var t = document.createTextNode("The Municipality field is required.");      // Create a text node
+        para.appendChild(t);                                          // Append the text to <p>
+        pnode.appendChild(para);
+    }else{
+        document.getElementById("user_form").submit();
+    }
+}
+
+//if county changed then update municipality if region_level is Municiple
+$("#id_county").change(function () {
+    if($("#id_region_level option:selected").text() == 'Municipal'){
+        //load new muni list based on County
+        var county = $("#id_county option:selected").text();
+
+        //do Ajax call to get munis in county
+        $.ajax({
+            type: "GET",
+            url: "/municipalities_in_county/",
+            data: {
+                'county': county
+            },
+            dataType: "json",
+            success: function(result) {
+                console.log("MUNIS FILTERED BY COUNTY -- SUCCESS! " + result.status);
+
+                //if we got munis back
+                if(result.status){
+                    /* Remove all options from the select list */
+                    $('#id_municipality').empty();
+                    $('#id_municipality').html('<option value="" selected="selected">---------</option>');
+                    for(var i=0; i<result.data.length; i++){
+                        var x = document.getElementById("id_municipality");
+                        var option = document.createElement("option");
+                        option.text = result.data[i];
+                        option.value = result.ids[i];//(i+1).toString();
+                        x.add(option);
+                    }
+
+                    //is there a pre-select?
+                    if(current_muni_val != ""){
+                        $("#id_municipality").val(current_muni_val);
+                    }
+
+                    //enable select
+                    $("#id_municipality").prop( "disabled", false );
+
+                }else{
+                    //or failure
+                    console.log("MUNIS FILTERED BY COUNTY ERROR:", result)
+                }
+            },
+            error: function(result) {
+                console.log("MUNIS FILTERED BY COUNTY ERROR:", result)
+            }
+        });
+
+    }
+});
+
+</script>
+{% endblock extra_script %}

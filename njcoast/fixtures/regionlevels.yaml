@@ -1,0 +1,15 @@
+- model: njcoast.njcregionlevel
+  pk: 1
+  fields:
+    name: "Municipal"
+    group_name: "municipal"
+- model: njcoast.njcregionlevel
+  pk: 2
+  fields:
+    name: "County"
+    group_name: "county"
+- model: njcoast.njcregionlevel
+  pk: 3
+  fields:
+    name: "Statewide"
+    group_name: "statewide"

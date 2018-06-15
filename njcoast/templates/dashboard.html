@@ -2,16 +2,32 @@
 {% load i18n %}
 {% load staticfiles %}
 {% load base_tags %}
+{% load njcoast_extras %}
 
 {% block body_class %}home{% endblock %}
 
+{% block extra_head %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/fontawesome-all.min.css" %}" media="screen" />
+    <link rel="stylesheet" type="text/css" href="{% static "css/njcoast-admin-style.css" %}" media="screen" />
+{% endblock extra_head %}
+
 {% block middle %}
+
 <div class="jumbotron njcoast-image slimmer"></div>
+
+{% if messages %}
+  {% for msg in messages %}
+    <div class="alert alert-info alert-dismissable">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+      {{msg.message}}
+    </div>
+  {% endfor %}
+{% endif %}
 
 <div class="gray-zone">
     <div class="container-fluid">
-        <div class="page-header overlay-div">
-            <div class="dropdown show">
+        <div class="page-header">
+            <!--<div class="dropdown show">
                 <a class="dropdown-toggle" id="muniRoleToggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             keansburg <span>|</span> planning<i class="fa fa-caret-down" style="margin-left: 10px" aria-hidden="true"></i>
           </a>
@@ -19,151 +35,325 @@
                     <a class="dropdown-item" href="#">Berkeley</a>
                     <a class="dropdown-item" href="#">Keansburg</a>
                 </div>
-            </div>
+            </div>-->
             <h3>Planning & Service Delivery Dashboard</h3>
         </div>
-        <div class="row">
 
+        <!---Main section------------------------------------------------------>
+        <div id="main_section" class="row ">
 
             <div class="col-sm-6 col-md-4">
-                <div class="overlay-div">
+                <!--<div class="overlay-div">-->
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading"><i class="fa fa-user" aria-hidden="true"></i>Profile</h4>
+                        <table class="table" style="margin-top: 10px">
+                            <tbody>
+                                <tr>
+                                    <th style="border-top: 0">Name</th>
+                                    <td id="info_name" style="border-top: 0">{{ user.first_name }} {{ user.last_name }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Title</th>
+                                    <td id="info_position">{{ user.njcusermeta.position }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Municipality</th>
+                                    <td>{{ user.njcusermeta.municipality }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Role</th>
+                                    <td>{{ user.njcusermeta.role }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Username</th>
+                                    <td>{{ user.username }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Mailing address</th>
+                                    <td>
+                                        <div id="info_address_line_1">{{ user.njcusermeta.address_line_1 }}</div>
+                                        <div id="info_address_line_2">{{ user.njcusermeta.address_line_2 }}</div>
+                                        <div id="info_city">{{ user.njcusermeta.city }}</div>
+                                        <div id="info_zip">{{ user.njcusermeta.zip }}</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Phone</th>
+                                    <td id="info_voice">{{ user.voice }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Email</th>
+                                    <td id="info_email">{{ user.email }}</td>
+                                </tr>
+                                <!--<tr>
+                                    <th>Password</th>
+                                    <td>•••••••</td>
+                                </tr>-->
+                            </tbody>
+                        </table>
+                        <a onclick="flip_edit_main(true);" href="#" class="btn btn-secondary btn-md btn-block" role="button">Edit Profile</a>
+                        <a href="{% url "change_password" %}" class="btn btn-secondary btn-md btn-block" role="button">Change Password</a>
+                    </li>
+                </ul>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading"><i class="fa fa-users" aria-hidden="true"></i>Groups</h4>
+                        <p>Groups for which you have membership.</p>
+                        <ul class="dashboard-list">
+                            <li>
+                                <a onclick="open_membership('main_membership');return false;" href="" ><span class="status">{{ main_group_membership_len }} mem <span id="main_membership_caret" class="fa fa-caret-down"></span></span></a>{{ user.njcusermeta.municipality.name }} {{ user.njcusermeta.role.name }}s
+                                <p>All {{ user.njcusermeta.municipality.name }} users with the {{ user.njcusermeta.role.name }} role</p>
+                                <ul id="main_membership" style="list-style-type: none;" class="hidden">
+                                    {% for main_group_user in main_group_membership %}
+                                    <li>{{ main_group_user.first_name}} {{ main_group_user.last_name}}</li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            {% if request.user|has_group:"municipal_administrators" %}
+                            <li>
+                                <a onclick="open_membership('muni_membership');return false;" href="" ><span class="status">{{ muni_group_membership_len }} mem <span id="muni_membership_caret" class="fa fa-caret-down"></span></span></a>Municipal Administrators
+                                <p>Municipal administrators team</p>
+                                <ul id="muni_membership" style="list-style-type: none;" class="hidden">
+                                    {% for muni_group_user in muni_group_membership %}
+                                    <li>{{ muni_group_user.first_name}} {{ muni_group_user.last_name}}</li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            {% endif %}
+                            {% if request.user|has_group:"dca_administrators" %}
+                            <li>
+                                <a onclick="open_membership('dca_membership');return false;" href="" ><span class="status">{{ dca_group_membership_len }} mem <span id="dca_membership_caret" class="fa fa-caret-down"></span></span></a>DCA Administrators
+                                <p>DCA administrators team</p>
+                                <ul id="dca_membership" style="list-style-type: none;" class="hidden">
+                                    {% for dca_group_user in dca_group_membership %}
+                                    <li>{{ dca_group_user.first_name}} {{ dca_group_user.last_name}}</li>
+                                    {% endfor %}
+                                </ul>
+                            </li>
+                            {% endif %}
+                        </ul>
+                        <!--<button class="btn btn-secondary btn-md btn-block" data-toggle="modal" data-target="">Explore Groups</button>
+                        <button class="btn btn-secondary btn-md btn-block" data-toggle="modal" data-target="">Create New Group</button>-->
+                    </li>
+                </ul>
+            <!--</div>-->
+        </div>
+
+        <div class="col-sm-6 col-md-4">
+            <ul class="list-group">
+                <li class="list-group-item" id="map-item">
+                    <a href="#" class="btn btn-primary btn-lg btn-block" data-toggle="modal" data-target="#createMap-1">Create New Map</a>
+                </li>
+                <li class="list-group-item">
+                    <h4 class="list-group-item-heading"><i class="fa fa-map-o" aria-hidden="true"></i>Maps</h4>
+                    <p>Explore all available GIS layers on the standard planning map, or interact with a custom saved version or maps shared by other users.</p>
+                    <ul class="dashboard-list scroll-maps" >
+                        {% for map in maps_for_user %}
+                        <li id="list_{{ map.id }}" >
+                            <a id="list_name_{{ map.id }}" href="{% url 'map_annotate' map.id %}">{{ map.name }}</a><i onclick="delete_map('{{ map.id }}');" style="float: right;color: #000;padding: 0 0 0 4px;" class="fa fa-remove"></i><span class="status">private</span>
+                        </li>
+                        {% endfor %} {% for map in shared_maps_for_user %}
+                        <li>
+                            <a href="{% url 'map_annotate' map.id %}"><span class="status">shared</span>{{ map.name }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ul>
+            <ul class="list-group">
+                <!--<div class="overlay-div">-->
+                    <li class="list-group-item">
+                        <h4 class="list-group-item-heading"><i class="fa fa-database" aria-hidden="true"></i>Layers</h4>
+                        <p>Browse descriptions of the GIS layers available on the Standard Planning Map, as well as layers shared by other users.</p>
+                        <a href="#" class="btn btn-secondary btn-md btn-block">Explore Layers</a>
+                    </li>
+                <!--</div>-->
+            </ul>
+        </div>
+
+        <div class="col-sm-6 col-md-4">
                     <ul class="list-group">
                         <li class="list-group-item">
-                            <h4 class="list-group-item-heading"><i class="fa fa-user" aria-hidden="true"></i>Profile</h4>
-                            <table class="table" style="margin-top: 10px">
-                                <tbody>
-                                    <tr>
-                                        <th style="border-top: 0">Name</th>
-                                        <td style="border-top: 0">Jane Marquette</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Title</th>
-                                        <td>Municipal Planner</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Municipality</th>
-                                        <td>Keansburg</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Role</th>
-                                        <td>Planner</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Username</th>
-                                        <td>j.marquette</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Password</th>
-                                        <td>•••••••</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <button class="btn btn-secondary btn-md btn-block" data-toggle="modal" data-target="">Edit Profile Information</button>
+                            <h4 class="list-group-item-heading"><i class="fa fa-cogs" aria-hidden="true"></i>Tools</h4>
+                            <p>Generate additional GIS data to view on the map alongside existing layers.</p>
+                            <!--<div class="overlay-div">
+                            <button class="btn btn-secondary btn-md btn-block" data-toggle="modal" data-target="">Browse Available Tools</button>
+                        </div>-->
                         </li>
-                    </ul>
-                    <ul class="list-group">
                         <li class="list-group-item">
-                            <h4 class="list-group-item-heading"><i class="fa fa-users" aria-hidden="true"></i>Groups</h4>
-                            <p>Create or join new user groups in addition to automatic membership in full municipality group for your role.</p>
-                            <ul class="dashboard-list">
-                                <li>
-                                    <a href=""><span class="status">28 mem</span>Keansburg Planners</a>
-                                    <p>All Keansburg users with planning and service delivery role</p>
-                                </li>
-                                <li>
-                                    <a href=""><span class="status">6 mem</span>Marquette's Planning Circle</a>
-                                    <p>Municipal planning advisory team</p>
-                                </li>
-                            </ul>
-                            <button class="btn btn-secondary btn-md btn-block" data-toggle="modal" data-target="">Explore Groups</button>
-                            <button class="btn btn-secondary btn-md btn-block" data-toggle="modal" data-target="">Create New Group</button>
+                            <!--<i class="fa fa-times pull-right" aria-hidden="true"></i>-->
+                            <h5 class="list-group-item-heading">Storm Hazard Projection (SHP) Tool </h5>
+                            <p>Evaluate exposure to natural hazards like strong winds, waves and surge for user-defined scenarios. <!--<a href="">Learn more</a>--></p>
+                            <div class="well rss-auto">
+                                <!--<div class="overlay-div">-->
+                                <div class="shp-cat-title auto">Active Storms
+                                    <div class="shp-cat" title="Based on latest track from NHC/NWS">active</div>
+                                </div>
+                                <!--<div class="map-layer-group-heading auto">
+                                    <a href="">
+                                        <div class="h-badge">H</div>Hurricane Jose</a><span title="Unfollow"><a href=""><i class="fa fa-minus-circle" aria-hidden="true"></i></a></span>
+                                </div>
+                                <p class="follow-unfollow">following</p>
+                                <div class="map-layer-group-heading auto">
+                                    <a href="">
+                                        <div class="h-badge">H</div>Hurricane Kaitlin</a><span title="Unfollow"><a href=""><i class="fa fa-minus-circle" aria-hidden="true"></i></a></span>
+                                </div>
+                                <p class="follow-unfollow">following</p>
+                                <div class="map-layer-group-heading auto not-following">
+                                    <div class="h-badge">H</div>Hurricane Liam <span title="Follow"><a href=""><i class="fa fa-plus-circle" aria-hidden="true"></i></a></span>
+                                </div>
+                                <p class="follow-unfollow">not following</p>-->
+                                </div>
+                            <!--</div>-->
+                            <a href="/expert" class="btn btn-primary btn-md btn-block" role="button">Run New Simulation</a>
+                            <a href="/explore/" class="btn btn-secondary btn-md btn-block" role="button">Explore Simulations</a>
                         </li>
+                        <!--<li class="list-group-item">
+                            <div class="overlay-div">
+                            <i class="fa fa-times pull-right" aria-hidden="true"></i>
+                            <h5 class="list-group-item-heading">Another New Tool</h5>
+                            <p>Tool that runs some other kind of simulation to generate new GIS layers. <a href="">Learn more</a></p>
+                            <button class="btn btn-primary btn-md btn-block" data-toggle="modal" data-target="">Use This Tool</button>
+                            </div>
+                        </li>-->
                     </ul>
+            </div>
+
+            <!-- Modal - Create map -->
+            <div class="modal fade" id="createMap-1" tabindex="-1" role="dialog" aria-labelledby="createMap">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="saveChanges">Create map</h4>
+                        </div>
+                        <div id="editable_user_modal" class="modal-body">
+                            Please enter a name and description for your new map:</br>
+                            <b>Map name</b></br>
+                            <input type="text" class="form-control" id="map_name" value="{{ user.username }}'s Map #{{ next_map_for_user }}" ></br>
+                            <b>Map description</b></br>
+                            <input type="text" class="form-control" id="map_description" value="NJ Coast auto-generated map for {{ user.username }}" ></br>
+                        </div>
+                        <div class="modal-footer">
+                            <a id="create_map_button" onclick="create_map();" class="btn btn-primary" href="#">Create</a>
+                            <a onclick="$('#createMap-1').modal('hide');" class="btn btn-default" href="#">Cancel</a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="col-sm-6 col-md-4">
-                <ul class="list-group">
-                    <li class="list-group-item" id="map-item">
-                        <a href="{% url 'new_njc_map' %}" class="btn btn-primary btn-lg btn-block">Create New Map</a>
-                    </li>
-                    <li class="list-group-item">
-                        <h4 class="list-group-item-heading"><i class="fa fa-map-o" aria-hidden="true"></i>Maps</h4>
-                        <p>Explore all available GIS layers on the standard planning map, or interact with a custom saved version or maps shared by other users.</p>
-                        <ul class="dashboard-list">
-                            {% for map in maps_for_user %}
-                            <li>
-                                <a href="{% url 'map_annotate' map.id %}"><span class="status">private</span>{{ map.name }}</a>
-                            </li>
-                            {% endfor %} {% for map in shared_maps_for_user %}
-                            <li>
-                                <a href="{% url 'map_annotate' map.id %}"><span class="status">shared</span>{{ map.name }}</a>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                </ul>
-                <ul class="list-group">
-                    <div class="overlay-div">
-                        <li class="list-group-item">
-                            <h4 class="list-group-item-heading"><i class="fa fa-database" aria-hidden="true"></i>Layers</h4>
-                            <p>Browse descriptions of the GIS layers available on the Standard Planning Map, as well as layers shared by other users.</p>
-                            <a href="#" class="btn btn-secondary btn-md btn-block">Explore Layers</a>
-                        </li>
-                        <div class="overlay-div">
-                </ul>
+            <!-- Modal - Delete map -->
+            <div class="modal fade" id="deleteMap-1" tabindex="-1" role="dialog" aria-labelledby="deleteMap">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="saveChanges">Delete map</h4>
+                        </div>
+                        <div id="editable_delete_modal" class="modal-body">
+                            Do you want to delete map?
+                        </div>
+                        <div class="modal-footer">
+                            <a id="delete_map_button" name="" onclick="delete_map_ajax(this.name);" class="btn btn-primary" href="#">Delete</a>
+                            <a onclick="$('#deleteMap-1').modal('hide');" class="btn btn-default" href="#">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- close row -->
+        <!---END of main section----------------------------------------------->
+
+        <!---Edit section------------------------------------------------------>
+        <div id="edit_section" class="row hidden">
+
+            <div class="col-sm-3 col-md-6">    <!-- col-md-6"-->
+                <table class="table edit-profile">
+                    <tbody>
+                        <tr id="edit_name_row">
+                            <th style="border-top: 0">Full Name</th>
+                            <td style="border-top: 0"><input type="text" class="form-control" id="edit_name" value="{{ user.first_name }} {{ user.last_name }}" placeholder="Jane Smith"></td>
+                        </tr>
+                        <tr>
+                            <th>Position/Title</th>
+                            <td><input type="text" class="form-control" id="edit_position" value="{{ user.njcusermeta.position }}" placeholder="Clerk"></td>
+                        </tr>
+                        <tr id="edit_zip_row">
+                            <th>Mailing address</th>
+                            <td>
+                                <input type="text" class="form-control" id="edit_address_line_1" value="{{ user.njcusermeta.address_line_1 }}" placeholder="Address line 1">
+                                <input type="text" class="form-control" id="edit_address_line_2" value="{{ user.njcusermeta.address_line_2 }}" placeholder="Address line 2">
+                                <input type="text" class="form-control" id="edit_city" value="{{ user.njcusermeta.city }}" placeholder="City">
+                                <input type="text" class="form-control" id="edit_zip" value="{{ user.njcusermeta.zip }}" placeholder="Zip code">
+                            </td>
+                        </tr>
+                        <tr id="edit_email_row">
+                            <th>Email</th>
+                            <td><input type="email" class="form-control" id="edit_email" value="{{ user.email }}" placeholder="jsmith@nj.gov"></td>
+                        </tr>
+                        <tr id="edit_voice_row">
+                            <th>Phone</th>
+                            <td><input type="tel" class="form-control" id="edit_voice" value="{{ user.voice}}" placeholder="123-456-7890"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="hidden" id="edit_username"></div>
+
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#saveChanges-1">
+                                      Save changes
+                                    </button>
+                <a onclick="flip_edit_main(false);" href="#" class="btn btn-default">Cancel</a>
+
+
+                <!-- Modal - Save changes button -->
+                <div class="modal fade" id="saveChanges-1" tabindex="-1" role="dialog" aria-labelledby="saveChanges">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="saveChanges">Save changes</h4>
+                            </div>
+                            <div id="editable_user_modal" class="modal-body">
+                                You have made changes to your profile. Would you like to save these changes?
+                            </div>
+                            <div class="modal-footer">
+                                <a name="create_muni_admin" id="save_changes_button" onclick="save_changes('{{ user.username }}');" class="btn btn-primary" href="#">Yes</a>
+                                <a onclick="$('#saveChanges-1').modal('hide');" class="btn btn-default" href="#">No</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="col-sm-6 col-md-4">
-                        <ul class="list-group">
-                            <li class="list-group-item">
-                                <h4 class="list-group-item-heading"><i class="fa fa-cogs" aria-hidden="true"></i>Tools</h4>
-                                <p>Generate additional GIS data to view on the map alongside existing layers.</p>
-                                <div class="overlay-div">
-                                <button class="btn btn-secondary btn-md btn-block" data-toggle="modal" data-target="">Browse Available Tools</button>
-                                </div>
-                            </li>
-                            <li class="list-group-item">
-                                <i class="fa fa-times pull-right" aria-hidden="true"></i>
-                                <h5 class="list-group-item-heading">Storm Hazard Projection (SHP) Tool </h5>
-                                <p>Evaluate exposure to natural hazards like strong winds, waves and surge for user-defined scenarios. <!--<a href="">Learn more</a>--></p>
-                                <div class="well rss-auto">
-                                    <div class="overlay-div">
-                                    <div class="shp-cat-title auto">Active Storms
-                                        <div class="shp-cat" title="Based on latest track from NHC/NWS">active</div>
-                                    </div>
-                                    <div class="map-layer-group-heading auto">
-                                        <a href="">
-                                            <div class="h-badge">H</div>Hurricane Jose</a><span title="Unfollow"><a href=""><i class="fa fa-minus-circle" aria-hidden="true"></i></a></span>
-                                    </div>
-                                    <p class="follow-unfollow">following</p>
-                                    <div class="map-layer-group-heading auto">
-                                        <a href="">
-                                            <div class="h-badge">H</div>Hurricane Kaitlin</a><span title="Unfollow"><a href=""><i class="fa fa-minus-circle" aria-hidden="true"></i></a></span>
-                                    </div>
-                                    <p class="follow-unfollow">following</p>
-                                    <div class="map-layer-group-heading auto not-following">
-                                        <div class="h-badge">H</div>Hurricane Liam <span title="Follow"><a href=""><i class="fa fa-plus-circle" aria-hidden="true"></i></a></span>
-                                    </div>
-                                    <p class="follow-unfollow">not following</p>
-                                    </div>
-                                </div>
-                                <a href="/expert" class="btn btn-primary btn-md btn-block" role="button">Run New Simulation</a>
-                                <a href="#" class="btn btn-secondary btn-md btn-block disabled" role="button">Explore Simulations</a>
-                            </li>
-                            <li class="list-group-item">
-                                <div class="overlay-div">
-                                <i class="fa fa-times pull-right" aria-hidden="true"></i>
-                                <h5 class="list-group-item-heading">Another New Tool</h5>
-                                <p>Tool that runs some other kind of simulation to generate new GIS layers. <a href="">Learn more</a></p>
-                                <button class="btn btn-primary btn-md btn-block" data-toggle="modal" data-target="">Use This Tool</button>
-                                </div>
-                            </li>
-                        </ul>
-                </div>
-
-                </div>
-                <!-- close row -->
             </div>
         </div>
+        <!---END of Edit section----------------------------------------------->
+
+        <!-- Modal - Info->OK ------------------------------------------------->
+        <div class="modal fade" id="fixInput-1" tabindex="-1" role="dialog" aria-labelledby="fixInput">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="saveChanges">Input Error</h4>
+                    </div>
+                    <div id="info_ok_modal" class="modal-body">
+                        User Email incorrect format! Please correct before proceeding.
+                    </div>
+                    <div class="modal-footer">
+                        <a onclick="$('#fixInput-1').modal('hide');" class="btn btn-default" href="#">OK</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END Modal - Info->OK --------------------------------------------->
+
+    </div>
+</div>
 {% endblock middle %}
+
+{% block extra_script %}
+<script src="{% static 'js/notify.min.js' %}"></script>
+<script src="{% static 'js/template_js/dashboard.js' %}"></script>
+{% endblock extra_script %}

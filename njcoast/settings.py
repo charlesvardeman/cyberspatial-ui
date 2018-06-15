@@ -100,3 +100,38 @@ TEMPLATES[0]['DIRS'].insert(0, os.path.join(LOCAL_ROOT, "templates"))
 
 # Handle Exported Variables
 TEMPLATES[0]['OPTIONS']['context_processors'].append('njcoast.context_processors.export_vars')
+
+# Setup Emails
+DEFAULT_FROM_EMAIL = 'jsweet@nd.edu'
+SERVER_EMAIL = 'jsweet@nd.edu'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'email-smtp.us-east-1.amazonaws.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('SMTP_USERNAME')
+EMAIL_HOST_PASSWORD = os.getenv('SMTP_PASSWORD')
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s - %(levelname)s - %(module)s - %(message)s'
+        }
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        }
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
+

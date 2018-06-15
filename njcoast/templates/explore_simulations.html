@@ -126,8 +126,8 @@
                         <ul class="list-inline pull-left" id="sort">
                             <li><a href="#" name="-modified" data-filter="order_by" class="selected" onclick='reload_simulation_data(this)'>Most recent</a></li>
                             <li><a href="#" name="modified" data-filter="order_by" onclick='reload_simulation_data(this)'>Less recent</a></li>
-                            <li><a href="#" name="description" data-filter="order_by" onclick='reload_simulation_data(this)'>A - Z</a></li>
-                            <li><a href="#" name="-description" data-filter="order_by" onclick='reload_simulation_data(this)'>Z - A</a></li>
+                            <li><a href="#" name="sim_name" data-filter="order_by" onclick='reload_simulation_data(this)'>A - Z</a></li>
+                            <li><a href="#" name="-sim_name" data-filter="order_by" onclick='reload_simulation_data(this)'>Z - A</a></li>
                             <!--<li><a data-value="-popular_count" data-filter="order_by" ng-click="single_choice_listener($event)">Most popular</a></li>-->
                         </ul>
                     </div>
@@ -156,7 +156,7 @@
 <script type=text/javascript>
     function AddUserMaps(sim_id){
         var html = `{% for map in maps_for_user %}
-        <a style="padding: 2px;" class="dropdown-item" name="{{ map.id }}" onclick='add_expert_to_map(this, ${sim_id});'>{{ map.name }}</a>
+        <a style="padding: 2px;" class="dropdown-item" name="{{ map.id }}" onclick='add_expert_to_map(this, "${sim_id}");'>{{ map.name }}</a>
         <div class="dropdown-divider"></div>
         {% endfor %}`;
 

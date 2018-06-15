@@ -1,0 +1,37 @@
+{% extends 'site_base.html' %}
+{% load i18n %}
+{% load staticfiles %}
+{% load base_tags %}
+
+{% block body_class %}home{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/njcoast-admin-style.css" %}" media="screen" />
+{% endblock extra_head %}
+
+{% block middle %}
+<div class="jumbotron njcoast-image slim">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</div>
+
+
+<div class="gray-zone-symmetric">
+    <div class="container">
+        <div class="row emphasis full-page-message">
+            <div class="col-md-2"></div>
+            <div class="col-sm-2">
+                <img class="img-responsive remove-on-mobile" src="/static/images/njcoast-logo_no-text.png" />
+            </div>
+            <div class="col-sm-10 col-md-6">
+                <h3 style="margin-top:0">Account Request</h3>
+                <p>Thank you for submitting your NJcoast account request. Your application has been forwarded to the account administrator. You will receive a follow up email with further instructions once your application has been reviewed.</p>
+            </div>
+            <div class="col-md-2"></div>
+        </div>
+    </div>
+</div>
+
+{% endblock middle %}

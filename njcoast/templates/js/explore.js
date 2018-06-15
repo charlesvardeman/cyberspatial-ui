@@ -198,12 +198,18 @@ function load_simulation_data(order_by) {
                     //counter from 1
                     var count = i + 1;
 
+                    //get name of sim if available
+                    var sim_title = result.data[i].data.storm_type + " Run";
+                    if(result.data[i].sim_name){
+                        sim_title = result.data[i].sim_name;
+                    }
+
                     //html to crete li
                     var html = `<li class="${hide}">
                                 <article>
                                     <div class="row items-list">
                                         <div class="col-xs-12 item-info shp-info">
-                                            <h4><div id="badge-${(count)}" class="h-badge what-if">H</div><span id="storm-${(count)}">${result.data[i].data.storm_type} Run</span></h4>
+                                            <h4><div id="badge-${(count)}" class="h-badge what-if">H</div><span id="storm-${(count)}">${ sim_title }</span></h4>
                                             <p>${result.data[i].description} <span class="owner">by <a href="">${result.data[i].user_name}</a></span></p>
                                             <p class="shp-scenario"><span>Sea Level Rise:</span> ${result.data[i].data.SLR}, <span>Coastal Protection:</span> ${result.data[i].data.protection}, <span>Tides:</span> ${result.data[i].data.tide_td}, <span>Analysis type:</span> ${result.data[i].data.analysis}, <span>Simulation id:</span> ${result.data[i].sim_id}</p>
                                             <br/>
