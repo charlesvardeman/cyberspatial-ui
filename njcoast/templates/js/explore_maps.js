@@ -194,3 +194,13 @@ $("#pageForward").on("click", function () {
     //update page
     document.getElementById('page').innerHTML = page;
 });
+
+//reload ordered data from simulation db
+function reload_map_data(object) {
+    //set selected
+    $(object).parent().siblings().find('.' + "selected").removeClass("selected");
+    object.classList.add("selected");
+
+    //load data
+    load_maps_data(object.name);
+}
