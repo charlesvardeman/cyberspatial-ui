@@ -35,6 +35,10 @@ from django.db import connection
 import logging
 logger = logging.getLogger(__name__)
 
+from django.shortcuts import render
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+
 '''
   This function is used to respond to ajax requests for which layers should be
   visible for a given user. Borrowed a lot of this from the GeoNode base code
@@ -341,6 +345,17 @@ def map_settings(request, map_id):
             #settings?
             if request.POST['action'] == 'save':
                 print "Settings ", map_objs[0].name, map_objs[0].id, map_id
+
+                #thumbnail?
+                try:
+                    if request.FILES['thumbnail']:
+                        #add thumbnail to database
+                        map_objs[0].thumbnail = request.FILES['thumbnail']
+                        print "Loaded thumbnail"
+
+                except:
+                    pass
+                #save the settings
                 map_objs[0].settings = request.POST['settings']
                 map_objs[0].save()
 

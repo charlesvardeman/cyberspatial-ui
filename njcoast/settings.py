@@ -101,6 +101,9 @@ TEMPLATES[0]['DIRS'].insert(0, os.path.join(LOCAL_ROOT, "templates"))
 # Handle Exported Variables
 TEMPLATES[0]['OPTIONS']['context_processors'].append('njcoast.context_processors.export_vars')
 
+#also media storage
+TEMPLATES[0]['OPTIONS']['context_processors'].append('django.template.context_processors.media')
+
 # Setup Emails
 DEFAULT_FROM_EMAIL = 'jsweet@nd.edu'
 SERVER_EMAIL = 'jsweet@nd.edu'
@@ -135,3 +138,6 @@ LOGGING = {
     },
 }
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MEDIA_URL = '/map_thumbnails/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'map_thumbnails')
