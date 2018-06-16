@@ -9,6 +9,8 @@
     <!-- load mods to leaflet for rectangular popups/map icons -->
     <link rel="stylesheet" type="text/css" href="{% static "css/crc_leaflet.css" %}" media="screen" />
     <link rel="stylesheet" type="text/css" href="{% static "css/fontawesome-all.min.css" %}" media="screen" />
+
+    <script src="{% static 'js/template_js/explore_maps.js' %}"></script>
 {% endblock extra_head %}
 
 {% block middle %}
@@ -16,7 +18,7 @@
 
 <div class="container">
     <div class="page-header map-header">
-        <button class="btn btn-primary btn-md pull-right" data-toggle="modal" data-target="">Create a New Map</button>
+        <button class="btn btn-primary btn-md pull-right" data-toggle="modal" data-target="#createMap-1">Create a New Map</button>
         <h3>Explore Maps</h3>
     </div>
     <div class="row">
@@ -193,32 +195,44 @@
 
 
 <!-- Modal must stay outside the navbar -->
-<div class="modal fade" id="SigninModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm">
+<!-- Modal - Create map -->
+<div class="modal fade" id="createMap-1" tabindex="-1" role="dialog" aria-labelledby="createMap">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                <h4 class="modal-title" id="myModalLabel">Sign in</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="saveChanges">Create map</h4>
             </div>
-            <form class="form-signin" role="form" action="/account/login/?next=/" method="post">
-                <div class="modal-body">
-                    <input type='hidden' name='csrfmiddlewaretoken' value='KYnTyykJtly0xoMBQb3mzsmockWyZqDN' />
-                    <div class="form-group">
-                        <label for="id_username" class="sr-only">Username:</label>
-                        <input id="id_username" class="form-control" name="username" placeholder="Username" type="text" />
-                    </div>
-                    <div class="form-group">
-                        <label for="id_password" class="sr-only">Password:</label>
-                        <input id="id_password" class="form-control" name="password" placeholder="Password" type="password" />
-                    </div>
-                    <label class="checkbox">
-              <input type="checkbox" /> Remember Me
-            </label>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary btn-block">Sign in</button>
-                </div>
-            </form>
+            <div id="editable_user_modal" class="modal-body">
+                Please enter a name and description for your new map:</br>
+                <b>Map name</b></br>
+                <input type="text" class="form-control" id="map_name" value="{{ user.username }}'s Map #{{ next_map_for_user }}" ></br>
+                <b>Map description</b></br>
+                <input type="text" class="form-control" id="map_description" value="NJ Coast auto-generated map for {{ user.username }}" ></br>
+            </div>
+            <div class="modal-footer">
+                <a id="create_map_button" onclick="create_map();" class="btn btn-primary" href="#">Create</a>
+                <a onclick="$('#createMap-1').modal('hide');" class="btn btn-default" href="#">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal - Delete map -->
+<div class="modal fade" id="deleteMap-1" tabindex="-1" role="dialog" aria-labelledby="deleteMap">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="saveChanges">Delete map</h4>
+            </div>
+            <div id="editable_delete_modal" class="modal-body">
+                Do you want to delete map?
+            </div>
+            <div class="modal-footer">
+                <a id="delete_map_button" name="" onclick="delete_map_ajax(this.name);" class="btn btn-primary" href="#">Delete</a>
+                <a onclick="$('#deleteMap-1').modal('hide');" class="btn btn-default" href="#">Cancel</a>
+            </div>
         </div>
     </div>
 </div>

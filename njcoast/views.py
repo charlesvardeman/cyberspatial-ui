@@ -580,6 +580,10 @@ class ExploreMapsTemplateView(TemplateView):
 
         #quiery, select if I am the owner
         context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+        if context['maps_for_user']:
+            context['next_map_for_user'] = len(context['maps_for_user']) + 1
+        else:
+            context['next_map_for_user'] = 1
 
         return context
 
