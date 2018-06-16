@@ -1,0 +1,233 @@
+{% extends 'site_base.html' %}
+{% load i18n %}
+{% load staticfiles %}
+{% load base_tags %}
+
+{% block body_class %}home{% endblock %}
+
+{% block extra_head %}
+    <!-- load mods to leaflet for rectangular popups/map icons -->
+    <link rel="stylesheet" type="text/css" href="{% static "css/crc_leaflet.css" %}" media="screen" />
+    <link rel="stylesheet" type="text/css" href="{% static "css/fontawesome-all.min.css" %}" media="screen" />
+{% endblock extra_head %}
+
+{% block middle %}
+<div class="jumbotron njcoast-image slimmer"></div>
+
+<div class="container">
+    <div class="page-header map-header">
+        <button class="btn btn-primary btn-md pull-right" data-toggle="modal" data-target="">Create a New Map</button>
+        <h3>Explore Maps</h3>
+    </div>
+    <div class="row">
+
+        <div class="col-md-3">
+            <div class="selections">
+                Your selections
+                <a href="" id="clear-search" class="pull-right">Clear</a>
+            </div>
+            <nav class="filter">
+
+                <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-down"></i>Text</a></h4>
+                <ul class="nav open" id="text">
+                    <li>
+                        <div class="input-group">
+                            <input name="text_search_input" id="text_search_input" ng-model="text_query" type="text" placeholder="Search by text" class="form-control">
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary" type="submit" id="text_search_btn"><i class="fa fa-search"></i></button>
+                            </span>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+
+            <div id="slide-pane">
+
+                <nav class="filter">
+                    <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-right"></i>Date</a></h4>
+                    <ul class="nav closed" id="date_start">
+                        <label>Date begins after:</label>
+                        <li><input value="yyyy-mm-dd" data-date-format="YYYY-MM-DD" type="text" class="datepicker" placeholder="yyyy-mm-dd" ng-model="date_query.date__gte" /></li>
+                    </ul>
+                    <ul class="nav closed" id="date_end">
+                        <label>Date ends before:</label>
+                        <li><input value="yyyy-mm-dd" data-date-format="YYYY-MM-DD" type="text" class="datepicker" placeholder="yyyy-mm-dd" ng-model="date_query.date__lte" /></li>
+                    </ul>
+                </nav>
+
+                <nav class="filter">
+                    <h4><a href="#" id="_extent_filter" class="toggle toggle-nav"><i class="fa fa-chevron-down"></i>Extent</a></h4>
+                    <fieldset class="nav closed">
+                        <div class="control-group leaflet_map">
+                            <leaflet class="filter-map-container" center="map_center" defaults="defaults" layers="layers" id="filter-map">
+                            </leaflet>
+                        </div>
+                    </fieldset>
+                </nav>
+
+            </div>
+
+
+
+        </div>
+        <div class="col-md-9">
+            <div class="row" style="margin-top:1em">
+                <div class="col-md-3">
+                    <span>Total: </span>
+                    <span ng-bind="total_counts">4</span>
+                </div>
+
+                <div class="col-md-9">
+                    <ul class="list-inline pull-left" id="sort">
+                        <li><a data-value="-date" data-filter="order_by" class="selected" ng-click="single_choice_listener($event)">Most recent</a></li>
+                        <li><a data-value="date" data-filter="order_by" ng-click="single_choice_listener($event)">Less recent</a></li>
+                        <li><a data-value="title" data-filter="order_by" ng-click="single_choice_listener($event)">A - Z</a></li>
+                        <li><a data-value="-title" data-filter="order_by" ng-click="single_choice_listener($event)">Z - A</a></li>
+                        <li><a data-value="-popular_count" data-filter="order_by" ng-click="single_choice_listener($event)">Most popular</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <article>
+                <div class="row items-list">
+                    <div class="col-xs-4 thumb">
+                        <a href=""><img src="images/custom-thumb.png" /></a>
+                    </div>
+                    <div class="col-xs-8 item-info">
+
+                        <h4><a href="">My Custom Map #4</a></h4>
+                        <p><span class="owner">by <a href="">j.marquette</a></span></p>
+                        <p class="abstract">Customized version of Standard Planning Map I recently saved and have not shared with anyone</p>
+                        <p class="actions">
+                            <a href=""><i class="fa fa-calendar-o"></i>16 Sept 2017</a> |
+                            <a href=""><i class="fa fa-eye"></i>0</a> |
+                            <a href=""><i class="fa fa-share"></i>0</a> |
+                            <a href=""><i class="fa fa-star"></i>0</a>
+                            <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="">
+                                <i class="fa fa-map-marker"></i>View Map</a>
+                        </p>
+                    </div>
+                </div>
+            </article>
+
+            <article>
+                <div class="row items-list">
+                    <div class="col-xs-4 thumb">
+                        <a href=""><img src="images/jose-thumb.png" /></a>
+                    </div>
+                    <div class="col-xs-8 item-info">
+
+                        <h4><a href="">Hurricane Jose Map - Annotated</a></h4>
+                        <p><span class="owner">by <a href="">j.gregorio</a></span></p>
+                        <p class="abstract">Shared map summarizing lessons learned from Hurricane Jose, with custom annotations from team</p>
+                        <p class="actions">
+                            <a href=""><i class="fa fa-calendar-o"></i>15 Sept 2017</a> |
+                            <a href=""><i class="fa fa-eye"></i>100</a> |
+                            <a href=""><i class="fa fa-share"></i>120</a> |
+                            <a href=""><i class="fa fa-star"></i>5</a>
+                            <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="">
+                                <i class="fa fa-map-marker"></i>View Map</a>
+                        </p>
+                    </div>
+                </div>
+            </article>
+
+            <article>
+                <div class="row items-list">
+                    <div class="col-xs-4 thumb">
+                        <a href=""><img src="images/smith-thumb.png" /></a>
+                    </div>
+                    <div class="col-xs-8 item-info">
+
+                        <h4><a href="">Jones Planning Map</a></h4>
+                        <p><span class="owner">by <a href="">k.jones</a></span></p>
+                        <p class="abstract">Map shared by another user that is relevant to specific planning project</p>
+                        <p class="actions">
+                            <a href=""><i class="fa fa-calendar-o"></i>12 April 2017</a> |
+                            <a href=""><i class="fa fa-eye"></i>4</a> |
+                            <a href=""><i class="fa fa-share"></i>4</a> |
+                            <a href=""><i class="fa fa-star"></i>4</a>
+                            <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="">
+                                <i class="fa fa-map-marker"></i>View Map</a>
+                        </p>
+                    </div>
+                </div>
+            </article>
+
+            <article>
+                <div class="row items-list">
+                    <div class="col-xs-4 thumb">
+                        <a href=""><img src="images/map-thumb.png" /></a>
+                    </div>
+                    <div class="col-xs-8 item-info">
+
+                        <h4><a href="">Standard Planning Map</a></h4>
+                        <p>Default map</p>
+                        <p class="abstract">Base map for Berkeley, dynamically loaded with all GIS layers available to the Planning and Service Delivery role</p>
+                        <p class="actions">
+                            <a href=""><i class="fa fa-calendar-o"></i>5 Jan 2018</a> |
+                            <a href=""><i class="fa fa-eye"></i>176</a> |
+                            <a href=""><i class="fa fa-share"></i>0</a> |
+                            <a href=""><i class="fa fa-star"></i>5</a>
+                            <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="map-p.html">
+                                <i class="fa fa-map-marker"></i>View Map</a>
+                        </p>
+                    </div>
+                </div>
+            </article>
+
+            <div class="row">
+                <nav>
+                    <ul class="pagination pull-right">
+                        <li ng-click="paginate_down()"><a href><strong><i class="fa fa-angle-left"></i></strong></a></li>
+                        <li><a href>page <span ng-model="page" ng-bind="page">1</span> of <span ng-bind="numpages">1</span></a>
+                        </li>
+                        <li ng-click="paginate_up()"><a href><strong><i class="fa fa-angle-right"></i></strong></a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- close container -->
+
+
+<!-- Modal must stay outside the navbar -->
+<div class="modal fade" id="SigninModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="myModalLabel">Sign in</h4>
+            </div>
+            <form class="form-signin" role="form" action="/account/login/?next=/" method="post">
+                <div class="modal-body">
+                    <input type='hidden' name='csrfmiddlewaretoken' value='KYnTyykJtly0xoMBQb3mzsmockWyZqDN' />
+                    <div class="form-group">
+                        <label for="id_username" class="sr-only">Username:</label>
+                        <input id="id_username" class="form-control" name="username" placeholder="Username" type="text" />
+                    </div>
+                    <div class="form-group">
+                        <label for="id_password" class="sr-only">Password:</label>
+                        <input id="id_password" class="form-control" name="password" placeholder="Password" type="password" />
+                    </div>
+                    <label class="checkbox">
+              <input type="checkbox" /> Remember Me
+            </label>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- End of Modal -->
+
+{% endblock middle %}
+
+{% block extra_script %}
+<script type=text/javascript>
+</script>
+{% endblock extra_script %}

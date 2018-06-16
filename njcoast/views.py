@@ -572,6 +572,17 @@ class ExploreTemplateView(TemplateView):
 
         return context
 
+class ExploreMapsTemplateView(TemplateView):
+    template_name = 'explore_maps.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ExploreMapsTemplateView, self).get_context_data(**kwargs)
+
+        #quiery, select if I am the owner
+        context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+
+        return context
+
 #signup new users.
 def signup(request):
     if request.method == 'POST':
