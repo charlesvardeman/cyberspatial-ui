@@ -49,6 +49,7 @@ class NJCMap(models.Model):
     shared_with = models.TextField(blank=True)
     # layers = models.ManyToManyField(Layer, blank=True)
     is_default = models.BooleanField(default=False)
+    thumbnail = models.ImageField(upload_to='thumbnails/', null=True, blank=True)
 
     def __str__(self):
         return self.name

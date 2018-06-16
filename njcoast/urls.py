@@ -6,6 +6,9 @@ from geonode.urls import urlpatterns
 from .views import my_gis_layers, MapTemplateView, DashboardTemplateView, MapExpertTemplateView, ExploreTemplateView, DCADashboardTemplateView
 from njcoast.views import map_annotations, njc_map_utilities, map_expert_simulations, map_settings, signup, user_approval, change_password, municipalities_in_county
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = patterns('',
                        url(r'^/?$', TemplateView.as_view(template_name='site_index.html'), name='home'),
                        url(r'^about/$', TemplateView.as_view(template_name='site_about.html'), name='about'),
@@ -27,3 +30,6 @@ urlpatterns = patterns('',
                        url(r'^password/$', change_password, name='change_password'),
                        url(r'^municipalities_in_county/$', municipalities_in_county, name='municipalities_in_county'),
                        ) + urlpatterns
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

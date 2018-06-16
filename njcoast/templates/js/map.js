@@ -499,46 +499,133 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type){
 });
 }
 
+//create blob from thumbnail
+function dataURLtoBlob(dataurl) {
+    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], {type:mime});
+}
+
 //save current map
-function save_map(notify){
-  //save map state
-  var map_data = {
-      'latitude': mymap.getCenter().lat,
-      'longitude': mymap.getCenter().lng,
-      'zoom': mymap.getZoom(),
-      'layers_selected': layers_selected,
-      'simulations': simulations
-  };
+function save_map(notify) {
+    //get general map data
+    //save map state
+    var map_data = {
+        'latitude': mymap.getCenter().lat,
+        'longitude': mymap.getCenter().lng,
+        'zoom': mymap.getZoom(),
+        'layers_selected': layers_selected,
+        'simulations': simulations
+    };
 
-  if( annotate_map_id != null ){
-      map_data.map_id = annotate_map_id;
-  }
+    if (annotate_map_id != null) {
+        map_data.map_id = annotate_map_id;
+    }
 
-  console.log("Layers "+JSON.stringify(map_data));
+    console.log("Layers " + JSON.stringify(map_data));
 
-  $.ajax({
-      type: "POST",
-      url: "/map/" + annotate_map_id + "/settings/",
-      data: {
-          'settings': JSON.stringify(map_data),
-          'action': 'save'
-      },
-      dataType: "json",
-      success: function(result) {
-          console.log("SETTING STORE -- SUCCESS!" + result.saved);
-          //now auto save so dont flag
-          if(notify){
-            $.notify("Settings saved", "success");
-          }
-      },
-      error: function(result) {
-          console.log("ERROR:", result)
-          if(notify){
-              $.notify("Error saving map settings", "error");
-          }
-      }
-  });
+    //setup form for AJAX magic
+    //create formdata to allow us to send file
+    var formData = new FormData();
+    formData.append('settings', JSON.stringify(map_data));
+    formData.append('action', 'save');
 
+    //lets do a try in case leafletImage fails
+    try{
+        //generate image and then save map information
+        leafletImage(mymap, function(err, canvas) {
+            // now you have canvas
+
+            //~~~~Get the blob for the image~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            //aspect ratio
+            var dimensions = mymap.getSize();
+            var aspect = dimensions.x / dimensions.y;
+
+            //set sizes
+            var height = 180;
+            var width = 240;
+
+            if(aspect > 1.3333){
+                height = 240 / aspect;
+            }else{
+                width = 180 * aspect;
+            }
+
+            //
+            var resizedCanvas = document.createElement("canvas");
+            var resizedContext = resizedCanvas.getContext("2d");
+
+            resizedCanvas.height = height;
+            resizedCanvas.width = width;
+
+            var context = canvas.getContext("2d");
+
+            resizedContext.drawImage(canvas, 0, 0, width, height);
+
+            var blob = dataURLtoBlob(resizedCanvas.toDataURL());
+            //~~~~END Get the blob for the image~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+            //add to formdata to allow us to send file
+            formData.append('thumbnail', blob, 'thumbnail.png');
+
+            //do AJAX call to save the map
+            $.ajax({
+                type: "POST",
+                url: "/map/" + annotate_map_id + "/settings/",
+                data: formData,
+                dataType: "json",
+                //use contentType, processData to allow us to send thumbnail image
+                contentType: false,
+                processData: false,
+                success: function success(result) {
+                    console.log("SETTING STORE -- SUCCESS!" + result.saved);
+                    //now auto save so dont flag
+                    if (notify) {
+                        $.notify("Settings saved", "success");
+                    }
+                },
+                error: function error(result) {
+                    console.log("ERROR:", result);
+                    if (notify) {
+                        $.notify("Error saving map settings", "error");
+                    }
+                }
+            });
+            //end ajax
+
+        });
+        //end leafletImage
+
+    }catch(err){    //here if we fail somehow. Wont work IE < 10
+        //if we cant get the thumbnail lets just save the other information
+        //do AJAX call to save the map
+        $.ajax({
+            type: "POST",
+            url: "/map/" + annotate_map_id + "/settings/",
+            data: formData,
+            dataType: "json",
+            //use contentType, processData to allow us to send thumbnail image
+            contentType: false,
+            processData: false,
+            success: function success(result) {
+                console.log("SETTING STORE -- SUCCESS!" + result.saved);
+                //now auto save so dont flag
+                if (notify) {
+                    $.notify("Settings saved", "success");
+                }
+            },
+            error: function error(result) {
+                console.log("ERROR:", result);
+                if (notify) {
+                    $.notify("Error saving map settings", "error");
+                }
+            }
+        });
+        //end ajax
+    }
 }
 
 //save map sharing users
