@@ -349,7 +349,11 @@ def map_settings(request, map_id):
                 #thumbnail?
                 try:
                     if request.FILES['thumbnail']:
-                        #add thumbnail to database
+                        #remove old image
+                        if map_objs[0].thumbnail:
+                            map_objs[0].thumbnail.delete(False)
+
+                        #add new thumbnail to database
                         map_objs[0].thumbnail = request.FILES['thumbnail']
                         print "Loaded thumbnail"
 
