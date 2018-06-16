@@ -219,18 +219,24 @@ def njc_map_utilities(request):
             return JsonResponse({'created': False})
     #delete
     elif request.method == "GET":
-        print "delete", request.GET['id']
+        #delete maps?
+        if request.GET['action'] == 'delete':
+            print "delete", request.GET['id']
 
-        #delete object
-        object_to_delete = NJCMap.objects.get(id = request.GET['id'])
-        if object_to_delete:
-            object_to_delete.delete()
+            #delete object
+            object_to_delete = NJCMap.objects.get(id = request.GET['id'])
+            if object_to_delete:
+                object_to_delete.delete()
 
-            return JsonResponse({'deleted': True})
-        else:
-            return JsonResponse({'deleted': False})
+                return JsonResponse({'deleted': True})
+            else:
+                return JsonResponse({'deleted': False})
 
-    return JsonResponse({'created': False, 'deleted': False})
+        #load map data?
+        elif request.GET['action'] == 'load_maps':
+            print "load_maps"
+
+    return JsonResponse({'created': False, 'deleted': False, 'load': False})
     #return HttpResponseRedirect(reverse('map_annotate', args=[map_object.id]))
 
 '''
