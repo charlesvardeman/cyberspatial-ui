@@ -1,3 +1,13 @@
+//~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$(document).ready(function () {
+
+    //load actual data
+    load_maps_data('-name');
+
+    //$("#datepicker1").datepicker();
+    //$("#datepicker2").datepicker();
+});
+
 //create a new map and launch it
 function create_map(){
     console.log("saving");
@@ -11,7 +21,7 @@ function create_map(){
         dataType: "json",
         success: function(result) {
             console.log("CREATE MAP -- SUCCESS!" + result.created);
-            if(result.created){
+            if(result.load){
                 //go to new map
                 window.location.href = "/map/" + result.id + "/";
             }else{
@@ -30,31 +40,32 @@ function create_map(){
 }
 
 //load ordered data from simulation db
-function load_map_data(order_by) {
+function load_maps_data(order_by) {
+    console.log("loading maps");
+
     $.ajax({
         type: "GET",
-        url: "/store/",
+        url: "/maps/new/",
         data: {
-            action: "get_my_data",
-            order_by: order_by,
-            start_date: start_date,
-            end_date: end_date,
-            text_search: text_search
+            'action': 'load_maps',
+            'order_by': order_by,
+            'start_date': 0,
+            'end_date': 0,
+            'text_search': ''
         },
         dataType: "json",
         success: function (result) {
 
-            console.log("GETTING SIMULATION -- SUCCESS! " + result.status);
+            console.log("GETTING MAPS -- SUCCESS! " + result.loaded);
 
-            //get heatmap from S3
-            if (result.status) {
+            //get maps
+            if (result.loaded) {
+                console.log("loaded "+result.data[0].thumbnail);
                 //clear current list
                 document.getElementById('dashboard-list').innerHTML = "";
 
                 //get JSON data
                 for (var i = 0; i < result.data.length; i++) {
-                    //console.log(result.data[i].sim_id);
-
                     //setup for hidden list elements
                     var hide = "";
                     if (i > 3) {
@@ -64,97 +75,44 @@ function load_map_data(order_by) {
                     //counter from 1
                     var count = i + 1;
 
-                    //get name of sim if available
-                    var sim_title = result.data[i].data.storm_type + " Run";
-                    if(result.data[i].sim_name){
-                        sim_title = result.data[i].sim_name;
+                    var url = result.data[i].thumbnail;
+                    if(!url){
+                        url = "/map_thumbnails/missing_map.png";
                     }
 
                     //html to crete li
                     var html = `<li class="${hide}">
-                                <article>
-                                    <div class="row items-list">
-                                        <div class="col-xs-12 item-info shp-info">
-                                            <h4><div id="badge-${(count)}" class="h-badge what-if">H</div><span id="storm-${(count)}">${ sim_title }</span></h4>
-                                            <p>${result.data[i].description} <span class="owner">by <a href="">${result.data[i].user_name}</a></span></p>
-                                            <p class="shp-scenario"><span>Sea Level Rise:</span> ${result.data[i].data.SLR}, <span>Coastal Protection:</span> ${result.data[i].data.protection}, <span>Tides:</span> ${result.data[i].data.tide_td}, <span>Analysis type:</span> ${result.data[i].data.analysis}, <span>Simulation id:</span> ${result.data[i].sim_id}</p>
-                                            <br/>
-                                            <p class="actions">
-                                                <table style="width: 100%;">
-                                                    <tr>
-                                                        <td style="font-size: 14px;">
-                                                            <i class="fa fa-calendar-o"></i> ${result.data[i].modified}
-                                                        </td>
-                                                        <td>
-                                                            <div class="dropup show pull-right">
-                                                                <button class="dropdown-toggle" style="margin-top: 5px;font-size: 14px;" id="dropdownMenuAddToMap_${count}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                                    Add Results to Map ... <i href="#"  class="fa fa-caret-up" style="margin-left: 10px" aria-hidden="true"></i>
-                                                                </button>
-                                                                <div id="add_${result.data[i].sim_id}" style="height: 250px;overflow: auto;" class="dropdown-menu" aria-labelledby="dropdownMenuAddToMap_${count}">
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </p>
+                                    <article>
+                                        <div class="row items-list">
+                                            <div class="col-xs-4 thumb">
+                                                <a href=""><img src="${ url }" /></a>
+                                            </div>
+                                            <div class="col-xs-8 item-info">
+
+                                                <h4><a href="">${ result.data[i].name }</a></h4>
+                                                <p><span class="owner">by <a href="">${ result.data[i].owner }</a></span></p>
+                                                <p class="abstract">${ result.data[i].description }</p>
+                                                <p class="actions">
+                                                    <a href=""><i class="fa fa-calendar-o"></i>16 Sept 2017</a> |
+                                                    <a href=""><i class="fa fa-eye"></i>0</a> |
+                                                    <a href=""><i class="fa fa-share"></i>0</a> |
+                                                    <a href=""><i class="fa fa-star"></i>0</a>
+                                                    <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="">
+                                                        <i class="fa fa-map-marker"></i>View Map</a>
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
-                                </article>
-                            </li>`;
+                                    </article>
+                                </li>`;
 
                     //add it
                     document.getElementById('dashboard-list').innerHTML += html;
-                    AddUserMaps(result.data[i].sim_id);
+
                 }
-
-                //loop until end of data list
-                counter = 1;
-                page = 1;
-                var hurricanes = 0;
-                var noreasters = 0;
-
-
-                do {
-                    var more_elmts = document.getElementById('badge-' + counter);
-
-                    //if exists and checked then save
-                    if (more_elmts) {
-                        //change badge if Nor'easter
-                        if (document.getElementById('storm-' + counter).innerHTML.indexOf("Nor'easter") >= 0) {
-                            more_elmts.innerHTML = "N";
-                            more_elmts.classList.remove("h-badge");
-                            more_elmts.classList.add("n-badge");
-                            noreasters++;
-                        } else {
-                            hurricanes++;
-                        }
-
-                        //increment
-                        counter++;
-                    }
-
-                } while (more_elmts)
-
-                //fix last increment
-                counter--;
-
-                //update total
-                document.getElementById('total').innerHTML = counter;
-
-                //update hurricanes
-                document.getElementById('hurricanes').innerHTML = hurricanes;
-
-                //update total
-                document.getElementById('noreasters').innerHTML = noreasters;
-
-                //update total
-                document.getElementById('pagetotal').innerHTML = Math.ceil(counter / 4);
-
             }
         },
         error: function (result) {
-            console.log("ERROR:", result)
-            //$.notify("Error loading simulation", "error");
+            console.log("GETTING MAPS -- ERROR:", result)
         }
     });
 

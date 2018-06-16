@@ -10,7 +10,6 @@
     <link rel="stylesheet" type="text/css" href="{% static "css/crc_leaflet.css" %}" media="screen" />
     <link rel="stylesheet" type="text/css" href="{% static "css/fontawesome-all.min.css" %}" media="screen" />
 
-    <script src="{% static 'js/template_js/explore_maps.js' %}"></script>
 {% endblock extra_head %}
 
 {% block middle %}
@@ -94,28 +93,6 @@
             <ul id="dashboard-list" class="dashboard-list">
             </ul>
 
-            <article>
-                <div class="row items-list">
-                    <div class="col-xs-4 thumb">
-                        <a href=""><img src="images/custom-thumb.png" /></a>
-                    </div>
-                    <div class="col-xs-8 item-info">
-
-                        <h4><a href="">My Custom Map #4</a></h4>
-                        <p><span class="owner">by <a href="">j.marquette</a></span></p>
-                        <p class="abstract">Customized version of Standard Planning Map I recently saved and have not shared with anyone</p>
-                        <p class="actions">
-                            <a href=""><i class="fa fa-calendar-o"></i>16 Sept 2017</a> |
-                            <a href=""><i class="fa fa-eye"></i>0</a> |
-                            <a href=""><i class="fa fa-share"></i>0</a> |
-                            <a href=""><i class="fa fa-star"></i>0</a>
-                            <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="">
-                                <i class="fa fa-map-marker"></i>View Map</a>
-                        </p>
-                    </div>
-                </div>
-            </article>
-
             <div class="row">
                 <nav>
                     <ul class="pagination pull-right">
@@ -180,6 +157,8 @@
 {% endblock middle %}
 
 {% block extra_script %}
+<script src="{% static 'js/template_js/explore_maps.js' %}"></script>
+
 <script type=text/javascript>
 </script>
 {% endblock extra_script %}

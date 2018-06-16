@@ -236,7 +236,46 @@ def njc_map_utilities(request):
         elif request.GET['action'] == 'load_maps':
             print "load_maps"
 
-    return JsonResponse({'created': False, 'deleted': False, 'load': False})
+            #get the ordering
+            order_by = request.GET['order_by']
+
+            #if dates
+            #if len(request.GET['start_date']) > 0 and len(request.GET['end_date']) > 0:
+            #    try:
+            #        start_date = datetime.strptime(request.GET['start_date'], '%m/%d/%Y')
+            #        end_date = datetime.strptime(request.GET['end_date'], '%m/%d/%Y')
+            #    except:
+            #        return JsonResponse({'loaded': False})
+
+            #    #get data from db
+            #    map_objs = NJCMap.objects.filter(owner = request.user, description__contains=request.GET['text_search']).order_by(order_by) #, modified__range=(start_date, end_date)
+
+            #or just belonging to user
+            #else:
+            #    #get data from db
+            map_objs = NJCMap.objects.filter(owner = request.user).order_by(order_by) #, description__contains=request.GET['text_search']
+
+            print "maps", len(map_objs)
+            #parse out results
+            output_array = []
+            for map in map_objs:
+                inner_dict = {}
+                inner_dict['name'] = map.name
+                inner_dict['description'] = map.description
+                inner_dict['settings'] = map.settings
+                inner_dict['shared_with'] = map.shared_with
+                if map.thumbnail:
+                    print "here", map.thumbnail.url
+                    inner_dict['thumbnail'] = map.thumbnail.url
+                inner_dict['is_default'] = map.is_default
+                inner_dict['owner'] = map.owner.username
+                #inner_dict['modified'] = map.modified.strftime('%m/%d/%Y %H:%M')
+                output_array.append(inner_dict)
+
+            #send it back
+            return JsonResponse({'loaded': True, 'data': output_array})
+
+    return JsonResponse({'created': False, 'deleted': False, 'loaded': False})
     #return HttpResponseRedirect(reverse('map_annotate', args=[map_object.id]))
 
 '''
