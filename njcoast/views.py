@@ -253,7 +253,7 @@ def njc_map_utilities(request):
             #or just belonging to user
             #else:
             #    #get data from db
-            map_objs = NJCMap.objects.filter(owner = request.user).order_by(order_by) #, description__contains=request.GET['text_search']
+            map_objs = NJCMap.objects.filter(Q(owner = request.user) | Q(shared_with__contains = request.user)).order_by(order_by) #, description__contains=request.GET['text_search']
 
             print "maps", len(map_objs)
             #parse out results
@@ -265,7 +265,7 @@ def njc_map_utilities(request):
                 inner_dict['settings'] = map.settings
                 inner_dict['shared_with'] = map.shared_with
                 if map.thumbnail:
-                    print "here", map.thumbnail.url
+                    #print "here", map.thumbnail.url
                     inner_dict['thumbnail'] = map.thumbnail.url
                 inner_dict['is_default'] = map.is_default
                 inner_dict['owner'] = map.owner.username
