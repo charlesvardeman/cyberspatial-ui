@@ -1,3 +1,8 @@
+//date range for Search
+var start_date = "";//"04/11/2018 18:30";
+var end_date = "";//"04/15/2018 9:30";
+var text_search = ""; //"sim stuff";
+
 //~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $(document).ready(function () {
 
@@ -64,8 +69,13 @@ function load_maps_data(order_by) {
                 //clear current list
                 document.getElementById('dashboard-list').innerHTML = "";
 
+                //loop until end of data list
+                counter = 1;
+                page = 1;
+
                 //get JSON data
                 for (var i = 0; i < result.data.length; i++) {
+
                     //setup for hidden list elements
                     var hide = "";
                     if (i > 3) {
@@ -108,8 +118,22 @@ function load_maps_data(order_by) {
                     //add it
                     document.getElementById('dashboard-list').innerHTML += html;
 
+                    //increment
+                    counter++;
+
                 }
+
+                //sort counter
+                counter--;
+
+                //update total
+                document.getElementById('total').innerHTML = counter;
+
+                //update total
+                document.getElementById('pagetotal').innerHTML = Math.ceil(counter / 4);
+
             }
+
         },
         error: function (result) {
             console.log("GETTING MAPS -- ERROR:", result)
@@ -117,3 +141,56 @@ function load_maps_data(order_by) {
     });
 
 }
+
+//total sims
+var counter = 1;
+var page = 1;
+
+var shownItems = 0;
+
+$("#pageBackwards").on("click", function () {
+    var items = $("#dashboard-list li");
+    //var shownItems = items.filter(":visible").length;
+    console.log("Clicked " + items.length + "," + shownItems);
+
+    //remove old ones
+    items.slice(shownItems, shownItems + 4).addClass("hidden");
+
+    //add new ones
+    shownItems -= 4;
+    if (shownItems < 0) {
+        shownItems = 0;
+    } else {
+        page--;
+    }
+    items.slice(shownItems, shownItems + 4).removeClass("hidden");
+
+    //update page
+    document.getElementById('page').innerHTML = page;
+});
+
+$("#pageForward").on("click", function () {
+    var items = $("#dashboard-list li");
+    //var shownItems = items.filter(":visible").length;
+    console.log("Clicked " + items.length + "," + shownItems);
+
+    //remove old ones
+    items.slice(shownItems, shownItems + 4).addClass("hidden");
+
+    //add new ones
+    var oldshownItems = shownItems;
+
+    if ((shownItems + 8) > counter) {
+        shownItems = counter - counter % 4;
+    } else {
+        shownItems += 4;
+    }
+
+    if (oldshownItems != shownItems) {
+        page++;
+    }
+    items.slice(shownItems, shownItems + 4).removeClass("hidden");
+
+    //update page
+    document.getElementById('page').innerHTML = page;
+});
