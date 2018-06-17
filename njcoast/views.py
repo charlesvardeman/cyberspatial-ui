@@ -240,20 +240,20 @@ def njc_map_utilities(request):
             order_by = request.GET['order_by']
 
             #if dates
-            #if len(request.GET['start_date']) > 0 and len(request.GET['end_date']) > 0:
-            #    try:
-            #        start_date = datetime.strptime(request.GET['start_date'], '%m/%d/%Y')
-            #        end_date = datetime.strptime(request.GET['end_date'], '%m/%d/%Y')
-            #    except:
-            #        return JsonResponse({'loaded': False})
+            if len(request.GET['start_date']) > 0 and len(request.GET['end_date']) > 0:
+                try:
+                    start_date = datetime.strptime(request.GET['start_date'], '%m/%d/%Y')
+                    end_date = datetime.strptime(request.GET['end_date'], '%m/%d/%Y')
+                except:
+                    return JsonResponse({'loaded': False})
 
-            #    #get data from db
-            #    map_objs = NJCMap.objects.filter(owner = request.user, description__contains=request.GET['text_search']).order_by(order_by) #, modified__range=(start_date, end_date)
+                #get data from db
+                map_objs = NJCMap.objects.filter(Q(owner = request.user) | Q(shared_with__contains = request.user)).filter(modified__range=(start_date, end_date), description__contains=request.GET['text_search']).order_by(order_by) #,
 
             #or just belonging to user
-            #else:
-            #    #get data from db
-            map_objs = NJCMap.objects.filter(Q(owner = request.user) | Q(shared_with__contains = request.user)).order_by(order_by) #, description__contains=request.GET['text_search']
+            else:
+                #get data from db
+                map_objs = NJCMap.objects.filter(Q(owner = request.user) | Q(shared_with__contains = request.user)).filter(description__contains=request.GET['text_search']).order_by(order_by) #, description__contains=request.GET['text_search']
 
             print "maps", len(map_objs)
             #parse out results

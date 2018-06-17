@@ -10,8 +10,8 @@ $(document).ready(function () {
     //load actual data
     load_maps_data('-modified');
 
-    //$("#datepicker1").datepicker();
-    //$("#datepicker2").datepicker();
+    $("#datepicker1").datepicker();
+    $("#datepicker2").datepicker();
 });
 
 //create a new map and launch it
@@ -55,9 +55,9 @@ function load_maps_data(order_by) {
         data: {
             'action': 'load_maps',
             'order_by': order_by,
-            'start_date': 0,
-            'end_date': 0,
-            'text_search': ''
+            'start_date': start_date,
+            'end_date': end_date,
+            'text_search': text_search
         },
         dataType: "json",
         success: function (result) {
@@ -69,7 +69,7 @@ function load_maps_data(order_by) {
                 //save data
                 current_map_data = result.data;
 
-                console.log("loaded "+result.data[0].thumbnail);
+                //console.log("loaded "+result.data[0].thumbnail);
                 //clear current list
                 document.getElementById('dashboard-list').innerHTML = "";
 
@@ -363,4 +363,58 @@ function open_share_users(map_number){
     //fade in modal
     $("#shareMap-1").modal("show");
 
+}
+
+//get date input
+function get_dates(object) {
+    if (object.name == "start_date") {
+        start_date = object.value;
+        console.log("Start " + start_date)
+    } else {
+        end_date = object.value;
+        console.log("End " + end_date)
+    }
+}
+
+//clear text search
+function clear_text_search() {
+    //clear
+    document.getElementById('text_search_input').value = "";
+    document.getElementById('datepicker1').value = "mm/dd/yyyy";
+    document.getElementById('datepicker2').value = "mm/dd/yyyy";
+    start_date = "";
+    end_date = "";
+    text_search = "";
+
+    //load data
+    load_maps_data('-modified');
+
+    return false;
+}
+
+//reload with text search
+function call_text_search() {
+
+    var date_regex = /^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/;
+
+    //test start
+    if (start_date != "" && !(date_regex.test(start_date))) {
+        alert("Error in start date " + start_date);
+    }
+
+    //test start
+    if (end_date != "" && !(date_regex.test(end_date))) {
+        alert("Error in end date " + end_date);
+    }
+
+    //both dates?
+    if ((end_date == "" && start_date != "") || (end_date != "" && start_date == "")) {
+        alert("Please enter a start AND end date!");
+    }
+
+    //get text
+    text_search = document.getElementById('text_search_input').value;
+
+    //load data
+    load_maps_data('-modified');
 }
