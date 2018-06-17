@@ -98,6 +98,12 @@ function load_maps_data(order_by) {
                     var shared_with = result.data[i].shared_with;
                     var shared_with_number = shared_with.length;
 
+                    var shares_text = "shares";
+
+                    if(shared_with_number == 1){
+                        shares_text = "share";
+                    }
+
                     //html to crete li
                     var html;
 
@@ -115,7 +121,7 @@ function load_maps_data(order_by) {
                                                     <p class="abstract">${ result.data[i].description }</p>
                                                     <p class="actions">
                                                         <i class="fa fa-calendar-o"></i>${result.data[i].modified} |
-                                                        <a id="share_link-${result.data[i].id}" onclick="open_share_users('${result.data[i].id}');return false;" href="#"><i class="fa fa-share"></i>${shared_with_number} shares</a> |
+                                                        <a id="share_link-${result.data[i].id}" onclick="open_share_users('${result.data[i].id}');return false;" href="#"><i class="fa fa-share"></i>${shared_with_number} ${shares_text}</a> |
                                                         <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="/map/${result.data[i].id}/">
                                                             <i class="fa fa-map-marker"></i>View Map</a>
                                                     </p>
@@ -137,7 +143,7 @@ function load_maps_data(order_by) {
                                                     <p class="abstract">${ result.data[i].description }</p>
                                                     <p class="actions">
                                                         <i class="fa fa-calendar-o"></i>${result.data[i].modified} |
-                                                        ${shared_with_number} shares |
+                                                        ${shared_with_number} ${shares_text} |
                                                         <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="/map/${result.data[i].id}/">
                                                             <i class="fa fa-map-marker"></i>View Map</a>
                                                     </p>
@@ -278,7 +284,13 @@ function save_shared_with(map_number){
             console.log("SETTING SHARES -- SUCCESS!" + result.saved);
 
             //update page
-            document.getElementById("share_link-"+map_number).innerHTML = `<i class="fa fa-share"></i>${checked_counter} shares `;
+            var shares_text = "shares";
+
+            if(checked_counter == 1){
+                shares_text = "share";
+            }
+
+            document.getElementById("share_link-"+map_number).innerHTML = `<i class="fa fa-share"></i>${checked_counter} ${shares_text} `;
 
             //fade out modal
             $("#shareMap-1").modal("hide");
