@@ -306,6 +306,8 @@ function open_share_users(map_number){
            if(more_elmts){
               if(more_elmts.name == shared_with[j]){
                   more_elmts.checked = true;
+              }else{
+                  more_elmts.checked = false;
               }
            }
         }while(more_elmts)
@@ -313,7 +315,7 @@ function open_share_users(map_number){
 
     //set map specifics
     document.getElementById('share_map_button').name = map_number;
-
+    document.getElementById('shareMap').innerHTML = "Share Map \"" + map_data.name + "\"?";
     //fade in modal
     $("#shareMap-1").modal("show");
 
