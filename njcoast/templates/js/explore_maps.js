@@ -222,11 +222,15 @@ $("#pageForward").on("click", function () {
     //add new ones
     var oldshownItems = shownItems;
 
-    if ((shownItems + 8) > counter) {
+    if((shownItems + 4) < counter){
+        shownItems += 4;
+    }
+    /*if ((shownItems + 8) > counter) {
+        console.log("Erk "+shownItems+","+counter);
         shownItems = counter - counter % 4;
     } else {
         shownItems += 4;
-    }
+    }*/
 
     if (oldshownItems != shownItems) {
         page++;
