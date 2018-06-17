@@ -99,27 +99,54 @@ function load_maps_data(order_by) {
                     var shared_with_number = shared_with.length;
 
                     //html to crete li
-                    var html = `<li class="${hide}">
-                                    <article>
-                                        <div class="row items-list">
-                                            <div class="col-xs-4 thumb">
-                                                <a href="/map/${result.data[i].id}/"><img src="${ url }" /></a>
-                                            </div>
-                                            <div class="col-xs-8 item-info">
+                    var html;
 
-                                                <h4>${ result.data[i].name }</h4>
-                                                <p><span class="owner">by ${ result.data[i].owner }</span></p>
-                                                <p class="abstract">${ result.data[i].description }</p>
-                                                <p class="actions">
-                                                    <i class="fa fa-calendar-o"></i>${result.data[i].modified} |
-                                                    <a id="share_link-${result.data[i].id}" onclick="open_share_users('${result.data[i].id}');return false;" href="#"><i class="fa fa-share"></i>${shared_with_number}</a> |
-                                                    <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="/map/${result.data[i].id}/">
-                                                        <i class="fa fa-map-marker"></i>View Map</a>
-                                                </p>
+                    if(result.data[i].owner == user_name){
+                        html = `<li class="${hide}">
+                                        <article>
+                                            <div class="row items-list">
+                                                <div class="col-xs-4 thumb">
+                                                    <a href="/map/${result.data[i].id}/"><img src="${ url }" /></a>
+                                                </div>
+                                                <div class="col-xs-8 item-info">
+
+                                                    <h4>${ result.data[i].name }</h4>
+                                                    <p><span class="owner">by ${ result.data[i].owner }</span></p>
+                                                    <p class="abstract">${ result.data[i].description }</p>
+                                                    <p class="actions">
+                                                        <i class="fa fa-calendar-o"></i>${result.data[i].modified} |
+                                                        <a id="share_link-${result.data[i].id}" onclick="open_share_users('${result.data[i].id}');return false;" href="#"><i class="fa fa-share"></i>${shared_with_number}</a> |
+                                                        <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="/map/${result.data[i].id}/">
+                                                            <i class="fa fa-map-marker"></i>View Map</a>
+                                                    </p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </article>
-                                </li>`;
+                                        </article>
+                                    </li>`;
+                    }else{
+                        html = `<li class="${hide}">
+                                        <article>
+                                            <div class="row items-list">
+                                                <div class="col-xs-4 thumb">
+                                                    <a href="/map/${result.data[i].id}/"><img src="${ url }" /></a>
+                                                </div>
+                                                <div class="col-xs-8 item-info">
+
+                                                    <h4>${ result.data[i].name }</h4>
+                                                    <p><span class="owner">by ${ result.data[i].owner }</span></p>
+                                                    <p class="abstract">${ result.data[i].description }</p>
+                                                    <p class="actions">
+                                                        <i class="fa fa-calendar-o"></i>${result.data[i].modified} |
+                                                        <i class="fa fa-share"></i>${shared_with_number}|
+                                                        <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="/map/${result.data[i].id}/">
+                                                            <i class="fa fa-map-marker"></i>View Map</a>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </article>
+                                    </li>`;
+
+                    }
 
                     //add it
                     document.getElementById('dashboard-list').innerHTML += html;
@@ -252,7 +279,7 @@ function save_shared_with(map_number){
 
             //update page
             document.getElementById("share_link-"+map_number).innerHTML = `<i class="fa fa-share"></i>${checked_counter}`;
-            
+
             //fade out modal
             $("#shareMap-1").modal("hide");
 
