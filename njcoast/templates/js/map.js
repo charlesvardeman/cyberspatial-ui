@@ -671,6 +671,10 @@ function save_shared_with(){
       },
       error: function(result) {
           console.log("ERROR:", result)
+
+          //fade out modal
+          $("#shareMap-1").modal("hide");
+
           $.notify("Error saving shares", "error");
       }
   });

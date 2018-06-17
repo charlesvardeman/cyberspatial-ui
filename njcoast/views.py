@@ -263,7 +263,14 @@ def njc_map_utilities(request):
                 inner_dict['name'] = map.name
                 inner_dict['description'] = map.description
                 inner_dict['settings'] = map.settings
-                inner_dict['shared_with'] = map.shared_with
+
+                #get shares
+                if len(map.shared_with) > 0:
+                    inner_dict['shared_with'] = json.loads(map.shared_with)
+                else:
+                    inner_dict['shared_with'] = []
+
+                #inner_dict['shared_with'] = map.shared_with
                 if map.thumbnail:
                     #print "here", map.thumbnail.url
                     inner_dict['thumbnail'] = map.thumbnail.url
@@ -650,6 +657,22 @@ class ExploreMapsTemplateView(TemplateView):
             context['next_map_for_user'] = len(context['maps_for_user']) + 1
         else:
             context['next_map_for_user'] = 1
+
+        #get users
+        #find groups I am in!
+        groups = Group.objects.filter(user=self.request.user).exclude(name='anonymous')
+
+        #get unique users in groups but exclude myself
+        usersList = set()
+        for group in groups:
+            tempList = group.user_set.exclude(pk=self.request.user.pk)
+            if tempList:
+                for user in tempList:
+                    print user
+                    usersList.add(user)
+
+        #send to client
+        context['users_in_group'] = usersList
 
         return context
 

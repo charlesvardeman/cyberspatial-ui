@@ -156,6 +156,32 @@
     </div>
 </div>
 
+<!-- Modal - choose users to share with -->
+<div class="modal fade" id="shareMap-1" tabindex="-1" role="dialog" aria-labelledby="shareMap">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="shareMap">Share Map</h4>
+            </div>
+            <div id="editable_user_modal" class="modal-body">
+                Please select users you would like to share this map with.
+                <ul class="dashboard-list">
+                  {% for user in users_in_group %}
+                  <li>
+                    <p><input id="sharemodal-{{ forloop.counter }}" name="{{ user }}" type="checkbox" value="on" data-toggle="popover" data-placement="right"> {{ user.first_name }} {{ user.last_name }}, {{ user.njcusermeta.role.name }}</p>
+                  </li>
+                  {% endfor %}
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <a id="share_map_button" name="0" onclick="save_shared_with(this.name);" class="btn btn-primary" href="#">Update Shares</a>
+                <a onclick="$('#shareMap-1').modal('hide');" class="btn btn-default" href="#">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- End of Modal -->
 
 {% endblock middle %}
