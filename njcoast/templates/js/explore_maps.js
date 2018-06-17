@@ -8,7 +8,7 @@ var current_map_data = null;
 $(document).ready(function () {
 
     //load actual data
-    load_maps_data('-name');
+    load_maps_data('-modified');
 
     //$("#datepicker1").datepicker();
     //$("#datepicker2").datepicker();
