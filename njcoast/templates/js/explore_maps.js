@@ -112,7 +112,7 @@ function load_maps_data(order_by) {
                                                 <p class="abstract">${ result.data[i].description }</p>
                                                 <p class="actions">
                                                     <i class="fa fa-calendar-o"></i>${result.data[i].modified} |
-                                                    <a onclick="open_share_users('${result.data[i].id}');return false;" href="#"><i class="fa fa-share"></i>${shared_with_number}</a> |
+                                                    <a id="share_link-${result.data[i].id}" onclick="open_share_users('${result.data[i].id}');return false;" href="#"><i class="fa fa-share"></i>${shared_with_number}</a> |
                                                     <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="/map/${result.data[i].id}/">
                                                         <i class="fa fa-map-marker"></i>View Map</a>
                                                 </p>
@@ -219,6 +219,7 @@ function save_shared_with(map_number){
     //get list of users
     var more_elmts;
     var counter = 1;
+    var checked_counter = 0;
 
     var data = [];
 
@@ -230,6 +231,7 @@ function save_shared_with(map_number){
         if(more_elmts){
             if(more_elmts.checked){
               data.push(more_elmts.name);
+              checked_counter++;
             }
         }
     }while(more_elmts)
@@ -248,6 +250,9 @@ function save_shared_with(map_number){
         success: function(result) {
             console.log("SETTING SHARES -- SUCCESS!" + result.saved);
 
+            //update page
+            document.getElementById("share_link-"+map_number).innerHTML = `<i class="fa fa-share"></i>${checked_counter}`;
+            
             //fade out modal
             $("#shareMap-1").modal("hide");
 
