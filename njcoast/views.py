@@ -269,7 +269,8 @@ def njc_map_utilities(request):
                     inner_dict['thumbnail'] = map.thumbnail.url
                 inner_dict['is_default'] = map.is_default
                 inner_dict['owner'] = map.owner.username
-                #inner_dict['modified'] = map.modified.strftime('%m/%d/%Y %H:%M')
+                inner_dict['id'] = map.id
+                inner_dict['modified'] = map.modified.strftime('%m/%d/%Y %H:%M')
                 output_array.append(inner_dict)
 
             #send it back

@@ -90,24 +90,26 @@ function load_maps_data(order_by) {
                         url = "/map_thumbnails/missing_map.png";
                     }
 
+                    //sort shared by
+                    var shared_with = result.data[i].shared_with;
+                    var shared_with_number = shared_with.split(",").length;
+
                     //html to crete li
                     var html = `<li class="${hide}">
                                     <article>
                                         <div class="row items-list">
                                             <div class="col-xs-4 thumb">
-                                                <a href=""><img src="${ url }" /></a>
+                                                <a href="/map/${result.data[i].id}/"><img src="${ url }" /></a>
                                             </div>
                                             <div class="col-xs-8 item-info">
 
-                                                <h4><a href="">${ result.data[i].name }</a></h4>
-                                                <p><span class="owner">by <a href="">${ result.data[i].owner }</a></span></p>
+                                                <h4>${ result.data[i].name }</h4>
+                                                <p><span class="owner">by ${ result.data[i].owner }</span></p>
                                                 <p class="abstract">${ result.data[i].description }</p>
                                                 <p class="actions">
-                                                    <a href=""><i class="fa fa-calendar-o"></i>16 Sept 2017</a> |
-                                                    <a href=""><i class="fa fa-eye"></i>0</a> |
-                                                    <a href=""><i class="fa fa-share"></i>0</a> |
-                                                    <a href=""><i class="fa fa-star"></i>0</a>
-                                                    <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="">
+                                                    <i class="fa fa-calendar-o"></i>${result.data[i].modified} |
+                                                    <a href=""><i class="fa fa-share"></i>${shared_with_number}</a> |
+                                                    <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="/map/${result.data[i].id}/">
                                                         <i class="fa fa-map-marker"></i>View Map</a>
                                                 </p>
                                             </div>
