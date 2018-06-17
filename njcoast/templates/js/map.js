@@ -533,79 +533,79 @@ function save_map(notify) {
     formData.append('settings', JSON.stringify(map_data));
     formData.append('action', 'save');
 
-    //lets do a try in case leafletImage fails
-    try{
-        //generate image and then save map information
-        leafletImage(mymap, function(err, canvas) {
-            // now you have canvas
-
-            //~~~~Get the blob for the image~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-            //aspect ratio
-            var dimensions = mymap.getSize();
-            var aspect = dimensions.x / dimensions.y;
-
-            //set sizes
-            var height = 180;
-            var width = 240;
-
-            if(aspect > 1.3333){
-                height = 240 / aspect;
-            }else{
-                width = 180 * aspect;
+    //in case we cant get the thumbnail lets just save the other information
+    //do AJAX call to save the map
+    $.ajax({
+        type: "POST",
+        url: "/map/" + annotate_map_id + "/settings/",
+        data: formData,
+        dataType: "json",
+        //use contentType, processData to allow us to send thumbnail image
+        contentType: false,
+        processData: false,
+        success: function success(result) {
+            console.log("SETTING STORE -- SUCCESS!" + result.saved);
+            //now auto save so dont flag
+            if (notify) {
+                $.notify("Settings saved", "success");
             }
+        },
+        error: function error(result) {
+            console.log("ERROR:", result);
+            if (notify) {
+                $.notify("Error saving map settings", "error");
+            }
+        }
+    });
+    //end ajax
 
-            //
-            var resizedCanvas = document.createElement("canvas");
-            var resizedContext = resizedCanvas.getContext("2d");
+    //create formdata to allow us to send file
+    var formDataI = new FormData();
+    formDataI.append('action', 'save_image');
 
-            resizedCanvas.height = height;
-            resizedCanvas.width = width;
+    //lets do an image save in case leafletImage fails
+    //generate image and then save map information
+    leafletImage(mymap, function(err, canvas) {
+        // now you have canvas
+        //console.log("Error "+err);
 
-            var context = canvas.getContext("2d");
+        //~~~~Get the blob for the image~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        //aspect ratio
+        var dimensions = mymap.getSize();
+        var aspect = dimensions.x / dimensions.y;
 
-            resizedContext.drawImage(canvas, 0, 0, width, height);
+        //set sizes
+        var height = 180;
+        var width = 240;
 
-            var blob = dataURLtoBlob(resizedCanvas.toDataURL());
-            //~~~~END Get the blob for the image~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        if(aspect > 1.3333){
+            height = 240 / aspect;
+        }else{
+            width = 180 * aspect;
+        }
 
-            //add to formdata to allow us to send file
-            formData.append('thumbnail', blob, 'thumbnail.png');
+        //
+        var resizedCanvas = document.createElement("canvas");
+        var resizedContext = resizedCanvas.getContext("2d");
 
-            //do AJAX call to save the map
-            $.ajax({
-                type: "POST",
-                url: "/map/" + annotate_map_id + "/settings/",
-                data: formData,
-                dataType: "json",
-                //use contentType, processData to allow us to send thumbnail image
-                contentType: false,
-                processData: false,
-                success: function success(result) {
-                    console.log("SETTING STORE -- SUCCESS!" + result.saved);
-                    //now auto save so dont flag
-                    if (notify) {
-                        $.notify("Settings saved", "success");
-                    }
-                },
-                error: function error(result) {
-                    console.log("ERROR:", result);
-                    if (notify) {
-                        $.notify("Error saving map settings", "error");
-                    }
-                }
-            });
-            //end ajax
+        resizedCanvas.height = height;
+        resizedCanvas.width = width;
 
-        });
-        //end leafletImage
+        var context = canvas.getContext("2d");
 
-    }catch(err){    //here if we fail somehow. Wont work IE < 10
-        //if we cant get the thumbnail lets just save the other information
+        resizedContext.drawImage(canvas, 0, 0, width, height);
+
+        var blob = dataURLtoBlob(resizedCanvas.toDataURL());
+        //~~~~END Get the blob for the image~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+        //add to formdata to allow us to send file
+        formDataI.append('thumbnail', blob, 'thumbnail.png');
+
         //do AJAX call to save the map
         $.ajax({
             type: "POST",
             url: "/map/" + annotate_map_id + "/settings/",
-            data: formData,
+            data: formDataI,
             dataType: "json",
             //use contentType, processData to allow us to send thumbnail image
             contentType: false,
@@ -625,7 +625,8 @@ function save_map(notify) {
             }
         });
         //end ajax
-    }
+
+    });
 }
 
 //save map sharing users
@@ -670,6 +671,10 @@ function save_shared_with(){
       },
       error: function(result) {
           console.log("ERROR:", result)
+
+          //fade out modal
+          $("#shareMap-1").modal("hide");
+
           $.notify("Error saving shares", "error");
       }
   });

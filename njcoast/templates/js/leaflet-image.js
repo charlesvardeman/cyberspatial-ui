@@ -31,7 +31,7 @@ module.exports = function leafletImage(map, callback) {
     // tiles, paths, and then markers
     map.eachLayer(drawTileLayer);
     map.eachLayer(drawEsriDynamicLayer);
-    
+
     if (map._pathRoot) {
         layerQueue.defer(handlePathRoot, map._pathRoot);
     } else if (map._panes) {
@@ -51,11 +51,11 @@ module.exports = function leafletImage(map, callback) {
             layerQueue.defer(handleMarkerLayer, l);
         }
     }
-    
+
     function drawEsriDynamicLayer(l) {
         if (!L.esri) return;
-       
-        if (l instanceof L.esri.DynamicMapLayer) {                       
+
+        if (l instanceof L.esri.DynamicMapLayer) {
             layerQueue.defer(handleEsriDymamicLayer, l);
         }
     }
@@ -229,18 +229,18 @@ module.exports = function leafletImage(map, callback) {
 
         if (isBase64) im.onload();
     }
-    
+
     function handleEsriDymamicLayer(dynamicLayer, callback) {
         var canvas = document.createElement('canvas');
         canvas.width = dimensions.x;
         canvas.height = dimensions.y;
-    
+
         var ctx = canvas.getContext('2d');
-    
+
         var im = new Image();
         im.crossOrigin = '';
         im.src = addCacheString(dynamicLayer._currentImage._image.src);
-    
+
         im.onload = function() {
             ctx.drawImage(im, 0, 0);
             callback(null, {
@@ -250,6 +250,7 @@ module.exports = function leafletImage(map, callback) {
     }
 
     function addCacheString(url) {
+        if(!url) return '/map_thumbnails/default.png';
         // If it's a data URL we don't want to touch this.
         if (isDataURL(url) || url.indexOf('mapbox.com/styles/v1') !== -1) {
             return url;
