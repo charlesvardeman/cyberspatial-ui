@@ -26,7 +26,7 @@ function create_map(){
         dataType: "json",
         success: function(result) {
             console.log("CREATE MAP -- SUCCESS!" + result.created);
-            if(result.load){
+            if(result.created){
                 //go to new map
                 window.location.href = "/map/" + result.id + "/";
             }else{
