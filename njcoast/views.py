@@ -406,7 +406,27 @@ def map_settings(request, map_id):
                     pass
                 #save the settings
                 map_objs[0].settings = request.POST['settings']
+                map_objs[0].modified = timezone.now()
                 map_objs[0].save()
+
+            elif request.POST['action'] == 'save_image': #add thumbnail
+                #thumbnail?
+                try:
+                    if request.FILES['thumbnail']:
+                        #remove old image
+                        if map_objs[0].thumbnail:
+                            map_objs[0].thumbnail.delete(False)
+
+                        #add new thumbnail to database
+                        map_objs[0].thumbnail = request.FILES['thumbnail']
+
+                        #save the image
+                        map_objs[0].modified = timezone.now()
+                        map_objs[0].save()
+                        print "Loaded thumbnail"
+
+                except:
+                    pass
 
             elif request.POST['action'] == 'add_simulation': #or simulation to add
                 #get settings
