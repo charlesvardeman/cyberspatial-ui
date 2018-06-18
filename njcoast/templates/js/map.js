@@ -599,7 +599,8 @@ function save_map(notify) {
         //~~~~END Get the blob for the image~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         //add to formdata to allow us to send file
-        formDataI.append('thumbnail', blob, 'thumbnail.png');
+        var rand_filename = 'thumbnail-' + Math.floor(Math.random() * 100000) + '.png';
+        formDataI.append('thumbnail', blob, rand_filename);
 
         //do AJAX call to save the map
         $.ajax({

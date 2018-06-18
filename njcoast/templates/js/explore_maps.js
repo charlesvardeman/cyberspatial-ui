@@ -91,7 +91,7 @@ function load_maps_data(order_by) {
 
                     var url = result.data[i].thumbnail;
                     if(!url){
-                        url = "/map_thumbnails/missing_map.png";
+                        url = "/static/images/missing_map.png";
                     }
 
                     //sort shared by
