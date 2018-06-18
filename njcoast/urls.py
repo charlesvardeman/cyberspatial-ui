@@ -32,5 +32,5 @@ urlpatterns = patterns('',
                        url(r'^municipalities_in_county/$', municipalities_in_county, name='municipalities_in_county'),
                        ) + urlpatterns
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+#if settings.DEBUG:
+#    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
