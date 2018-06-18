@@ -250,7 +250,7 @@ module.exports = function leafletImage(map, callback) {
     }
 
     function addCacheString(url) {
-        if(!url) return '/map_thumbnails/default.png';
+        if(!url) return '/static/images/default.png';
         // If it's a data URL we don't want to touch this.
         if (isDataURL(url) || url.indexOf('mapbox.com/styles/v1') !== -1) {
             return url;
