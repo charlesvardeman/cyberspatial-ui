@@ -588,12 +588,12 @@ function save_map(notify) {
         var resizedCanvas = document.createElement("canvas");
         var resizedContext = resizedCanvas.getContext("2d");
 
-        resizedCanvas.height = height;
-        resizedCanvas.width = width;
+        resizedCanvas.height = 180;
+        resizedCanvas.width = 240;
 
         var context = canvas.getContext("2d");
 
-        resizedContext.drawImage(canvas, 0, 0, width, height);
+        resizedContext.drawImage(canvas, (240 - width) / 2, (180 - height) / 2, width, height);
 
         var blob = dataURLtoBlob(resizedCanvas.toDataURL());
         //~~~~END Get the blob for the image~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
