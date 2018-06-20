@@ -129,11 +129,13 @@ function user_filter(object){
     var object_name = inner_str.substring(0, n);
 
     //test if hidden
-    if(panel.classList.contains('hidden')){
-        panel.classList.remove("hidden");
+    if(!$("#"+panel_name).is(':visible')){
+        //panel.classList.remove("hidden");
+        $("#"+panel_name).show(300)
         object.innerHTML = object_name + " <span class='fa fa-chevron-down pull-right'>";
     }else{
-        panel.classList.add("hidden");
+        //panel.classList.add("hidden");
+        $("#"+panel_name).hide(200);
         object.innerHTML = object_name + " <span class='fa fa-chevron-right pull-right'>";
     }
 }
