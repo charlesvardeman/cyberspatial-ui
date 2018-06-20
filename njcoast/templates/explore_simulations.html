@@ -104,14 +104,14 @@
                     <nav class="filter">
                         <h4><a href="#" id="date_search" onclick="user_filter(this);return false;" class="toggle toggle-nav"><i class="fa fa-chevron-right"></i>Date</a></h4>
                         <div id="date_search_panel" style="display: none;">
-                        <ul class="nav open" id="date_start">
-                            <label>Date begins after:</label>
-                            <li><input id="datepicker1" value="mm-dd-yyyy" data-date-format="MM-DD-YYYY" name="start_date" type="text" class="datepicker" placeholder="mm-dd-yyyy" ng-model="date_query.date__gte" onchange="get_dates(this);"/></li>
-                        </ul>
-                        <ul class="nav open" id="date_end">
-                            <label>Date ends before:</label>
-                            <li><input id="datepicker2" value="mm-dd-yyyy" data-date-format="MM-DD-YYYY" name="end_date" type="text" class="datepicker" placeholder="mm-dd-yyyy" ng-model="date_query.date__lte" onchange="get_dates(this);"/></li>
-                        </ul>
+                            <ul class="nav open" id="date_start">
+                                <label>Date begins after:</label>
+                                <li><input id="datepicker1" value="mm-dd-yyyy" data-date-format="MM-DD-YYYY" name="start_date" type="text" class="datepicker" placeholder="mm-dd-yyyy" ng-model="date_query.date__gte" onchange="get_dates(this);"/></li>
+                            </ul>
+                            <ul class="nav open" id="date_end">
+                                <label>Date ends before:</label>
+                                <li><input id="datepicker2" value="mm-dd-yyyy" data-date-format="MM-DD-YYYY" name="end_date" type="text" class="datepicker" placeholder="mm-dd-yyyy" ng-model="date_query.date__lte" onchange="get_dates(this);"/></li>
+                            </ul>
                         </div>
                     </nav>
 

@@ -422,3 +422,26 @@ function call_text_search() {
     //load data
     load_maps_data('-modified');
 }
+
+//filter for users
+function user_filter(object){
+    //figure out button clicked and find its panel
+    var panel_name = object.id + '_panel';
+    var panel = document.getElementById(panel_name);
+
+    //get name of section
+    var inner_str = object.innerHTML;
+    var n = inner_str.indexOf("</i>");
+    var object_name = inner_str.substring(n+4);
+
+    //test if hidden
+    if(!$("#"+panel_name).is(':visible')){
+        //panel.classList.remove("hidden");
+        $("#"+panel_name).show(300)
+        object.innerHTML = "<i class='fa fa-chevron-down'></i>" + object_name;
+    }else{
+        //panel.classList.add("hidden");
+        $("#"+panel_name).hide(200);
+        object.innerHTML = "<i class='fa fa-chevron-right'></i>" + object_name;
+    }
+}
