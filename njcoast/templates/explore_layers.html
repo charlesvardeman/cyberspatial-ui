@@ -1,0 +1,252 @@
+{% extends 'site_base.html' %}
+{% load i18n %}
+{% load staticfiles %}
+{% load base_tags %}
+
+{% block body_class %}home{% endblock %}
+
+{% block extra_head %}
+    <!-- load mods to leaflet for rectangular popups/map icons -->
+    <link rel="stylesheet" type="text/css" href="{% static "css/crc_leaflet.css" %}" media="screen" />
+    <link rel="stylesheet" type="text/css" href="{% static "css/fontawesome-all.min.css" %}" media="screen" />
+
+{% endblock extra_head %}
+
+{% block middle %}
+<div class="jumbotron njcoast-image slimmer"></div>
+
+<div class="container">
+    <div class="page-header map-header">
+        <button class="btn btn-primary btn-md pull-right" data-toggle="modal" data-target="" style="margin-left: 5px">Create Layers</button>
+        <button class="btn btn-primary btn-md pull-right" data-toggle="modal" data-target="">Upload Layers</button>
+        <h3>Explore Layers</h3>
+    </div>
+    <div class="row">
+
+        <div class="col-md-3">
+            <div class="selections">
+                Your selections
+                <a href="" id="clear-search" class="pull-right">Clear</a>
+            </div>
+            <nav class="filter">
+
+                <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-right"></i>Text</a></h4>
+                <ul class="nav closed" id="text">
+                    <li>
+                        <div class="input-group">
+                            <input name="text_search_input" id="text_search_input" ng-model="text_query" type="text" placeholder="Search by text" class="form-control">
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary" type="submit" id="text_search_btn"><i class="fa fa-search"></i></button>
+                            </span>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+
+            <div id="slide-pane">
+
+
+
+                <nav class="filter">
+                    <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-down"></i>Categories</a></h4>
+                    <ul class="nav open" id="categories">
+
+                        <li>
+                            <a>
+                                Base Mapping
+                                <span class="badge pull-right">7</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="active">
+                                Property & Parcels
+                                <span class="badge pull-right">2</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a>
+                                Emergency Ops Plan
+                                <span class="badge pull-right">15</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a>
+                                Transportation
+                                <span class="badge pull-right">1</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a>
+                                Planning & Zoning
+                                <span class="badge pull-right">6</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a>
+                                Public Works
+                                <span class="badge pull-right">8</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a>
+                                Flooding/FEMA
+                                <span class="badge pull-right">6</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a>
+                                Hazards
+                                <span class="badge pull-right">17</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+
+                <nav class="filter">
+                    <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-right"></i>Regions</a></h4>
+                    <ul class="nav closed" id="regions">
+
+                        <li ng-repeat="region in regions" ng-if="region.count > 0">
+                            <a data-value="{{ region.code }}" data-filter="regions__code__in" ng-click="multiple_choice_listener($event)" class="{{region.active}}">{{ region.name }}
+                                <span class="badge pull-right">{{ region.count }}</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+
+
+                <nav class="filter">
+                    <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-right"></i> Keywords</a></h4>
+                    <ul class="nav closed" id="keywords">
+
+                        <li ng-repeat="keyword in keywords" ng-if="keyword.count > 4">
+                            <a data-value="{{ keyword.slug }}" data-filter="keywords__slug__in" ng-click="multiple_choice_listener($event)" class="{{keyword.active}}">{{ keyword.name }}
+                                <span class="badge pull-right">{{ keyword.count }}</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+
+
+
+                <nav class="filter">
+                    <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-right"></i>Date</a></h4>
+                    <ul class="nav closed" id="date_start">
+                        <label>Date begins after:</label>
+                        <li><input value="yyyy-mm-dd" data-date-format="YYYY-MM-DD" type="text" class="datepicker" placeholder="yyyy-mm-dd" ng-model="date_query.date__gte" /></li>
+                    </ul>
+                    <ul class="nav closed" id="date_end">
+                        <label>Date ends before:</label>
+                        <li><input value="yyyy-mm-dd" data-date-format="YYYY-MM-DD" type="text" class="datepicker" placeholder="yyyy-mm-dd" ng-model="date_query.date__lte" /></li>
+                    </ul>
+                </nav>
+
+
+
+
+                <nav class="filter">
+                    <h4><a href="#" id="_extent_filter" class="toggle toggle-nav"><i class="fa fa-chevron-right"></i>Extent</a></h4>
+                    <fieldset class="nav closed">
+                        <div class="control-group leaflet_map">
+                            <leaflet class="filter-map-container" center="map_center" defaults="defaults" layers="layers" id="filter-map">
+                            </leaflet>
+                        </div>
+                    </fieldset>
+                </nav>
+
+
+
+            </div>
+
+
+
+        </div>
+        <div class="col-md-9">
+            <div class="row" style="margin-top:1em">
+                <div class="col-md-3">
+                    <span>Total: </span>
+                    <span ng-bind="total_counts">4</span>
+                </div>
+
+                <div class="col-md-9">
+                    <ul class="list-inline pull-left" id="sort">
+                        <li><a data-value="-date" data-filter="order_by" class="selected" ng-click="single_choice_listener($event)">Most recent</a></li>
+                        <li><a data-value="date" data-filter="order_by" ng-click="single_choice_listener($event)">Less recent</a></li>
+                        <li><a data-value="title" data-filter="order_by" ng-click="single_choice_listener($event)">A - Z</a></li>
+                        <li><a data-value="-title" data-filter="order_by" ng-click="single_choice_listener($event)">Z - A</a></li>
+                        <li><a data-value="-popular_count" data-filter="order_by" ng-click="single_choice_listener($event)">Most popular</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <article>
+                <div class="row items-list">
+                    <div class="col-xs-4 thumb">
+                        <a href=""><img src="images/parcels-thumb.png" /></a>
+                    </div>
+                    <div class="col-xs-8 item-info">
+
+                        <h4><a href="">Parcels</a></h4>
+                        <p>Property & Parcels <span class="owner">by <a href="">admin</a></span></p>
+                        <p class="abstract">Description of layer, including source and other metadata</p>
+                        <p class="actions">
+                            <a href=""><i class="fa fa-calendar-o"></i>19 July 2017</a> |
+                            <a href=""><i class="fa fa-eye"></i>0</a> |
+                            <a href=""><i class="fa fa-share"></i>0</a> |
+                            <a href=""><i class="fa fa-star"></i>0</a>
+                            <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="map-p.html">
+                                <i class="fa fa-map-marker"></i>View on Map</a>
+                        </p>
+                    </div>
+                </div>
+            </article>
+
+            <article>
+                <div class="row items-list">
+                    <div class="col-xs-4 thumb">
+                        <a href=""><img src="images/buildings-thumb.png" /></a>
+                    </div>
+                    <div class="col-xs-8 item-info">
+
+                        <h4><a href="">Buildings</a></h4>
+                        <p>Property & Parcels <span class="owner">by <a href="">admin</a></span></p>
+                        <p class="abstract">Description of layer, including source and other metadata</p>
+                        <p class="actions">
+                            <a href=""><i class="fa fa-calendar-o"></i>29 April 2017</a> |
+                            <a href=""><i class="fa fa-eye"></i>0</a> |
+                            <a href=""><i class="fa fa-share"></i>0</a> |
+                            <a href=""><i class="fa fa-star"></i>0</a>
+                            <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="map-p.html">
+                                <i class="fa fa-map-marker"></i>View on Map</a>
+                        </p>
+                    </div>
+                </div>
+            </article>
+
+
+            <div class="row" style="margin-bottom: 300px">
+                <nav>
+                    <ul class="pagination pull-right">
+                        <li ng-click="paginate_down()"><a href><strong><i class="fa fa-angle-left"></i></strong></a></li>
+                        <li><a href>page <span ng-model="page" ng-bind="page">1</span> of <span ng-bind="numpages">1</span></a>
+                        </li>
+                        <li ng-click="paginate_up()"><a href><strong><i class="fa fa-angle-right"></i></strong></a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+    
+</div><!-- close container -->
+
+{% endblock middle %}
+
+{% block extra_script %}
+<script src="{% static 'js/notify.min.js' %}"></script>
+<script type=text/javascript>
+var user_name = "{{ user.username }}";
+</script>
+{% endblock extra_script %}

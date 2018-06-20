@@ -645,6 +645,14 @@ class ExploreTemplateView(TemplateView):
 
         return context
 
+class ExploreLayersTemplateView(TemplateView):
+    template_name = 'explore_layers.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ExploreLayersTemplateView, self).get_context_data(**kwargs)
+
+        return context
+
 class ExploreMapsTemplateView(TemplateView):
     template_name = 'explore_maps.html'
 
