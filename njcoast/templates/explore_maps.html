@@ -1,0 +1,196 @@
+{% extends 'site_base.html' %}
+{% load i18n %}
+{% load staticfiles %}
+{% load base_tags %}
+
+{% block body_class %}home{% endblock %}
+
+{% block extra_head %}
+    <!-- load mods to leaflet for rectangular popups/map icons -->
+    <link rel="stylesheet" type="text/css" href="{% static "css/crc_leaflet.css" %}" media="screen" />
+    <link rel="stylesheet" type="text/css" href="{% static "css/fontawesome-all.min.css" %}" media="screen" />
+
+{% endblock extra_head %}
+
+{% block middle %}
+<div class="jumbotron njcoast-image slimmer"></div>
+
+<div class="container">
+    <div class="page-header map-header">
+        <button class="btn btn-primary btn-md pull-right" data-toggle="modal" data-target="#createMap-1">Create a New Map</button>
+        <h3>Explore Maps</h3>
+    </div>
+    <div class="row">
+
+        <div class="col-md-3">
+            <div class="selections">
+                Your selections
+                <a href="" id="clear-search" class="pull-right" onclick="clear_text_search()">Clear</a>
+            </div>
+            <nav class="filter">
+
+                <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-down"></i>Text</a></h4>
+                <ul class="nav open" id="text">
+                    <li>
+                        <div class="input-group">
+                            <input name="text_search_input" id="text_search_input" ng-model="text_query" type="text" placeholder="Search by text" class="form-control">
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary" type="submit" id="text_search_btn" onclick="call_text_search();"><i class="fa fa-search"></i></button>
+                            </span>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+
+            <div id="slide-pane">
+
+                <nav class="filter">
+                    <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-down"></i>Date</a></h4>
+                    <ul class="nav open" id="date_start">
+                        <label>Date begins after:</label>
+                        <li><input id="datepicker1" value="mm-dd-yyyy" data-date-format="MM-DD-YYYY" name="start_date" type="text" class="datepicker" placeholder="mm-dd-yyyy" ng-model="date_query.date__gte" onchange="get_dates(this);"/></li>
+                    </ul>
+                    <ul class="nav open" id="date_end">
+                        <label>Date ends before:</label>
+                        <li><input id="datepicker2" value="mm-dd-yyyy" data-date-format="MM-DD-YYYY" name="end_date" type="text" class="datepicker" placeholder="mm-dd-yyyy" ng-model="date_query.date__lte" onchange="get_dates(this);"/></li>
+                    </ul>
+                </nav>
+
+                <!--<nav class="filter">
+                    <h4><a href="#" id="_extent_filter" class="toggle toggle-nav"><i class="fa fa-chevron-down"></i>Extent</a></h4>
+                    <fieldset class="nav closed">
+                        <div class="control-group leaflet_map">
+                            <leaflet class="filter-map-container" center="map_center" defaults="defaults" layers="layers" id="filter-map">
+                            </leaflet>
+                        </div>
+                    </fieldset>
+                </nav>-->
+
+            </div>
+
+
+
+        </div>
+        <div class="col-md-9">
+            <div class="row" style="margin-top:1em">
+                <div class="col-md-3">
+                    <span>Total: </span>
+                    <span id="total" ng-bind="total_counts">4</span>
+                </div>
+
+                <div class="col-md-9">
+                    <ul class="list-inline pull-left" id="sort">
+                        <li><a href="#" name="-modified" data-filter="order_by" class="selected" onclick='reload_map_data(this)'>Most recent</a></li>
+                        <li><a href="#" name="modified" data-filter="order_by" onclick='reload_map_data(this)'>Less recent</a></li>
+                        <li><a href="#" name="name" data-filter="order_by" onclick='reload_map_data(this)'>A - Z</a></li>
+                        <li><a href="#" name="-name" data-filter="order_by" onclick='reload_map_data(this)'>Z - A</a></li>
+                        <!--<li><a data-value="-date" data-filter="order_by" class="selected" ng-click="single_choice_listener($event)">Most recent</a></li>
+                        <li><a data-value="date" data-filter="order_by" ng-click="single_choice_listener($event)">Less recent</a></li>
+                        <li><a data-value="title" data-filter="order_by" ng-click="single_choice_listener($event)">A - Z</a></li>
+                        <li><a data-value="-title" data-filter="order_by" ng-click="single_choice_listener($event)">Z - A</a></li>
+                        <li><a data-value="-popular_count" data-filter="order_by" ng-click="single_choice_listener($event)">Most popular</a></li>-->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- container for list of simulations -->
+            <ul id="dashboard-list" class="dashboard-list">
+            </ul>
+
+            <div class="row">
+                <nav>
+                    <ul class="pagination pull-right">
+                        <li ng-click="paginate_down()"><a id="pageBackwards" href="#"><strong><i class="fa fa-angle-left"></i></strong></a></li>
+                        <li><a href>page <span id="page" ng-model="page" ng-bind="page">1</span> of <span id="pagetotal" ng-bind="numpages">1</span></a>
+                        </li>
+                        <li ng-click="paginate_up()"><a id="pageForward" href="#"><strong><i class="fa fa-angle-right"></i></strong></a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- close container -->
+
+
+<!-- Modal must stay outside the navbar -->
+<!-- Modal - Create map -->
+<div class="modal fade" id="createMap-1" tabindex="-1" role="dialog" aria-labelledby="createMap">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="saveChanges">Create map</h4>
+            </div>
+            <div id="editable_user_modal" class="modal-body">
+                Please enter a name and description for your new map:</br>
+                <b>Map name</b></br>
+                <input type="text" class="form-control" id="map_name" value="{{ user.username }}'s Map #{{ next_map_for_user }}" ></br>
+                <b>Map description</b></br>
+                <input type="text" class="form-control" id="map_description" value="NJ Coast auto-generated map for {{ user.username }}" ></br>
+            </div>
+            <div class="modal-footer">
+                <a id="create_map_button" onclick="create_map();" class="btn btn-primary" href="#">Create</a>
+                <a onclick="$('#createMap-1').modal('hide');" class="btn btn-default" href="#">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal - Delete map -->
+<div class="modal fade" id="deleteMap-1" tabindex="-1" role="dialog" aria-labelledby="deleteMap">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="saveChanges">Delete map</h4>
+            </div>
+            <div id="editable_delete_modal" class="modal-body">
+                Do you want to delete map?
+            </div>
+            <div class="modal-footer">
+                <a id="delete_map_button" name="" onclick="delete_map_ajax(this.name);" class="btn btn-primary" href="#">Delete</a>
+                <a onclick="$('#deleteMap-1').modal('hide');" class="btn btn-default" href="#">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal - choose users to share with -->
+<div class="modal fade" id="shareMap-1" tabindex="-1" role="dialog" aria-labelledby="shareMap">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="shareMap">Share Map</h4>
+            </div>
+            <div id="editable_user_modal" class="modal-body">
+                Please select users you would like to share this map with.
+                <ul class="dashboard-list">
+                  {% for user in users_in_group %}
+                  <li>
+                    <p><input id="sharemodal-{{ forloop.counter }}" name="{{ user }}" type="checkbox" value="on" data-toggle="popover" data-placement="right"> {{ user.first_name }} {{ user.last_name }}, {{ user.njcusermeta.role.name }}</p>
+                  </li>
+                  {% endfor %}
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <a id="share_map_button" name="0" onclick="save_shared_with(this.name);return false;" class="btn btn-primary" href="#">Update Shares</a>
+                <a onclick="$('#shareMap-1').modal('hide');" class="btn btn-default" href="#">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- End of Modal -->
+
+{% endblock middle %}
+
+{% block extra_script %}
+<script src="{% static 'js/notify.min.js' %}"></script>
+<script src="{% static 'js/template_js/explore_maps.js' %}"></script>
+
+<script type=text/javascript>
+var user_name = "{{ user.username }}";
+</script>
+{% endblock extra_script %}

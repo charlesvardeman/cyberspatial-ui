@@ -35,6 +35,10 @@ from django.db import connection
 import logging
 logger = logging.getLogger(__name__)
 
+from django.shortcuts import render
+from django.conf import settings
+from django.core.files.storage import FileSystemStorage
+
 '''
   This function is used to respond to ajax requests for which layers should be
   visible for a given user. Borrowed a lot of this from the GeoNode base code
@@ -215,18 +219,71 @@ def njc_map_utilities(request):
             return JsonResponse({'created': False})
     #delete
     elif request.method == "GET":
-        print "delete", request.GET['id']
+        #delete maps?
+        if request.GET['action'] == 'delete':
+            print "delete", request.GET['id']
 
-        #delete object
-        object_to_delete = NJCMap.objects.get(id = request.GET['id'])
-        if object_to_delete:
-            object_to_delete.delete()
+            #delete object
+            object_to_delete = NJCMap.objects.get(id = request.GET['id'])
+            if object_to_delete:
+                object_to_delete.delete()
 
-            return JsonResponse({'deleted': True})
-        else:
-            return JsonResponse({'deleted': False})
+                return JsonResponse({'deleted': True})
+            else:
+                return JsonResponse({'deleted': False})
 
-    return JsonResponse({'created': False, 'deleted': False})
+        #load map data?
+        elif request.GET['action'] == 'load_maps':
+            print "load_maps"
+
+            #get the ordering
+            order_by = request.GET['order_by']
+
+            #if dates
+            if len(request.GET['start_date']) > 0 and len(request.GET['end_date']) > 0:
+                try:
+                    start_date = datetime.strptime(request.GET['start_date'], '%m/%d/%Y')
+                    end_date = datetime.strptime(request.GET['end_date'], '%m/%d/%Y')
+                except:
+                    return JsonResponse({'loaded': False})
+
+                #get data from db
+                map_objs = NJCMap.objects.filter(Q(owner = request.user) | Q(shared_with__contains = request.user)).filter(modified__range=(start_date, end_date), description__contains=request.GET['text_search']).order_by(order_by) #,
+
+            #or just belonging to user
+            else:
+                #get data from db
+                map_objs = NJCMap.objects.filter(Q(owner = request.user) | Q(shared_with__contains = request.user)).filter(description__contains=request.GET['text_search']).order_by(order_by) #, description__contains=request.GET['text_search']
+
+            print "maps", len(map_objs)
+            #parse out results
+            output_array = []
+            for map in map_objs:
+                inner_dict = {}
+                inner_dict['name'] = map.name
+                inner_dict['description'] = map.description
+                inner_dict['settings'] = map.settings
+
+                #get shares
+                if len(map.shared_with) > 0:
+                    inner_dict['shared_with'] = json.loads(map.shared_with)
+                else:
+                    inner_dict['shared_with'] = []
+
+                #inner_dict['shared_with'] = map.shared_with
+                if map.thumbnail:
+                    #print "here", map.thumbnail.url
+                    inner_dict['thumbnail'] = map.thumbnail.url
+                inner_dict['is_default'] = map.is_default
+                inner_dict['owner'] = map.owner.username
+                inner_dict['id'] = map.id
+                inner_dict['modified'] = map.modified.strftime('%m/%d/%Y %H:%M')
+                output_array.append(inner_dict)
+
+            #send it back
+            return JsonResponse({'loaded': True, 'data': output_array})
+
+    return JsonResponse({'created': False, 'deleted': False, 'loaded': False})
     #return HttpResponseRedirect(reverse('map_annotate', args=[map_object.id]))
 
 '''
@@ -341,8 +398,43 @@ def map_settings(request, map_id):
             #settings?
             if request.POST['action'] == 'save':
                 print "Settings ", map_objs[0].name, map_objs[0].id, map_id
+
+                #thumbnail?
+                try:
+                    if request.FILES['thumbnail']:
+                        #remove old image
+                        if map_objs[0].thumbnail:
+                            map_objs[0].thumbnail.delete(False)
+
+                        #add new thumbnail to database
+                        map_objs[0].thumbnail = request.FILES['thumbnail']
+                        print "Loaded thumbnail"
+
+                except:
+                    pass
+                #save the settings
                 map_objs[0].settings = request.POST['settings']
+                map_objs[0].modified = timezone.now()
                 map_objs[0].save()
+
+            elif request.POST['action'] == 'save_image': #add thumbnail
+                #thumbnail?
+                try:
+                    if request.FILES['thumbnail']:
+                        #remove old image
+                        if map_objs[0].thumbnail:
+                            map_objs[0].thumbnail.delete(False)
+
+                        #add new thumbnail to database
+                        map_objs[0].thumbnail = request.FILES['thumbnail']
+
+                        #save the image
+                        map_objs[0].modified = timezone.now()
+                        map_objs[0].save()
+                        print "Loaded thumbnail"
+
+                except:
+                    pass
 
             elif request.POST['action'] == 'add_simulation': #or simulation to add
                 #get settings
@@ -550,6 +642,37 @@ class ExploreTemplateView(TemplateView):
 
         #quiery, select if I am the owner
         context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+
+        return context
+
+class ExploreMapsTemplateView(TemplateView):
+    template_name = 'explore_maps.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ExploreMapsTemplateView, self).get_context_data(**kwargs)
+
+        #quiery, select if I am the owner
+        context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+        if context['maps_for_user']:
+            context['next_map_for_user'] = len(context['maps_for_user']) + 1
+        else:
+            context['next_map_for_user'] = 1
+
+        #get users
+        #find groups I am in!
+        groups = Group.objects.filter(user=self.request.user).exclude(name='anonymous')
+
+        #get unique users in groups but exclude myself
+        usersList = set()
+        for group in groups:
+            tempList = group.user_set.exclude(pk=self.request.user.pk)
+            if tempList:
+                for user in tempList:
+                    print user
+                    usersList.add(user)
+
+        #send to client
+        context['users_in_group'] = usersList
 
         return context
 

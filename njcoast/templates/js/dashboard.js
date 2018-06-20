@@ -160,7 +160,8 @@ function delete_map_ajax(id){
         type: "GET",
         url: "/maps/new/",
         data: {
-            'id': id
+            'id': id,
+            'action': 'delete'
         },
         dataType: "json",
         success: function(result) {

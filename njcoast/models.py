@@ -8,6 +8,8 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from account.conf import settings
 
+from datetime import datetime
+
 #new addendum to GeoNode Profile
 class NJCUserMeta(models.Model):
     user = models.OneToOneField(Profile, on_delete=models.CASCADE)
@@ -49,7 +51,8 @@ class NJCMap(models.Model):
     shared_with = models.TextField(blank=True)
     # layers = models.ManyToManyField(Layer, blank=True)
     is_default = models.BooleanField(default=False)
-
+    thumbnail = models.ImageField(upload_to='thumbnails/', null=True, blank=True)
+    modified = models.DateTimeField(default=datetime.now, blank=True)
     def __str__(self):
         return self.name
 
