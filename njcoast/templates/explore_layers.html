@@ -239,7 +239,7 @@
             </div>
         </div>
     </div>
-    
+
 </div><!-- close container -->
 
 {% endblock middle %}
@@ -248,5 +248,38 @@
 <script src="{% static 'js/notify.min.js' %}"></script>
 <script type=text/javascript>
 var user_name = "{{ user.username }}";
+
+//~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$(document).ready(function () {
+
+    //$("#datepicker1").datepicker();
+    //$("#datepicker2").datepicker();
+
+    $.ajax({
+        type: "GET",
+        url: "/api/layers/",
+        data: {
+        },
+        dataType: "json",
+        success: function (result) {
+            console.log("GETTING LAYERS -- SUCCESS! " + result.meta.total_count);
+
+            //get total number
+            var count = result.meta.total_count;
+
+            //loop over objects
+            for(var i=0; i<count; i++){
+                var object = result.objects[i];
+                console.log("Title "+object.title);
+            }
+
+        },
+        error: function (result) {
+            console.log("GETTING MAPS -- ERROR:", result)
+        }
+    });
+
+});
+
 </script>
 {% endblock extra_script %}
