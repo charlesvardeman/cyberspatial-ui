@@ -116,7 +116,6 @@
                     </ul>
                 </nav>
 
-
                 <nav class="filter">
                     <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-right"></i> Keywords</a></h4>
                     <ul class="nav closed" id="keywords">
@@ -130,8 +129,6 @@
                     </ul>
                 </nav>
 
-
-
                 <nav class="filter">
                     <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-right"></i>Date</a></h4>
                     <ul class="nav closed" id="date_start">
@@ -144,9 +141,6 @@
                     </ul>
                 </nav>
 
-
-
-
                 <nav class="filter">
                     <h4><a href="#" id="_extent_filter" class="toggle toggle-nav"><i class="fa fa-chevron-right"></i>Extent</a></h4>
                     <fieldset class="nav closed">
@@ -157,11 +151,7 @@
                     </fieldset>
                 </nav>
 
-
-
             </div>
-
-
 
         </div>
         <div class="col-md-9">
@@ -182,50 +172,9 @@
                 </div>
             </div>
 
-            <article>
-                <div class="row items-list">
-                    <div class="col-xs-4 thumb">
-                        <a href=""><img src="images/parcels-thumb.png" /></a>
-                    </div>
-                    <div class="col-xs-8 item-info">
-
-                        <h4><a href="">Parcels</a></h4>
-                        <p>Property & Parcels <span class="owner">by <a href="">admin</a></span></p>
-                        <p class="abstract">Description of layer, including source and other metadata</p>
-                        <p class="actions">
-                            <a href=""><i class="fa fa-calendar-o"></i>19 July 2017</a> |
-                            <a href=""><i class="fa fa-eye"></i>0</a> |
-                            <a href=""><i class="fa fa-share"></i>0</a> |
-                            <a href=""><i class="fa fa-star"></i>0</a>
-                            <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="map-p.html">
-                                <i class="fa fa-map-marker"></i>View on Map</a>
-                        </p>
-                    </div>
-                </div>
-            </article>
-
-            <article>
-                <div class="row items-list">
-                    <div class="col-xs-4 thumb">
-                        <a href=""><img src="images/buildings-thumb.png" /></a>
-                    </div>
-                    <div class="col-xs-8 item-info">
-
-                        <h4><a href="">Buildings</a></h4>
-                        <p>Property & Parcels <span class="owner">by <a href="">admin</a></span></p>
-                        <p class="abstract">Description of layer, including source and other metadata</p>
-                        <p class="actions">
-                            <a href=""><i class="fa fa-calendar-o"></i>29 April 2017</a> |
-                            <a href=""><i class="fa fa-eye"></i>0</a> |
-                            <a href=""><i class="fa fa-share"></i>0</a> |
-                            <a href=""><i class="fa fa-star"></i>0</a>
-                            <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="map-p.html">
-                                <i class="fa fa-map-marker"></i>View on Map</a>
-                        </p>
-                    </div>
-                </div>
-            </article>
-
+            <!-- container for list of layers -->
+            <ul id="dashboard-list" class="dashboard-list">
+            </ul><!--End of list of layers -->
 
             <div class="row" style="margin-bottom: 300px">
                 <nav>
@@ -264,6 +213,9 @@ $(document).ready(function () {
         success: function (result) {
             console.log("GETTING LAYERS -- SUCCESS! " + result.meta.total_count);
 
+            //clear current list
+            document.getElementById('dashboard-list').innerHTML = "";
+
             //get total number
             var count = result.meta.total_count;
 
@@ -271,6 +223,34 @@ $(document).ready(function () {
             for(var i=0; i<count; i++){
                 var object = result.objects[i];
                 console.log("Title "+object.title);
+
+                //html to crete li
+                var html;
+
+                html = `<article>
+                            <div class="row items-list">
+                                <div class="col-xs-4 thumb">
+                                    <a href=""><img src="${object.thumbnail_url}" /></a>
+                                </div>
+                                <div class="col-xs-8 item-info">
+                                    <h4><a href="">${object.title}</a></h4>
+                                    <p>${object.supplemental_information} <span class="owner">by <a href="">${object.owner__username}</a></span></p>
+                                    <p class="abstract">${object.abstract}</p>
+                                    <p class="actions">
+                                        <a href=""><i class="fa fa-calendar-o"></i>${object.date}</a> |
+                                        <a href=""><i class="fa fa-eye"></i>${object.popular_count}</a> |
+                                        <a href=""><i class="fa fa-share"></i>${object.share_count}</a> |
+                                        <a href=""><i class="fa fa-star"></i>${object.rating}</a>
+                                        <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="map-p.html">
+                                            <i class="fa fa-map-marker"></i>View on Map</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </article>`;
+
+                //add it
+                document.getElementById('dashboard-list').innerHTML += html;
+
             }
 
         },
