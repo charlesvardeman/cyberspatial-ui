@@ -224,6 +224,16 @@ $(document).ready(function () {
                 var object = result.objects[i];
                 console.log("Title "+object.title);
 
+                //truncations
+                if (object.supplemental_information.length >= 200) {
+                    object.supplemental_information = object.supplemental_information.substring(0, 197) + "...";
+                }
+
+                //truncations
+                if (object.abstract.length >= 200) {
+                    object.abstract = object.abstract.substring(0, 197) + "...";
+                }
+
                 //html to crete li
                 var html;
 
