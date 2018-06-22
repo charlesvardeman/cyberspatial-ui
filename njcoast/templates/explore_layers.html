@@ -48,54 +48,6 @@
                 <nav class="filter">
                     <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-right"></i>Categories</a></h4>
                     <ul class="nav closed" id="categories">
-                        <li>
-                            <a>
-                                Base Mapping
-                                <span class="badge pull-right">7</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="active">
-                                Property & Parcels
-                                <span class="badge pull-right">2</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a>
-                                Emergency Ops Plan
-                                <span class="badge pull-right">15</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a>
-                                Transportation
-                                <span class="badge pull-right">1</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a>
-                                Planning & Zoning
-                                <span class="badge pull-right">6</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a>
-                                Public Works
-                                <span class="badge pull-right">8</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a>
-                                Flooding/FEMA
-                                <span class="badge pull-right">6</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a>
-                                Hazards
-                                <span class="badge pull-right">17</span>
-                            </a>
-                        </li>
                     </ul>
                 </nav>
 
@@ -201,6 +153,57 @@ $(document).ready(function () {
     //$("#datepicker1").datepicker();
     //$("#datepicker2").datepicker();
 
+    //get catagories
+    $.ajax({
+        type: "GET",
+        url: "/api/categories/",
+        data: {
+        },
+        dataType: "json",
+        success: function (result) {
+            console.log("GETTING catagories -- SUCCESS! ");
+            //clear current list
+            document.getElementById('categories').innerHTML = "";
+
+            //get total number
+            var count = result.meta.total_count;
+
+            //loop over objects
+            for(var i=0; i<count; i++){
+
+                //get catagory
+                var object = result.objects[i];
+
+                //skip if none available
+                if(object.count == 0) continue;
+
+                console.log("Title "+object.gn_description);
+                //truncations
+                if (object.gn_description.length > 25) {
+                    object.gn_description = object.gn_description.substring(0, 22) + "...";
+                }
+
+                //html to crete li
+                var html;
+
+                html = `<li>
+                            <a id="cat_${object.id}" class="catagorytoclick" onclick="highlight('${object.id}')">
+                                ${object.gn_description}
+                                <span class="badge pull-right">${object.count}</span>
+                            </a>
+                        </li>`;
+
+                //add it
+                document.getElementById('categories').innerHTML += html;
+
+            }
+        },
+        error: function (result) {
+            console.log("GETTING catagories -- ERROR:", result)
+        }
+    });
+
+    //get actual layers
     $.ajax({
         type: "GET",
         url: "/api/layers/",
@@ -267,6 +270,18 @@ $(document).ready(function () {
     });
 
 });
+
+//click catagory
+function highlight(id){
+    console.log("Click " + id);
+
+    //are we active?
+    if(document.getElementById('cat_'+id).classList.contains("active")){
+        document.getElementById('cat_'+id).classList.remove("active");
+    }else{
+        document.getElementById('cat_'+id).classList.add("active");
+    }
+}
 
 $(function() {
 
