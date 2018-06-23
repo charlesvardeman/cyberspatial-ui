@@ -3,7 +3,7 @@ from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 
 from geonode.urls import urlpatterns
-from .views import my_gis_layers, MapTemplateView, DashboardTemplateView, MapExpertTemplateView, ExploreTemplateView, DCADashboardTemplateView, ExploreMapsTemplateView
+from .views import my_gis_layers, MapTemplateView, DashboardTemplateView, MapExpertTemplateView, ExploreTemplateView, DCADashboardTemplateView, ExploreMapsTemplateView, ExploreLayersTemplateView
 from njcoast.views import map_annotations, njc_map_utilities, map_expert_simulations, map_settings, signup, user_approval, change_password, municipalities_in_county
 
 from django.conf import settings
@@ -16,6 +16,7 @@ urlpatterns = patterns('',
                        url(r'^resources-shp/$', TemplateView.as_view(template_name='site_resources_shp.html'), name='shp'),
                        url(r'^explore/$', login_required(ExploreTemplateView.as_view()), name='explore'),
                        url(r'^explore-maps/$', login_required(ExploreMapsTemplateView.as_view()), name='explore-maps'),
+                       url(r'^explore-layers/$', login_required(ExploreLayersTemplateView.as_view()), name='explore-layers'),
                        url(r'^maps/$', login_required(MapTemplateView.as_view()), name='maps_browse'),
                        url(r'^expert/$', login_required(MapExpertTemplateView.as_view()), name='maps_expert'),
                        url(r'^store/$', map_expert_simulations, name='map_expert_simulations_api'),

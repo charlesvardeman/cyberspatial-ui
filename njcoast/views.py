@@ -489,6 +489,28 @@ def map_settings(request, map_id):
                 map_objs[0].shared_with = request.POST['shares']
                 map_objs[0].save()
 
+            elif request.POST['action'] == 'add_layer': #or layer to add
+                #get settings
+                try:
+                    settings = json.loads(map_objs[0].settings)
+                except:
+                    settings = {}
+
+                layer_name = 'layer__' + request.POST['layer_id']
+                if layer_name not in settings['layers_selected']:
+
+                    #append to layers
+                    settings.setdefault('layers_selected', []).append(layer_name)
+
+                    #save it
+                    map_objs[0].settings = json.dumps(settings)
+                    map_objs[0].save()
+
+                    #print for posterity
+                    print "Settings ", map_objs[0].name, layer_name, json.dumps(settings)
+                else:
+                    print layer_name, "already exists!"
+
             else:
                 print "Action not defined!"
 
@@ -639,6 +661,17 @@ class ExploreTemplateView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ExploreTemplateView, self).get_context_data(**kwargs)
+
+        #quiery, select if I am the owner
+        context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+
+        return context
+
+class ExploreLayersTemplateView(TemplateView):
+    template_name = 'explore_layers.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ExploreLayersTemplateView, self).get_context_data(**kwargs)
 
         #quiery, select if I am the owner
         context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)

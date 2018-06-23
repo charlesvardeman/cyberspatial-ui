@@ -1,0 +1,166 @@
+{% extends 'site_base.html' %}
+{% load i18n %}
+{% load staticfiles %}
+{% load base_tags %}
+
+{% block body_class %}home{% endblock %}
+
+{% block extra_head %}
+    <!-- load mods to leaflet for rectangular popups/map icons -->
+    <link rel="stylesheet" type="text/css" href="{% static "css/crc_leaflet.css" %}" media="screen" />
+    <link rel="stylesheet" type="text/css" href="{% static "css/fontawesome-all.min.css" %}" media="screen" />
+
+{% endblock extra_head %}
+
+{% block middle %}
+<div class="jumbotron njcoast-image slimmer"></div>
+
+<div class="container">
+    <div class="page-header map-header">
+        <!--<button class="btn btn-primary btn-md pull-right" data-toggle="modal" data-target="" style="margin-left: 5px">Create Layers</button>
+        <button class="btn btn-primary btn-md pull-right" data-toggle="modal" data-target="">Upload Layers</button>-->
+        <h3>Explore Layers</h3>
+    </div>
+    <div class="row">
+
+        <div class="col-md-3">
+            <div class="selections">
+                Your selections
+                <a href="" id="clear-search" class="pull-right" onclick="clear_search();return false;">Clear</a>
+            </div>
+            <nav class="filter">
+
+                <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-right"></i>Text</a></h4>
+                <ul class="nav closed" id="text">
+                    <li>
+                        <div class="input-group">
+                            <input name="text_search_input" id="text_search_input" ng-model="text_query" type="text" placeholder="Search by text" class="form-control">
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary" type="submit" id="text_search_btn"><i class="fa fa-search" onclick="do_text_search();"></i></button>
+                            </span>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+
+            <div id="slide-pane">
+
+                <nav class="filter">
+                    <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-right"></i>Categories</a></h4>
+                    <ul class="nav closed" id="categories">
+                    </ul>
+                </nav>
+
+                <!--<nav class="filter">
+                    <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-right"></i>Regions</a></h4>
+                    <ul class="nav closed" id="regions">
+
+                        <li ng-repeat="region in regions" ng-if="region.count > 0">
+                            <a data-value="{{ region.code }}" data-filter="regions__code__in" ng-click="multiple_choice_listener($event)" class="{{region.active}}">{{ region.name }}
+                                <span class="badge pull-right">{{ region.count }}</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>-->
+
+                <nav class="filter">
+                    <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-right"></i> Keywords</a></h4>
+                    <ul class="nav closed" id="keywords" style="height: 350px; overflow: auto">
+
+                        <li ng-repeat="keyword in keywords" ng-if="keyword.count > 4">
+                            <a data-value="{{ keyword.slug }}" data-filter="keywords__slug__in" ng-click="multiple_choice_listener($event)" class="{{keyword.active}}">{{ keyword.name }}
+                                <span class="badge pull-right">{{ keyword.count }}</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+
+                <nav class="filter">
+                    <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-right"></i>Date</a></h4>
+                    <ul class="nav closed" id="date_start">
+                        <label>Date begins after:</label>
+                        <li><input id="date__gte" onchange="do_date_search(this);" value="yyyy-mm-dd" data-date-format="YYYY-MM-DD" type="text" class="datepicker" placeholder="yyyy-mm-dd" ng-model="date_query.date__gte" /></li>
+                    </ul>
+                    <ul class="nav closed" id="date_end">
+                        <label>Date ends before:</label>
+                        <li><input id="date__lte" onchange="do_date_search(this);" value="yyyy-mm-dd" data-date-format="YYYY-MM-DD" type="text" class="datepicker" placeholder="yyyy-mm-dd" ng-model="date_query.date__lte" /></li>
+                    </ul>
+                </nav>
+
+                <!--<nav class="filter">
+                    <h4><a href="#" id="_extent_filter" class="toggle toggle-nav"><i class="fa fa-chevron-right"></i>Extent</a></h4>
+                    <fieldset class="nav closed">
+                        <div class="control-group leaflet_map">
+                            <leaflet class="filter-map-container" center="map_center" defaults="defaults" layers="layers" id="filter-map">
+                            </leaflet>
+                        </div>
+                    </fieldset>
+                </nav>-->
+
+            </div>
+
+        </div>
+        <div class="col-md-9">
+            <div class="row" style="margin-top:1em">
+                <div class="col-md-3">
+                    <span>Total: </span>
+                    <span ng-bind="total_counts" id="total_counts">4</span>
+                </div>
+
+                <div class="col-md-9">
+                    <ul class="list-inline pull-left" id="sort">
+                        <li><a name="-date" data-filter="order_by" class="selected" onclick='reload_layer_data(this)'>Most recent</a></li>
+                        <li><a name="date" data-filter="order_by" onclick='reload_layer_data(this)'>Less recent</a></li>
+                        <li><a name="title" data-filter="order_by" onclick='reload_layer_data(this)'>A - Z</a></li>
+                        <li><a name="-title" data-filter="order_by" onclick='reload_layer_data(this)'>Z - A</a></li>
+                        <!--<li><a data-value="-popular_count" data-filter="order_by" ng-click="single_choice_listener($event)">Most popular</a></li>-->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- container for list of layers -->
+            <ul id="dashboard-list" class="dashboard-list">
+            </ul><!--End of list of layers -->
+
+            <div class="row" style="margin-bottom: 300px">
+                <nav>
+                    <ul class="pagination pull-right">
+                        <li onclick="return false;"><a id="pageBackwards" href><strong><i class="fa fa-angle-left"></i></strong></a></li>
+                        <li><span>page <span id="page" ng-model="page" ng-bind="page">1</span> of <span id="pagetotal" ng-bind="numpages">1</span></span>
+                        </li>
+                        <li onclick="return false;"><a id="pageForward" href><strong><i class="fa fa-angle-right"></i></strong></a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+</div><!-- close container -->
+
+{% endblock middle %}
+
+{% block extra_script %}
+<!--<script src="/static/geonode/js/search/explore.js?v=2.6.3"></script>-->
+<script src="{% static 'js/notify.min.js' %}"></script>
+<script src="{% static 'js/template_js/explore_layers.js' %}"></script>
+
+<script type=text/javascript>
+
+//variables
+var user_name = "{{ user.username }}";
+
+//~~~~load users maps for use in viewing layers~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+function AddUserMaps(sim_id){
+    var html = `{% for map in maps_for_user %}
+    <a style="padding: 2px;" class="dropdown-item" name="{{ map.id }}" onclick='add_layer_to_map(this, "${sim_id}");'>{{ map.name }}</a>
+    <div class="dropdown-divider"></div>
+    {% endfor %}`;
+
+    $("#add_"+sim_id)[0].innerHTML = html
+}
+
+</script>
+
+{% endblock extra_script %}
