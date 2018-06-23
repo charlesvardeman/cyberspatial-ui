@@ -187,7 +187,7 @@ $(document).ready(function () {
                 var html;
 
                 html = `<li>
-                            <a id="cat_${object.id}" class="catagorytoclick" onclick="highlight('${object.id}')">
+                            <a id="cat_${object.id}" class="catagorytoclick" )">
                                 ${object.gn_description}
                                 <span class="badge pull-right">${object.count}</span>
                             </a>
@@ -197,26 +197,56 @@ $(document).ready(function () {
                 document.getElementById('categories').innerHTML += html;
 
             }
+
+            //add click function
+            $(".catagorytoclick").click(function(e) {
+                console.log("Click "+$(this).attr('id').substring(4));
+
+                //toggle active
+                $(this).toggleClass("active");
+
+                //are we active?
+                if($(this).hasClass("active")){
+
+                    //remove other actives
+                    $(this).addClass("active");
+                    $(this).parent('li').siblings().find('a.catagorytoclick').removeClass('active');
+
+                    //load layers
+                    load_layers(false, '-date', $(this).attr('id').substring(4), "");
+                }
+
+            });
+
         },
         error: function (result) {
             console.log("GETTING catagories -- ERROR:", result)
         }
     });
 
-    //load layers
-    load_layers(false);
+    //load layers, start with order by most recent
+    load_layers(false, '-date', "", "");
 
 });
 
 //load the layersvia AJAX
-function load_layers(append){
+function load_layers(append, orderby, catagory, keyword){
 
-    //get actual layers
+    //sort out query
+    qdata = {
+                'order_by': orderby
+            };
+
+    //add catagory if relevant
+    if(catagory != ""){
+        qdata['category'] = catagory;
+    }
+
+    //get actual layers, order by date, -date, title, -title
     $.ajax({
         type: "GET",
         url: "/api/layers/",
-        data: {
-        },
+        data: qdata,
         dataType: "json",
         success: function (result) {
             console.log("GETTING LAYERS -- SUCCESS! " + result.meta.total_count);
@@ -279,18 +309,6 @@ function load_layers(append){
         }
     });
 
-}
-
-//click catagory
-function highlight(id){
-    console.log("Click " + id);
-
-    //are we active?
-    if(document.getElementById('cat_'+id).classList.contains("active")){
-        document.getElementById('cat_'+id).classList.remove("active");
-    }else{
-        document.getElementById('cat_'+id).classList.add("active");
-    }
 }
 
 $(function() {
