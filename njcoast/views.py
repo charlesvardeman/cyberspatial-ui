@@ -651,6 +651,9 @@ class ExploreLayersTemplateView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(ExploreLayersTemplateView, self).get_context_data(**kwargs)
 
+        #quiery, select if I am the owner
+        context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+
         return context
 
 class ExploreMapsTemplateView(TemplateView):
