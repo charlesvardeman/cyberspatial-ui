@@ -81,11 +81,11 @@
                     <h4><a href="#" class="toggle toggle-nav"><i class="fa fa-chevron-right"></i>Date</a></h4>
                     <ul class="nav closed" id="date_start">
                         <label>Date begins after:</label>
-                        <li><input value="yyyy-mm-dd" data-date-format="YYYY-MM-DD" type="text" class="datepicker" placeholder="yyyy-mm-dd" ng-model="date_query.date__gte" /></li>
+                        <li><input id="date__gte" onchange="do_date_search(this);" value="yyyy-mm-dd" data-date-format="YYYY-MM-DD" type="text" class="datepicker" placeholder="yyyy-mm-dd" ng-model="date_query.date__gte" /></li>
                     </ul>
                     <ul class="nav closed" id="date_end">
                         <label>Date ends before:</label>
-                        <li><input value="yyyy-mm-dd" data-date-format="YYYY-MM-DD" type="text" class="datepicker" placeholder="yyyy-mm-dd" ng-model="date_query.date__lte" /></li>
+                        <li><input id="date__lte" onchange="do_date_search(this);" value="yyyy-mm-dd" data-date-format="YYYY-MM-DD" type="text" class="datepicker" placeholder="yyyy-mm-dd" ng-model="date_query.date__lte" /></li>
                     </ul>
                 </nav>
 
@@ -152,6 +152,8 @@ var orderby = '-date';
 var catagory = "";
 var keyword = "";
 var text_search = "";
+var start_date = "";
+var end_date = "";
 
 //~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $(document).ready(function () {
@@ -222,12 +224,12 @@ $(document).ready(function () {
                     catagory = $(this).attr('id').substring(4);
 
                     //load layers
-                    load_layers(false, orderby, catagory, keyword);
+                    load_layers(false, orderby);
                 }else{
                     catagory = "";
 
                     //load layers
-                    load_layers(false, orderby, catagory, keyword);
+                    load_layers(false, orderby);
                 }
 
             });
@@ -301,12 +303,12 @@ $(document).ready(function () {
                     keyword = $(this).attr('id').substring(4);
 
                     //load layers
-                    load_layers(false, orderby, catagory, keyword);
+                    load_layers(false, orderby);
                 }else{
                     keyword = "";
 
                     //load layers
-                    load_layers(false, orderby, catagory, keyword);
+                    load_layers(false, orderby);
                 }
 
             });
@@ -318,7 +320,7 @@ $(document).ready(function () {
     });
 
     //load layers, start with order by most recent
-    load_layers(false, orderby, catagory, keyword);
+    load_layers(false, orderby);
 
 });
 
@@ -340,8 +342,19 @@ function load_layers(append, orderby){
         qdata['keywords'] = keyword;
     }
 
+    //text search
     if(text_search != ""){
         qdata['title__contains'] = text_search;
+    }
+
+    //date gte
+    if(start_date != ""){
+        qdata['date__gte'] = start_date;
+    }
+
+    //date gte
+    if(end_date != ""){
+        qdata['date__lte'] = end_date;
     }
 
     //get actual layers, order by date, -date, title, -title
@@ -468,17 +481,17 @@ function reload_layer_data(object) {
     orderby = object.name;
 
     //load data
-    load_layers(false, orderby, catagory, keyword);
+    load_layers(false, orderby);
 }
 
 //clear text search
 function clear_search() {
     //clear
     document.getElementById('text_search_input').value = "";
-    /*document.getElementById('datepicker1').value = "mm/dd/yyyy";
-    document.getElementById('datepicker2').value = "mm/dd/yyyy";
+    document.getElementById('date__gte').value = "mm/dd/yyyy";
+    document.getElementById('date__lte').value = "mm/dd/yyyy";
     start_date = "";
-    end_date = "";*/
+    end_date = "";
     text_search = "";
 
     //clear actives
@@ -490,14 +503,14 @@ function clear_search() {
     keyword = "";
 
     //load data
-    load_layers(false, orderby, catagory, keyword);
+    load_layers(false, orderby);
 
 }
 
 //reload with text search
 function do_text_search() {
 
-    var date_regex = /^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/;
+    //var date_regex = /^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/;
 
     /*//test start
     if (start_date != "" && !(date_regex.test(start_date))) {
@@ -518,7 +531,26 @@ function do_text_search() {
     text_search = document.getElementById('text_search_input').value;
 
     //load data
-    load_layers(false, orderby, catagory, keyword);
+    load_layers(false, orderby);
+}
+
+//date Update
+function do_date_search(object){
+
+    //get date in correct format
+    var dateObject = $("#"+object.id).datepicker("getDate");
+    var dateString = $.datepicker.formatDate("yy-mm-dd", dateObject);
+
+    //setup dates
+    if(object.id == 'date__gte'){
+        start_date = dateString;
+    }else{
+        end_date = dateString;
+    }
+
+    //load data
+    load_layers(false, orderby);
+
 }
 
 </script>
