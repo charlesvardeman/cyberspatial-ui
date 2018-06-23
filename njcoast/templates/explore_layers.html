@@ -127,10 +127,10 @@
             <div class="row" style="margin-bottom: 300px">
                 <nav>
                     <ul class="pagination pull-right">
-                        <li ng-click="paginate_down()"><a href><strong><i class="fa fa-angle-left"></i></strong></a></li>
-                        <li><a href>page <span ng-model="page" ng-bind="page">1</span> of <span ng-bind="numpages">1</span></a>
+                        <li onclick="return false;"><a id="pageBackwards" href><strong><i class="fa fa-angle-left"></i></strong></a></li>
+                        <li><span>page <span id="page" ng-model="page" ng-bind="page">1</span> of <span id="pagetotal" ng-bind="numpages">1</span></span>
                         </li>
-                        <li ng-click="paginate_up()"><a href><strong><i class="fa fa-angle-right"></i></strong></a></li>
+                        <li onclick="return false;"><a id="pageForward" href><strong><i class="fa fa-angle-right"></i></strong></a></li>
                     </ul>
                 </nav>
             </div>
@@ -329,7 +329,9 @@ function load_layers(append, orderby){
 
     //sort out query
     qdata = {
-                'order_by': orderby
+                'order_by': orderby,
+                'limit': 4,
+                'offset': (page - 1) * 4
             };
 
     //add catagory if relevant
@@ -377,6 +379,10 @@ function load_layers(append, orderby){
             //set label
             document.getElementById("total_counts").innerHTML = count;
 
+            //set page stuff
+            counter = parseInt(count);
+            document.getElementById("pagetotal").innerHTML = Math.ceil(count / 4);
+
             //loop over objects
             for(var i=0; i<count; i++){
                 var object = result.objects[i];
@@ -405,10 +411,10 @@ function load_layers(append, orderby){
                                     <p>${object.supplemental_information} <span class="owner">by <a href="">${object.owner__username}</a></span></p>
                                     <p class="abstract">${object.abstract}</p>
                                     <p class="actions">
-                                        <a href=""><i class="fa fa-calendar-o"></i>${object.date}</a> |
-                                        <a href=""><i class="fa fa-eye"></i>${object.popular_count}</a> |
-                                        <a href=""><i class="fa fa-share"></i>${object.share_count}</a> |
-                                        <a href=""><i class="fa fa-star"></i>${object.rating}</a>
+                                        <i class="fa fa-calendar-o"></i>${object.date} |
+                                        <i class="fa fa-eye"></i>${object.popular_count} |
+                                        <i class="fa fa-share"></i>${object.share_count} |
+                                        <i class="fa fa-star"></i>${object.rating}
                                         <a ng-if="item.detail_url.indexOf('/maps/') > -1" class="pull-right" href="map-p.html">
                                             <i class="fa fa-map-marker"></i>View on Map</a>
                                     </p>
@@ -552,6 +558,44 @@ function do_date_search(object){
     load_layers(false, orderby);
 
 }
+
+//page variables
+var counter = 1;
+var page = 1;
+var layer_per_page = 4;
+
+$("#pageBackwards").on("click", function (e) {
+    e.preventDefault();
+
+    //can we move backwards?
+    if(page > 1){
+        //decrement
+        page--;
+
+        //load data
+        load_layers(false, orderby);
+
+        //update page
+        document.getElementById('page').innerHTML = page;
+    }
+});
+
+$("#pageForward").on("click", function (e) {
+    e.preventDefault();
+
+    //can we move forward?
+    if((page * layer_per_page) < counter){
+
+        //increment
+        page++;
+
+        //load data
+        load_layers(false, orderby);
+
+        //update page
+        document.getElementById('page').innerHTML = page;
+    }
+});
 
 </script>
 
