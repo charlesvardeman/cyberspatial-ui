@@ -26,7 +26,7 @@
         <div class="col-md-3">
             <div class="selections">
                 Your selections
-                <a href="" id="clear-search" class="pull-right">Clear</a>
+                <a href="" id="clear-search" class="pull-right" onclick="clear_search();return false;">Clear</a>
             </div>
             <nav class="filter">
 
@@ -36,7 +36,7 @@
                         <div class="input-group">
                             <input name="text_search_input" id="text_search_input" ng-model="text_query" type="text" placeholder="Search by text" class="form-control">
                             <span class="input-group-btn">
-                                <button class="btn btn-primary" type="submit" id="text_search_btn"><i class="fa fa-search"></i></button>
+                                <button class="btn btn-primary" type="submit" id="text_search_btn"><i class="fa fa-search" onclick="do_text_search();"></i></button>
                             </span>
                         </div>
                     </li>
@@ -145,11 +145,13 @@
 <!--<script src="/static/geonode/js/search/explore.js?v=2.6.3"></script>-->
 <script src="{% static 'js/notify.min.js' %}"></script>
 <script type=text/javascript>
+
 //variables
 var user_name = "{{ user.username }}";
 var orderby = '-date';
 var catagory = "";
 var keyword = "";
+var text_search = "";
 
 //~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $(document).ready(function () {
@@ -321,7 +323,7 @@ $(document).ready(function () {
 });
 
 //load the layer svia AJAX
-function load_layers(append, orderby, catagory, keyword){
+function load_layers(append, orderby){
 
     //sort out query
     qdata = {
@@ -336,6 +338,10 @@ function load_layers(append, orderby, catagory, keyword){
     //add keyword if relevant
     if(keyword != ""){
         qdata['keywords'] = keyword;
+    }
+
+    if(text_search != ""){
+        qdata['title__contains'] = text_search;
     }
 
     //get actual layers, order by date, -date, title, -title
@@ -460,6 +466,56 @@ function reload_layer_data(object) {
 
     //set ordering
     orderby = object.name;
+
+    //load data
+    load_layers(false, orderby, catagory, keyword);
+}
+
+//clear text search
+function clear_search() {
+    //clear
+    document.getElementById('text_search_input').value = "";
+    /*document.getElementById('datepicker1').value = "mm/dd/yyyy";
+    document.getElementById('datepicker2').value = "mm/dd/yyyy";
+    start_date = "";
+    end_date = "";*/
+    text_search = "";
+
+    //clear actives
+    $("#categories").find('li').siblings().find('a.catagorytoclick').removeClass('active');
+    $("#keywords").find('li').siblings().find('a.keywordtoclick').removeClass('active');
+
+    //clear data
+    catagory = "";
+    keyword = "";
+
+    //load data
+    load_layers(false, orderby, catagory, keyword);
+
+}
+
+//reload with text search
+function do_text_search() {
+
+    var date_regex = /^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/;
+
+    /*//test start
+    if (start_date != "" && !(date_regex.test(start_date))) {
+        alert("Error in start date " + start_date);
+    }
+
+    //test start
+    if (end_date != "" && !(date_regex.test(end_date))) {
+        alert("Error in end date " + end_date);
+    }
+
+    //both dates?
+    if ((end_date == "" && start_date != "") || (end_date != "" && start_date == "")) {
+        alert("Please enter a start AND end date!");
+    }*/
+
+    //get text
+    text_search = document.getElementById('text_search_input').value;
 
     //load data
     load_layers(false, orderby, catagory, keyword);
