@@ -185,7 +185,7 @@ $(document).ready(function () {
                 //skip if none available
                 if(object.count == 0) continue;
 
-                console.log("Title "+object.gn_description);
+                //console.log("Title "+object.gn_description);
                 //truncations
                 if (object.gn_description.length > 25) {
                     object.gn_description = object.gn_description.substring(0, 22) + "...";
@@ -264,7 +264,7 @@ $(document).ready(function () {
                 //skip if none available
                 if(object.count == 0) continue;
 
-                console.log("Name "+object.name);
+                //console.log("Name "+object.name);
                 //truncations
                 if (object.name.length > 25) {
                     object.name = object.name.substring(0, 22) + "...";
@@ -386,7 +386,7 @@ function load_layers(append, orderby){
             //loop over objects
             for(var i=0; i<count; i++){
                 var object = result.objects[i];
-                console.log("Title "+object.title);
+                //console.log("Title "+object.title);
 
                 //truncations
                 if (object.supplemental_information.length >= 200) {
@@ -396,6 +396,13 @@ function load_layers(append, orderby){
                 //truncations
                 if (object.abstract.length >= 200) {
                     object.abstract = object.abstract.substring(0, 197) + "...";
+                }
+
+                //fix date?
+                object.date = object.date.replace("T"," ");
+                var indx = object.date.indexOf(".");
+                if(indx > -1){
+                    object.date = object.date.substring(0,indx);
                 }
 
                 //html to crete li
