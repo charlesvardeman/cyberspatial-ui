@@ -138,7 +138,7 @@ $(document).ready(function () {
 
             //add click function
             $(".keywordtoclick").click(function(e) {
-                console.log("Click "+$(this).attr('id').substring(4));
+                //console.log("Click "+$(this).attr('id').substring(4));
 
                 //toggle active
                 $(this).toggleClass("active");
@@ -266,7 +266,7 @@ function load_layers(append, orderby){
                 html = `<article>
                             <div class="row items-list">
                                 <div class="col-xs-4 thumb">
-                                    <a href=""><img src="${object.thumbnail_url}" /></a>
+                                    <img src="${object.thumbnail_url}" />
                                 </div>
                                 <div class="col-xs-8 item-info">
                                     <h4><a href="">${object.title}</a></h4>
