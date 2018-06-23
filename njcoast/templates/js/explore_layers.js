@@ -281,7 +281,7 @@ function load_layers(append, orderby){
                                             <a class="dropdown-toggle pull-right" id="dropdownMenuAddToMap_${count}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 <i class="fa fa-map-marker"></i>View on Map</a>
                                             </a>
-                                            <div id="add_${object.id}" style="height: 250px;overflow: auto;" class="dropdown-menu" aria-labelledby="dropdownMenuAddToMap_${count}">
+                                            <div id="add_${object.id}" style="height: 250px;overflow: auto;padding: 2px;" class="dropdown-menu" aria-labelledby="dropdownMenuAddToMap_${count}">
                                             </div>
                                         </div>
                                     </div>
