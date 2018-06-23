@@ -628,6 +628,30 @@ $("#pageForward").on("click", function (e) {
 //add layer to map and go
 function add_layer_to_map(object, id){
     console.log("Add layer. map id: "+object.name+", layer id: "+id);
+
+    //Do ajax
+    $.ajax({
+        type: "POST",
+        url: "/map/" + object.name + "/settings/",
+        data: {
+            'layer_id': id,
+            'action': 'add_layer',
+        },
+        dataType: "json",
+        success: function (result) {
+            console.log("SAVING TO MAP -- SUCCESS!" + result.saved);
+            //flag saved
+            $.notify("Layer saved to map " + object.innerHTML, "success");
+
+            //jump to page
+            window.location.href = "/map/" + object.name + "/";
+        },
+        error: function (result) {
+            console.log("ERROR:", result)
+            $.notify("Error saving simulation to map", "error");
+        }
+    });
+
 }
 
 </script>
