@@ -644,14 +644,14 @@ class DashboardTemplateView(TemplateView):
         context = super(DashboardTemplateView, self).get_context_data(**kwargs)
 
         #quiery, select if I am the owner
-        context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+        context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user).order_by('name')
         if context['maps_for_user']:
             context['next_map_for_user'] = len(context['maps_for_user']) + 1
         else:
             context['next_map_for_user'] = 1
 
         #quiery, select if I an in the list of shared_with__contains
-        context['shared_maps_for_user'] = NJCMap.objects.filter(shared_with__contains = self.request.user)
+        context['shared_maps_for_user'] = NJCMap.objects.filter(shared_with__contains = self.request.user).order_by('name')
 
         #get users groups
         current_user = self.request.user
