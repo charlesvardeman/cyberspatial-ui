@@ -16,6 +16,8 @@ urlpatterns = patterns('',
                        url(r'^resources-shp/$', TemplateView.as_view(template_name='site_resources_shp.html'), name='shp'),
                        url(r'^explore/$', login_required(ExploreTemplateView.as_view()), name='explore'),
                        url(r'^explore-maps/$', login_required(ExploreMapsTemplateView.as_view()), name='explore-maps'),
+                       #overwrite the Geonone layers
+                       url(r'^layers/$', login_required(ExploreLayersTemplateView.as_view()), name='explore-layers'),
                        url(r'^explore-layers/$', login_required(ExploreLayersTemplateView.as_view()), name='explore-layers'),
                        url(r'^maps/$', login_required(MapTemplateView.as_view()), name='maps_browse'),
                        url(r'^expert/$', login_required(MapExpertTemplateView.as_view()), name='maps_expert'),

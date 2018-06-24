@@ -287,6 +287,9 @@ def njc_map_utilities(request):
             else:
                 return JsonResponse({'created': False, 'deleted': False, 'loaded': False})
         else:
+            if 'layer' in request.GET:
+                print "Layer", request.GET['layer']
+                
             # TODO: The user should have the option to name the map when they create it
             next_user_map_count = len(NJCMap.objects.filter(owner = request.user)) + 1
             map_object = NJCMap.objects.create(
