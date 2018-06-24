@@ -75,12 +75,12 @@ $(document).ready(function () {
                     catagory = $(this).attr('id').substring(4);
 
                     //load layers
-                    load_layers(false, orderby);
+                    load_layers(false, orderby, false);
                 }else{
                     catagory = "";
 
                     //load layers
-                    load_layers(false, orderby);
+                    load_layers(false, orderby, false);
                 }
 
             });
@@ -138,7 +138,7 @@ $(document).ready(function () {
 
             //add click function
             $(".keywordtoclick").click(function(e) {
-                console.log("Click "+$(this).attr('id').substring(4));
+                //console.log("Click "+$(this).attr('id').substring(4));
 
                 //toggle active
                 $(this).toggleClass("active");
@@ -154,12 +154,12 @@ $(document).ready(function () {
                     keyword = $(this).attr('id').substring(4);
 
                     //load layers
-                    load_layers(false, orderby);
+                    load_layers(false, orderby, false);
                 }else{
                     keyword = "";
 
                     //load layers
-                    load_layers(false, orderby);
+                    load_layers(false, orderby, false);
                 }
 
             });
@@ -171,19 +171,28 @@ $(document).ready(function () {
     });
 
     //load layers, start with order by most recent
-    load_layers(false, orderby);
+    load_layers(false, orderby, false);
 
 });
 
 //load the layer svia AJAX
-function load_layers(append, orderby){
+function load_layers(append, orderby, pageing){
 
     //sort out query
     var qdata = {
                 'order_by': orderby,
                 'limit': 4,
-                'offset': (page - 1) * 4
             };
+
+    //are we paging through data, or loading new set?
+    if(pageing){
+        qdata['offset'] = (page - 1) * 4;
+    }else{ //if new data then reset to page 1
+        page = 1;
+
+        //update page
+        document.getElementById('page').innerHTML = page;
+    }
 
     //add catagory if relevant
     if(catagory != ""){
@@ -266,11 +275,11 @@ function load_layers(append, orderby){
                 html = `<article>
                             <div class="row items-list">
                                 <div class="col-xs-4 thumb">
-                                    <a href=""><img src="${object.thumbnail_url}" /></a>
+                                    <img src="${object.thumbnail_url}" />
                                 </div>
                                 <div class="col-xs-8 item-info">
-                                    <h4><a href="">${object.title}</a></h4>
-                                    <p>${object.supplemental_information} <span class="owner">by <a href="">${object.owner__username}</a></span></p>
+                                    <h4>${object.title}</h4>
+                                    <p>${object.supplemental_information} <span class="owner">by ${object.owner__username}</span></p>
                                     <p class="abstract">${object.abstract}</p>
                                     <div class="actions">
                                         <i class="fa fa-calendar-o"></i>${object.date} |
@@ -356,7 +365,7 @@ function reload_layer_data(object) {
     orderby = object.name;
 
     //load data
-    load_layers(false, orderby);
+    load_layers(false, orderby, false);
 }
 
 //clear text search
@@ -378,7 +387,7 @@ function clear_search() {
     keyword = "";
 
     //load data
-    load_layers(false, orderby);
+    load_layers(false, orderby, false);
 
 }
 
@@ -406,7 +415,7 @@ function do_text_search() {
     text_search = document.getElementById('text_search_input').value;
 
     //load data
-    load_layers(false, orderby);
+    load_layers(false, orderby, false);
 }
 
 //date Update
@@ -424,7 +433,7 @@ function do_date_search(object){
     }
 
     //load data
-    load_layers(false, orderby);
+    load_layers(false, orderby, false);
 
 }
 
@@ -442,7 +451,7 @@ $("#pageBackwards").on("click", function (e) {
         page--;
 
         //load data
-        load_layers(false, orderby);
+        load_layers(false, orderby, true);
 
         //update page
         document.getElementById('page').innerHTML = page;
@@ -459,7 +468,7 @@ $("#pageForward").on("click", function (e) {
         page++;
 
         //load data
-        load_layers(false, orderby);
+        load_layers(false, orderby, true);
 
         //update page
         document.getElementById('page').innerHTML = page;
