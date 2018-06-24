@@ -275,10 +275,10 @@ function load_layers(append, orderby, pageing){
                 html = `<article>
                             <div class="row items-list">
                                 <div class="col-xs-4 thumb">
-                                    <img src="${object.thumbnail_url}" />
+                                    <a href="${object.detail_url}"><img src="${object.thumbnail_url}" /></a>
                                 </div>
                                 <div class="col-xs-8 item-info">
-                                    <h4>${object.title}</h4>
+                                    <a href="${object.detail_url}"><h4>${object.title}</h4></a>
                                     <p>${object.supplemental_information} <span class="owner">by ${object.owner__username}</span></p>
                                     <p class="abstract">${object.abstract}</p>
                                     <div class="actions">
