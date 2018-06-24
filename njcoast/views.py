@@ -287,15 +287,24 @@ def njc_map_utilities(request):
             else:
                 return JsonResponse({'created': False, 'deleted': False, 'loaded': False})
         else:
+            #called from creat map with layer? Lets try and get the id
+            layerid = 0
             if 'layer' in request.GET:
-                print "Layer", request.GET['layer']
-                
+                #print "Layer", request.GET['layer']
+
+                #find the id of the layer
+                objs = Layer.objects.filter(detail_url__contains=request.GET['layer'])
+                if objs:
+                    #print "Id",objs[0].id
+                    layerid = objs[0].id
+
             # TODO: The user should have the option to name the map when they create it
             next_user_map_count = len(NJCMap.objects.filter(owner = request.user)) + 1
             map_object = NJCMap.objects.create(
                 owner = request.user,
                 name = "%s's Map #%d" % (request.user, next_user_map_count),
-                description = 'NJ Coast auto-generated map for %s' % request.user
+                description = 'NJ Coast auto-generated map for %s' % request.user,
+                settings = '{"layers_selected": ["layer__%d"]}' % layerid
             )
             return HttpResponseRedirect(reverse('map_annotate', args=[map_object.id]))
 
