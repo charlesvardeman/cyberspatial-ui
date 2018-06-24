@@ -22,6 +22,8 @@ urlpatterns = patterns('',
                        url(r'^store/$', map_expert_simulations, name='map_expert_simulations_api'),
                        url(r'^dashboard/$', login_required(DashboardTemplateView.as_view()), name='dashboard'),
                        url(r'^dca_dashboard/$', login_required(DCADashboardTemplateView.as_view()), name='dca_dashboard'),
+                       #overwrite the Geonone new map
+                       url(r'^maps/new$', njc_map_utilities, name='njc_map_utilities'),
                        url(r'^maps/new/$', njc_map_utilities, name='njc_map_utilities'),
                        url(r'^map/(?P<map_id>[a-zA-Z0-9_]+)/$', login_required(MapTemplateView.as_view()), name='map_annotate'),
                        url(r'^map/(?P<map_id>[a-zA-Z0-9_]+)/settings/$', map_settings, name='map_settings_api'),
