@@ -309,12 +309,20 @@ def njc_map_utilities(request):
 
             # TODO: The user should have the option to name the map when they create it
             next_user_map_count = len(NJCMap.objects.filter(owner = request.user)) + 1
-            map_object = NJCMap.objects.create(
-                owner = request.user,
-                name = "%s's Map #%d" % (request.user, next_user_map_count),
-                description = 'NJ Coast auto-generated map for %s' % request.user,
-                settings = '{"layers_selected": ["layer__%d"],"latitude":%s,"longitude":%s,"zoom":9}' % (layerid, layerlat, layerlong)
-            )
+            if layerid > 0:
+                map_object = NJCMap.objects.create(
+                    owner = request.user,
+                    name = "%s's Map #%d" % (request.user, next_user_map_count),
+                    description = 'NJ Coast auto-generated map for %s' % request.user,
+                    settings = '{"layers_selected": ["layer__%d"],"latitude":%s,"longitude":%s,"zoom":9}' % (layerid, layerlat, layerlong)
+                )
+            else:
+                map_object = NJCMap.objects.create(
+                    owner = request.user,
+                    name = "%s's Map #%d" % (request.user, next_user_map_count),
+                    description = 'NJ Coast auto-generated map for %s' % request.user
+                )
+
             return HttpResponseRedirect(reverse('map_annotate', args=[map_object.id]))
 
 '''
