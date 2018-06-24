@@ -219,72 +219,103 @@ def njc_map_utilities(request):
             return JsonResponse({'created': False})
     #delete
     elif request.method == "GET":
-        #delete maps?
-        if request.GET['action'] == 'delete':
-            print "delete", request.GET['id']
+        if 'action' in request.GET:
+            #delete maps?
+            if request.GET['action'] == 'delete':
+                print "delete", request.GET['id']
 
-            #delete object
-            object_to_delete = NJCMap.objects.get(id = request.GET['id'])
-            if object_to_delete:
-                object_to_delete.delete()
+                #delete object
+                object_to_delete = NJCMap.objects.get(id = request.GET['id'])
+                if object_to_delete:
+                    object_to_delete.delete()
 
-                return JsonResponse({'deleted': True})
-            else:
-                return JsonResponse({'deleted': False})
-
-        #load map data?
-        elif request.GET['action'] == 'load_maps':
-            print "load_maps"
-
-            #get the ordering
-            order_by = request.GET['order_by']
-
-            #if dates
-            if len(request.GET['start_date']) > 0 and len(request.GET['end_date']) > 0:
-                try:
-                    start_date = datetime.strptime(request.GET['start_date'], '%m/%d/%Y')
-                    end_date = datetime.strptime(request.GET['end_date'], '%m/%d/%Y')
-                except:
-                    return JsonResponse({'loaded': False})
-
-                #get data from db
-                map_objs = NJCMap.objects.filter(Q(owner = request.user) | Q(shared_with__contains = request.user)).filter(modified__range=(start_date, end_date), description__contains=request.GET['text_search']).order_by(order_by) #,
-
-            #or just belonging to user
-            else:
-                #get data from db
-                map_objs = NJCMap.objects.filter(Q(owner = request.user) | Q(shared_with__contains = request.user)).filter(description__contains=request.GET['text_search']).order_by(order_by) #, description__contains=request.GET['text_search']
-
-            print "maps", len(map_objs)
-            #parse out results
-            output_array = []
-            for map in map_objs:
-                inner_dict = {}
-                inner_dict['name'] = map.name
-                inner_dict['description'] = map.description
-                inner_dict['settings'] = map.settings
-
-                #get shares
-                if len(map.shared_with) > 0:
-                    inner_dict['shared_with'] = json.loads(map.shared_with)
+                    return JsonResponse({'deleted': True})
                 else:
-                    inner_dict['shared_with'] = []
+                    return JsonResponse({'deleted': False})
 
-                #inner_dict['shared_with'] = map.shared_with
-                if map.thumbnail:
-                    #print "here", map.thumbnail.url
-                    inner_dict['thumbnail'] = map.thumbnail.url
-                inner_dict['is_default'] = map.is_default
-                inner_dict['owner'] = map.owner.username
-                inner_dict['id'] = map.id
-                inner_dict['modified'] = map.modified.strftime('%m/%d/%Y %H:%M')
-                output_array.append(inner_dict)
+            #load map data?
+            elif request.GET['action'] == 'load_maps':
+                print "load_maps"
 
-            #send it back
-            return JsonResponse({'loaded': True, 'data': output_array})
+                #get the ordering
+                order_by = request.GET['order_by']
 
-    return JsonResponse({'created': False, 'deleted': False, 'loaded': False})
-    #return HttpResponseRedirect(reverse('map_annotate', args=[map_object.id]))
+                #if dates
+                if len(request.GET['start_date']) > 0 and len(request.GET['end_date']) > 0:
+                    try:
+                        start_date = datetime.strptime(request.GET['start_date'], '%m/%d/%Y')
+                        end_date = datetime.strptime(request.GET['end_date'], '%m/%d/%Y')
+                    except:
+                        return JsonResponse({'loaded': False})
+
+                    #get data from db
+                    map_objs = NJCMap.objects.filter(Q(owner = request.user) | Q(shared_with__contains = request.user)).filter(modified__range=(start_date, end_date), description__contains=request.GET['text_search']).order_by(order_by) #,
+
+                #or just belonging to user
+                else:
+                    #get data from db
+                    map_objs = NJCMap.objects.filter(Q(owner = request.user) | Q(shared_with__contains = request.user)).filter(description__contains=request.GET['text_search']).order_by(order_by) #, description__contains=request.GET['text_search']
+
+                print "maps", len(map_objs)
+                #parse out results
+                output_array = []
+                for map in map_objs:
+                    inner_dict = {}
+                    inner_dict['name'] = map.name
+                    inner_dict['description'] = map.description
+                    inner_dict['settings'] = map.settings
+
+                    #get shares
+                    if len(map.shared_with) > 0:
+                        inner_dict['shared_with'] = json.loads(map.shared_with)
+                    else:
+                        inner_dict['shared_with'] = []
+
+                    #inner_dict['shared_with'] = map.shared_with
+                    if map.thumbnail:
+                        #print "here", map.thumbnail.url
+                        inner_dict['thumbnail'] = map.thumbnail.url
+                    inner_dict['is_default'] = map.is_default
+                    inner_dict['owner'] = map.owner.username
+                    inner_dict['id'] = map.id
+                    inner_dict['modified'] = map.modified.strftime('%m/%d/%Y %H:%M')
+                    output_array.append(inner_dict)
+
+                #send it back
+                return JsonResponse({'loaded': True, 'data': output_array})
+
+            else:
+                return JsonResponse({'created': False, 'deleted': False, 'loaded': False})
+        else:
+            #called from creat map with layer? Lets try and get the id
+            #vars
+            layerid = 0
+            layerlong = ""
+            layerlat = ""
+
+            #test
+            if 'layer' in request.GET:
+                #print "Layer", request.GET['layer']
+                #find the id of the layer
+                objs = Layer.objects.filter(detail_url__contains=request.GET['layer'])
+                if objs:
+                    #print "Id",objs[0].id
+                    layerid = objs[0].id
+                    try:
+                        layerlong = str((float(objs[0].bbox_x0) + float(objs[0].bbox_x1)) / 2.0)
+                        layerlat = str((float(objs[0].bbox_y0) + float(objs[0].bbox_y1)) / 2.0)
+                    except:
+                        pass
+
+            # TODO: The user should have the option to name the map when they create it
+            next_user_map_count = len(NJCMap.objects.filter(owner = request.user)) + 1
+            map_object = NJCMap.objects.create(
+                owner = request.user,
+                name = "%s's Map #%d" % (request.user, next_user_map_count),
+                description = 'NJ Coast auto-generated map for %s' % request.user,
+                settings = '{"layers_selected": ["layer__%d"],"latitude":%s,"longitude":%s,"zoom":9}' % (layerid, layerlat, layerlong)
+            )
+            return HttpResponseRedirect(reverse('map_annotate', args=[map_object.id]))
 
 '''
   API-ish view for annotation ajax calls from the map page.
@@ -613,14 +644,14 @@ class DashboardTemplateView(TemplateView):
         context = super(DashboardTemplateView, self).get_context_data(**kwargs)
 
         #quiery, select if I am the owner
-        context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+        context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user).order_by('name')
         if context['maps_for_user']:
             context['next_map_for_user'] = len(context['maps_for_user']) + 1
         else:
             context['next_map_for_user'] = 1
 
         #quiery, select if I an in the list of shared_with__contains
-        context['shared_maps_for_user'] = NJCMap.objects.filter(shared_with__contains = self.request.user)
+        context['shared_maps_for_user'] = NJCMap.objects.filter(shared_with__contains = self.request.user).order_by('name')
 
         #get users groups
         current_user = self.request.user
