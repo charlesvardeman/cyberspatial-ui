@@ -189,7 +189,7 @@ function load_layers(append, orderby, pageing){
         qdata['offset'] = (page - 1) * 4;
     }else{ //if new data then reset to page 1
         page = 1;
-        
+
         //update page
         document.getElementById('page').innerHTML = page;
     }
@@ -278,8 +278,8 @@ function load_layers(append, orderby, pageing){
                                     <img src="${object.thumbnail_url}" />
                                 </div>
                                 <div class="col-xs-8 item-info">
-                                    <h4><a href="">${object.title}</a></h4>
-                                    <p>${object.supplemental_information} <span class="owner">by <a href="">${object.owner__username}</a></span></p>
+                                    <h4>${object.title}</h4>
+                                    <p>${object.supplemental_information} <span class="owner">by ${object.owner__username}</span></p>
                                     <p class="abstract">${object.abstract}</p>
                                     <div class="actions">
                                         <i class="fa fa-calendar-o"></i>${object.date} |
