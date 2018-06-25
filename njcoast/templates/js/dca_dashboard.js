@@ -352,6 +352,13 @@ function update_muni_admins(){
 // Update approval pending list
 // AJAX call to get up to date information on users.
 function update_approval_list(){
+
+    //counter for approvals
+    var approval_count = 0;
+
+    //clear out old list
+    document.getElementById("account_list").innerHTML = "";
+
     //do Ajax call for people to be approved
     $.ajax({
         type: "GET",
@@ -366,13 +373,13 @@ function update_approval_list(){
             //success?
             if(result.updated){
                 //counter for approvals
-                var approval_count = 0;
+                //var approval_count = 0;
 
                 //get approver container
                 var approver_container = document.getElementById("account_list");
 
                 //clear out old list
-                approver_container.innerHTML = "";
+                //approver_container.innerHTML = "";
 
                 //loop over users
                 for(var i=0; i<result.data.length; i++){
@@ -478,7 +485,7 @@ function update_approval_list(){
             //success?
             if(result.updated){
                 //counter for approvals
-                var approval_count = 0;
+                //var approval_count = 0;
 
                 //get approver container
                 var approver_container = document.getElementById("account_list");
@@ -494,8 +501,6 @@ function update_approval_list(){
                     //user add muni data
                     var add_muni_json = JSON.parse(user.additional_muni_request);
 
-                    console.log("Arrgh "+add_muni_json.date);
-
                     //basic user data
                     if(user.notes == null){
                         user.notes = "";
@@ -507,13 +512,13 @@ function update_approval_list(){
                     //create user muni section
                     var user_muni = user.municipality;
 
-                    if(result.is_dca){
-                        user_muni = "<a onclick=\"view_user_info('" + user.muni_approver + "', 3, 'Return to All NJcoast Users list', '', '');\" href=\"#\">"+user.municipality+"</a>";
-                    }
-
                     var muni_table = ``;
                     for(var j=0; j<add_muni_json.munis.length; j++){
-                        muni_table += `<a href="admin-ma-profile.html">${add_muni_json.munis[j]}</a><br/>`;
+                        if(add_muni_json.muni_approvers[j] != ""){
+                            muni_table += `<a onclick="view_user_info('${ add_muni_json.muni_approvers[j] }', 3, 'Return to Account Requests', '', '');" href="#">${add_muni_json.munis[j]}</a><br/>`;
+                        }else{
+                            muni_table += `<span>${add_muni_json.munis[j]}</span><br/>`;
+                        }
                     }
 
                     approver_container.innerHTML +=

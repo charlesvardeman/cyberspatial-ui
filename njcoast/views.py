@@ -1029,15 +1029,24 @@ def user_add_muni(request):
             pkg = json.loads(request.POST['data'])
 
             munis = []
+            muni_appros = []
+            
             #loop over munis
             for muni_id in pkg['muni_id']:
                 muni = NJCMunicipality.objects.get(id=muni_id);
                 if muni:
                     munis.append(muni.name)
+                    #get muni approver username
+                    muni_approvers = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').filter(groups__name='municipal_administrators').filter(njcusermeta__municipality__name=muni.name).order_by('last_name')
+                    if muni_approvers:
+                        muni_appros.append(muni_approvers[0].username)
+                    else:
+                        muni_appros.append("")
 
             #construct data package
             muni_data = {
                 'munis' : munis,
+                'muni_approvers': muni_appros,
                 'justification' : pkg['justification'],
                 'date': timezone.now().replace(microsecond=0).__str__()
             }
