@@ -702,7 +702,7 @@ class ExploreTemplateView(TemplateView):
         context = super(ExploreTemplateView, self).get_context_data(**kwargs)
 
         #quiery, select if I am the owner
-        context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+        context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user).order_by('name')
 
         return context
 
@@ -713,7 +713,7 @@ class ExploreLayersTemplateView(TemplateView):
         context = super(ExploreLayersTemplateView, self).get_context_data(**kwargs)
 
         #quiery, select if I am the owner
-        context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user)
+        context['maps_for_user'] = NJCMap.objects.filter(owner = self.request.user).order_by('name')
 
         return context
 
