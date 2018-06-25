@@ -1038,11 +1038,12 @@ def user_add_muni(request):
             #construct data package
             muni_data = {
                 'munis' : munis,
-                'justification' : pkg['justification']
+                'justification' : pkg['justification'],
+                'date': timezone.now().replace(microsecond=0).__str__()
             }
 
             #save it to user as json
-            current_user.njcusermeta.additional_muni_request = muni_data
+            current_user.njcusermeta.additional_muni_request = json.dumps(muni_data)
             current_user.save()
 
             #get admins to email
@@ -1071,6 +1072,31 @@ def user_add_muni(request):
 
             return JsonResponse({'updated': True});
 
+    ####GET section of the API##################################################
+    elif request.method == "GET":
+        #~~~~add_muni?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        if request.GET['action'] == 'get_approvals':
+            #get users if JSON in additional_muni_request
+            users = Profile.objects.exclude(username='AnonymousUser').filter(njcusermeta__additional_muni_request__contains=u'{').order_by('last_name')
+
+            print "Users for muni add", len(users)
+            #test we got them
+            output_array = []
+
+            if users:
+                #get each user
+                for user in users:
+                    user_dict = user_to_dictionary(user)
+                    user_dict['additional_muni_request'] = user.njcusermeta.additional_muni_request
+                    output_array.append(user_dict)
+
+                #flag OK and return data
+                return JsonResponse({'updated': True, 'data': output_array, 'is_muni': False, 'is_dca': False})
+            else:
+                #flag OK and return data
+                return JsonResponse({'updated': True, 'data': output_array, 'is_muni': False, 'is_dca': False})
+
+    #catch all
     return JsonResponse({'updated': False});
 
 '''
