@@ -231,6 +231,47 @@ function delete_map_ajax(id){
 
 //forward request for additional munis
 function request_munis(){
-    console.log("Munis "+$("#muniList").val());
-    $('#reqMuni').modal('hide');
+    var munis = $("#muniList").val();
+    var justi = $("#muniJustification").val();
+    console.log("Munis "+munis+","+justi);
+
+    //test data
+    if(munis != "" && justi != ""){
+
+        //clear modal
+        $('#reqMuni').modal('hide');
+
+        //process data
+        var jsondata = {};
+
+        //get options
+        var muni_id = [];
+
+        //loop to add selected munis
+        for(var i=0; i<munis.length; i++){
+            muni_id.push(munis[i]);
+        }
+
+        //add to json
+        jsondata["muni_id"] = muni_id;
+        jsondata["justification"] = justi;
+
+        console.log("c "+JSON.stringify(jsondata));
+
+    }else{  //missing data
+        if(munis == null){  //if muni error
+            document.getElementById('muniLabel').style.color = "red";
+            document.getElementById("muniLabel").innerHTML = "Municipality(ies) required!";
+        }else{
+            document.getElementById('muniLabel').style.color = "black";
+            document.getElementById("muniLabel").innerHTML = "Municipality(ies)";
+        }
+        if(justi == ""){    //if justification error
+            document.getElementById('justiLabel').style.color = "red";
+            document.getElementById("justiLabel").innerHTML = "Justification required!";
+        }else{
+            document.getElementById('justiLabel').style.color = "black";
+            document.getElementById("justiLabel").innerHTML = "Justification";
+        }
+    }
 }
