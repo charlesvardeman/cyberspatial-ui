@@ -1014,6 +1014,66 @@ def user_to_dictionary(user):
     return user_dict
 
 '''
+  Ajax calls to add munis to user.
+'''
+@login_required
+def user_add_muni(request):
+    #get current user
+    current_user = request.user
+    ####POST section of the API#################################################
+    if request.method == "POST":
+
+        #~~~~add_muni?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        if request.POST['action'] == 'add_muni':
+            #grab data
+            pkg = json.loads(request.POST['data'])
+
+            munis = []
+            #loop over munis
+            for muni_id in pkg['muni_id']:
+                muni = NJCMunicipality.objects.get(id=muni_id);
+                if muni:
+                    munis.append(muni.name)
+
+            #construct data package
+            muni_data = {
+                'munis' : munis,
+                'justification' : pkg['justification']
+            }
+
+            #save it to user as json
+            current_user.njcusermeta.additional_muni_request = muni_data
+            current_user.save()
+
+            #get admins to email
+            dca_admins = Profile.objects.exclude(is_active=False).filter(groups__name='dca_administrators').order_by('last_name')
+
+            #successful?
+            if dca_admins:
+                #actual email part
+                current_site = get_current_site(request)
+                subject = 'NJcoast Account Additional Municipality Request'
+                message = render_to_string('additional_muni_email.html', {
+                    'user': current_user.first_name+" "+current_user.last_name,
+                    'domain': current_site.domain + "/dca_dashboard/",
+                    'municipalities': munis,
+                })
+
+                #get each admin
+                for dca_admin in dca_admins:
+                    #send it
+                    try:
+                        dca_admin.email_user(subject, message)
+                    except:
+                        pass
+
+            #print "Action", request.POST['action'], pkg['muni_id']
+
+            return JsonResponse({'updated': True});
+
+    return JsonResponse({'updated': False});
+
+'''
   Ajax calls to approve or modify users from DCA dashboard.
 '''
 @login_required
