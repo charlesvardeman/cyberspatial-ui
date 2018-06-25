@@ -11,6 +11,7 @@
     <link rel="stylesheet" type="text/css" href="{% static "css/njcoast-admin-style.css" %}" media="screen" />
     <link rel="stylesheet" type="text/css" href="{% static "css/fontawesome-all.min.css" %}" media="screen" />
     <link rel="stylesheet" type="text/css" href="{% static "css/font-awesome.min.css" %}" media="screen" />
+    <link href="https://cdnjsw.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
 {% endblock extra_head %}
 
 {% block middle %}
@@ -96,6 +97,7 @@
                         </table>
                         <a onclick="flip_edit_main(true);" href="#" class="btn btn-secondary btn-md btn-block" role="button">Edit Profile</a>
                         <a href="{% url "change_password" %}" class="btn btn-secondary btn-md btn-block" role="button">Change Password</a>
+                        <a href="#" class="btn btn-secondary btn-md btn-block" role="button" data-toggle="modal" data-target="#reqMuni">Request Additional Municipality</a>
                     </li>
                 </ul>
                 <ul class="list-group">
@@ -264,6 +266,40 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Modal - Request Add'l Muni -->
+            <div class="modal fade" id="reqMuni" tabindex="-1" role="dialog" aria-labelledby="requestMuni">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="saveChanges">Request access to additional municipalities</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p class="small-print">Access requests must be approved by NJcoast administrators. Once approved, any new municipalites will be listed in the Profile Section of your Dashboard. Switch between your approved municipalities using the dropdown at the top left of
+                                your Dashbord or Map view.</p>
+                            <form>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Municipality(ies)</label></br>
+                                    <select id="muniList" class="js-example-basic-multiple" name="munis[]" multiple="multiple" placeholder="Begin typing municipality names to choose from list" style="width: 568px;">
+                                        <option></option>
+                                    </select>
+                                    <!--<input type="text" id="muniList" placeholder="Begin typing municipality names to choose from list" value="awesome,neat">-->
+                                </div>
+                                <div class="form-group">
+                                    <label for="exampleInputEmail1">Justification</label>
+                                    <textarea class="form-control" rows="3" placeholder="I need access because..."></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <a class="btn btn-primary" onclick="request_munis();" href="#">Submit</a>
+                            <a class="btn btn-default" onclick="$('#reqMuni').modal('hide');" href="#">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END Modal - Request Add'l Muni -->
 
         </div>
         <!-- close row -->

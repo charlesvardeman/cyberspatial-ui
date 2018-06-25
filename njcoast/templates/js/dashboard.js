@@ -187,3 +187,9 @@ function delete_map_ajax(id){
     });
 
 }
+
+//forward request for additional munis
+function request_munis(){
+    console.log("Munis "+$("#muniList").val());
+    $('#reqMuni').modal('hide');
+}
