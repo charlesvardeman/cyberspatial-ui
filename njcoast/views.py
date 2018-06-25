@@ -1644,7 +1644,11 @@ def change_password(request):
 '''
 def municipalities_in_county(request):
     if request.GET['county']:
-        municipalities = NJCMunicipality.objects.filter(county__name=request.GET['county']).order_by('name')
+        if request.GET['county'] != 'All':
+            municipalities = NJCMunicipality.objects.filter(county__name=request.GET['county']).order_by('name')
+        else:
+            municipalities = NJCMunicipality.objects.order_by('name')
+
         print "munis", len(municipalities)
         if municipalities:
             munis_in_county = []
