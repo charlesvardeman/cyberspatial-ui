@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 
 from geonode.urls import urlpatterns
 from .views import my_gis_layers, MapTemplateView, DashboardTemplateView, MapExpertTemplateView, ExploreTemplateView, DCADashboardTemplateView, ExploreMapsTemplateView, ExploreLayersTemplateView
-from njcoast.views import map_annotations, njc_map_utilities, map_expert_simulations, map_settings, signup, user_approval, change_password, municipalities_in_county
+from njcoast.views import map_annotations, njc_map_utilities, map_expert_simulations, map_settings, signup, user_approval, change_password, municipalities_in_county, user_add_muni
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -35,6 +35,7 @@ urlpatterns = patterns('',
                        url(r'^api/my_layers/$', my_gis_layers, name='my_gis_layers'),
                        url(r'^signup/$', signup, name='signup'),
                        url(r'^user/settings/$', user_approval, name='user_approval'),
+                       url(r'^user/update/$', user_add_muni, name='user_add_muni'),
                        url(r'^password/$', change_password, name='change_password'),
                        url(r'^municipalities_in_county/$', municipalities_in_county, name='municipalities_in_county'),
                        ) + urlpatterns

@@ -238,9 +238,6 @@ function request_munis(){
     //test data
     if(munis != "" && justi != ""){
 
-        //clear modal
-        $('#reqMuni').modal('hide');
-
         //process data
         var jsondata = {};
 
@@ -257,6 +254,27 @@ function request_munis(){
         jsondata["justification"] = justi;
 
         console.log("c "+JSON.stringify(jsondata));
+
+        //start the process
+        $.ajax({
+            type: "POST",
+            url: "/user/update/",
+            data: {
+                'action': 'add_muni',
+                'data': JSON.stringify(jsondata)
+            },
+            dataType: "json",
+            success: function(result) {
+                console.log("ADD MUNI -- SUCCESS!" + result.updated);
+                //clear modal
+                $('#reqMuni').modal('hide');
+            },
+            error: function(result) {
+                console.log("ADD MUNI ERROR:", result)
+                //clear modal
+                $('#reqMuni').modal('hide');
+            }
+        });
 
     }else{  //missing data
         if(munis == null){  //if muni error
