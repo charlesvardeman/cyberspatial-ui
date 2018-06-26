@@ -1115,6 +1115,46 @@ def user_add_muni(request):
                 #flag OK
                 return JsonResponse({'updated': True})
 
+        #~~~~approve?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        elif request.POST['action'] == 'approve':
+            #load user
+            user = Profile.objects.get(username=request.POST['user'])
+
+            #test we got them
+            if user:
+                print "Approve",user.username
+                #set notes update
+                user.njcusermeta.notes = request.POST['notes']
+
+                #get list of munis
+                new_munis = json.loads(user.njcusermeta.additional_muni_request)['munis']
+
+                #and current set
+                old_munis = []
+                try:
+                    old_munis = json.loads(user.njcusermeta.additional_muni_approved)['munis']
+                except:
+                    pass
+
+                #combine
+                old_munis.extend(new_munis)
+
+                #construct data package
+                muni_data = {
+                    'munis' : old_munis,
+                    'date': timezone.now().replace(microsecond=0).__str__()
+                }
+
+                #save it
+                user.njcusermeta.additional_muni_approved = json.dumps(muni_data)
+
+                #clear muni requests
+                user.njcusermeta.additional_muni_request = ""
+
+                #save results
+                user.save()
+
+
     ####GET section of the API##################################################
     elif request.method == "GET":
         #~~~~add_muni?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
