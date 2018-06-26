@@ -1160,6 +1160,22 @@ def user_add_muni(request):
                 #save results
                 user.save()
 
+                #send email to tell user our decision
+                current_site = get_current_site(request)
+                subject = 'NJcoast Account Additional Municipality Status'
+                message = render_to_string('additional_muni_accepted_email.html', {
+                    'user': user.first_name+" "+user.last_name,
+                    'notes': user.njcusermeta.notes,
+                })
+
+                #actual send
+                try:
+                    user.email_user(subject, message)
+                except:
+                    pass
+
+                #flag OK
+                return JsonResponse({'updated': True})
 
     ####GET section of the API##################################################
     elif request.method == "GET":
