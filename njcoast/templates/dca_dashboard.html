@@ -156,14 +156,14 @@
 
                         <ul class="user-filters">
                             <li id="status_button" onclick="user_filter(this);">Status <span class="fa fa-chevron-right pull-right"></span></li>
-                            <ul id="status_button_panel" class="hidden">
+                            <ul id="status_button_panel" style="display:none">
                                 <li><input onchange="update_user_list();" id="status_button_pending" type="checkbox" checked> Pending</li>
                                 <li><input onchange="update_user_list();" id="status_button_active" type="checkbox" checked> Active</li>
                                 <li><input onchange="update_user_list();" id="status_button_inactive" type="checkbox" checked> Inactive</li>
                             </ul>
                             {% if request.user|has_group:"dca_administrators" %}
                             <li id="county_button" onclick="user_filter(this);">County <span class="fa fa-chevron-right pull-right"></span></li>
-                            <ul id="county_button_panel" class="form-group hidden">
+                            <ul id="county_button_panel" class="form-group" style="display:none">
                                 <select onchange="load_munis_in_county(this);" class="form-control" id="select_county">
                                     <option>All</option>
                                     {% for county in counties %}
@@ -172,7 +172,7 @@
                                 </select>
                             </ul>
                             <li id="municipality_button" onclick="user_filter(this);">Municipality <span class="fa fa-chevron-right pull-right"></span></li>
-                            <ul id="municipality_button_panel" class="form-group hidden">
+                            <ul id="municipality_button_panel" class="form-group" style="display:none">
                                 <select onchange="update_user_list();" class="form-control" id="select_municipality">
                                     <option>All</option>
                                     {% for municipality in municipalities %}
@@ -182,7 +182,7 @@
                             </ul>
                             {% endif %}
                             <li id="role_button" onclick="user_filter(this);">Role <span class="fa fa-chevron-right pull-right"></span></li>
-                            <ul id="role_button_panel" class="hidden">
+                            <ul id="role_button_panel" style="display:none">
                                 {% for role in roles %}
                                 <li id="role_button_li_{{ forloop.counter }}"><input onchange="update_user_list();" id="role_button_{{ forloop.counter }}" type="checkbox" checked> {{ role.name }}</li>
                                 {% endfor %}
