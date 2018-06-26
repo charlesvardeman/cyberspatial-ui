@@ -1160,6 +1160,14 @@ def user_add_muni(request):
                 #save results
                 user.save()
 
+                #add to groups
+                for nmuni in new_munis:
+                    this_muni = NJCMunicipality.objects.get(name=nmuni);
+                    group_name = user.njcusermeta.role.group_name + '-' + this_muni.group_name
+                    group, created = Group.objects.get_or_create(name=group_name)
+                    if group:
+                        group.user_set.add(user)
+
                 #send email to tell user our decision
                 current_site = get_current_site(request)
                 subject = 'NJcoast Account Additional Municipality Status'
