@@ -1030,7 +1030,7 @@ def user_add_muni(request):
 
             munis = []
             muni_appros = []
-            
+
             #loop over munis
             for muni_id in pkg['muni_id']:
                 muni = NJCMunicipality.objects.get(id=muni_id);
@@ -1080,6 +1080,40 @@ def user_add_muni(request):
             #print "Action", request.POST['action'], pkg['muni_id']
 
             return JsonResponse({'updated': True});
+
+        #~~~~decline?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        elif request.POST['action'] == 'decline':
+            #load user
+            user = Profile.objects.get(username=request.POST['user'])
+
+            #test we got them
+            if user:
+                print "Decline",user.username
+                #set notes update
+                user.njcusermeta.notes = request.POST['notes']
+
+                #clear muni requests
+                user.njcusermeta.additional_muni_request = ""
+
+                #save results
+                user.save()
+
+                #send email to tell user our decision
+                current_site = get_current_site(request)
+                subject = 'NJcoast Account Additional Municipality Status'
+                message = render_to_string('additional_muni_rejected_email.html', {
+                    'user': user.first_name+" "+user.last_name,
+                    'notes': user.njcusermeta.notes,
+                })
+
+                #actual send
+                try:
+                    user.email_user(subject, message)
+                except:
+                    pass
+
+                #flag OK
+                return JsonResponse({'updated': True})
 
     ####GET section of the API##################################################
     elif request.method == "GET":
