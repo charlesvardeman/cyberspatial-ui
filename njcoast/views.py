@@ -1169,11 +1169,14 @@ def user_approval(request):
                 else:
                     muni_admins = Profile.objects.exclude(is_active=False).filter(njcusermeta__municipality__county__name=county).filter(groups__name='municipal_administrators').order_by(sortby,'last_name')
 
+                #array for muni admins
+                output_array = []
+
+                #if they exist
                 if muni_admins:
                     print "Muni admins",len(muni_admins)
 
                     #get definative list of munis without admins
-                    output_array = []
                     for muni_admin in muni_admins:
                         output_array.append(user_to_dictionary(muni_admin))
                         try:
@@ -1181,8 +1184,8 @@ def user_approval(request):
                         except:
                             pass
 
-                    #flag OK and return data
-                    return JsonResponse({'updated': True, 'data': output_array, 'munis': munis_without_admin})
+                #flag OK and return data, even if no admins
+                return JsonResponse({'updated': True, 'data': output_array, 'munis': munis_without_admin})
 
         #~~~~get the DCA administrators~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         elif request.GET['action'] == 'get_dca_admins':
