@@ -1139,9 +1139,15 @@ def user_add_muni(request):
                 #combine
                 old_munis.extend(new_munis)
 
+                #add the actual muni
+                old_munis.append(user.njcusermeta.municipality.name)
+
+                #remove duplicates
+                munis_set = set(old_munis)
+
                 #construct data package
                 muni_data = {
-                    'munis' : old_munis,
+                    'munis' : list(munis_set),
                     'date': timezone.now().replace(microsecond=0).__str__()
                 }
 
