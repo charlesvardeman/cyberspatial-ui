@@ -563,8 +563,8 @@ function update_approval_list(){
                                                     <ul id="account_list_roles_${i}" class="dropdown-menu">
                                                     </ul>
                                                 </div>
-                                                <button onclick="user_update('${ user.username }', '${ i }', 'approve', '');" class="btn btn-primary" data-toggle="modal" data-target="">Approve</button>
-                                                <button onclick="user_update('${ user.username }', '${ i }', 'decline', '');" class="btn btn-default" data-toggle="modal" data-target="">Decline*</button>
+                                                <button onclick="user_muni_update('${ user.username }', '${ i }', 'approve', '');" class="btn btn-primary" data-toggle="modal" data-target="">Approve</button>
+                                                <button onclick="user_muni_update('${ user.username }', '${ i }', 'decline', '');" class="btn btn-default" data-toggle="modal" data-target="">Decline*</button>
                                                 <p class="qualifier" style="margin-top: 10px;">*Any notes entered for a Declined applicant will be shared with the applicant to justify the decision.</p>
                                             </div>
                                         </div>
@@ -1027,6 +1027,52 @@ function user_update(username, user_number, action, role){
         }
     });
 
+}
+
+//user municipality approvals
+function user_muni_update(username, user_number, action, role){
+    //console.log("Update to municipalites, number "+user_number);
+
+    //do Ajax call
+    $.ajax({
+        type: "POST",
+        url: "/user/update/",
+        data: {
+            'role': role,
+            'notes': document.getElementById("text_"+user_number).value,
+            'user': username,
+            'action': action
+        },
+        dataType: "json",
+        success: function(result) {
+            console.log("USER MUNI APPROVAL -- SUCCESS!" + result.updated);
+
+            if(result.updated){
+                //flag success
+                $.notify("User municipalities updated", "success");
+
+                //reload approvals list
+                update_approval_list();
+
+                //reload main list
+                update_user_list();
+
+                //reload munis
+                update_muni_admins();
+
+                //update the dca admins?
+                flip_main_dcaapprovals(true, false);
+
+            }else{
+                //or failure
+                $.notify("Error updating user municipalities", "error");
+            }
+        },
+        error: function(result) {
+            console.log("ERROR:", result)
+            $.notify("Error updating user municipalities", "error");
+        }
+    });
 }
 
 //create new user
