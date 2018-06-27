@@ -1205,7 +1205,9 @@ def user_add_muni(request):
             tempList = []
             try:
                 group =  Group.objects.get(name=group_name)
-                tempList = group.user_set.exclude(pk=self.request.user.pk)
+                gusers = group.user_set.exclude(pk=request.user.pk)
+                for guser in gusers:
+                    tempList.append(guser.first_name + " " + guser.last_name)
             except Group.DoesNotExist:
                 logger.warn("Attempted to test if missing group existed - %s", group_name)
                 pass
