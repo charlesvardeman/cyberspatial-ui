@@ -293,3 +293,29 @@ function request_munis(){
         }
     }
 }
+
+//function for swapping current muni
+function swap_municipality(name){
+    console.log("Muni "+name);
+
+    //set name
+    document.getElementById('current_muni').innerHTML = name + ' <i class="fa fa-caret-down" style="margin-left: 10px" aria-hidden="true"></i>';
+
+    //start the process
+    $.ajax({
+        type: "POST",
+        url: "/user/update/",
+        data: {
+            'action': 'switch_muni',
+            'municipality': name
+        },
+        dataType: "json",
+        success: function(result) {
+            console.log("SWITCH MUNI -- SUCCESS!" + result.updated);
+        },
+        error: function(result) {
+            console.log("SWITCH MUNI ERROR:", result)
+        }
+    });
+
+}

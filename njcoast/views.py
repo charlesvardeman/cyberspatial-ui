@@ -691,6 +691,12 @@ class DashboardTemplateView(TemplateView):
             context['muni_group_membership_len'] = len(muniusers) + 1
             context['muni_group_membership'] = muniusers
 
+        #get alternate munis
+        try:
+            context['muni_list'] = json.loads(current_user.njcusermeta.additional_muni_approved)['munis']
+        except:
+            context['muni_list'] = []
+            pass
 
         #context['dca_group_membership'] = len(Group.objects.all())
         return context
@@ -1184,6 +1190,28 @@ def user_add_muni(request):
 
                 #flag OK
                 return JsonResponse({'updated': True})
+
+        #~~~~switch_muni?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        elif request.POST['action'] == 'switch_muni':
+            #set the muni
+            current_user.njcusermeta.municipality = NJCMunicipality.objects.get(name=request.POST['municipality'])
+
+            #save results
+            current_user.save()
+
+            #get group data
+            group_name = current_user.njcusermeta.role.group_name + "-" + current_user.njcusermeta.municipality.group_name
+
+            tempList = []
+            try:
+                group =  Group.objects.get(name=group_name)
+                tempList = group.user_set.exclude(pk=self.request.user.pk)
+            except Group.DoesNotExist:
+                logger.warn("Attempted to test if missing group existed - %s", group_name)
+                pass
+
+            #flag OK
+            return JsonResponse({'updated': True, 'group_users': json.dumps(tempList)})
 
     ####GET section of the API##################################################
     elif request.method == "GET":

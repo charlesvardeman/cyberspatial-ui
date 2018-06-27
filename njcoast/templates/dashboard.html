@@ -30,15 +30,18 @@
 <div class="gray-zone">
     <div class="container-fluid">
         <div class="page-header">
-            <!--<div class="dropdown show">
-                <a class="dropdown-toggle" id="muniRoleToggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            keansburg <span>|</span> planning<i class="fa fa-caret-down" style="margin-left: 10px" aria-hidden="true"></i>
-          </a>
+            {% if muni_list %}
+            <div class="dropdown show">
+                <a id="current_muni" class="dropdown-toggle" id="muniRoleToggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {{ user.njcusermeta.municipality.name }} <i class="fa fa-caret-down" style="margin-left: 10px" aria-hidden="true"></i>
+                </a>
                 <div class="dropdown-menu muniRole" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item" href="#">Berkeley</a>
-                    <a class="dropdown-item" href="#">Keansburg</a>
+                    {% for muni in muni_list %}
+                    <a onclick="swap_municipality('{{ muni }}');return false;" class="dropdown-item" href="#">{{ muni }}</a>
+                    {% endfor %}
                 </div>
-            </div>-->
+            </div>
+            {% endif %}
             <h3>Planning & Service Delivery Dashboard</h3>
         </div>
 
