@@ -821,7 +821,7 @@ def signup(request):
                             #send it
                             try:
                                 muni_admin.email_user(subject, "", html_message=message)
-                            except e:
+                            except:
                                 logger.warn("email send failed: %s", e.msg)
                                 pass
                 else:
@@ -843,7 +843,7 @@ def signup(request):
                             #send it
                             try:
                                 dca_admin.email_user(subject, "", html_message=message)
-                            except e:
+                            except:
                                 logger.warn("email send failed: %s", e.msg)
                                 pass
 
@@ -1540,7 +1540,7 @@ def user_approval(request):
                             #send it
                             try:
                                 dca_admin.email_user(subject, "", html_message=message)
-                            except e:
+                            except:
                                 logger.warn("email send failed: %s", e.msg)
                                 pass
 
@@ -1564,7 +1564,7 @@ def user_approval(request):
                     #send it
                     try:
                         user.email_user(subject, "", html_message=message)
-                    except e:
+                    except:
                         logger.warn("email send failed: %s", e.msg)
                         pass
 
@@ -1726,7 +1726,7 @@ def user_approval(request):
                     #actual send
                     try:
                         user.email_user(subject, "", html_message=message)
-                    except e:
+                    except:
                         logger.warn("email send failed: %s", e.msg)
                         pass
 
@@ -1804,7 +1804,7 @@ def user_approval(request):
                     #actual send
                     try:
                         user.email_user(subject, "", html_message=message)
-                    except e:
+                    except:
                         logger.warn("email send failed: %s", e.msg)
                         pass
 
@@ -1849,7 +1849,7 @@ def user_approval(request):
                 #actual send
                 try:
                     user.email_user(subject, "", html_message=message)
-                except e:
+                except:
                     logger.warn("email send failed: %s", e.msg)
                     pass
 
