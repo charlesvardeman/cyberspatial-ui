@@ -33,7 +33,7 @@
             {% if muni_list %}
             <div class="dropdown show">
                 <a id="current_muni" class="dropdown-toggle" id="muniRoleToggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {{ user.njcusermeta.municipality.name }} <i class="fa fa-caret-down" style="margin-left: 10px" aria-hidden="true"></i>
+                    {{ user.njcusermeta.municipality.name }} <span>|</span> {{ user.njcusermeta.role.name }}<i class="fa fa-caret-down" style="margin-left: 10px" aria-hidden="true"></i>
                 </a>
                 <div class="dropdown-menu muniRole" aria-labelledby="dropdownMenuButton">
                     {% for muni in muni_list %}
