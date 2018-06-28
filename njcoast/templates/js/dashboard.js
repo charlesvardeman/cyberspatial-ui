@@ -234,7 +234,7 @@ function delete_map_ajax(id){
 function request_munis(){
     var munis = $("#muniList").val();
     var justi = $("#muniJustification").val();
-    console.log("Munis "+munis+","+justi);
+    //console.log("Munis "+munis+","+justi);
 
     //test data
     if(munis != "" && justi != ""){
@@ -297,7 +297,7 @@ function request_munis(){
 
 //function for swapping current muni
 function swap_municipality(name){
-    console.log("Muni "+name);
+    //console.log("Muni "+name);
 
     //start the process
     $.ajax({
@@ -323,7 +323,7 @@ function swap_municipality(name){
                 elmt.innerHTML = "";
 
                 for(var i=0; i<ucount; i++){
-                    console.log("User "+users[i])
+                    //console.log("User "+users[i])
                     elmt.innerHTML += `<li>${users[i]}</li>`;
                 }
 
