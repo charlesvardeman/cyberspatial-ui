@@ -1,7 +1,68 @@
 {% autoescape off %}
-Thank you for your interest in the NJcoast platform. We regret to inform you that your account request has been denied due to the following reason:
+<html>
 
-{{ notes }}.
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
 
-To discuss this decision further, please contact njcoast@dca.nj.gov.
+<body>
+    <p>
+        Thank you for your interest in the NJcoast platform. We regret to inform you that your account request has been denied due
+        to the following reason: {{ notes }}. To discuss this decision further, please contact njcoast@dca.nj.gov.
+    </p>
+    <table cellspacing="0" cellpadding="0" border="0">
+        <tbody>
+            <tr>
+                <td valign="top" style="padding-left: 0px; padding-top: 0px; padding-bottom: 0px; padding-right: 0px;">
+                    <span style="text-align: left; color: #122d46; font-family: 'Arial', sans-serif; font-size: 10pt; font-weight: bold">New Jersey Department of Community Affairs</span>
+                    <br>
+                </td>
+            </tr>
+            <tr>
+                <td valign="top" style="padding-left: 0px; padding-top: 3px; padding-bottom: 0px; padding-right: 0px;">
+                    <span style="text-align: left; color: #122d46; font-family: Arial; font-size: 9pt; font-style: normal; font-weight: normal;">
+                        tel (609) 292-3000
+                        <font size="1" color="#B9B9B9">|</font> email
+                        <a style="text-decoration: none; color: #EB6B00" href="mailto:njcoast@dca.nj.gov">
+                            <font color="#F77A1E">njcoast@dca.nj.gov</font>
+                        </a>
+                        <br>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td valign="top" style="padding-left: 0px; padding-top: 2px; padding-bottom: 0px; padding-right: 0px;">
+                    <span style="text-align: left; color: #122d46; font-family: Arial; font-size: 9pt; font-style: normal; font-weight: normal;">
+                        website
+                        <a style="text-decoration: none; color: #EB6B00" href="https://{{ domain }}/">
+                            <font color="#EB6B00">njcoast.us</font>
+                        </a>
+                        <br>
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td valign="top" style="padding-left: 0px; padding-top: 7px; padding-bottom: 4px; padding-right: 0px;">
+                    <a href="https://{{ domain }}/">
+                        <img src="https://{{ domain }}/static/images/njcoast-logo.png" nosend="1" border="0" width="170" height="50" alt="NJcoast" title="NJcoast">
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td valign="top" style="padding-left: 0px; padding-top: 7px; padding-bottom: 0px; padding-right: 0px;">
+                    <span style="color: #8A8A8A; font-family: 'Calibri', sans-serif; font-size: 8pt; font-weight: regular;">
+                        <b>Confidentiality Note: </b> This email may contain confidential and/or private information. If you
+                        received this email in error please delete and notify sender.</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+<style>
+    a {
+        color: #EB6B00;
+    }
+</style>
+
+</html>
 {% endautoescape %}
