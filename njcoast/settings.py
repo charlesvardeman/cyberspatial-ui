@@ -137,3 +137,6 @@ LOGGING = {
         },
     },
 }
+
+# Layer Preview
+LAYER_PREVIEW_LIBRARY = 'leaflet'
