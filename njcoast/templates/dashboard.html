@@ -109,8 +109,8 @@
                         <p>Groups for which you have membership.</p>
                         <ul class="dashboard-list">
                             <li>
-                                <a onclick="open_membership('main_membership');return false;" href="" ><span class="status">{{ main_group_membership_len }} mem <span id="main_membership_caret" class="fa fa-caret-down"></span></span></a>{{ user.njcusermeta.municipality.name }} {{ user.njcusermeta.role.name }}s
-                                <p>All {{ user.njcusermeta.municipality.name }} users with the {{ user.njcusermeta.role.name }} role</p>
+                                <a onclick="open_membership('main_membership');return false;" href="" ><span class="status"><span id="muni_group_count">{{ main_group_membership_len }}</span> mem <span id="main_membership_caret" class="fa fa-caret-down"></span></span></a><span id="muni_group_heading">{{ user.njcusermeta.municipality.name }}</span> {{ user.njcusermeta.role.name }}s
+                                <p>All <span id="muni_group_text">{{ user.njcusermeta.municipality.name }}</span> users with the {{ user.njcusermeta.role.name }} role</p>
                                 <ul id="main_membership" style="list-style-type: none;" class="hidden">
                                     {% for main_group_user in main_group_membership %}
                                     <li>{{ main_group_user.first_name}} {{ main_group_user.last_name}}</li>

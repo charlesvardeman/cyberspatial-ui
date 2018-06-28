@@ -312,6 +312,26 @@ function swap_municipality(name){
         dataType: "json",
         success: function(result) {
             console.log("SWITCH MUNI -- SUCCESS!" + result.updated);
+
+            //if succesful
+            if(result.updated){
+                //get users
+                var users = JSON.parse(result.group_users);
+                var elmt = document.getElementById('main_membership');
+                var ucount = users.length;
+                elmt.innerHTML = "";
+
+                for(var i=0; i<ucount; i++){
+                    console.log("User "+users[i])
+                    elmt.innerHTML += `<li>${users[i]}</li>`;
+                }
+
+                //set muni data
+                document.getElementById('muni_group_text').innerHTML = name;
+                document.getElementById('muni_group_count').innerHTML = ucount;
+                document.getElementById('muni_group_heading').innerHTML = name;
+            }
+
         },
         error: function(result) {
             console.log("SWITCH MUNI ERROR:", result)
