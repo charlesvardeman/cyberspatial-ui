@@ -766,6 +766,15 @@ function save_changes(username, action_if_no_user, exclude_string, disable_edit_
             if(result.updated){
                 //flip back to view
                 document.getElementById("info_user").classList.remove("hidden");
+
+                //check if delete usable
+                if(document.getElementById("info_name").innerHTML == ""){
+                    document.getElementById("user_delete").disabled = true;
+                }else{
+                    document.getElementById("user_delete").disabled = false;
+                }
+
+                //hide edit
                 document.getElementById("editable_user").classList.add("hidden");
 
                 //reload view, get current setting
@@ -833,6 +842,14 @@ function show_user_edit(do_edit){
         document.getElementById("editable_user").classList.remove("hidden");
     }else{
         document.getElementById("info_user").classList.remove("hidden");
+
+        //check if delete usable
+        if(document.getElementById("info_name").innerHTML == ""){
+            document.getElementById("user_delete").disabled = true;
+        }else{
+            document.getElementById("user_delete").disabled = false;
+        }
+
         document.getElementById("editable_user").classList.add("hidden");
     }
 }
@@ -904,6 +921,20 @@ function create_new_dca_approver(tab_to_return_to, return_text){
     document.getElementById("edit_username").innerHTML = "";
     //document.getElementById("edit_municipality").innerHTML = "";
 
+    //clear info in case bail
+    document.getElementById("info_name").innerHTML = "";
+    document.getElementById("info_position").innerHTML = "";
+    document.getElementById("info_municipality").innerHTML = "";
+    document.getElementById("info_code").innerHTML = "";
+    document.getElementById("info_address_line_1").innerHTML = "";
+    document.getElementById("info_address_line_2").innerHTML = "";
+    document.getElementById("info_city").innerHTML = "";
+    document.getElementById("info_zip").innerHTML = "";
+    document.getElementById("info_email").innerHTML = "";
+    document.getElementById("info_voice").innerHTML = "";
+    document.getElementById("info_role").innerHTML = "";
+    document.getElementById("info_justification").innerHTML = "";
+
     //set code
     document.getElementById("edit_code").innerHTML = "";
 
@@ -962,6 +993,20 @@ function create_new_muni_admin(muni, code, tab_to_return_to, return_text){
     document.getElementById("edit_voice").value = "";
     document.getElementById("edit_justification").innerHTML = "";
     document.getElementById("edit_username").innerHTML = "";
+
+    //clear info in case bail
+    document.getElementById("info_name").innerHTML = "";
+    document.getElementById("info_position").innerHTML = "";
+    document.getElementById("info_municipality").innerHTML = "";
+    document.getElementById("info_code").innerHTML = "";
+    document.getElementById("info_address_line_1").innerHTML = "";
+    document.getElementById("info_address_line_2").innerHTML = "";
+    document.getElementById("info_city").innerHTML = "";
+    document.getElementById("info_zip").innerHTML = "";
+    document.getElementById("info_email").innerHTML = "";
+    document.getElementById("info_voice").innerHTML = "";
+    document.getElementById("info_role").innerHTML = "";
+    document.getElementById("info_justification").innerHTML = "";
 
     //set edit selector for municipality
     var selctr = document.getElementById("edit_municipality_selector");
@@ -1039,6 +1084,8 @@ function view_user_info(username, tab_to_return_to, return_text, exclude_string,
 
                 if(result.updated){
                     //console.log(result.data+","+result.data.name);
+                    document.getElementById("user_delete").disabled = false;
+
                     //put data into html
                     for(var user_var in result.data){
                         //info form

@@ -811,7 +811,7 @@ def signup(request):
 
                             #send it
                             try:
-                                muni_admin.email_user(subject, message)
+                                muni_admin.email_user(subject, "", html_message=message)
                             except:
                                 pass
                 else:
@@ -832,7 +832,7 @@ def signup(request):
 
                             #send it
                             try:
-                                dca_admin.email_user(subject, message)
+                                dca_admin.email_user(subject, "", html_message=message)
                             except:
                                 pass
 
@@ -1286,7 +1286,7 @@ def user_approval(request):
 
                             #send it
                             try:
-                                dca_admin.email_user(subject, message)
+                                dca_admin.email_user(subject, "", html_message=message)
                             except:
                                 pass
 
@@ -1309,7 +1309,7 @@ def user_approval(request):
 
                     #send it
                     try:
-                        user.email_user(subject, message)
+                        user.email_user(subject, "", html_message=message)
                     except:
                         pass
 
@@ -1470,7 +1470,7 @@ def user_approval(request):
 
                     #actual send
                     try:
-                        user.email_user(subject, message)
+                        user.email_user(subject, "", html_message=message)
                     except:
                         pass
 
@@ -1547,7 +1547,7 @@ def user_approval(request):
 
                     #actual send
                     try:
-                        user.email_user(subject, message)
+                        user.email_user(subject, "", html_message=message)
                     except:
                         pass
 
@@ -1591,7 +1591,7 @@ def user_approval(request):
 
                 #actual send
                 try:
-                    user.email_user(subject, message)
+                    user.email_user(subject, "", html_message=message)
                 except:
                     pass
 
