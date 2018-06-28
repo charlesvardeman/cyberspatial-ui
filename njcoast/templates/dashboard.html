@@ -11,6 +11,7 @@
     <link rel="stylesheet" type="text/css" href="{% static "css/njcoast-admin-style.css" %}" media="screen" />
     <link rel="stylesheet" type="text/css" href="{% static "css/fontawesome-all.min.css" %}" media="screen" />
     <link rel="stylesheet" type="text/css" href="{% static "css/font-awesome.min.css" %}" media="screen" />
+    <link href="{% static "css/select2.min.css" %}" rel="stylesheet" />
 {% endblock extra_head %}
 
 {% block middle %}
@@ -29,15 +30,18 @@
 <div class="gray-zone">
     <div class="container-fluid">
         <div class="page-header">
-            <!--<div class="dropdown show">
-                <a class="dropdown-toggle" id="muniRoleToggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            keansburg <span>|</span> planning<i class="fa fa-caret-down" style="margin-left: 10px" aria-hidden="true"></i>
-          </a>
+            {% if muni_list %}
+            <div class="dropdown show">
+                <a id="current_muni" class="dropdown-toggle" id="muniRoleToggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {{ user.njcusermeta.municipality.name }} <span>|</span> {{ user.njcusermeta.role.name }}<i class="fa fa-caret-down" style="margin-left: 10px" aria-hidden="true"></i>
+                </a>
                 <div class="dropdown-menu muniRole" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item" href="#">Berkeley</a>
-                    <a class="dropdown-item" href="#">Keansburg</a>
+                    {% for muni in muni_list %}
+                    <a onclick="swap_municipality('{{ muni }}');return false;" class="dropdown-item" href="#">{{ muni }}</a>
+                    {% endfor %}
                 </div>
-            </div>-->
+            </div>
+            {% endif %}
             <h3>Planning & Service Delivery Dashboard</h3>
         </div>
 
@@ -96,6 +100,7 @@
                         </table>
                         <a onclick="flip_edit_main(true);" href="#" class="btn btn-secondary btn-md btn-block" role="button">Edit Profile</a>
                         <a href="{% url "change_password" %}" class="btn btn-secondary btn-md btn-block" role="button">Change Password</a>
+                        <a href="#" class="btn btn-secondary btn-md btn-block" role="button" data-toggle="modal" data-target="#reqMuni">Request Additional Municipality</a>
                     </li>
                 </ul>
                 <ul class="list-group">
@@ -104,8 +109,8 @@
                         <p>Groups for which you have membership.</p>
                         <ul class="dashboard-list">
                             <li>
-                                <a onclick="open_membership('main_membership');return false;" href="" ><span class="status">{{ main_group_membership_len }} mem <span id="main_membership_caret" class="fa fa-caret-down"></span></span></a>{{ user.njcusermeta.municipality.name }} {{ user.njcusermeta.role.name }}s
-                                <p>All {{ user.njcusermeta.municipality.name }} users with the {{ user.njcusermeta.role.name }} role</p>
+                                <a onclick="open_membership('main_membership');return false;" href="" ><span class="status"><span id="muni_group_count">{{ main_group_membership_len }}</span> mem <span id="main_membership_caret" class="fa fa-caret-down"></span></span></a><span id="muni_group_heading">{{ user.njcusermeta.municipality.name }}</span> {{ user.njcusermeta.role.name }}s
+                                <p>All <span id="muni_group_text">{{ user.njcusermeta.municipality.name }}</span> users with the {{ user.njcusermeta.role.name }} role</p>
                                 <ul id="main_membership" style="list-style-type: none;" class="hidden">
                                     {% for main_group_user in main_group_membership %}
                                     <li>{{ main_group_user.first_name}} {{ main_group_user.last_name}}</li>
@@ -265,6 +270,40 @@
                 </div>
             </div>
 
+            <!-- Modal - Request Add'l Muni -->
+            <div class="modal fade" id="reqMuni" tabindex="-1" role="dialog" aria-labelledby="requestMuni">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="saveChanges">Request access to additional municipalities</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p class="small-print">Access requests must be approved by NJcoast administrators. Once approved, any new municipalites will be listed in the Profile Section of your Dashboard. Switch between your approved municipalities using the dropdown at the top left of
+                                your Dashbord or Map view.</p>
+                            <form>
+                                <div class="form-group">
+                                    <label id="muniLabel" for="exampleInputEmail1">Municipality(ies)</label></br>
+                                    <select id="muniList" class="js-example-basic-multiple" name="munis[]" multiple="multiple" placeholder="Begin typing municipality names to choose from list" style="width: 568px;">
+                                        <option></option>
+                                    </select>
+                                    <!--<input type="text" id="muniList" placeholder="Begin typing municipality names to choose from list" value="awesome,neat">-->
+                                </div>
+                                <div class="form-group">
+                                    <label id="justiLabel" for="exampleInputEmail1">Justification</label>
+                                    <textarea id="muniJustification" class="form-control" rows="3" placeholder="I need access because..."></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <a class="btn btn-primary" onclick="request_munis();" href="#">Submit</a>
+                            <a class="btn btn-default" onclick="$('#reqMuni').modal('hide');" href="#">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END Modal - Request Add'l Muni -->
+
         </div>
         <!-- close row -->
         <!---END of main section----------------------------------------------->
@@ -358,5 +397,6 @@
 
 {% block extra_script %}
 <script src="{% static 'js/notify.min.js' %}"></script>
+<script src="{% static 'js/template_js/select2.min.js' %}" ></script>
 <script src="{% static 'js/template_js/dashboard.js' %}"></script>
 {% endblock extra_script %}

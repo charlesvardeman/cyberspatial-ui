@@ -32,6 +32,10 @@ class NJCUserMeta(models.Model):
     zip = models.CharField(max_length=20, blank=True,null=True)
     dca_approver = models.CharField(max_length=50, blank=True,null=True)
     muni_approver = models.CharField(max_length=50, blank=True,null=True)
+    
+    #additions for multiple municipalities (T&M employees for example)
+    additional_muni_request = models.TextField(blank=True,null=True)
+    additional_muni_approved = models.TextField(blank=True,null=True)
 
 # need to do this to add the addendum to GeoNode Profile
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
