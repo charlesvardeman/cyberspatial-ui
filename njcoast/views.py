@@ -1016,6 +1016,248 @@ def user_to_dictionary(user):
     return user_dict
 
 '''
+  Ajax calls to add munis to user.
+'''
+@login_required
+def user_add_muni(request):
+    #get current user
+    current_user = request.user
+    ####POST section of the API#################################################
+    if request.method == "POST":
+
+        #~~~~add_muni?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        if request.POST['action'] == 'add_muni':
+            #grab data
+            pkg = json.loads(request.POST['data'])
+
+            munis = []
+            muni_appros = []
+
+            #loop over munis
+            for muni_id in pkg['muni_id']:
+                muni = NJCMunicipality.objects.get(id=muni_id);
+                if muni:
+                    munis.append(muni.name)
+                    #get muni approver username
+                    muni_approvers = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').filter(groups__name='municipal_administrators').filter(njcusermeta__municipality__name=muni.name).order_by('last_name')
+                    if muni_approvers:
+                        muni_appros.append(muni_approvers[0].username)
+                    else:
+                        muni_appros.append("")
+
+            #construct data package
+            muni_data = {
+                'munis' : munis,
+                'muni_approvers': muni_appros,
+                'justification' : pkg['justification'],
+                'date': timezone.now().replace(microsecond=0).__str__()
+            }
+
+            #save it to user as json
+            current_user.njcusermeta.additional_muni_request = json.dumps(muni_data)
+            current_user.save()
+
+            #get admins to email
+            dca_admins = Profile.objects.exclude(is_active=False).filter(groups__name='dca_administrators').order_by('last_name')
+
+            #successful?
+            if dca_admins:
+                #actual email part
+                current_site = get_current_site(request)
+                subject = 'NJcoast Account Additional Municipality Request'
+                message = render_to_string('additional_muni_email.html', {
+                    'user': current_user.first_name+" "+current_user.last_name,
+                    'domain': current_site.domain + "/dca_dashboard/",
+                    'municipalities': munis,
+                })
+
+                #get each admin
+                for dca_admin in dca_admins:
+                    #send it
+                    try:
+                        dca_admin.email_user(subject, message)
+                    except:
+                        pass
+
+            #print "Action", request.POST['action'], pkg['muni_id']
+
+            return JsonResponse({'updated': True});
+
+        #~~~~decline?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        elif request.POST['action'] == 'decline':
+            #load user
+            user = Profile.objects.get(username=request.POST['user'])
+
+            #test we got them
+            if user:
+                print "Decline",user.username
+                #set notes update
+                user.njcusermeta.notes = request.POST['notes']
+
+                #clear muni requests
+                user.njcusermeta.additional_muni_request = ""
+
+                #save results
+                user.save()
+
+                #send email to tell user our decision
+                current_site = get_current_site(request)
+                subject = 'NJcoast Account Additional Municipality Status'
+                message = render_to_string('additional_muni_rejected_email.html', {
+                    'user': user.first_name+" "+user.last_name,
+                    'notes': user.njcusermeta.notes,
+                })
+
+                #actual send
+                try:
+                    user.email_user(subject, message)
+                except:
+                    pass
+
+                #flag OK
+                return JsonResponse({'updated': True})
+
+        #~~~~approve?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        elif request.POST['action'] == 'approve':
+            #load user
+            user = Profile.objects.get(username=request.POST['user'])
+
+            #test we got them
+            if user:
+                print "Approve",user.username
+                #set notes update
+                user.njcusermeta.notes = request.POST['notes']
+
+                #get list of munis
+                new_munis = json.loads(user.njcusermeta.additional_muni_request)['munis']
+
+                #and current set
+                old_munis = []
+                try:
+                    old_munis = json.loads(user.njcusermeta.additional_muni_approved)['munis']
+                except:
+                    pass
+
+                #combine
+                old_munis.extend(new_munis)
+
+                #add the actual muni
+                old_munis.append(user.njcusermeta.municipality.name)
+
+                #remove duplicates
+                munis_set = set(old_munis)
+
+                #construct data package
+                muni_data = {
+                    'munis' : list(munis_set),
+                    'date': timezone.now().replace(microsecond=0).__str__()
+                }
+
+                #save it
+                user.njcusermeta.additional_muni_approved = json.dumps(muni_data)
+
+                #clear muni requests
+                user.njcusermeta.additional_muni_request = ""
+
+                #save results
+                user.save()
+
+                #~~~~Now assigning groups on the fly!~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                #add to groups
+                # for nmuni in new_munis:
+                #     this_muni = NJCMunicipality.objects.get(name=nmuni);
+                #     group_name = user.njcusermeta.role.group_name + '-' + this_muni.group_name
+                #     group, created = Group.objects.get_or_create(name=group_name)
+                #     if group:
+                #         group.user_set.add(user)
+
+                #send email to tell user our decision
+                current_site = get_current_site(request)
+                subject = 'NJcoast Account Additional Municipality Status'
+                message = render_to_string('additional_muni_accepted_email.html', {
+                    'user': user.first_name+" "+user.last_name,
+                    'notes': user.njcusermeta.notes,
+                })
+
+                #actual send
+                try:
+                    user.email_user(subject, message)
+                except:
+                    pass
+
+                #flag OK
+                return JsonResponse({'updated': True})
+
+        #~~~~switch_muni?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        elif request.POST['action'] == 'switch_muni':
+            #get old group
+            old_group_name = current_user.njcusermeta.role.group_name + "-" + current_user.njcusermeta.municipality.group_name
+
+            #lets remove user from group
+            try:
+                old_group =  Group.objects.get(name=old_group_name)
+                if old_group:
+                    old_group.user_set.remove(current_user)
+            except Group.DoesNotExist:
+                logger.warn("Attempted to test if missing group existed - %s", group_name)
+                pass
+
+            #set the new muni
+            current_user.njcusermeta.municipality = NJCMunicipality.objects.get(name=request.POST['municipality'])
+
+            #save results
+            current_user.save()
+
+            #get group data
+            group_name = current_user.njcusermeta.role.group_name + "-" + current_user.njcusermeta.municipality.group_name
+
+            #add to groups
+            group, created = Group.objects.get_or_create(name=group_name)
+            if group:
+                group.user_set.add(current_user)
+
+            #get my new group's users for dropdown
+            tempList = []
+            try:
+                group =  Group.objects.get(name=group_name)
+                gusers = group.user_set.exclude(pk=request.user.pk)
+                for guser in gusers:
+                    tempList.append(guser.first_name + " " + guser.last_name)
+            except Group.DoesNotExist:
+                logger.warn("Attempted to test if missing group existed - %s", group_name)
+                pass
+
+            #flag OK
+            return JsonResponse({'updated': True, 'group_users': json.dumps(tempList), 'role': current_user.njcusermeta.role.name})
+
+    ####GET section of the API##################################################
+    elif request.method == "GET":
+        #~~~~add_muni?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        if request.GET['action'] == 'get_approvals':
+            #get users if JSON in additional_muni_request
+            users = Profile.objects.exclude(username='AnonymousUser').filter(njcusermeta__additional_muni_request__contains=u'{').order_by('last_name')
+
+            print "Users for muni add", len(users)
+            #test we got them
+            output_array = []
+
+            if users:
+                #get each user
+                for user in users:
+                    user_dict = user_to_dictionary(user)
+                    user_dict['additional_muni_request'] = user.njcusermeta.additional_muni_request
+                    output_array.append(user_dict)
+
+                #flag OK and return data
+                return JsonResponse({'updated': True, 'data': output_array, 'is_muni': False, 'is_dca': False})
+            else:
+                #flag OK and return data
+                return JsonResponse({'updated': True, 'data': output_array, 'is_muni': False, 'is_dca': False})
+
+    #catch all
+    return JsonResponse({'updated': False});
+
+'''
   Ajax calls to approve or modify users from DCA dashboard.
 '''
 @login_required
@@ -1658,16 +1900,16 @@ def municipalities_in_county(request):
             user = request.user
             municipalities = NJCMunicipality.objects.exclude(name=user.njcusermeta.municipality.name).order_by('name')
 
-            # #get additional munis
-            # try:
-            #     additional_muni_list = json.loads(user.njcusermeta.additional_muni_approved)['munis']
-            #     #loop through
-            #     for amuni in additional_muni_list:
-            #         print "Exclude", amuni
-            #         #remove this muni
-            #         municipalities = municipalities.exclude(name=amuni)
-            # except:
-            #     pass
+            #get additional munis
+            try:
+                additional_muni_list = json.loads(user.njcusermeta.additional_muni_approved)['munis']
+                #loop through
+                for amuni in additional_muni_list:
+                    print "Exclude", amuni
+                    #remove this muni
+                    municipalities = municipalities.exclude(name=amuni)
+            except:
+                pass
 
         print "munis", len(municipalities)
         if municipalities:
