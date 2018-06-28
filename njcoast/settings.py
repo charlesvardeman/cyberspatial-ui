@@ -105,8 +105,8 @@ TEMPLATES[0]['OPTIONS']['context_processors'].append('njcoast.context_processors
 TEMPLATES[0]['OPTIONS']['context_processors'].append('django.template.context_processors.media')
 
 # Setup Emails
-DEFAULT_FROM_EMAIL = 'jsweet@nd.edu'
-SERVER_EMAIL = 'jsweet@nd.edu'
+DEFAULT_FROM_EMAIL = 'njcoast@dca.nj.gov'
+SERVER_EMAIL = 'njcoast@dca.nj.gov'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'email-smtp.us-east-1.amazonaws.com'
 EMAIL_PORT = 587
