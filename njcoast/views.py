@@ -1169,13 +1169,14 @@ def user_add_muni(request):
                 #save results
                 user.save()
 
+                #~~~~Now assigning groups on the fly!~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 #add to groups
-                for nmuni in new_munis:
-                    this_muni = NJCMunicipality.objects.get(name=nmuni);
-                    group_name = user.njcusermeta.role.group_name + '-' + this_muni.group_name
-                    group, created = Group.objects.get_or_create(name=group_name)
-                    if group:
-                        group.user_set.add(user)
+                # for nmuni in new_munis:
+                #     this_muni = NJCMunicipality.objects.get(name=nmuni);
+                #     group_name = user.njcusermeta.role.group_name + '-' + this_muni.group_name
+                #     group, created = Group.objects.get_or_create(name=group_name)
+                #     if group:
+                #         group.user_set.add(user)
 
                 #send email to tell user our decision
                 current_site = get_current_site(request)
@@ -1196,7 +1197,19 @@ def user_add_muni(request):
 
         #~~~~switch_muni?~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         elif request.POST['action'] == 'switch_muni':
-            #set the muni
+            #get old group
+            old_group_name = current_user.njcusermeta.role.group_name + "-" + current_user.njcusermeta.municipality.group_name
+
+            #lets remove user from group
+            try:
+                old_group =  Group.objects.get(name=old_group_name)
+                if old_group:
+                    old_group.user_set.remove(current_user)
+            except Group.DoesNotExist:
+                logger.warn("Attempted to test if missing group existed - %s", group_name)
+                pass
+
+            #set the new muni
             current_user.njcusermeta.municipality = NJCMunicipality.objects.get(name=request.POST['municipality'])
 
             #save results
@@ -1205,6 +1218,12 @@ def user_add_muni(request):
             #get group data
             group_name = current_user.njcusermeta.role.group_name + "-" + current_user.njcusermeta.municipality.group_name
 
+            #add to groups
+            group, created = Group.objects.get_or_create(name=group_name)
+            if group:
+                group.user_set.add(current_user)
+
+            #get my new group's users for dropdown
             tempList = []
             try:
                 group =  Group.objects.get(name=group_name)
@@ -1216,7 +1235,7 @@ def user_add_muni(request):
                 pass
 
             #flag OK
-            return JsonResponse({'updated': True, 'group_users': json.dumps(tempList)})
+            return JsonResponse({'updated': True, 'group_users': json.dumps(tempList), 'role': current_user.njcusermeta.role.name})
 
     ####GET section of the API##################################################
     elif request.method == "GET":

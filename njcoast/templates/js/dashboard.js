@@ -298,9 +298,6 @@ function request_munis(){
 function swap_municipality(name){
     console.log("Muni "+name);
 
-    //set name
-    document.getElementById('current_muni').innerHTML = name + ' <i class="fa fa-caret-down" style="margin-left: 10px" aria-hidden="true"></i>';
-
     //start the process
     $.ajax({
         type: "POST",
@@ -315,6 +312,9 @@ function swap_municipality(name){
 
             //if succesful
             if(result.updated){
+                //set name
+                document.getElementById('current_muni').innerHTML = name + ' <span>|</span> ' + result.role + '<i class="fa fa-caret-down" style="margin-left: 10px" aria-hidden="true"></i>';
+
                 //get users
                 var users = JSON.parse(result.group_users);
                 var elmt = document.getElementById('main_membership');
@@ -328,7 +328,7 @@ function swap_municipality(name){
 
                 //set muni data
                 document.getElementById('muni_group_text').innerHTML = name;
-                document.getElementById('muni_group_count').innerHTML = ucount;
+                document.getElementById('muni_group_count').innerHTML = ucount + 1;
                 document.getElementById('muni_group_heading').innerHTML = name;
             }
 
