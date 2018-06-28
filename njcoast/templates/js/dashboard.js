@@ -5,6 +5,48 @@
  *
  */
 
+$(document).ready(function() {
+
+     //setup for select input
+      $('.js-example-basic-multiple').select2({ allowClear: true }); //, minimumInputLength: 1
+
+      //do Ajax call to get munis in county
+      $.ajax({
+          type: "GET",
+          url: "/municipalities_in_county/",
+          data: {
+              'county': 'All'
+          },
+          dataType: "json",
+          success: function(result) {
+              console.log("MUNIS FILTERED BY COUNTY -- SUCCESS! " + result.status);
+
+              //if we got munis back
+              if(result.status){
+                  /* Remove all options from the select list */
+                  //$('#muniList').empty();
+                  var x = document.getElementById("muniList");
+                  for(var i=0; i<result.data.length; i++){
+                      //if(result.data[i] == {{ user.njcusermeta.municipality.name }}) continue;
+                      var option = document.createElement("option");
+                      option.text = result.data[i];
+                      option.value = result.ids[i];
+                      x.add(option);
+                  }
+
+              }else{
+                  //or failure
+                  console.log("MUNIS FILTERED BY COUNTY ERROR:", result)
+              }
+          },
+          error: function(result) {
+              console.log("MUNIS FILTERED BY COUNTY ERROR:", result)
+          }
+      });
+
+});
+
+
 //function to open group membership
 function open_membership(object_name){
     var member_list = document.getElementById(object_name);
