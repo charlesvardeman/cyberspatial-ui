@@ -678,7 +678,10 @@ class DashboardTemplateView(TemplateView):
             context['main_group_membership'] = tempList
         except Group.DoesNotExist:
             logger.warn("Attempted to test if missing group existed - %s", group_name)
-            return False
+            print "No group"
+            context['main_group_membership_len'] = 0
+            context['main_group_membership'] = []
+            pass
 
         #admin?
         if current_user.groups.filter(name='dca_administrators').exists():
