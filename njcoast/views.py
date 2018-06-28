@@ -1898,7 +1898,20 @@ def municipalities_in_county(request):
         if request.GET['county'] != 'All':
             municipalities = NJCMunicipality.objects.filter(county__name=request.GET['county']).order_by('name')
         else:
-            municipalities = NJCMunicipality.objects.order_by('name')
+            #get user
+            user = request.user
+            municipalities = NJCMunicipality.objects.exclude(name=user.njcusermeta.municipality.name).order_by('name')
+
+            #get additional munis
+            try:
+                additional_muni_list = json.loads(user.njcusermeta.additional_muni_approved)['munis']
+                #loop through
+                for amuni in additional_muni_list:
+                    print "Exclude", amuni
+                    #remove this muni
+                    municipalities = municipalities.exclude(name=amuni)
+            except:
+                pass
 
         print "munis", len(municipalities)
         if municipalities:
