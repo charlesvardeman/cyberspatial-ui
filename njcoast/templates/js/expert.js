@@ -186,7 +186,7 @@ function start_expert_simulation() {
     data = {
         "index_SLT": [1, 1],
         "index_W": 1,
-        "index_prob": 1,
+        "index_prob": 0,
         "indicator": 1,
         "param": [latitude, longitude, angle, input_cp, input_vf, input_rm],
         "timeMC": input_ttl,
