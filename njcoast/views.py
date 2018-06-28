@@ -691,6 +691,12 @@ class DashboardTemplateView(TemplateView):
             context['muni_group_membership_len'] = len(muniusers) + 1
             context['muni_group_membership'] = muniusers
 
+        #get alternate munis
+        try:
+            context['muni_list'] = json.loads(current_user.njcusermeta.additional_muni_approved)['munis']
+        except:
+            context['muni_list'] = []
+            pass
 
         #context['dca_group_membership'] = len(Group.objects.all())
         return context

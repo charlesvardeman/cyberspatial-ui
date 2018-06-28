@@ -30,15 +30,18 @@
 <div class="gray-zone">
     <div class="container-fluid">
         <div class="page-header">
-            <!--<div class="dropdown show">
-                <a class="dropdown-toggle" id="muniRoleToggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            keansburg <span>|</span> planning<i class="fa fa-caret-down" style="margin-left: 10px" aria-hidden="true"></i>
-          </a>
+            {% if muni_list %}
+            <div class="dropdown show">
+                <a id="current_muni" class="dropdown-toggle" id="muniRoleToggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {{ user.njcusermeta.municipality.name }} <span>|</span> {{ user.njcusermeta.role.name }}<i class="fa fa-caret-down" style="margin-left: 10px" aria-hidden="true"></i>
+                </a>
                 <div class="dropdown-menu muniRole" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item" href="#">Berkeley</a>
-                    <a class="dropdown-item" href="#">Keansburg</a>
+                    {% for muni in muni_list %}
+                    <a onclick="swap_municipality('{{ muni }}');return false;" class="dropdown-item" href="#">{{ muni }}</a>
+                    {% endfor %}
                 </div>
-            </div>-->
+            </div>
+            {% endif %}
             <h3>Planning & Service Delivery Dashboard</h3>
         </div>
 
@@ -106,8 +109,8 @@
                         <p>Groups for which you have membership.</p>
                         <ul class="dashboard-list">
                             <li>
-                                <a onclick="open_membership('main_membership');return false;" href="" ><span class="status">{{ main_group_membership_len }} mem <span id="main_membership_caret" class="fa fa-caret-down"></span></span></a>{{ user.njcusermeta.municipality.name }} {{ user.njcusermeta.role.name }}s
-                                <p>All {{ user.njcusermeta.municipality.name }} users with the {{ user.njcusermeta.role.name }} role</p>
+                                <a onclick="open_membership('main_membership');return false;" href="" ><span class="status"><span id="muni_group_count">{{ main_group_membership_len }}</span> mem <span id="main_membership_caret" class="fa fa-caret-down"></span></span></a><span id="muni_group_heading">{{ user.njcusermeta.municipality.name }}</span> {{ user.njcusermeta.role.name }}s
+                                <p>All <span id="muni_group_text">{{ user.njcusermeta.municipality.name }}</span> users with the {{ user.njcusermeta.role.name }} role</p>
                                 <ul id="main_membership" style="list-style-type: none;" class="hidden">
                                     {% for main_group_user in main_group_membership %}
                                     <li>{{ main_group_user.first_name}} {{ main_group_user.last_name}}</li>
