@@ -315,10 +315,12 @@ function updateMapClick(storm_name) {
         }
         if (addressPoints) {
             storm_layer_dict[surge_checkbox.attr('id')] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
+            add_surge_legend(mymap);
         }
     } else {
         if (surge_checkbox.attr('id') in storm_layer_dict) {
             mymap.removeLayer(storm_layer_dict[surge_checkbox.attr('id')]);
+            del_surge_legend(mymap);
         }
     }
 
@@ -347,10 +349,12 @@ function updateMapClick(storm_name) {
         }
         if (addressPoints) {
             storm_layer_dict[wind_checkbox.attr('id')] = create_wind_heatmap(addressPoints.wind).addTo(mymap);
+            add_wind_legend(mymap);
         }
     } else {
         if (wind_checkbox.attr('id') in storm_layer_dict) {
             mymap.removeLayer(storm_layer_dict[wind_checkbox.attr('id')]);
+            del_wind_legend();
         }
     }
 }

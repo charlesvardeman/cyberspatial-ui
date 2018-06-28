@@ -94,3 +94,93 @@ function create_wind_heatmap(data){
     
     return hLayer;
 }
+
+// Legend Code
+var legend = {}
+var legend_count = {}
+
+function create_surge_legend(){
+    function getColor(d) {
+        return d > 9 ? 'red' : d > 6  ? 'orange' : d > 3  ? 'yellow' :  'blue';
+    }
+
+    var legend = L.control({position: 'bottomleft'});
+    legend.onAdd = function (map) {
+
+        var div = L.DomUtil.create('div', 'info legend'),
+            heights = [1, 3, 6, 9],
+            labels = [];
+
+        // loop through our density intervals and generate a label with a colored square for each interval
+        div.innerHTML = "Surge (m):<br>";
+        for (var i = 0; i < heights.length; i++) {
+            div.innerHTML +=
+                '<i style="background:' + getColor(heights[i] + 1) + '"></i> ' +
+                heights[i] + (heights[i + 1] ? '&ndash;' + heights[i + 1] + '<br>' : '+');
+        }
+
+        return div;
+    };
+
+    return legend;
+}
+
+function add_surge_legend(mymap){
+    if( legend['surge'] == null ){
+        legend_count['surge'] = 1;
+        legend['surge'] = create_surge_legend(L).addTo(mymap);
+    }else{
+        legend_count['surge'] += 1;
+    }
+}
+
+function del_surge_legend(mymap){
+    legend_count['surge'] -= 1;
+    if( legend_count['surge'] == 0 ){
+        legend['surge'].remove();
+        delete legend['surge'];  
+    }
+}
+
+function create_wind_legend(L){
+    function getColor(d) {
+        return d > 78.5 ? '#ff6060' : d > 65  ? '#ff8f20' : d > 55.5  ? '#ffc140' : d > 47.5  ? '#ffe775' : '#ffffcc';
+    }
+
+    var legend = L.control({position: 'bottomleft'});
+    legend.onAdd = function (map) {
+
+        var div = L.DomUtil.create('div', 'info legend'),
+            heights = [37, 47.5, 55.5, 65, 78.5],
+            labels = [];
+
+        // loop through our density intervals and generate a label with a colored square for each interval
+        div.innerHTML = "Wind (mph):<br>";
+        for (var i = 0; i < heights.length; i++) {
+            div.innerHTML +=
+                '<i style="background:' + getColor(heights[i] + 1) + '"></i> ' +
+                heights[i] + (heights[i + 1] ? '&ndash;' + heights[i + 1] + '<br>' : '+');
+        }
+
+        return div;
+    };
+
+    return legend;
+}
+
+function add_wind_legend(mymap){
+    if( legend['wind'] == null ){
+        legend_count['wind'] = 1;
+        legend['wind'] = create_wind_legend(L).addTo(mymap);
+    }else{
+        legend_count['wind'] += 1;
+    }
+}
+
+function del_wind_legend(){
+    legend_count['wind'] -= 1;
+    if( legend_count['wind'] == 0 ){
+        legend['wind'].remove();
+        delete legend['wind'];  
+    }
+}
