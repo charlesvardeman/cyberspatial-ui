@@ -248,6 +248,7 @@
   <footer>
     <div class="container">
       <div class="row">
+        {% if user.is_authenticated %}
         <div class="col-md-2">
           <ul class="list-unstyled">
             <li>Data</li>
@@ -255,154 +256,28 @@
             <li><a href="/documents/">Documents</a></li>
           </ul>
         </div>
-      <div class="col-md-2">
-        <ul class="list-unstyled">
-          <li>Maps</li>
-          <li><a href="/maps/">Explore Maps</a></li>
-        </ul>
-      </div>
-      <div class="col-md-2">
-        <ul class="list-unstyled">
-          <li>About</li>
-          <li><a href="/people/">People</a></li>
-          <li><a href="/groups/">Groups</a></li>
-        </ul>
-      </div>
+        <div class="col-md-2">
+          <ul class="list-unstyled">
+            <li>Maps</li>
+            <li><a href="/maps/">Explore Maps</a></li>
+          </ul>
+        </div>
+        <div class="col-md-2">
+          <ul class="list-unstyled">
+            <li>About</li>
+            <li><a href="/people/">People</a></li>
+            <li><a href="/groups/">Groups</a></li>
+          </ul>
+        </div>
+        {% else %}
+        <div class="col-md-6">
+        </div>
+        {% endif %}
         <div class="col-md-6 text-right">
           <ul class="list-unstyled">
             <li>{% trans "Powered by" %} <a href="http://geonode.org">{% trans "GeoNode" %}</a> <em>{% trans "version" %} {{ VERSION }}</em></li>
             <li><a href="/developer">Developers</a> | <a href="/about">About</a></li>
           </ul>
-        <label class="hidden">Language</label>
-
-        <form class="form-inline" action="/i18n/setlang/" method="post">
-          <input type='hidden' name='csrfmiddlewaretoken' value='{{ csrf_token }}'/>
-            <select class="col-md-6 pull-right" name="language" oninput="javascript:form.submit()">
-              <option value="en" selected hidden>
-                English
-              </option>
-
-              <option value="en">
-                English
-              </option>
-
-              <option value="es" >
-                Español
-              </option>
-
-              <option value="it" >
-                Italiano
-              </option>
-
-              <option value="fr" >
-                Français
-              </option>
-
-              <option value="de" >
-                Deutsch
-              </option>
-
-              <option value="el" >
-                Ελληνικά
-              </option>
-
-              <option value="id" >
-                Bahasa Indonesia
-              </option>
-
-              <option value="zh-cn" >
-                中文
-              </option>
-
-              <option value="ja" >
-                日本語
-              </option>
-
-              <option value="fa" >
-                Persian
-              </option>
-
-              <option value="ar" >
-                Arabic
-              </option>
-
-              <option value="bn" >
-                Bengali
-              </option>
-
-              <option value="ne" >
-                Nepali
-              </option>
-
-              <option value="sq" >
-                Albanian
-              </option>
-
-              <option value="af" >
-                Afrikaans
-              </option>
-
-              <option value="sw" >
-                Swahili
-              </option>
-
-              <option value="pt" >
-                Portuguese
-              </option>
-
-              <option value="pt-br" >
-                Portuguese (Brazil)
-              </option>
-
-              <option value="ru" >
-                Russian
-              </option>
-
-              <option value="vi" >
-                Vietnamese
-              </option>
-
-              <option value="ko" >
-                한국어
-              </option>
-
-              <option value="am" >
-                Amharic
-              </option>
-
-              <option value="km" >
-                Khmer
-              </option>
-
-              <option value="pl" >
-                Polish
-              </option>
-
-              <option value="sv" >
-                Swedish
-              </option>
-
-              <option value="th" >
-                ไทย
-              </option>
-
-              <option value="uk" >
-                Ukranian
-              </option>
-
-              <option value="si" >
-                Sinhala
-              </option>
-
-              <option value="ta" >
-                Tamil
-              </option>
-
-              <option value="tl" >
-                Tagalog
-              </option>
-            </select>
-          </form>
         </div>
       </div>
   </footer>

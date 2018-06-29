@@ -352,7 +352,14 @@ function update_muni_admins(){
 // Update approval pending list
 // AJAX call to get up to date information on users.
 function update_approval_list(){
-    //do Ajax call
+
+    //counter for approvals
+    var approval_count = 0;
+
+    //clear out old list
+    document.getElementById("account_list").innerHTML = "";
+
+    //do Ajax call for people to be approved
     $.ajax({
         type: "GET",
         url: "/user/settings/",
@@ -366,13 +373,13 @@ function update_approval_list(){
             //success?
             if(result.updated){
                 //counter for approvals
-                var approval_count = 0;
+                //var approval_count = 0;
 
                 //get approver container
                 var approver_container = document.getElementById("account_list");
 
                 //clear out old list
-                approver_container.innerHTML = "";
+                //approver_container.innerHTML = "";
 
                 //loop over users
                 for(var i=0; i<result.data.length; i++){
@@ -455,6 +462,139 @@ function update_approval_list(){
                 //set approvals to be done
                 document.getElementById("number_to_be_approved").innerHTML = `<span class="fa fa-exclamation-circle"></span> ${ approval_count } pending requests`;
 
+                //~~~~nest AJAX calls~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                //do Ajax call for people who want additional munis
+                $.ajax({
+                    type: "GET",
+                    url: "/user/update/",
+                    data: {
+                        'action': 'get_approvals'
+                    },
+                    dataType: "json",
+                    success: function(result) {
+                        console.log("GET USER ADMIN APPROVALS -- SUCCESS!" + result.updated);
+
+                        //success?
+                        if(result.updated){
+                            //counter for approvals
+                            //var approval_count = 0;
+
+                            //get approver container
+                            var approver_container = document.getElementById("account_list");
+
+                            //don't clear out old list
+                            //approver_container.innerHTML = "";
+
+                            //loop over users
+                            for(var i=0; i<result.data.length; i++){
+                                var user = result.data[i];
+                                //console.log(user.name);
+
+                                //user add muni data
+                                var add_muni_json = JSON.parse(user.additional_muni_request);
+
+                                //basic user data
+                                if(user.notes == null){
+                                    user.notes = "";
+                                }
+
+                                //----Approval list?----------------------------------------
+                                approval_count++;
+
+                                //create user muni section
+                                var user_muni = user.municipality;
+
+                                var muni_table = ``;
+                                for(var j=0; j<add_muni_json.munis.length; j++){
+                                    if(add_muni_json.muni_approvers[j] != ""){
+                                        muni_table += `<a onclick="view_user_info('${ add_muni_json.muni_approvers[j] }', 3, 'Return to Account Requests', '', '');" href="#">${add_muni_json.munis[j]}</a><br/>`;
+                                    }else{
+                                        muni_table += `<span>${add_muni_json.munis[j]}</span><br/>`;
+                                    }
+                                }
+
+                                approver_container.innerHTML +=
+                                        `<a class="anchor" id="${ user.username }"></a>
+                                         <div class="row review-request">
+                                            <div class="col-md-5 col-lg-4">
+                                                <div class="well">
+                                                    <table class="table">
+                                                        <tbody>
+                                                            <tr>
+                                                                <th style="border-top: 0">Name</th>
+                                                                <td style="border-top: 0">${ user.name }</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Title</th>
+                                                                <td>${ user.position }</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Municipality</th>
+                                                                <td>${ user_muni }</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>Role</th>
+                                                                <td id="role_${i}" >${ user.role }</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                    <p><b>Justification:</b>${ user.justification }</p>
+                                                    <table class="table" style="margin-top: 20px">
+                                                    <tbody>
+                                                        <tr>
+                                                            <th>Addn'l Muni's</th>
+                                                            <td>
+                                                                ${ muni_table }
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                    </table>
+                                                    <p><b>Justification:</b> ${ add_muni_json.justification }</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-7 col-lg-8">
+                                                <p class="qualifier" style="margin-top: 10px;">Received: ${ user.date_joined }; Muni Approval: ${ user.muni_approver_name } ${ user.muni_approval_date };New request ${ add_muni_json.date }: Seeking access to additional municipalities</p>
+                                                <textarea id="text_${i}" class="form-control" placeholder="Notes..." rows="7">${ user.notes }</textarea>
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-default dropdown-toggle"
+                                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            Change Role <span class="caret"></span>
+                                                                </button>
+                                                    <ul id="account_list_roles_${i}" class="dropdown-menu">
+                                                    </ul>
+                                                </div>
+                                                <button onclick="user_muni_update('${ user.username }', '${ i }', 'approve', '');" class="btn btn-primary" data-toggle="modal" data-target="">Approve</button>
+                                                <button onclick="user_muni_update('${ user.username }', '${ i }', 'decline', '');" class="btn btn-default" data-toggle="modal" data-target="">Decline*</button>
+                                                <p class="qualifier" style="margin-top: 10px;">*Any notes entered for a Declined applicant will be shared with the applicant to justify the decision.</p>
+                                            </div>
+                                        </div>
+                                        <hr/>`;
+
+                                //create roles list
+                                var list_roles = document.getElementById("account_list_roles_"+i);
+                                list_roles.innerHTML = "";
+
+                                //get edit selector for role
+                                var selctr = document.getElementById("edit_role_selector");
+                                for(var j=0; j<selctr.options.length; j++){
+                                    var role_name = selctr.options[j].text;
+                                    list_roles.innerHTML += `<li><a onclick="user_update('${ user.username }', '${ i }', 'update_role', '${ role_name }');" href="#">${ role_name }</a></li>`;
+                                }
+                            }
+
+                            //set approvals to be done
+                            document.getElementById("number_to_be_approved").innerHTML = `<span class="fa fa-exclamation-circle"></span> ${ approval_count } pending requests`;
+
+                        }else{
+                            //or failure
+                        }
+                    },
+                    error: function(result) {
+                        console.log("ERROR:", result)
+                    }
+                });
+
+                //~~~~end nest AJAX calls~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
             }else{
                 //or failure
             }
@@ -904,6 +1044,52 @@ function user_update(username, user_number, action, role){
         }
     });
 
+}
+
+//user municipality approvals
+function user_muni_update(username, user_number, action, role){
+    //console.log("Update to municipalites, number "+user_number);
+
+    //do Ajax call
+    $.ajax({
+        type: "POST",
+        url: "/user/update/",
+        data: {
+            'role': role,
+            'notes': document.getElementById("text_"+user_number).value,
+            'user': username,
+            'action': action
+        },
+        dataType: "json",
+        success: function(result) {
+            console.log("USER MUNI APPROVAL -- SUCCESS!" + result.updated);
+
+            if(result.updated){
+                //flag success
+                $.notify("User municipalities updated", "success");
+
+                //reload approvals list
+                update_approval_list();
+
+                //reload main list
+                update_user_list();
+
+                //reload munis
+                update_muni_admins();
+
+                //update the dca admins?
+                flip_main_dcaapprovals(true, false);
+
+            }else{
+                //or failure
+                $.notify("Error updating user municipalities", "error");
+            }
+        },
+        error: function(result) {
+            console.log("ERROR:", result)
+            $.notify("Error updating user municipalities", "error");
+        }
+    });
 }
 
 //create new user

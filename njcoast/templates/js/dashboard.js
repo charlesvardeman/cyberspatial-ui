@@ -5,6 +5,48 @@
  *
  */
 
+$(document).ready(function() {
+
+     //setup for select input
+      $('.js-example-basic-multiple').select2({ allowClear: true }); //, minimumInputLength: 1
+
+      //do Ajax call to get munis in county
+      $.ajax({
+          type: "GET",
+          url: "/municipalities_in_county/",
+          data: {
+              'county': 'All'
+          },
+          dataType: "json",
+          success: function(result) {
+              console.log("MUNIS FILTERED BY COUNTY -- SUCCESS! " + result.status);
+
+              //if we got munis back
+              if(result.status){
+                  /* Remove all options from the select list */
+                  //$('#muniList').empty();
+                  var x = document.getElementById("muniList");
+                  for(var i=0; i<result.data.length; i++){
+                      //if(result.data[i] == {{ user.njcusermeta.municipality.name }}) continue;
+                      var option = document.createElement("option");
+                      option.text = result.data[i];
+                      option.value = result.ids[i];
+                      x.add(option);
+                  }
+
+              }else{
+                  //or failure
+                  console.log("MUNIS FILTERED BY COUNTY ERROR:", result)
+              }
+          },
+          error: function(result) {
+              console.log("MUNIS FILTERED BY COUNTY ERROR:", result)
+          }
+      });
+
+});
+
+
 //function to open group membership
 function open_membership(object_name){
     var member_list = document.getElementById(object_name);
@@ -183,6 +225,117 @@ function delete_map_ajax(id){
             //fade out modal
             $("#deleteMap-1").modal("hide");
             $.notify("Map could not be deleted!", "error");
+        }
+    });
+
+}
+
+//forward request for additional munis
+function request_munis(){
+    var munis = $("#muniList").val();
+    var justi = $("#muniJustification").val();
+    //console.log("Munis "+munis+","+justi);
+
+    //test data
+    if(munis != "" && justi != ""){
+
+        //process data
+        var jsondata = {};
+
+        //get options
+        var muni_id = [];
+
+        //loop to add selected munis
+        for(var i=0; i<munis.length; i++){
+            muni_id.push(munis[i]);
+        }
+
+        //add to json
+        jsondata["muni_id"] = muni_id;
+        jsondata["justification"] = justi;
+
+        console.log("c "+JSON.stringify(jsondata));
+
+        //start the process
+        $.ajax({
+            type: "POST",
+            url: "/user/update/",
+            data: {
+                'action': 'add_muni',
+                'data': JSON.stringify(jsondata)
+            },
+            dataType: "json",
+            success: function(result) {
+                console.log("ADD MUNI -- SUCCESS!" + result.updated);
+                //clear modal
+                $('#reqMuni').modal('hide');
+            },
+            error: function(result) {
+                console.log("ADD MUNI ERROR:", result)
+                //clear modal
+                $('#reqMuni').modal('hide');
+            }
+        });
+
+    }else{  //missing data
+        if(munis == null){  //if muni error
+            document.getElementById('muniLabel').style.color = "red";
+            document.getElementById("muniLabel").innerHTML = "Municipality(ies) required!";
+        }else{
+            document.getElementById('muniLabel').style.color = "black";
+            document.getElementById("muniLabel").innerHTML = "Municipality(ies)";
+        }
+        if(justi == ""){    //if justification error
+            document.getElementById('justiLabel').style.color = "red";
+            document.getElementById("justiLabel").innerHTML = "Justification required!";
+        }else{
+            document.getElementById('justiLabel').style.color = "black";
+            document.getElementById("justiLabel").innerHTML = "Justification";
+        }
+    }
+}
+
+//function for swapping current muni
+function swap_municipality(name){
+    //console.log("Muni "+name);
+
+    //start the process
+    $.ajax({
+        type: "POST",
+        url: "/user/update/",
+        data: {
+            'action': 'switch_muni',
+            'municipality': name
+        },
+        dataType: "json",
+        success: function(result) {
+            console.log("SWITCH MUNI -- SUCCESS!" + result.updated);
+
+            //if succesful
+            if(result.updated){
+                //set name
+                document.getElementById('current_muni').innerHTML = name + ' <span>|</span> ' + result.role + '<i class="fa fa-caret-down" style="margin-left: 10px" aria-hidden="true"></i>';
+
+                //get users
+                var users = JSON.parse(result.group_users);
+                var elmt = document.getElementById('main_membership');
+                var ucount = users.length;
+                elmt.innerHTML = "";
+
+                for(var i=0; i<ucount; i++){
+                    //console.log("User "+users[i])
+                    elmt.innerHTML += `<li>${users[i]}</li>`;
+                }
+
+                //set muni data
+                document.getElementById('muni_group_text').innerHTML = name;
+                document.getElementById('muni_group_count').innerHTML = ucount + 1;
+                document.getElementById('muni_group_heading').innerHTML = name;
+            }
+
+        },
+        error: function(result) {
+            console.log("SWITCH MUNI ERROR:", result)
         }
     });
 
