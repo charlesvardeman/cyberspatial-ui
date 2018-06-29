@@ -494,7 +494,7 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type){
             heatmap[sim_type] = create_wind_heatmap(addressPoints.wind).addTo(mymap);
             add_wind_legend(mymap);
         }else{
-            //not supported
+            heatmap[sim_type] = L.geoJSON(addressPoints).addTo(mymap);
         }
 
         //remove heatmap loaded for production
