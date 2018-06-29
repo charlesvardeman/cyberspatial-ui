@@ -455,17 +455,23 @@ function load_simulation(user_id, object){
   }
 
   if(!object.checked && object.id in heatmap){
-      mymap.removeLayer(heatmap[object.id]);
-      delete heatmap[object.id];
+    mymap.removeLayer(heatmap[object.id]);
+    delete heatmap[object.id];
 
-      //remove from layers
-      var index = layers_selected.indexOf(object.id);
-      if (index !== -1){
-          layers_selected.splice(index, 1);
-          if(!initial_load) map_changed();
-          console.log("Removed "+object.name+","+object.id);
-      }
-  }
+    if(sim_type.includes("surge")){
+        del_surge_legend();
+    }else if(sim_type.includes("wind")){
+        del_wind_legend();
+    }
+
+    //remove from layers
+    var index = layers_selected.indexOf(object.id);
+    if (index !== -1){
+        layers_selected.splice(index, 1);
+        if(!initial_load) map_changed();
+            console.log("Removed "+object.name+","+object.id);
+        }
+    }
 }
 
 //get heatmap from S3
@@ -483,8 +489,10 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type){
         //get correct
         if(sim_type.includes("surge")){
             heatmap[sim_type] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
+            add_surge_legend(mymap);
         }else if(sim_type.includes("wind")){
             heatmap[sim_type] = create_wind_heatmap(addressPoints.wind).addTo(mymap);
+            add_wind_legend(mymap);
         }else{
             //not supported
         }

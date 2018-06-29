@@ -186,7 +186,7 @@ function start_expert_simulation() {
     data = {
         "index_SLT": [1, 1],
         "index_W": 1,
-        "index_prob": 1,
+        "index_prob": 0,
         "indicator": 1,
         "param": [latitude, longitude, angle, input_cp, input_vf, input_rm],
         "timeMC": input_ttl,
@@ -318,6 +318,12 @@ function load_heatmap(object) {
         } else if (!object.checked && (object.name in heatmap)) {
             mymap.removeLayer(heatmap[object.name]);
             delete heatmap[object.name];
+
+            if (object.name == "surge") {
+                del_surge_legend();
+            } else if (object.name == "wind") {
+                del_wind_legend();
+            }
         }
     }
 }
@@ -338,8 +344,10 @@ function load_expert_data_to_server(file_name, json_tag) {
 
             if (json_tag == "surge") {
                 heatmap[json_tag] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
+                add_surge_legend(mymap);
             } else if (json_tag == "wind") {
                 heatmap[json_tag] = create_wind_heatmap(addressPoints.wind).addTo(mymap);
+                add_wind_legend(mymap);
             } else {
                 //not supported
             }
