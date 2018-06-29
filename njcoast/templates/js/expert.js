@@ -200,6 +200,7 @@ function start_expert_simulation() {
         "storm_type": storm_type,
         "surge_file": "heatmap.json",
         "wind_file": "wind_heatmap.json",
+        "runup_file":"transect_line.json",
         "workspace_file": ""
     };
 
@@ -290,6 +291,10 @@ function get_expert_data_to_server() {
                 if (document.getElementById("wind_checkbox").checked) {
                     load_expert_data_to_server(data.wind_file, "wind");
                 }
+
+                if (document.getElementById("runup_checkbox").checked) {
+                    load_expert_data_to_server(data.runup_file, "runup");
+                }
             }
         },
         error: function (result) {
@@ -314,6 +319,8 @@ function load_heatmap(object) {
                 load_expert_data_to_server(data.surge_file, object.name);
             } else if (object.name == "wind") {
                 load_expert_data_to_server(data.wind_file, object.name);
+            } else {
+                load_expert_data_to_server(data.runup_file, object.name);
             }
         } else if (!object.checked && (object.name in heatmap)) {
             mymap.removeLayer(heatmap[object.name]);
@@ -349,7 +356,7 @@ function load_expert_data_to_server(file_name, json_tag) {
                 heatmap[json_tag] = create_wind_heatmap(addressPoints.wind).addTo(mymap);
                 add_wind_legend(mymap);
             } else {
-                //not supported
+                heatmap[json_tag] = L.geoJSON(addressPoints).addTo(mymap);
             }
 
             $.notify("Heatmap loaded", "success");
