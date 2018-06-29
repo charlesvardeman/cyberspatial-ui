@@ -252,7 +252,9 @@
           <ul class="list-unstyled">
             <li>Data</li>
             <li><a href="/layers/">Layers</a></li>
+            {% if user.is_authenticated %}
             <li><a href="/documents/">Documents</a></li>
+            {% endif %}
           </ul>
         </div>
       <div class="col-md-2">
@@ -264,8 +266,10 @@
       <div class="col-md-2">
         <ul class="list-unstyled">
           <li>About</li>
+          {% if user.is_authenticated %}
           <li><a href="/people/">People</a></li>
           <li><a href="/groups/">Groups</a></li>
+          {% endif %}
         </ul>
       </div>
         <div class="col-md-6 text-right">
