@@ -981,7 +981,7 @@ def user_to_dictionary(user):
     #or county?
     elif user.njcusermeta.county:
         user_dict['county'] = user.njcusermeta.county.name
-        user_dict['municipality'] = "All in " + user.njcusermeta.county.name + " Cnty"
+        #user_dict['municipality'] = "All in " + user.njcusermeta.county.name + " Cnty"
         user_dict['code'] = user.njcusermeta.county.code
 
     #get region but allow for legacy user
