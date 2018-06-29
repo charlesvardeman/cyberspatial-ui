@@ -787,9 +787,6 @@ def signup(request):
 
                 #save dependent models
                 #print region_level, form.cleaned_data.get('county'), form.cleaned_data.get('municipality')
-                if form.cleaned_data.get('county'):
-                    print "County",form.cleaned_data.get('county')
-                    user.njcusermeta.county = NJCCounty.objects.get(name=form.cleaned_data.get('county'))
                 if form.cleaned_data.get('municipality'):
                     print "Muni", form.cleaned_data.get('municipality')
                     user.njcusermeta.municipality = NJCMunicipality.objects.get(name=form.cleaned_data.get('municipality'))
@@ -797,6 +794,11 @@ def signup(request):
                     #if not muni then skip muni approval
                     user.njcusermeta.is_muni_approved = True
                     user.njcusermeta.muni_approval_date = timezone.now()
+
+                    #check if we have county
+                    if form.cleaned_data.get('county'):
+                        print "County",form.cleaned_data.get('county')
+                        user.njcusermeta.county = NJCCounty.objects.get(name=form.cleaned_data.get('county'))
 
                 #now save everything
                 user.save()
@@ -967,19 +969,20 @@ def user_to_dictionary(user):
     user_dict['date_joined'] = user.date_joined
 
     #additional user fields for NJC
+    #defaults
+    user_dict['municipality'] = ""
+    user_dict['code'] = ""
+    user_dict['county'] = ""
+
+    #check if muni
     if user.njcusermeta.municipality:
         user_dict['municipality'] = user.njcusermeta.municipality.name
         user_dict['code'] = user.njcusermeta.municipality.code
-    else:
-        user_dict['municipality'] = ""
-        user_dict['code'] = ""
-
-    if user.njcusermeta.county:
+    #or county?
+    elif user.njcusermeta.county:
         user_dict['county'] = user.njcusermeta.county.name
         user_dict['municipality'] = "All in " + user.njcusermeta.county.name + " Cnty"
         user_dict['code'] = user.njcusermeta.county.code
-    else:
-        user_dict['county'] = ""
 
     #get region but allow for legacy user
     if user.njcusermeta.region_level:
