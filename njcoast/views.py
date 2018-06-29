@@ -1330,9 +1330,9 @@ def user_approval(request):
 
             #get users
             if is_dca:
-                users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').filter(njcusermeta__is_muni_approved=True).order_by(sortby,'last_name')
+                users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').filter(njcusermeta__is_muni_approved=True, is_active=True).order_by(sortby,'last_name')
             elif is_muni:
-                users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').exclude(groups__name='municipal_administrators').exclude(groups__name='dca_administrators').filter(njcusermeta__municipality__name=current_muni).order_by(sortby,'last_name')
+                users = Profile.objects.exclude(username='admin').exclude(username='AnonymousUser').exclude(groups__name='municipal_administrators').exclude(groups__name='dca_administrators').filter(njcusermeta__municipality__name=current_muni, is_active=True).order_by(sortby,'last_name')
             else:
                 print "Not a valid user!"
 
