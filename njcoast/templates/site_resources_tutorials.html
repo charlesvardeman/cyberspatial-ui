@@ -5,6 +5,11 @@
 
 {% block body_class %}home{% endblock %}
 
+{% block extra_head %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/fontawesome-all.min.css" %}" media="screen" />
+    <link rel="stylesheet" type="text/css" href="{% static "css/njcoast-admin-style.css" %}" media="screen" />
+{% endblock extra_head %}
+
 {% block middle %}
 <div class="jumbotron njcoast-image slim">
     <div class="container">
@@ -16,10 +21,69 @@
 <div class="container">
     <div class="row spaced">
         <div class="col-md-9 faq">
-            <h3>Frequently Asked Questions</h3>
-            <h4>What is NJcoast?</h4>
-            <p>NJcoast is a user-friendly, web-environment that provides efficient access to geospatial data and custom tools to evaluate storm scenarios, all without the need to learn or maintain sophisticated Geographic Information Systems (GIS) software in-house.</p>
+            <h3>Tutorials</h3>
+
+            <table class="table">
+                <tbody id="tutorial_list">
+                </tbody>
+            </table>
+
         </div>
     </div>
 </div>
 {% endblock %}
+
+{% block extra_script %}
+<script type=text/javascript>
+var user_name = "{{ user.username }}";
+
+//~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+$(document).ready(function () {
+    //get actual documents
+    $.ajax({
+        type: "GET",
+        url: "/api/documents/",
+        data: {
+                'title__contains': 'njcoast_tutorials'
+        },
+        dataType: "json",
+        success: function (result) {
+            console.log("GETTING DOCUMENTS -- SUCCESS! " + result.meta.total_count);
+
+            //clear current list
+            var doc_table = document.getElementById('tutorial_list');
+
+            //setup table
+            doc_table.innerHTML = ``;
+
+            //get total number
+            var count = result.meta.total_count;
+
+            //loop over objects
+            for(var i=0; i<count; i++){
+                //get object
+                var object = result.objects[i];
+
+                console.log("Title "+object.title);
+
+                //populate table
+                doc_table.innerHTML += `<tr>
+                    <td>${ object.title.substring(18) }</a></td>
+                    <td>${ object.abstract }</td>
+                    <td><a href='/documents/${object.id}/download/'>Quick Reference Guide</a></td>
+                    <td><a href='${ object.supplemental_information }'>YouTube Video</a></td>
+                </tr>`;
+            }
+
+            doc_table.innerHTML += `<tr><td colspan="4"></td></tr>`;
+
+        },
+        error: function (result) {
+            console.log("GETTING DOCUMENTS -- ERROR:", result)
+        }
+    });
+
+});
+
+</script>
+{% endblock extra_script %}
