@@ -752,6 +752,9 @@ function update_user_list(){
                                 html_string +=  `<td class="status act">active</td>
                                                 <td class="notes">${ user.notes }</td>
                                                 <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list', 'municipality,code', '');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
+
+                                                //serup excludes for data reload
+                                                document.getElementById("save_changes_button").setAttribute( "onClick", "save_changes(document.getElementById('edit_username').innerHTML, this.name, 'municipality,code', '');" );
                             }
                         }else{
                             html_string +=  `<td class="status act">active</td>
@@ -857,6 +860,9 @@ function validateEmail(email) {
 
 //save user data
 function save_changes(username, action_if_no_user, exclude_string, disable_edit_string){
+    //reset default save changes call
+    document.getElementById("save_changes_button").setAttribute( "onClick", "save_changes(document.getElementById('edit_username').innerHTML, this.name, '', '');" );
+
     //set default action
     var action = 'update_all';
 
@@ -1376,7 +1382,7 @@ function view_user_info(username, tab_to_return_to, return_text, exclude_string,
 
                         //set return link
                         if(return_text != ""){
-                            document.getElementById("navigation_4").innerHTML = "<a onclick=\"view_user_info('', "+tab_to_return_to+", '', '', '');\" href=\"#\"><span class=\"fa fa-chevron-left\"></span> "+return_text;
+                            document.getElementById("navigation_4").innerHTML = "<a onclick=\"view_user_info('', "+tab_to_return_to+", '', '"+exclude_string+"', '');\" href=\"#\"><span class=\"fa fa-chevron-left\"></span> "+return_text;
                         }
                         //console.log("variable "+user_var+","+result.data[user_var]);
 
