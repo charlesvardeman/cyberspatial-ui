@@ -200,6 +200,7 @@ function start_expert_simulation() {
         "storm_type": storm_type,
         "surge_file": "heatmap.json",
         "wind_file": "wind_heatmap.json",
+        "runup_file":"transect_line.json",
         "workspace_file": ""
     };
 
@@ -284,11 +285,16 @@ function get_expert_data_to_server() {
                 //surge
                 if (document.getElementById("surge_checkbox").checked) {
                     load_expert_data_to_server(data.surge_file, "surge");
+                    load_expert_data_to_server( "surge_line.json", "srg_line");
                 }
 
                 //wind
                 if (document.getElementById("wind_checkbox").checked) {
                     load_expert_data_to_server(data.wind_file, "wind");
+                }
+
+                if (document.getElementById("runup_checkbox").checked) {
+                    load_expert_data_to_server(data.runup_file, "runup");
                 }
             }
         },
@@ -312,14 +318,20 @@ function load_heatmap(object) {
             //load it
             if (object.name == "surge") {
                 load_expert_data_to_server(data.surge_file, object.name);
+                load_expert_data_to_server( "surge_line.json", "srg_line");
             } else if (object.name == "wind") {
                 load_expert_data_to_server(data.wind_file, object.name);
+            } else {
+                load_expert_data_to_server(data.runup_file, object.name);
             }
         } else if (!object.checked && (object.name in heatmap)) {
             mymap.removeLayer(heatmap[object.name]);
             delete heatmap[object.name];
 
             if (object.name == "surge") {
+                mymap.removeLayer(heatmap["srg_line"]);
+                delete heatmap["srg_line"];
+
                 del_surge_legend();
             } else if (object.name == "wind") {
                 del_wind_legend();
@@ -348,8 +360,23 @@ function load_expert_data_to_server(file_name, json_tag) {
             } else if (json_tag == "wind") {
                 heatmap[json_tag] = create_wind_heatmap(addressPoints.wind).addTo(mymap);
                 add_wind_legend(mymap);
+            } else if( json_tag.includes("srg")){
+                heatmap[json_tag] = L.geoJSON(addressPoints, {
+                    style: function(feature) {
+                        switch (feature.properties.height) {
+                            case 0: return {color: "blue"};
+                            case 3: return {color: "yellow"};
+                            case 6: return {color: "orange"};
+                            case 9: return {color: "red"};
+                            case 12: return {color: "blue"};
+                        }
+                    },
+                    filter: function(feature, layer) {
+                        return feature.properties.height <= 9;
+                    }
+                }).addTo(mymap);
             } else {
-                //not supported
+                heatmap[json_tag] = L.geoJSON(addressPoints).addTo(mymap);
             }
 
             $.notify("Heatmap loaded", "success");

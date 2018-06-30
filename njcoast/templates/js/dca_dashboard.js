@@ -709,6 +709,11 @@ function update_user_list(){
                         continue;
                     }
 
+                    //deleted
+                    if(!user.active && user.is_dca_approved && user.is_muni_approved){
+                        continue;
+                    }
+
                     //----All NJC users-----------------------------------------
                     //basic user data
                     if(user.notes == null){
