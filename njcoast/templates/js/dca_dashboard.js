@@ -1330,7 +1330,6 @@ function view_user_info(username, tab_to_return_to, return_text, exclude_string,
                         for(var i=0; i<selctr.options.length; i++){
                             if(result.data.municipality == selctr.options[i].text){
                                 selctr.value = result.data.code;
-                                muni_found = true;
                             }
                         }
 
