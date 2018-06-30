@@ -452,24 +452,45 @@ function load_simulation(user_id, object){
           layers_selected.push(object.id);
           if(!initial_load) map_changed();
       }
+
+      if( object.id.includes("surge") ){
+        var objid = object.id.replace("surge", "srg_line");
+        load_heatmap_from_s3(user_id, object.name, "surge_line.json", objid)
+        if (layers_selected.indexOf(objid) == -1){
+            layers_selected.push(objid);
+            if(!initial_load) map_changed();
+        }
+      }
   }
 
-  if(!object.checked && object.id in heatmap){
-    mymap.removeLayer(heatmap[object.id]);
-    delete heatmap[object.id];
+    if(!object.checked && object.id in heatmap){
+        mymap.removeLayer(heatmap[object.id]);
+        delete heatmap[object.id];
 
-    if(sim_type.includes("surge")){
-        del_surge_legend();
-    }else if(sim_type.includes("wind")){
-        del_wind_legend();
-    }
+        if(object.id.includes("surge")){
+            del_surge_legend();
+        }else if(object.id.includes("wind")){
+            del_wind_legend();
+        }
 
-    //remove from layers
-    var index = layers_selected.indexOf(object.id);
-    if (index !== -1){
-        layers_selected.splice(index, 1);
-        if(!initial_load) map_changed();
+        //remove from layers
+        if (layers_selected.indexOf(object.id) !== -1){
+            layers_selected.splice(index, 1);
+            if(!initial_load) map_changed();
             console.log("Removed "+object.name+","+object.id);
+        }
+
+        if( object.id.includes("surge") ){
+            var objid = object.id.replace("surge", "srg_line");
+
+            mymap.removeLayer(heatmap[objid]);
+            delete heatmap[objid];
+
+            if (layers_selected.indexOf(objid) !== -1){
+                layers_selected.splice(index, 1);
+                if(!initial_load) map_changed();
+                console.log("Removed "+object.name+","+objid);
+            }
         }
     }
 }
@@ -493,6 +514,21 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type){
         }else if(sim_type.includes("wind")){
             heatmap[sim_type] = create_wind_heatmap(addressPoints.wind).addTo(mymap);
             add_wind_legend(mymap);
+        }else if( sim_type.includes("srg")){
+            heatmap[sim_type] = L.geoJSON(addressPoints, {
+                style: function(feature) {
+                    switch (feature.properties.height) {
+                        case 0: return {color: "blue"};
+                        case 3: return {color: "yellow"};
+                        case 6: return {color: "orange"};
+                        case 9: return {color: "red"};
+                        case 12: return {color: "blue"};
+                    }
+                },
+                filter: function(feature, layer) {
+                    return feature.properties.height <= 9;
+                }
+            }).addTo(mymap);
         }else{
             heatmap[sim_type] = L.geoJSON(addressPoints).addTo(mymap);
         }
