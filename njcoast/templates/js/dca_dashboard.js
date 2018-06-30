@@ -752,9 +752,6 @@ function update_user_list(){
                                 html_string +=  `<td class="status act">active</td>
                                                 <td class="notes">${ user.notes }</td>
                                                 <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list', 'municipality,code', '');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
-
-                                                //serup excludes for data reload
-                                                document.getElementById("save_changes_button").setAttribute( "onClick", "save_changes(document.getElementById('edit_username').innerHTML, this.name, 'municipality,code', '');" );
                             }
                         }else{
                             html_string +=  `<td class="status act">active</td>
@@ -1269,6 +1266,9 @@ function create_new_muni_admin(muni, code, tab_to_return_to, return_text){
 
 //view user info
 function view_user_info(username, tab_to_return_to, return_text, exclude_string, disable_edit_string){
+    //serup excludes for data reload
+    document.getElementById("save_changes_button").setAttribute( "onClick", "save_changes(document.getElementById('edit_username').innerHTML, this.name, '"+exclude_string+"', '');" );
+
     //get excludes
     var excludes = exclude_string.split(",");
 
