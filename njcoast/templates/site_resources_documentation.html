@@ -44,7 +44,8 @@ $(document).ready(function () {
         type: "GET",
         url: "/api/documents/",
         data: {
-                'title__contains': 'njcoast_documentation'
+                'title__contains': 'njcoast_documentation',
+                'order_by': 'title'
         },
         dataType: "json",
         success: function (result) {
@@ -71,11 +72,14 @@ $(document).ready(function () {
                 //get object
                 var object = result.objects[i];
 
-                console.log("Title "+object.title);
+                //console.log("Title "+object.title);
+
+                var pos = object.title.indexOf("njcoast_documentation");
+                pos += "njcoast_documentation:".length;
 
                 //populate table
                 doc_table.innerHTML += `<tr>
-                    <td><a href='/documents/${object.id}/download/'>${ object.title.substring(22) }</a></td>
+                    <td><a href='/documents/${object.id}/download/'>${ object.title.substring(pos) }</a></td>
                     <td>${ object.abstract }</td>
                     <td>${ object.supplemental_information }</td>
                 </tr>`;

@@ -44,7 +44,8 @@ $(document).ready(function () {
         type: "GET",
         url: "/api/documents/",
         data: {
-                'title__contains': 'njcoast_tutorials'
+                'title__contains': 'njcoast_tutorials',
+                'order_by': 'title'
         },
         dataType: "json",
         success: function (result) {
@@ -75,9 +76,12 @@ $(document).ready(function () {
                 var cell_color = "";
                 if(split_supl.length > 1) cell_color = split_supl[1];
 
+                var pos = object.title.indexOf("njcoast_tutorials");
+                pos += "njcoast_tutorials:".length;
+
                 //populate table
                 doc_table.innerHTML += `<tr>
-                    <td bgcolor="${cell_color}">${ object.title.substring(18) }</a></td>
+                    <td bgcolor="${cell_color}">${ object.title.substring(pos) }</a></td>
                     <td>${ object.abstract }</td>
                     <td><a href='/documents/${object.id}/download/'>Quick Reference Guide</a></td>
                     <td><a href='${ video_link }'>YouTube Video</a></td>
