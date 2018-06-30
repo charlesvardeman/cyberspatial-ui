@@ -149,8 +149,10 @@
                   <ul class="dropdown-menu">
                     <li><a href="{% url "faq" %}" role="button">{% trans "FAQ" %}</a></li>
                     <li><a href="{% url "shp" %}" role="button">{% trans "SHP Tool" %}</a></li>
-                <!--<li><a href="{% url "about" %}" role="button">{% trans "Documentation" %}</a></li> -->
-              <!--  <li><a href="{% url "about" %}" role="button">{% trans "Tutorials" %}</a></li> -->
+                    {% if user.is_authenticated %}
+                    <li><a href="{% url "documentation" %}" role="button">{% trans "Documentation" %}</a></li>
+                    <li><a href="{% url "tutorials" %}" role="button">{% trans "Tutorials" %}</a></li>
+                    {% endif %}
                   </ul>
                 <li><a href="{% url "about" %}" role="button">{% trans "About" %}</a></li>
             {% else %}

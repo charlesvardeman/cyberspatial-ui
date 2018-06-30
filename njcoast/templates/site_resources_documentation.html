@@ -1,0 +1,25 @@
+{% extends 'site_base.html' %}
+{% load i18n %}
+{% load staticfiles %}
+{% load base_tags %}
+
+{% block body_class %}home{% endblock %}
+
+{% block middle %}
+<div class="jumbotron njcoast-image slim">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row spaced">
+        <div class="col-md-9 faq">
+            <h3>Frequently Asked Questions</h3>
+            <h4>What is NJcoast?</h4>
+            <p>NJcoast is a user-friendly, web-environment that provides efficient access to geospatial data and custom tools to evaluate storm scenarios, all without the need to learn or maintain sophisticated Geographic Information Systems (GIS) software in-house.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
