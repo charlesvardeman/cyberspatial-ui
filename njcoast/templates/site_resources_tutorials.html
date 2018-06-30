@@ -64,14 +64,23 @@ $(document).ready(function () {
                 //get object
                 var object = result.objects[i];
 
-                console.log("Title "+object.title);
+                //console.log("Title "+object.title);
+
+                //split up suplimental info
+                var split_supl = object.supplemental_information.split(',');
+
+                var video_link = "";
+                if(split_supl.length > 0) video_link = split_supl[0];
+
+                var cell_color = "";
+                if(split_supl.length > 1) cell_color = split_supl[1];
 
                 //populate table
                 doc_table.innerHTML += `<tr>
-                    <td>${ object.title.substring(18) }</a></td>
+                    <td bgcolor="${cell_color}">${ object.title.substring(18) }</a></td>
                     <td>${ object.abstract }</td>
                     <td><a href='/documents/${object.id}/download/'>Quick Reference Guide</a></td>
-                    <td><a href='${ object.supplemental_information }'>YouTube Video</a></td>
+                    <td><a href='${ video_link }'>YouTube Video</a></td>
                 </tr>`;
             }
 
