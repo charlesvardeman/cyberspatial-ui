@@ -44,7 +44,7 @@ $(document).ready(function () {
         type: "GET",
         url: "/api/documents/",
         data: {
-                'keyword': 'njcoast_documentation'
+                'title__contains': 'njcoast_documentation'
         },
         dataType: "json",
         success: function (result) {
@@ -75,7 +75,7 @@ $(document).ready(function () {
 
                 //populate table
                 doc_table.innerHTML += `<tr>
-                    <td><a href='/documents/${object.id}/download/'>${ object.title }</a></td>
+                    <td><a href='/documents/${object.id}/download/'>${ object.title.substring(22) }</a></td>
                     <td>${ object.abstract }</td>
                     <td>${ object.supplemental_information }</td>
                 </tr>`;
