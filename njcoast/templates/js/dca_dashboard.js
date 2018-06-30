@@ -722,11 +722,19 @@ function update_user_list(){
 
                     var html_string;
                     if(result.is_dca){
-                        html_string = `<tr>
+                        if(user.region_level == 'Municipal'){
+                            html_string = `<tr>
                                             <td>${ user.name }</td>
                                             <td><a>${ user.email }</a></td>
                                             <td>${ user.rolesf }</td>
                                             <td><a onclick="view_user_info('${ user.muni_approver }', 2, 'Return to All NJcoast Users list', '', '');" href="#">${ user.municipality }</a></td>`;
+                        }else{
+                            html_string = `<tr>
+                                            <td>${ user.name }</td>
+                                            <td><a>${ user.email }</a></td>
+                                            <td>${ user.rolesf }</td>
+                                            <td>${ user.county } ${ user.region_level }</td>`;
+                        }
                     }else{
                         html_string = `<tr>
                                             <td>${ user.name }</td>
@@ -736,9 +744,15 @@ function update_user_list(){
                     //variable data
                     if(user.active){
                         if(result.is_dca){
-                            html_string +=  `<td class="status act">active</td>
-                                            <td class="notes">${ user.notes }</td>
-                                            <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list', '', '');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
+                            if(user.region_level == 'Municipal'){
+                                html_string +=  `<td class="status act">active</td>
+                                                <td class="notes">${ user.notes }</td>
+                                                <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list', '', '');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
+                            }else{
+                                html_string +=  `<td class="status act">active</td>
+                                                <td class="notes">${ user.notes }</td>
+                                                <td><a onclick="view_user_info('${ user.username }', 2, 'Return to All NJcoast Users list', '', 'municipality,code');" href="#"><span class="fa fa-info-circle"></span></a></td>`;
+                            }
                         }else{
                             html_string +=  `<td class="status act">active</td>
                                             <td class="notes">${ user.notes }</td>
@@ -1313,11 +1327,16 @@ function view_user_info(username, tab_to_return_to, return_text, exclude_string,
 
                         //set edit selector for municipality
                         selctr = document.getElementById("edit_municipality_selector");
+                        var muni_found = false;
                         for(var i=0; i<selctr.options.length; i++){
                             if(result.data.municipality == selctr.options[i].text){
                                 selctr.value = result.data.code;
+                                muni_found = true;
                             }
                         }
+                        //blank if not found
+                        if(!muni_found) selctr.value = "";
+
                         document.getElementById("edit_municipality_row").classList.remove("hidden");
                         if(disable_edit.indexOf("municipality") > -1){
                             $('#edit_municipality_selector').prop('disabled', true);
