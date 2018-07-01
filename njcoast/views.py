@@ -1075,12 +1075,18 @@ def user_add_muni(request):
             #successful?
             if dca_admins:
                 #actual email part
+                #unroll munis
+                munis_string = ""
+                for muni in munis:
+                    munis_string += muni + ", "
+
+                #other data
                 current_site = get_current_site(request)
                 subject = 'NJcoast Account Additional Municipality Request'
                 message = render_to_string('additional_muni_email.html', {
                     'user': current_user.first_name+" "+current_user.last_name,
                     'domain': current_site.domain + "/dca_dashboard/",
-                    'municipalities': munis,
+                    'municipalities': munis_string,
                 })
 
                 #get each admin
@@ -1610,16 +1616,22 @@ def user_approval(request):
                     user.first_name = namesplit[0]
                     user.last_name = namesplit[1]
 
-                #name
+                #name etc.
                 user.email = request.POST['email']
                 user.voice = request.POST['voice']
                 user.njcusermeta.role = NJCRole.objects.get(name=request.POST['role'])
-                user.njcusermeta.municipality = NJCMunicipality.objects.get(name=request.POST['municipality'])
                 user.njcusermeta.address_line_1 = request.POST['address_line_1']
                 user.njcusermeta.address_line_2 = request.POST['address_line_2']
                 user.njcusermeta.city = request.POST['city']
                 user.njcusermeta.zip = request.POST['zip']
                 user.njcusermeta.position = request.POST['position']
+
+                #municipality, dont update if county or statewide
+                if user.njcusermeta.region_level:
+                    if user.njcusermeta.region_level.name == 'Municipal':
+                        user.njcusermeta.municipality = NJCMunicipality.objects.get(name=request.POST['municipality'])
+                else:
+                    user.njcusermeta.municipality = NJCMunicipality.objects.get(name=request.POST['municipality'])
 
                 #save results
                 user.save()

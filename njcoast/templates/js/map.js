@@ -273,6 +273,10 @@ Could likely be simplified, but camelizing the lowercase strings wasn't too diff
 function add_layer_group_to_menu(layerGroup) {
     var group_template = $('#layerGroup').clone(true);
     $(group_template).find('span').html(layerGroup);
+
+    //add identifier to highlight group name
+    $(group_template).find('span').attr('id', camelize(layerGroup.toLowerCase()) + '_name');
+
     $(group_template).find('a').attr('href', '#' +
         camelize(layerGroup.toLowerCase())).attr('aria-controls', camelize(layerGroup.toLowerCase()));
     $(group_template).find('ul').attr('id', camelize(layerGroup.toLowerCase()));
@@ -367,6 +371,14 @@ function apply_settings(data){
           if(document.getElementById(data.layers_selected[i])){
               if(!document.getElementById(data.layers_selected[i]).checked){
                 document.getElementById(data.layers_selected[i]).click();//checked = true;
+
+                //highlight group name
+                var header_id = $("#"+data.layers_selected[i]).closest("ul").prop("id") + '_name';
+                //if not bolded then bold it
+                var header_span = document.getElementById(header_id);
+                if(!header_span.innerHTML.includes('<b>')){
+                    header_span.innerHTML = '<b>' + header_span.innerHTML + '</b>';
+                }
               }
           }else{
               //push it anyway
