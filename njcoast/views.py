@@ -105,6 +105,9 @@ class MapTemplateView(TemplateView):
                 else:
                     context['map_rename'] = False
 
+        #get map number for suggesting name
+        context['next_map_for_user'] = len(NJCMap.objects.filter(owner = self.request.user))
+
         user = self.request.user
         keywords = self.request.user.keywords
 
