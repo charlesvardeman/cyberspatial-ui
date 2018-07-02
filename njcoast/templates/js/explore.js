@@ -41,11 +41,14 @@ $("#pageForward").on("click", function () {
     //add new ones
     var oldshownItems = shownItems;
 
-    if ((shownItems + 8) > counter) {
-        shownItems = counter - counter % 4;
-    } else {
+    if((shownItems + 4) < counter){
         shownItems += 4;
     }
+    // if ((shownItems + 8) > counter) {
+    //     shownItems = counter - counter % 4;
+    // } else {
+    //     shownItems += 4;
+    // }
 
     if (oldshownItems != shownItems) {
         page++;
