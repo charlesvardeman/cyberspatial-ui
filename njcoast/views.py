@@ -87,6 +87,24 @@ class MapTemplateView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(MapTemplateView, self).get_context_data(**kwargs)
 
+        #lets get the map id from the url to find its name
+        map_id = self.kwargs['map_id']
+
+        context['map_rename'] = True
+        context['map_id'] = 0
+
+        #get it
+        if map_id:
+            context['map_id'] = map_id
+
+            #get map object
+            map = NJCMap.objects.get(id = map_id)
+            if map:
+                if map.name == "":
+                    context['map_rename'] = True
+                else:
+                    context['map_rename'] = False
+
         user = self.request.user
         keywords = self.request.user.keywords
 
