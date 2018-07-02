@@ -26,6 +26,12 @@
             <table class="table">
                 <tbody id="document_list">
                 </tbody>
+                <tr>
+                    <td><a href='http://docs.geonode.org/en/master/tutorials/users/index.html'>GeoNode Manual </br>(Third Party website)</a></td>
+                    <td>Introduction to the GeoNode environment used to manage and visualize NJcoast’s geospatial data</td>
+                    <td>Advanced NJcoast Users interested in taking advantage of GeoNode capabilities beyond those in the User Manual</td>
+                </tr>
+                <tr><td colspan="3"></td></tr>
             </table>
 
         </div>
@@ -85,7 +91,7 @@ $(document).ready(function () {
                 </tr>`;
             }
 
-            doc_table.innerHTML += `<tr><td colspan="3"></td></tr>`;
+            //doc_table.innerHTML += `<tr><td colspan="3"></td></tr>`;
 
         },
         error: function (result) {
