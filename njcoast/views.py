@@ -205,18 +205,38 @@ class MapExpertTemplateView(TemplateView):
 def njc_map_utilities(request):
     #create
     if request.method == "POST":
-        #print request.POST['name'], request.POST['description']
         # TODO: The user should have the option to name the map when they create it
-        #next_user_map_count = len(NJCMap.objects.filter(owner = request.user)) + 1
-        map_object = NJCMap.objects.create(
-            owner = request.user,
-            name = request.POST['name'],
-            description = request.POST['description']
-        )
-        if map_object:
-            return JsonResponse({'created': True, 'id': map_object.id})
+        #if map exists
+        if 'id' in request.POST:
+            #get it
+            map = NJCMap.objects.get(id = request.POST['id'])
+
+            if map:
+                #update data
+                map.name = request.POST['name']
+                map.description = request.POST['description']
+                map.modified = timezone.now()
+
+                #save the map
+                map.save()
+
+                return JsonResponse({'updated': True, 'id': map.id})
+            else:
+                return JsonResponse({'updated': False, 'id': map.id})
+
+        #otherwise create
         else:
-            return JsonResponse({'created': False})
+            #next_user_map_count = len(NJCMap.objects.filter(owner = request.user)) + 1
+            map_object = NJCMap.objects.create(
+                owner = request.user,
+                name = request.POST['name'],
+                description = request.POST['description']
+            )
+            if map_object:
+                return JsonResponse({'created': True, 'id': map_object.id})
+            else:
+                return JsonResponse({'created': False})
+
     #delete
     elif request.method == "GET":
         if 'action' in request.GET:
@@ -312,14 +332,14 @@ def njc_map_utilities(request):
             if layerid > 0:
                 map_object = NJCMap.objects.create(
                     owner = request.user,
-                    name = "%s's Map #%d" % (request.user, next_user_map_count),
+                    name = "", #"%s's Map #%d" % (request.user, next_user_map_count),
                     description = 'NJ Coast auto-generated map for %s' % request.user,
                     settings = '{"layers_selected": ["layer__%d"],"latitude":%s,"longitude":%s,"zoom":9}' % (layerid, layerlat, layerlong)
                 )
             else:
                 map_object = NJCMap.objects.create(
                     owner = request.user,
-                    name = "%s's Map #%d" % (request.user, next_user_map_count),
+                    name = "", #"%s's Map #%d" % (request.user, next_user_map_count),
                     description = 'NJ Coast auto-generated map for %s' % request.user
                 )
 
