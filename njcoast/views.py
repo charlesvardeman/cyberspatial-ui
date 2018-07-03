@@ -1,3 +1,30 @@
+'''
+    views.py
+
+    Authors:        Chris Sweet/Caleb Reinking/Beth Caldwell
+    Organization:   CRC Notre Dame
+    Date:           04/11/2018
+
+    Functions:
+        my_gis_layers               Get layers I can use from Geoserver for map.html.
+        MapTemplateView             Basic map template for map.html.
+        MapExpertTemplateView       Simulation page for map_expert.html.
+        njc_map_utilities           Create or delete maps for dashboard.html and called from Geonode new map.
+        map_annotations             Saving and retrieving map annotations, used for map.html.
+        map_settings                Set and get map settings. Also add/remove layers and simulations from map.
+        map_expert_simulations      Save and retriev and manipulate simulation data.
+        DashboardTemplateView       Dashboard template for dashboard.html.
+        ExploreTemplateView         Explore sims template for explore_simulations.html
+        ExploreMapsTemplateView     Explore maps template for explore_maps.html
+        signup                      Signup new users, extends Geonode signup form to add specific info.
+        DCADashboardTemplateView    DCA_dashboard template for dca_dashboard.html.
+        user_to_dictionary          Convert user model data to a dictionary to return to webpage.
+        user_add_muni               Add new munis for user. Also approve/decline and get users awaiting approval.
+        user_approval               Add municipality to user or decline etc.
+        change_password             User change password from dashboard.html
+        municipalities_in_county    Return the munis in county or all (all excludes users current munis)
+'''
+
 from django.http import JsonResponse, HttpResponseRedirect
 from guardian.shortcuts import get_objects_for_user
 from django.conf import settings
@@ -71,10 +98,7 @@ def my_gis_layers(request):
             # simply ignore layers without categories assigned and continue on with the loop
             pass
 
-
     return JsonResponse(layers_dictionary)
-
-
 
 '''
   Template View that injects some parameters about starting map position based on user keywords
@@ -110,17 +134,6 @@ class MapTemplateView(TemplateView):
 
         user = self.request.user
         keywords = self.request.user.keywords
-
-        # map_object, created = NJCMap.objects.get_or_create(
-        #         owner = request.user, is_default=True,
-        #         defaults = {
-        #             'name' : "%s's Default Map" % request.user,
-        #             'description' : 'NJ Coast auto-generated starter map for %s' % request.user
-        #         }
-        # )
-        # context['map_id'] = map_object.id
-
-
 
         # no keywords assigned OR both Keansburg + Berkeley will start the user
         # at Keansburg, as well as the obvious case of just having keansburg
@@ -163,6 +176,10 @@ class MapTemplateView(TemplateView):
 
         return context
 
+'''
+    Template View for running simulations that injects some parameters about starting
+    map position etc. Adds a list of maps that we can add the simulation to.
+'''
 class MapExpertTemplateView(TemplateView):
     template_name = 'map_expert.html'
 
@@ -171,15 +188,6 @@ class MapExpertTemplateView(TemplateView):
 
         user = self.request.user
         keywords = self.request.user.keywords
-
-        # map_object, created = NJCMap.objects.get_or_create(
-        #         owner = request.user, is_default=True,
-        #         defaults = {
-        #             'name' : "%s's Default Map" % request.user,
-        #             'description' : 'NJ Coast auto-generated starter map for %s' % request.user
-        #         }
-        # )
-        # context['map_id'] = map_object.id
 
         # no keywords assigned OR both Keansburg + Berkeley will start the user
         # at Keansburg, as well as the obvious case of just having keansburg
@@ -219,8 +227,15 @@ class MapExpertTemplateView(TemplateView):
 
 '''
   Function view that simply creates a new object and then redirects the user to
-  the proper map template view based on that new map object
-  Hijacked by Chris for real functionality 6/8/18
+  the proper map template view based on that new map object.
+  Hijacked by Chris for real functionality 6/8/18.
+
+  POST functions:
+    create or update a map
+
+  GET functions:
+    delete map
+    create new map with highlighted layer (called from Geonode new map)
 '''
 @login_required
 def njc_map_utilities(request):
@@ -368,6 +383,13 @@ def njc_map_utilities(request):
 
 '''
   API-ish view for annotation ajax calls from the map page.
+
+  GET functions:
+    get annotations
+
+  POST functions:
+    save annotation
+    delete annotation
 '''
 @login_required
 def map_annotations(request, map_id):
@@ -437,6 +459,17 @@ def map_annotations(request, map_id):
 
 '''
   API-ish view for map data ajax calls from the map page.
+
+  GET functions:
+    inject data for map to display, based on id (from url)
+
+  POST functions:
+    save                save map
+    save_image          save map image
+    add_simulation      add simulation to map
+    remove_simulation   remove sim from map
+    share               share map
+    add_layer           add layer to map
 '''
 @login_required
 def map_settings(request, map_id):
@@ -601,6 +634,13 @@ def map_settings(request, map_id):
 
 '''
   API-ish view for expert simulation ajax calls from the map_expert page.
+
+  GET functions:
+    get_sim_id_data     get data for simulation based on idea
+    get_my_data         get all sims that I can see
+
+  POST functions:
+    update or create new simulation based on completion of a sim
 '''
 @login_required
 def map_expert_simulations(request):
@@ -686,6 +726,9 @@ def map_expert_simulations(request):
 
         return JsonResponse({'saved': True})
 
+'''
+    Template view for user dashboard.
+'''
 class DashboardTemplateView(TemplateView):
     template_name = 'dashboard.html'
 
@@ -745,6 +788,9 @@ class DashboardTemplateView(TemplateView):
         #context['dca_group_membership'] = len(Group.objects.all())
         return context
 
+'''
+    Template view for explore simulation page
+'''
 class ExploreTemplateView(TemplateView):
     template_name = 'explore_simulations.html'
 
@@ -756,6 +802,9 @@ class ExploreTemplateView(TemplateView):
 
         return context
 
+'''
+    Template view for explore layers page
+'''
 class ExploreLayersTemplateView(TemplateView):
     template_name = 'explore_layers.html'
 
@@ -767,6 +816,9 @@ class ExploreLayersTemplateView(TemplateView):
 
         return context
 
+'''
+    Template view for explore maps page
+'''
 class ExploreMapsTemplateView(TemplateView):
     template_name = 'explore_maps.html'
 
@@ -798,7 +850,9 @@ class ExploreMapsTemplateView(TemplateView):
 
         return context
 
-#signup new users.
+'''
+    Signup form for new users. Triggers cascade through the muni/dca admin approval chain.
+'''
 def signup(request):
     if request.method == 'POST':
         print "POST signup",request.POST
@@ -917,7 +971,10 @@ def signup(request):
     print "here!",form
     return render(request, 'signup.html', {'form': form, 'error_data': ''})
 
-#DCA admin dashboard
+
+'''
+    Template view for DCA admin dashboard
+'''
 class DCADashboardTemplateView(TemplateView):
     template_name = 'dca_dashboard.html'
 
@@ -999,7 +1056,10 @@ class DCADashboardTemplateView(TemplateView):
 
         return context
 
-#Parse out user object to dictionary
+
+'''
+    Parse out user object to dictionary
+'''
 def user_to_dictionary(user):
     #convert user data
     user_dict = {}
@@ -1070,6 +1130,15 @@ def user_to_dictionary(user):
 
 '''
   Ajax calls to add munis to user.
+
+  POST functions:
+    add_muni        add municipalities to user
+    decline         decline request for new munis
+    approve         approve request for new munis
+    switch_muni     switch active municipality
+
+  GET functions:
+    get_approvals   get users awaiting approval for additional munis
 '''
 @login_required
 def user_add_muni(request):
@@ -1317,7 +1386,29 @@ def user_add_muni(request):
     return JsonResponse({'updated': False});
 
 '''
-  Ajax calls to approve or modify users from DCA dashboard.
+  Ajax calls to approve or modify users from DCA and Municipal dashboards.
+  Used with dca_dashboard.html/js
+
+  User needs to be logged in and in the dca or muni admin groups
+  GET functions
+    get_user                Gets data on user set in 'user', provides info on the calling user
+                            for if dca approver/muni approver (with municipality).
+    load_munis_in_county    Get a list of municipalities in a given county (or All munis).
+    get_users               Get a list of non-admin users based on municipality or All
+                            and ordered by a sort_by parameter.
+    get_approvers           Get a list of users to be approved for muni and dca approvers.
+    get_muni_admins         Get a list of muni admins and sort by 'sort_by'
+    get_dca_admins          Get a list of dca admins
+
+  POST functions
+    approve                 Approve a user. Results depend on if called by dca or muni admin.
+    update_role             Updare a users role.
+    update_all              Update most of user data.
+    update_profile          Update users profile, except role.
+    create_muni_admin       Create a new muni admin.
+    create_dca_admin        Create a new dca admin.
+    decline                 Decline users application.
+    delete                  Delete a user (actually removes user Active flag.
 '''
 @login_required
 def user_approval(request):
