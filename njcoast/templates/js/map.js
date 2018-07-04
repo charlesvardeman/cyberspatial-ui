@@ -1,3 +1,36 @@
+/*
+ * Purpose:            js file for map template, uses leaflet maps for GIS display.
+ * Authors:            Beth Caldwell, Caleb Reinking, Chris Sweet
+ * Org:                CRC at Notre Dame
+ * Date:               04/01/2018
+ *
+ * Associated files:   map.html    main html for map page,
+ *
+ * Description:        Provides functionality to load leaflet map, display layers,
+ *                     live storm information and simulation data.
+ *
+ * Functions:
+ *  $(document).ready       Adds Open Street View tiles to map and loads layers and their state.
+ *  get_layers_from_server  Loads layers via AJAX call to views.py
+ *  process_layers          pull the layer groups out and call the appropriate function
+ *                          for layer group or layer to be added to the menu.
+ *  add_layer_group_to_menu Add layers to LHS menu under collapsable headings.
+ *  add_layer_to_menu       Actual layer add, called from process_layers.
+ *  load_map                Get current map info. from server (views.py)
+ *  apply_settings          Apply map settings such as active layers, central view coordinates,
+ *                          zoom level etc. Called from load_map.
+ *  load_heatmap_from_s3    Load heatmap from S3 bucket contating simulation results.
+ *  dataURLtoBlob           Creates blob from URL, used in creation of thumbnail from
+ *                          current map view.
+ *  save_map                Save current state of map.
+ *  save_shared_with        Save who we are sharing our map with, called after selection of user.
+ *  load_simulation_data    Loads data for a selected simulation (run up, wind model etc.)
+ *                          Called from load_map.
+ *  remove_simulation       Remove simulation from view.
+ *  map_changed             Auto save map if changed.
+ *  mymap.on('zoomend','dragend'... Functions attached to map to flag map has changed.
+ */
+
 //fix for callable js
 if( annotate_map_id == null ){
     $("#save_map").addClass("disabled");
