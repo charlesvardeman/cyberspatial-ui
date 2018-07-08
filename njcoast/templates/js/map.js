@@ -32,35 +32,31 @@
  */
 
 //fix for callable js
+//If annotate_map_id not defined then disable load/save and sharing.
+//Latest code has auto saving so load/save irrelevant
 if( annotate_map_id == null ){
     $("#save_map").addClass("disabled");
     $("#load_map").addClass("disabled");
     $("#share_map").addClass("disabled");
 }
 
-//for heatmap
+//variable for heatmap
 var heatmap = {};
 
-//save simulations
+//dictionary of simulations
 var simulations = [];
 
-//disctionary of selected layers
+//dictionary of selected layers
 var layers_selected = [];
 
 //flag to stop map re-load during initialization
 var initial_load = true;
 
-/*
-Base Map -- Centered on Keansburg, NJ
-WMS Tile Layers
-Data: Watershed Boundary Dataset - National Hydrography Overlay Map Service
-      https://catalog.data.gov/dataset/usgs-national-watershed-boundary-dataset-wbd-
-      downloadable-data-collection-national-geospatial-/resource/f55f881d-9de8-471f-9b6b-22cd7a98025d
-XML: https://services.nationalmap.gov/arcgis/services/nhd/MapServer/WMSServer?request=GetCapabilities&service=WMS
- */
+//dictionarys for layer list and groups
 var layer_list = [];
 var layer_groups = [];
 
+//prevent map from being recognized as touchable, stops lorge annotate symbols
 L.Browser.touch = false;
 
 // Setup Zoom Controls
@@ -132,6 +128,7 @@ L.Control.zoomHome = L.Control.extend({
         }
     }
 });
+
 // add the new control to the map
 var zoomHome = new L.Control.zoomHome();
 zoomHome.addTo(mymap);
@@ -139,6 +136,7 @@ zoomHome.addTo(mymap);
 // Setup Scale View
 var scale_options = { metric: false, imperial: false, maxWidth: 200 };
 
+//select the correct units based on locality
 var language = window.navigator.userLanguage || window.navigator.language;
 if( language == "en-US" ){
     scale_options.imperial = true;
@@ -353,6 +351,7 @@ function add_layer_to_menu(layer, ul_id) {
     });
 }
 
+//used for features not yet implemented
 $(function () {
 $('.beta-feature-not-available').tooltip(
   {
@@ -362,7 +361,7 @@ $('.beta-feature-not-available').tooltip(
   });
 });
 
-//load map
+//load map data via AJAX call
 function load_map(){
 
   $.ajax({
@@ -540,7 +539,7 @@ function load_simulation(user_id, object){
     }
 }
 
-//get heatmap from S3
+//get heatmap from S3 bucket
 function load_heatmap_from_s3(owner, simulation, filename, sim_type){
   $.ajax({
     type: "GET",
@@ -588,7 +587,7 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type){
 });
 }
 
-//create blob from thumbnail
+//create blob from thumbnail, used to get snapshot of map for map explorer
 function dataURLtoBlob(dataurl) {
     var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
         bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
@@ -598,7 +597,7 @@ function dataURLtoBlob(dataurl) {
     return new Blob([u8arr], {type:mime});
 }
 
-//save current map
+//save the current map settings/info
 function save_map(notify) {
     //get general map data
     //save map state
@@ -923,16 +922,14 @@ function remove_simulation(name){
 //function to track map changes and save
 function map_changed(){
     save_map(false);
-    //console.log("Map has changed");
 }
 
 //update map changed with zoom
 mymap.on('zoomend', function (event) {
     if(!initial_load) map_changed();
-    //console.log("Map has zoomed");
-});
+);
 
+//if dragging map wait until end before saving
 mymap.on('dragend', function() {
-    //console.log("Map has panned");
     if(!initial_load) map_changed();
 });
