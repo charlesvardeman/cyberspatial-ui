@@ -1,12 +1,6 @@
-/**
- * @author Chris Sweet <csweet1@nd.edu>
- *
- * @description Runs simulations on James' backend with expert choice of input parameters.
- *
- */
  /*
   * Purpose:            js file for map template, uses leaflet maps for GIS display.
-  * @author             Caleb Reinking, Chris Sweet
+  * @author             James Sweet, Caleb Reinking, Chris Sweet
   * Org:                CRC at Notre Dame
   * Date:               04/01/2018
   *

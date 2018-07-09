@@ -5,6 +5,21 @@
 
 {% block body_class %}home{% endblock %}
 
+{% comment %}
+Purpose:            HTML file for simulation explorer.
+Authors:            Chris Sweet
+Org:                CRC at Notre Dame
+Date:               04/01/2018
+
+Associated files:   explore.js                      main js for simulation explorer page,
+
+Description:        Allows the user to explore the simulations that have been run and add them to maps for viewing.
+                    Contains some js that require data from Django.
+
+js functions:
+    AddUserMaps     Add a list of maps that the user can add simulations to.
+{% endcomment %}
+
 {% block extra_head %}
     <!-- Load Leaflet from CDN -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
