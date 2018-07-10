@@ -5,6 +5,21 @@
 
 {% block body_class %}home{% endblock %}
 
+{% comment %}
+Purpose:            HTML file for layer explorer.
+Authors:            Chris Sweet
+Org:                CRC at Notre Dame
+Date:               04/01/2018
+
+Associated files:   explore_layers.js       main js for layer explorer page,
+
+Description:        Allows the user to explore the layers that have been uploaded to Geonode.
+                    Contains some js that require data from Django.
+
+js functions:
+    AddUserMaps     Add a list of maps that the user can add simulations to.
+{% endcomment %}
+
 {% block extra_head %}
     <!-- load mods to leaflet for rectangular popups/map icons -->
     <link rel="stylesheet" type="text/css" href="{% static "css/crc_leaflet.css" %}" media="screen" />

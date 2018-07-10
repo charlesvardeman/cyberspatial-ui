@@ -1,6 +1,31 @@
-var storm_layer_dict = {}; // dictionary of layers added through active storm layer checkboxes
-var update_map_layers = {}; // Dictionary of layers added through the explore scenarios box
+/*
+ * Purpose:            js file for storm visualization menu.
+ * Authors:            Beth Caldwell, Caleb Reinking
+ * Org:                CRC at Notre Dame
+ * Date:               04/01/2018
+ *
+ * Associated files:   storm_visualization_menu.html    storm visualization menu for main map page,
+ *
+ * Description:        Provides functionality to create storm visualization menus on the main map page.
+ *
+ * Functions:
+ *      $(document).ready   run once page loaded
+ *      get_rss_feed        loads current storm data from RSS Feed
+ *      add_active_storm_to_menu    Adds active storm to menu
+ *      unfollowClick       Remove storm from menu
+ *      followClick         Follow storm
+ *      storm_vis_check     Updates when checkbox checked
+ *      check_scenario_map_layers   Updates when scenario is checked
+ *      updateMapClick      Updates when clicking actively followed storm
+ */
 
+// dictionary of layers added through active storm layer checkboxes
+var storm_layer_dict = {};
+
+// Dictionary of layers added through the explore scenarios box
+var update_map_layers = {};
+
+//run once loaded
 $(document).ready(function () {
     get_rss_feed();
 });
@@ -269,7 +294,7 @@ function updateMapClick(storm_name) {
 
     var sea_level = $("input[id='" + storm_name + "_input_slr']").val() * 0.3048;
     sea_level = (Math.round(sea_level * 2) / 2).toFixed(1)
-    
+
     var coastal_protection = $("input[name='" + storm_name + "_dunes']:checked").val();
     var tides = $("input[name='" + storm_name + "_tides']:checked").val();
     var analysis_type = $("input[name='" + storm_name + "_analysis']:checked").val();

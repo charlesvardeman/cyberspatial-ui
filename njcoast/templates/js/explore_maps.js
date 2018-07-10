@@ -1,7 +1,32 @@
+/*
+ * Purpose:            js file for explore_maps.html.
+ * @author             Chris Sweet
+ * Org:                CRC at Notre Dame
+ * Date:               04/01/2018
+ *
+ * Associated files:   explore_maps.html    Explore maps page,
+ *
+ * @description        Provides functionality to view, filter, order and share maps that have been created.
+ *
+ * Functions:
+ *  $("#pageBackwards").on("click"  Paging for list.
+ *  $("#pageForward").on("click"    Paging for list.
+ *  $(document).ready               Setup date picker and initial ordering.
+ *  create_map                      Create a new map and launch it.
+ *  load_maps_data                  Load ordered list of maps.
+ *  reload_map_data                 Reload maps from database.
+ *  save_shared_with                Save users the map is shared with.
+ *  open_share_users                Open modal to select users map is shared with.
+ *  get_dates                       Get user date input.
+ *  clear_text_search               Clear search criteria.
+ *  call_text_search                Reload using search criteria.
+ *  user_filter                     Handle button clicked on panel.
+ */
+
 //date range for Search
-var start_date = "";//"04/11/2018 18:30";
-var end_date = "";//"04/15/2018 9:30";
-var text_search = ""; //"sim stuff";
+var start_date = "";
+var end_date = "";
+var text_search = "";
 var current_map_data = null;
 
 //~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -190,6 +215,7 @@ var page = 1;
 
 var shownItems = 0;
 
+//paging for view
 $("#pageBackwards").on("click", function () {
     var items = $("#dashboard-list li");
     //var shownItems = items.filter(":visible").length;
@@ -211,6 +237,7 @@ $("#pageBackwards").on("click", function () {
     document.getElementById('page').innerHTML = page;
 });
 
+//paging for view
 $("#pageForward").on("click", function () {
     var items = $("#dashboard-list li");
     //var shownItems = items.filter(":visible").length;

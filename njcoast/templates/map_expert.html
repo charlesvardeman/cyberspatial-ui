@@ -5,6 +5,24 @@
 
 {% block body_class %}home{% endblock %}
 
+{% comment %}
+Purpose:            HTML file for running simulations (experts) with James' computational backend.
+Authors:            James Sweet, Caleb Reinking, Chris Sweet
+Org:                CRC at Notre Dame
+Date:               04/01/2018
+
+Associated files:   expert.js                       main js for map_expert page,
+
+Description:        Allows the expert user to select input parameters and run simulations
+                    on the server backend. The resulting simulation outputs can then be displayed
+                    on the map. The layers can also be shared/viewed on other maps.
+                    Also houses some js that requires info from Django.
+
+js functions:
+    $(document).ready   Runs once document loaded. Loads the map tiles.
+
+{% endcomment %}
+
 {% block extra_head %}
     <!-- Load Leaflet from CDN -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"

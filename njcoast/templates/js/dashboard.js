@@ -1,9 +1,25 @@
-/**
- * @author Chris Sweet <csweet1@nd.edu>
- *
- * @description User dashboard code for dashboard.html
- *
- */
+ /*
+  * Purpose:            js file for dashboard.html.
+  * @author             Beth Caldwell, Chris Sweet <csweet1@nd.edu>
+  * Org:                CRC at Notre Dame
+  * Date:               04/01/2018
+  *
+  * Associated files:   dashboard.html    Explore user profile, maps, layers and simulations page,
+  *
+  * @description        User dashboard code for dashboard.html.
+  *
+  * Functions:
+  *     $(document).ready   Load municipalities in county.
+  *     open_membership     Show mwmbers of a group I am in.
+  *     flip_edit_main      Flip between main dashboard and edit user data.
+  *     validateEmail       Check email input OK.
+  *     save_changes        Save user profile changes.
+  *     create_map          Create a new map and launch it.
+  *     delete_map          Delete map after showing OK modal.
+  *     delete_map_ajax     Actual map delete.
+  *     request_munis       Request additional municipalities to belong to.
+  *     swap_municipality   Set primary muni from those I have been given access to.
+  */
 
 $(document).ready(function() {
 

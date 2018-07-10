@@ -5,6 +5,24 @@
 
 {% block body_class %}home{% endblock %}
 
+{% comment %}
+Purpose:            HTML file for map template, uses leaflet maps for GIS display.
+Authors:            Beth Caldwell, Caleb Reinking, Chris Sweet
+Org:                CRC at Notre Dame
+Date:               04/01/2018
+
+Associated files:   map.js                          main js for map page,
+                    annotate_maps.js                js for implementing annotations on leflet and communications with other clients,
+                    storm_visualization_menu.html   html to add storm visualization to map
+                    storm_visualization.js          js file for storm_visualization_menu.html
+
+Description:        Provides <div> to hold leaflet map, has LHS menu to allow the
+                    user to display layers, live storm information and simulation
+                    data. Also allows the user to annotate the map by placing markers,
+                    lines and polygons and lebel them. The annotations can be shared with
+                    others via map sharing, and updates can be seen in "real time".
+{% endcomment %}
+
 {% block extra_head %}
     <!-- Load Leaflet from CDN -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
