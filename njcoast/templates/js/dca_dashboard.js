@@ -1,8 +1,36 @@
-/**
- * @author Chris Sweet <csweet1@nd.edu>
+/*
+ * Purpose:            js file for dca_dashboard.
+ * @author             Chris Sweet <csweet1@nd.edu>
+ * Org:                CRC at Notre Dame
+ * Date:               06/01/2018
  *
- * @description DCA administrator code
+ * Associated files:   dca_dashboard.html    dca/muni dashboard html page,
+ *                     views.py              Django backend for AJAX calls etc.
  *
+ * @description        DCA/Municipality administrator code.
+ *
+ * Functions:
+ *  $(document).ready   Load user list, users to be approved and list of muni admins.
+ *  sort_muni_admins    Set sorting for muni admins page and reload.
+ *  sort_users          Set sorting for users and reload.
+ *  load_munis_in_county    Get munis in a given county.
+ *  user_filter         Setup LHS filter input panel.
+ *  filter_muni_admin_by_county Filter the muni admins according to county.
+ *  flip_main_dcaapprovals      Flip main screen from tabs (muni admin. user, approvals) to DCA admin screen.
+ *  update_muni_admins  Update the muni admins list.
+ *  update_approval_list    Update approval pending list, AJAX call to get up to date information on users.
+ *  update_user_list    Update user info list, AJAX call to get up to date information on users.
+ *  set_municipality_code   Set muni code after selecting.
+ *  delete_user         Delete user.
+ *  validateEmail       Check email is correct format.
+ *  save_changes        Save user profile changes.
+ *  show_user_edit      Flip to edit screen (or back).
+ *  user_update         Update user info. on screen.
+ *  user_muni_update    Switch municipality for user.
+ *  create_new_dca_approver Create a new DCA approver.
+ *  create_new_muni_admin   Create a new Municipality approver.
+ *  view_user_info      Put user info in form.
+ *  flip_tabs           Flip between tabs on page.
  */
 
 //~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -1,3 +1,16 @@
+/*
+ * Purpose:            js file for creating heatmaps for maps.html and map_expert.html.
+ * @author             James Sweet <csweet1@nd.edu>
+ * Org:                CRC at Notre Dame
+ * Date:               05/01/2018
+ *
+ * Associated files:   maps.html        Main map view,
+ *                     map_expert.html  Simulation view.
+ *
+ * @description       Heatmap generation code.
+ *
+ */
+
 function create_surge_heatmap(data){
     var heatData = {
         max: 10.00,
@@ -7,8 +20,8 @@ function create_surge_heatmap(data){
     var data_array = data;
     for( var i = 0; i < data.length; i++ ){
         heatData.data.push({
-            lat: data[i][0], 
-            lng: data[i][1], 
+            lat: data[i][0],
+            lng: data[i][1],
             value: Math.max(data[i][2], 0.0),
         });
     }
@@ -18,9 +31,9 @@ function create_surge_heatmap(data){
         // if scaleRadius is false it will be the constant radius used in pixels
         "radius": 0.0025,
         "opacity": 0.65,
-        "maxOpacity": 0.75, 
+        "maxOpacity": 0.75,
         // scales the radius based on map zoom
-        "scaleRadius": true, 
+        "scaleRadius": true,
         "gradient": {
             // enter n keys between 0 and 1 here
             // for gradient color customization
@@ -30,7 +43,7 @@ function create_surge_heatmap(data){
             '.9': 'red',
         },
         // if set to false the heatmap uses the global maximum for colorization
-        // if activated: uses the data maximum within the current map boundaries 
+        // if activated: uses the data maximum within the current map boundaries
         //   (there will always be a red spot with useLocalExtremas true)
         "useLocalExtrema": false,
         // which field name in your data represents the latitude - default "lat"
@@ -43,7 +56,7 @@ function create_surge_heatmap(data){
 
     var hLayer = new HeatmapOverlay(cfg);
     hLayer.setData(heatData);
-    
+
     return hLayer;
 }
 
@@ -56,8 +69,8 @@ function create_wind_heatmap(data){
     var data_array = data;
     for( var i = 0; i < data.length; i++ ){
         heatData.data.push({
-            lat: data[i][0], 
-            lng: data[i][1], 
+            lat: data[i][0],
+            lng: data[i][1],
             value: Math.max(data[i][2], 0.0),
         });
     }
@@ -67,9 +80,9 @@ function create_wind_heatmap(data){
         // if scaleRadius is false it will be the constant radius used in pixels
         "radius": 0.0075,
         "opacity": 0.65,
-        "maxOpacity": 0.75, 
+        "maxOpacity": 0.75,
         // scales the radius based on map zoom
-        "scaleRadius": true,  
+        "scaleRadius": true,
         "gradient": {
             '0.37': '#ffffcc',
             '0.475': '#ffe775',
@@ -78,7 +91,7 @@ function create_wind_heatmap(data){
             '0.785': '#ff6060',
         },
         // if set to false the heatmap uses the global maximum for colorization
-        // if activated: uses the data maximum within the current map boundaries 
+        // if activated: uses the data maximum within the current map boundaries
         //   (there will always be a red spot with useLocalExtremas true)
         "useLocalExtrema": false,
         // which field name in your data represents the latitude - default "lat"
@@ -91,7 +104,7 @@ function create_wind_heatmap(data){
 
     var hLayer = new HeatmapOverlay(cfg);
     hLayer.setData(heatData);
-    
+
     return hLayer;
 }
 
@@ -138,7 +151,7 @@ function del_surge_legend(mymap){
     legend_count['surge'] -= 1;
     if( legend_count['surge'] == 0 ){
         legend['surge'].remove();
-        delete legend['surge'];  
+        delete legend['surge'];
     }
 }
 
@@ -181,6 +194,6 @@ function del_wind_legend(){
     legend_count['wind'] -= 1;
     if( legend_count['wind'] == 0 ){
         legend['wind'].remove();
-        delete legend['wind'];  
+        delete legend['wind'];
     }
 }
