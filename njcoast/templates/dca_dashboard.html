@@ -6,6 +6,32 @@
 
 {% block body_class %}home{% endblock %}
 
+{% comment %}
+Purpose:            HTML file for DCA and Municipality dashboards.
+Authors:            Chris Sweet
+Org:                CRC at Notre Dame
+Date:               06/01/2018
+
+Associated files:   dca_dashboard.js                main js for dca_dashboard.html,
+                    account_created_email           email template for account created,
+                    account_rejected_email          email template for account rejected,
+                    dca_admin_account_created_email email template for dca admin account created,
+                    muni_admin_account_created_email    email template muni admin account created,
+                    additional_muni_accepted_email  email template additional munis accepted,
+                    additional_muni_email           email template for additional munis,
+                    additional_muni_rejected_email  email template additional munis rejected,
+                    account_created                 account created splash page.
+                    views.py                        Django backend for AJAX calls etc.
+                    
+Description:        Provides DCA and Municipality dashboards where all users, muni admins
+                    and dca admins are created, edited and deleted.
+                    This page uses a tabbed format with the tabs corresponding
+                    to id="data_1" to id="data_4", individually made visible as required.
+                    "data_4" contains two main divs for user_info and user_edit to flip
+                    between these functions.
+
+{% endcomment %}
+
 {% block extra_head %}
     <link rel="stylesheet" type="text/css" href="{% static "css/fontawesome-all.min.css" %}" media="screen" />
     <link rel="stylesheet" type="text/css" href="{% static "css/njcoast-admin-style.css" %}" media="screen" />
