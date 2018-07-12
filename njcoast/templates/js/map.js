@@ -927,7 +927,7 @@ function map_changed(){
 //update map changed with zoom
 mymap.on('zoomend', function (event) {
     if(!initial_load) map_changed();
-);
+});
 
 //if dragging map wait until end before saving
 mymap.on('dragend', function() {
