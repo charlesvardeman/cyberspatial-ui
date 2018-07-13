@@ -184,7 +184,7 @@ function start_expert_simulation() {
     sim_id = Math.random().toString(36).substr(2, 9);
 
     //get tide
-    var tide = document.querySelector('input[name="tide"]:checked').value;
+    var tide = document.querySelector('input[name="tide"]:checked');
 
     //get protection
     var protection = document.querySelector('input[name="protection"]:checked').value;
@@ -214,8 +214,8 @@ function start_expert_simulation() {
         "lat_track": [lat_past_point, latitude],
         "long_track": [long_past_point, longitude],
         "SLR": input_slr,
-        "tide": 0,
-        "tide_td": tide,
+        "tide": parseFloat(tide.value),
+        "tide_td": tide.parentNode.innerText,
         "protection": protection,
         "analysis": analysis,
         "storm_type": storm_type,
