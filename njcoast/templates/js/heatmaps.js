@@ -127,9 +127,10 @@ function create_surge_legend(){
         // loop through our density intervals and generate a label with a colored square for each interval
         div.innerHTML = "Surge (m):<br>";
         for (var i = 0; i < heights.length; i++) {
-            div.innerHTML +=
-                '<i style="background:' + getColor(heights[i] + 1) + '"></i> ' +
-                heights[i] + (heights[i + 1] ? '&ndash;' + heights[i + 1] + '<br>' : '+');
+            div.innerHTML += '<i style="background:' + getColor(heights[i] + 1) + '"></i> ' + heights[i];
+            if(heights[i + 1]){
+                div.innerHTML += '<br>';
+            }
         }
 
         return div;
