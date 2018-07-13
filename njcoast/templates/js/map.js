@@ -507,9 +507,11 @@ function load_simulation(user_id, object){
       }
   }
 
-    if(!object.checked && object.id in heatmap){
-        mymap.removeLayer(heatmap[object.id]);
-        delete heatmap[object.id];
+    if(!object.checked){
+        if( object.id in heatmap ) {
+            mymap.removeLayer(heatmap[object.id]);
+            delete heatmap[object.id];
+        }
 
         if(object.id.includes("surge")){
             del_surge_legend();
@@ -553,7 +555,7 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type){
 
         //get correct
         if(sim_type.includes("surge")){
-            heatmap[sim_type] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
+            //heatmap[sim_type] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
             add_surge_legend(mymap);
         }else if(sim_type.includes("wind")){
             heatmap[sim_type] = create_wind_heatmap(addressPoints.wind).addTo(mymap);

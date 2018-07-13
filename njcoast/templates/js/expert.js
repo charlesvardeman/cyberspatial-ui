@@ -338,16 +338,18 @@ function load_heatmap(object) {
         if (object.checked && !(object.name in heatmap)) {
             //load it
             if (object.name == "surge") {
-                load_expert_data_to_server(data.surge_file, object.name);
+                //load_expert_data_to_server(data.surge_file, object.name);
                 load_expert_data_to_server( "surge_line.json", "srg_line");
             } else if (object.name == "wind") {
                 load_expert_data_to_server(data.wind_file, object.name);
             } else {
                 load_expert_data_to_server(data.runup_file, object.name);
             }
-        } else if (!object.checked && (object.name in heatmap)) {
-            mymap.removeLayer(heatmap[object.name]);
-            delete heatmap[object.name];
+        } else if (!object.checked) {
+            if( object.name in heatmap ) {
+                mymap.removeLayer(heatmap[object.name]);
+                delete heatmap[object.name];
+            }
 
             if (object.name == "surge") {
                 mymap.removeLayer(heatmap["srg_line"]);
@@ -376,7 +378,7 @@ function load_expert_data_to_server(file_name, json_tag) {
             addressPoints = data;
 
             if (json_tag == "surge") {
-                heatmap[json_tag] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
+                //heatmap[json_tag] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
                 add_surge_legend(mymap);
             } else if (json_tag == "wind") {
                 heatmap[json_tag] = create_wind_heatmap(addressPoints.wind).addTo(mymap);

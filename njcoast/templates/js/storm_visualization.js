@@ -339,7 +339,7 @@ function updateMapClick(storm_name) {
             mymap.removeLayer(storm_layer_dict[surge_checkbox.attr('id')]);
         }
         if (addressPoints) {
-            storm_layer_dict[surge_checkbox.attr('id')] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
+            //storm_layer_dict[surge_checkbox.attr('id')] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
             add_surge_legend(mymap);
         }
     } else {
