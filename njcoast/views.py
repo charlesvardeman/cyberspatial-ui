@@ -556,25 +556,20 @@ def map_settings(request, map_id):
                 except:
                     settings = {}
 
-                #test if it is already there
-                #if request.POST['sim_id'] not in map_objs[0].settings:
-                if request.POST['sim_id'] not in settings['simulations']:
+                # Early out for simulation already added to map
+                if 'simulations' in settings and request.POST['sim_id'] in settings['simulations']:
+                    logger.info("Attempted to add a simulation that is already part of a map - %s", request.POST['sim_id'])
+                    return JsonResponse({'saved': True})
 
-                    #append new simulation to simulations
-                    settings.setdefault('simulations', []).append(request.POST['sim_id'])
+                #append new simulation to simulations
+                settings.setdefault('simulations', []).append(request.POST['sim_id'])
 
-                    #append to layers?
-                    if request.POST['sim_id']+"_surge" not in settings['layers_selected']:
-                        settings.setdefault('layers_selected', []).append(request.POST['sim_id']+"_surge")
+                #save it
+                map_objs[0].settings = json.dumps(settings)
+                map_objs[0].save()
 
-                    #save it
-                    map_objs[0].settings = json.dumps(settings)
-                    map_objs[0].save()
-
-                    #print for posterity
-                    print "Settings ", map_objs[0].name, request.POST['sim_id'], json.dumps(settings)
-                else:
-                    print request.POST['sim_id'], "already exists!"
+                #print for posterity
+                logger.info("Added simulation[%s] to map[%s] with settings - %s", request.POST['sim_id'], map_objs[0].name, json.dumps(settings))
 
             elif request.POST['action'] == 'remove_simulation': #remove simulation
                 #test if it is already there

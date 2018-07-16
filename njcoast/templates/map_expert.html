@@ -187,12 +187,7 @@ js functions:
             </div>
             <div class="map-control-item">
                 <p class="tool-heading">describe scenario</p>
-                <p class="slider-label" style="margin-top:0">Time to Landfall</p>
-                <div class="shp-controls">
-                    <input class="range-input" data-target="ttl" min="0" max="96" step="1" value="48" type="range" oninput="updateInput(this)" onchange="updateInput(this)">
-                    <input id="input_ttl" class="num-input job-input" name="ttl" value="48" type="text" onchange="updateInput(this)"> hr
-                </div>
-                <p class="slider-label">Sea Level Rise</p>
+                <p class="slider-label" style="margin-top:0">Sea Level Rise</p>
                 <div class="shp-controls">
                     <input class="range-input" data-target="rm" min="0" max="4.5" step="1.5" value="0" type="range" oninput="updateInput(this)" onchange="updateInput(this)">
                     <input id="input_slr" class="num-input job-input" name="slr" value="0" type="text" onchange="updateInput(this)"> ft
@@ -205,16 +200,21 @@ js functions:
                 </ul>
                 <p class="slider-label">Tides</p>
                 <ul class="shp-tool-radios one-line">
-                    <li><input type="radio" name="tide" value="high"> High</li>
-                    <li><input type="radio" name="tide" value="current" checked> Zero</li>
-                    <li><input type="radio" name="tide" value="low"> Low</li>
+                    <li><input type="radio" name="tide" value="1">High</li>
+                    <li><input type="radio" name="tide" value="0.5" checked>Typical</li>
+                    <li><input type="radio" name="tide" value="0">None</li>
                 </ul>
                 <p class="slider-label">Analysis Type</p>
                 <ul class="shp-tool-radios">
                     <li><input type="radio" name="analysis" value="deterministic" checked> Deterministic</li>
-                    <li><input type="radio" name="analysis" value="probabilistic expected" disabled> Probabilistic&nbsp;<span class="qualifier">expected</span></li>
-                    <li><input type="radio" name="analysis" value="probabilistic extreme" disabled> Probabilistic&nbsp;<span class="qualifier">extreme</span></li>
+                    <li><input type="radio" name="analysis" value="probabilistic expected"> Probabilistic&nbsp;<span class="qualifier">expected</span></li>
+                    <li><input type="radio" name="analysis" value="probabilistic extreme"> Probabilistic&nbsp;<span class="qualifier">extreme</span></li>
                 </ul>
+                <p id="landfall-label" class="slider-label" style="display:none">Time to Landfall</p>
+                <div id="landfall-control" class="shp-controls" style="display:none">
+                    <input class="range-input" data-target="ttl" min="0" max="96" step="1" value="48" type="range" oninput="updateInput(this)" onchange="updateInput(this)">
+                    <input id="input_ttl" class="num-input job-input" name="ttl" value="48" type="text" onchange="updateInput(this)"> hr
+                </div>
             </div>
             <div class="map-control-item">
 
@@ -310,6 +310,16 @@ $(document).ready(function() {
         title: "Feature not available at this time",
         placement: "top",
         width: '300px'
+    });
+
+    $('input[name=analysis]').change( function() {
+        if( $(this).val() == "deterministic" ){
+            $("#landfall-label").css("display", "none");
+            $("#landfall-control").css("display", "none");
+        }else{
+            $("#landfall-label").css("display", "");
+            $("#landfall-control").css("display", "");
+        }
     });
 
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {

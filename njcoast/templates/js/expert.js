@@ -184,7 +184,7 @@ function start_expert_simulation() {
     sim_id = Math.random().toString(36).substr(2, 9);
 
     //get tide
-    var tide = document.querySelector('input[name="tide"]:checked').value;
+    var tide = document.querySelector('input[name="tide"]:checked');
 
     //get protection
     var protection = document.querySelector('input[name="protection"]:checked').value;
@@ -214,8 +214,8 @@ function start_expert_simulation() {
         "lat_track": [lat_past_point, latitude],
         "long_track": [long_past_point, longitude],
         "SLR": input_slr,
-        "tide": 0,
-        "tide_td": tide,
+        "tide": parseFloat(tide.value),
+        "tide_td": tide.parentNode.innerText,
         "protection": protection,
         "analysis": analysis,
         "storm_type": storm_type,
@@ -338,16 +338,18 @@ function load_heatmap(object) {
         if (object.checked && !(object.name in heatmap)) {
             //load it
             if (object.name == "surge") {
-                load_expert_data_to_server(data.surge_file, object.name);
+                //load_expert_data_to_server(data.surge_file, object.name);
                 load_expert_data_to_server( "surge_line.json", "srg_line");
             } else if (object.name == "wind") {
                 load_expert_data_to_server(data.wind_file, object.name);
             } else {
                 load_expert_data_to_server(data.runup_file, object.name);
             }
-        } else if (!object.checked && (object.name in heatmap)) {
-            mymap.removeLayer(heatmap[object.name]);
-            delete heatmap[object.name];
+        } else if (!object.checked) {
+            if( object.name in heatmap ) {
+                mymap.removeLayer(heatmap[object.name]);
+                delete heatmap[object.name];
+            }
 
             if (object.name == "surge") {
                 mymap.removeLayer(heatmap["srg_line"]);
@@ -376,7 +378,7 @@ function load_expert_data_to_server(file_name, json_tag) {
             addressPoints = data;
 
             if (json_tag == "surge") {
-                heatmap[json_tag] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
+                //heatmap[json_tag] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
                 add_surge_legend(mymap);
             } else if (json_tag == "wind") {
                 heatmap[json_tag] = create_wind_heatmap(addressPoints.wind).addTo(mymap);
