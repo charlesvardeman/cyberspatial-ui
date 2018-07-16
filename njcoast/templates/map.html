@@ -5,6 +5,24 @@
 
 {% block body_class %}home{% endblock %}
 
+{% comment %}
+Purpose:            HTML file for map template, uses leaflet maps for GIS display.
+Authors:            Beth Caldwell, Caleb Reinking, Chris Sweet
+Org:                CRC at Notre Dame
+Date:               04/01/2018
+
+Associated files:   map.js                          main js for map page,
+                    annotate_maps.js                js for implementing annotations on leflet and communications with other clients,
+                    storm_visualization_menu.html   html to add storm visualization to map
+                    storm_visualization.js          js file for storm_visualization_menu.html
+
+Description:        Provides <div> to hold leaflet map, has LHS menu to allow the
+                    user to display layers, live storm information and simulation
+                    data. Also allows the user to annotate the map by placing markers,
+                    lines and polygons and lebel them. The annotations can be shared with
+                    others via map sharing, and updates can be seen in "real time".
+{% endcomment %}
+
 {% block extra_head %}
     <!-- Load Leaflet from CDN -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
@@ -190,6 +208,29 @@
             {% endif %}
         </div>
 
+        <!-- Modal - Rename map -->
+        <div class="modal fade" id="createMap-1" tabindex="-1" role="dialog" aria-labelledby="createMap">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="saveChanges">Enter Map Name and Description</h4>
+                    </div>
+                    <div id="editable_user_modal" class="modal-body">
+                        Please enter a name and description for your new map:</br>
+                        <b>Map name</b></br>
+                        <input type="text" class="form-control" id="map_name_modal" value="{{ user.username }}'s Map #{{ next_map_for_user }}" ></br>
+                        <b>Map description</b></br>
+                        <input type="text" class="form-control" id="map_description_modal" value="NJ Coast auto-generated map for {{ user.username }}" ></br>
+                    </div>
+                    <div class="modal-footer">
+                        <a id="create_map_button" onclick="update_map();" class="btn btn-primary" href="#">Update map</a>
+                        <!--<a onclick="$('#createMap-1').modal('hide');" class="btn btn-default" href="#">Cancel</a>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -240,7 +281,46 @@
 <script src="{% static 'js/template_js/annotate_maps.js' %}"></script>
 
 <script type=text/javascript>
+//get Django environment vars
+var map_rename = {{ map_rename|yesno:"true,false" }};
+var map_id = {{ map_id }};
+
+//create a new map and launch it
+function update_map(){
+    console.log("saving");
+    $.ajax({
+        type: "POST",
+        url: "/maps/new/",
+        data: {
+            'id': map_id,
+            'name': document.getElementById("map_name_modal").value,
+            'description': document.getElementById("map_description_modal").value
+        },
+        dataType: "json",
+        success: function(result) {
+            console.log("UPDATE MAP -- SUCCESS!" + result.updated);
+            if(result.updated){
+            }else{
+                $.notify("Map update error!", "error");
+            }
+            $("#createMap-1").modal("hide");
+        },
+        error: function(result) {
+            console.log("UPDATE MAP ERROR:", result)
+            //fade out modal
+            $("#createMap-1").modal("hide");
+            $.notify("Map could not be updated!", "error");
+        }
+    });
+}
+
+//run once loaded
 $(document).ready(function() {
+    //throw up the modal if no name
+    if(map_rename){
+        $('#createMap-1').modal('show');
+    }
+
     $('.beta-feature-not-available').tooltip({
         title: "Feature not available at this time",
         placement: "top",

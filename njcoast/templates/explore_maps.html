@@ -5,6 +5,19 @@
 
 {% block body_class %}home{% endblock %}
 
+{% comment %}
+Purpose:            HTML file for map explorer.
+Authors:            Chris Sweet
+Org:                CRC at Notre Dame
+Date:               04/01/2018
+
+Associated files:   explore_maps.js         main js for map explorer page,
+
+Description:        Allows the user to explore the maps that user has created, includes thumnails generated from map canvas.
+                    Contains some js that require data from Django.
+
+{% endcomment %}
+
 {% block extra_head %}
     <!-- load mods to leaflet for rectangular popups/map icons -->
     <link rel="stylesheet" type="text/css" href="{% static "css/crc_leaflet.css" %}" media="screen" />

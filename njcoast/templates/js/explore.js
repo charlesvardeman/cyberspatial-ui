@@ -1,7 +1,30 @@
-//date range for Search
-var start_date = "";//"04/11/2018 18:30";
-var end_date = "";//"04/15/2018 9:30";
-var text_search = ""; //"sim stuff";
+/*
+ * Purpose:            js file for explore_simulations.html.
+ * @author             Chris Sweet
+ * Org:                CRC at Notre Dame
+ * Date:               04/01/2018
+ *
+ * Associated files:   explore_simulations.html    Explore simulations page,
+ *
+ * @description        Provides functionality to view, filter and order simulations that have been run.
+ *
+ * Functions:
+ *  $("#pageBackwards").on("click"  Paging for list.
+ *  $("#pageForward").on("click"    Paging for list.
+ *  $(document).ready               Setup date picker and initial ordering.
+ *  add_expert_to_map               Add current sim to map.
+ *  reload_simulation_data          reload the sim data from database.
+ *  clear_text_search               Clear search criteria.
+ *  call_text_search                Reload using search criteria.
+ *  get_dates                       Get user date input.
+ *  load_simulation_data            Load ordered sim data.
+ *  user_filter                     Handle button clicked on panel.
+ */
+
+//initialize date for Search
+var start_date = "";
+var end_date = "";
+var text_search = "";
 
 //total sims
 var counter = 1;
@@ -9,6 +32,7 @@ var page = 1;
 
 var shownItems = 0;
 
+//paging for view
 $("#pageBackwards").on("click", function () {
     var items = $("#dashboard-list li");
     //var shownItems = items.filter(":visible").length;
@@ -30,6 +54,7 @@ $("#pageBackwards").on("click", function () {
     document.getElementById('page').innerHTML = page;
 });
 
+//paging for view
 $("#pageForward").on("click", function () {
     var items = $("#dashboard-list li");
     //var shownItems = items.filter(":visible").length;
@@ -41,11 +66,14 @@ $("#pageForward").on("click", function () {
     //add new ones
     var oldshownItems = shownItems;
 
-    if ((shownItems + 8) > counter) {
-        shownItems = counter - counter % 4;
-    } else {
+    if((shownItems + 4) < counter){
         shownItems += 4;
     }
+    // if ((shownItems + 8) > counter) {
+    //     shownItems = counter - counter % 4;
+    // } else {
+    //     shownItems += 4;
+    // }
 
     if (oldshownItems != shownItems) {
         page++;

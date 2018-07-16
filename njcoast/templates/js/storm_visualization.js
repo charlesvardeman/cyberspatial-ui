@@ -1,6 +1,31 @@
-var storm_layer_dict = {}; // dictionary of layers added through active storm layer checkboxes
-var update_map_layers = {}; // Dictionary of layers added through the explore scenarios box
+/*
+ * Purpose:            js file for storm visualization menu.
+ * Authors:            Beth Caldwell, Caleb Reinking
+ * Org:                CRC at Notre Dame
+ * Date:               04/01/2018
+ *
+ * Associated files:   storm_visualization_menu.html    storm visualization menu for main map page,
+ *
+ * Description:        Provides functionality to create storm visualization menus on the main map page.
+ *
+ * Functions:
+ *      $(document).ready   run once page loaded
+ *      get_rss_feed        loads current storm data from RSS Feed
+ *      add_active_storm_to_menu    Adds active storm to menu
+ *      unfollowClick       Remove storm from menu
+ *      followClick         Follow storm
+ *      storm_vis_check     Updates when checkbox checked
+ *      check_scenario_map_layers   Updates when scenario is checked
+ *      updateMapClick      Updates when clicking actively followed storm
+ */
 
+// dictionary of layers added through active storm layer checkboxes
+var storm_layer_dict = {};
+
+// Dictionary of layers added through the explore scenarios box
+var update_map_layers = {};
+
+//run once loaded
 $(document).ready(function () {
     get_rss_feed();
 });
@@ -67,13 +92,6 @@ function add_active_storm_to_menu(active_storms) {
             "<div class=\"well plain orange scenarios\">\n" +
             "                  <h5>Explore Scenarios</h5>\n" +
             "                  <ul class=\"map-layers\">\n" +
-            "                    <li class=\"explore-scenario-controls\">\n" +
-            "                      <p>Sea Level Rise</p>\n" +
-            "                      <div class=\"shp-controls\">\n" +
-            "                        <input id=\"" + camelcaseName + "_slr_slider\" class=\"range-input sealevel " + camelcaseName + "_slr_range\" data-target=\"slr\" min=\"0\" max=\"4.5\" step=\"1.5\" value=\"0\" type=\"range\">\n" +
-            "                        <input id=\"" + camelcaseName + "_input_slr\" class=\"sealevel num-input job-input " + camelcaseName + "_slr_input\" name=\"slr\" value=\"0\" type=\"text\"> ft\n" +
-            "                      </div>\n" +
-            "                    </li>\n" +
             "                    <li class=\"explore-scenario-controls controls-" + camelcaseName + "\">\n" +
             "                      <p>Coastal Protection (e.g. dunes)</p>\n" +
             "                      <ul class=\"beta-feature-not-available one-line " + camelcaseName + "_dunes_radios\">\n" +
@@ -269,7 +287,7 @@ function updateMapClick(storm_name) {
 
     var sea_level = $("input[id='" + storm_name + "_input_slr']").val() * 0.3048;
     sea_level = (Math.round(sea_level * 2) / 2).toFixed(1)
-    
+
     var coastal_protection = $("input[name='" + storm_name + "_dunes']:checked").val();
     var tides = $("input[name='" + storm_name + "_tides']:checked").val();
     var analysis_type = $("input[name='" + storm_name + "_analysis']:checked").val();
@@ -314,7 +332,7 @@ function updateMapClick(storm_name) {
             mymap.removeLayer(storm_layer_dict[surge_checkbox.attr('id')]);
         }
         if (addressPoints) {
-            storm_layer_dict[surge_checkbox.attr('id')] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
+            //storm_layer_dict[surge_checkbox.attr('id')] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
             add_surge_legend(mymap);
         }
     } else {

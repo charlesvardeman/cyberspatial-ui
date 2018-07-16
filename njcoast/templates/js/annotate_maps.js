@@ -1,9 +1,30 @@
-/**
- * @author Chris Sweet/Caleb Reinking <csweet1@nd.edu>
- *
- * @description Utilizes Leatlet Edit tools and DJango Chennels to implement map annotations and sharing.
- *
- */
+ /**
+  * Purpose:            js file for map annotations, works with leaflet.
+  * @author             Chris Sweet/Caleb Reinking <csweet1@nd.edu>
+  * Org:                CRC at Notre Dame
+  * Date:               04/01/2018
+  *
+  * Associated files:   map.html    main html for map page,
+  *
+  * @description        Utilizes Leatlet Edit tools and DJango Chennels to implement map annotations and sharing.
+  *
+  * Functions:
+  *     deleteObject        Delete annotation elmnt from map
+  *     startEdit           Edit the content of an annotation elmnt
+  *     canceledEdit        Annotation elmnt edit cancel
+  *     finishedEdit        Annotation elmnt edit complete
+  *     reset_annotation_available  Flip status of annotation
+  *     open_popup          Open pop-up associated with annotation elmnt
+  *     annotation_update   Update annotation elmnt
+  *     toggle_annotation_layer Toggle annotation layer on/off
+  *     toggle_annotate     Toggle annotate buttons on map
+  *     save_annotation_element     Save an annotation elmnt
+  *     save_annotation_elements    Save all annotation elmnts
+  *     send_annotation_to_server   Store annotation elmnt
+  *     load_annotation_elements    Load all annotation elements for this map
+  *     get_annotations_from_server Load annotations via AJAX
+  *     clear_annotations   Clear all annotation elmnts
+  */
 
 //create socket variable for comms
 var socket;
@@ -169,6 +190,7 @@ function deleteObject(popup_marker) {
     console.log("Delete " + popup_marker.myCustomID);
 }
 
+//start editing popup box
 function startEdit() {
     //fix edit box size
     var element = document.getElementById("txt");
@@ -193,6 +215,7 @@ function startEdit() {
     current_popup._updateLayout();
 }
 
+//cancel editing of popup box
 function canceledEdit(){
     //flip texts back
     document.getElementById("txtB").style.display = "none";
@@ -207,6 +230,7 @@ function canceledEdit(){
     document.getElementById("trash_text").classList.remove("disabled");
 }
 
+//finish editing of popup box
 function finishedEdit() {
     document.getElementById("txtB").style.display = "none";
     document.getElementById("txt").style.display = "block";

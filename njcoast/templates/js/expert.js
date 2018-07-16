@@ -1,18 +1,37 @@
-/**
- * @author Chris Sweet <csweet1@nd.edu>
- *
- * @description Runs simulations on James' backend with expert choice of input parameters.
- *
- */
-
  /*
-Base Map -- Centered on Keansburg, NJ
-WMS Tile Layers
-Data: Watershed Boundary Dataset - National Hydrography Overlay Map Service
-      https://catalog.data.gov/dataset/usgs-national-watershed-boundary-dataset-wbd-
-      downloadable-data-collection-national-geospatial-/resource/f55f881d-9de8-471f-9b6b-22cd7a98025d
-XML: https://services.nationalmap.gov/arcgis/services/nhd/MapServer/WMSServer?request=GetCapabilities&service=WMS
- */
+  * Purpose:            js file for map template, uses leaflet maps for GIS display.
+  * @author             James Sweet, Caleb Reinking, Chris Sweet
+  * Org:                CRC at Notre Dame
+  * Date:               04/01/2018
+  *
+  * Associated files:   map_expert.html    map expert/simulation html page,
+  *
+  * @description        Runs simulations on James' backend with expert choice of input parameters.
+  *
+  * Functions:
+  *     start_expert_simulation     Start an expert simulation based on selected parameters.
+  *     send_expert_data_to_server  Store calculated model data
+  *     get_expert_data_to_server   Get status of simulation from back end server.
+  *     load_heatmap                Load or unload a heatmap from the view.
+  *     load_expert_data_to_server  Get heatmap from S3 bucket.
+  *     updateInput                 Links slider/text box values
+  *     update_storm_track          Update arrow widget for storm landfall/direction
+  *     update_widget               Update arrow widget for user input
+  *     create_storm_track          Create storm track icons
+  *     save_simulation             Save the simulation once complete.
+  *     save_simulation_ajax        AJAX for above function.
+  *     latLngChange                Check bounds of lat long input
+  *     get_layers_from_server      AJAX call for layers from server
+  *     process_layers              Function to pull the layer groups out and call the appropriate
+  *                                 function for layer group or layer to be added to the menu.
+  *     add_layer_group_to_menu     Add layer group to the menu.
+  *     add_layer_to_menu           Add the actual layer to the menu.
+  *     tab_flip_tools              Flip tabs for storm data input.
+  *     add_expert_to_map           Add simulation to the map.
+  *     updateCatagory              Update the storm catagory data in all tabs.
+  */
+
+//dictionarys for layers and groups
 var layer_list = [];
 var layer_groups = [];
 
@@ -85,6 +104,7 @@ L.Control.zoomHome = L.Control.extend({
         }
     }
 });
+
 // add the new control to the map
 var zoomHome = new L.Control.zoomHome();
 zoomHome.addTo(mymap);
@@ -92,6 +112,7 @@ zoomHome.addTo(mymap);
 // Setup Scale View
 var scale_options = { metric: false, imperial: false, maxWidth: 200 };
 
+//setup units by locality
 var language = window.navigator.userLanguage || window.navigator.language;
 if (language == "en-US") {
     scale_options.imperial = true;
@@ -163,7 +184,7 @@ function start_expert_simulation() {
     sim_id = Math.random().toString(36).substr(2, 9);
 
     //get tide
-    var tide = document.querySelector('input[name="tide"]:checked').value;
+    var tide = document.querySelector('input[name="tide"]:checked');
 
     //get protection
     var protection = document.querySelector('input[name="protection"]:checked').value;
@@ -193,8 +214,8 @@ function start_expert_simulation() {
         "lat_track": [lat_past_point, latitude],
         "long_track": [long_past_point, longitude],
         "SLR": input_slr,
-        "tide": 0,
-        "tide_td": tide,
+        "tide": parseFloat(tide.value),
+        "tide_td": tide.parentNode.innerText,
         "protection": protection,
         "analysis": analysis,
         "storm_type": storm_type,
@@ -317,16 +338,18 @@ function load_heatmap(object) {
         if (object.checked && !(object.name in heatmap)) {
             //load it
             if (object.name == "surge") {
-                load_expert_data_to_server(data.surge_file, object.name);
+                //load_expert_data_to_server(data.surge_file, object.name);
                 load_expert_data_to_server( "surge_line.json", "srg_line");
             } else if (object.name == "wind") {
                 load_expert_data_to_server(data.wind_file, object.name);
             } else {
                 load_expert_data_to_server(data.runup_file, object.name);
             }
-        } else if (!object.checked && (object.name in heatmap)) {
-            mymap.removeLayer(heatmap[object.name]);
-            delete heatmap[object.name];
+        } else if (!object.checked) {
+            if( object.name in heatmap ) {
+                mymap.removeLayer(heatmap[object.name]);
+                delete heatmap[object.name];
+            }
 
             if (object.name == "surge") {
                 mymap.removeLayer(heatmap["srg_line"]);
@@ -355,7 +378,7 @@ function load_expert_data_to_server(file_name, json_tag) {
             addressPoints = data;
 
             if (json_tag == "surge") {
-                heatmap[json_tag] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
+                //heatmap[json_tag] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
                 add_surge_legend(mymap);
             } else if (json_tag == "wind") {
                 heatmap[json_tag] = create_wind_heatmap(addressPoints.wind).addTo(mymap);

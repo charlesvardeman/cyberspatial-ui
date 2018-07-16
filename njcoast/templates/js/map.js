@@ -1,33 +1,62 @@
+/*
+ * Purpose:            js file for map template, uses leaflet maps for GIS display.
+ * Authors:            Beth Caldwell, Caleb Reinking, Chris Sweet
+ * Org:                CRC at Notre Dame
+ * Date:               04/01/2018
+ *
+ * Associated files:   map.html    main html for map page,
+ *
+ * Description:        Provides functionality to load leaflet map, display layers,
+ *                     live storm information and simulation data.
+ *
+ * Functions:
+ *  $(document).ready       Adds Open Street View tiles to map and loads layers and their state.
+ *  get_layers_from_server  Loads layers via AJAX call to views.py
+ *  process_layers          pull the layer groups out and call the appropriate function
+ *                          for layer group or layer to be added to the menu.
+ *  add_layer_group_to_menu Add layers to LHS menu under collapsable headings.
+ *  add_layer_to_menu       Actual layer add, called from process_layers.
+ *  load_map                Get current map info. from server (views.py)
+ *  apply_settings          Apply map settings such as active layers, central view coordinates,
+ *                          zoom level etc. Called from load_map.
+ *  load_heatmap_from_s3    Load heatmap from S3 bucket contating simulation results.
+ *  dataURLtoBlob           Creates blob from URL, used in creation of thumbnail from
+ *                          current map view.
+ *  save_map                Save current state of map.
+ *  save_shared_with        Save who we are sharing our map with, called after selection of user.
+ *  load_simulation_data    Loads data for a selected simulation (run up, wind model etc.)
+ *                          Called from load_map.
+ *  remove_simulation       Remove simulation from view.
+ *  map_changed             Auto save map if changed.
+ *  mymap.on('zoomend','dragend'... Functions attached to map to flag map has changed.
+ */
+
 //fix for callable js
+//If annotate_map_id not defined then disable load/save and sharing.
+//Latest code has auto saving so load/save irrelevant
 if( annotate_map_id == null ){
     $("#save_map").addClass("disabled");
     $("#load_map").addClass("disabled");
     $("#share_map").addClass("disabled");
 }
 
-//for heatmap
+//variable for heatmap
 var heatmap = {};
 
-//save simulations
+//dictionary of simulations
 var simulations = [];
 
-//disctionary of selected layers
+//dictionary of selected layers
 var layers_selected = [];
 
 //flag to stop map re-load during initialization
 var initial_load = true;
 
-/*
-Base Map -- Centered on Keansburg, NJ
-WMS Tile Layers
-Data: Watershed Boundary Dataset - National Hydrography Overlay Map Service
-      https://catalog.data.gov/dataset/usgs-national-watershed-boundary-dataset-wbd-
-      downloadable-data-collection-national-geospatial-/resource/f55f881d-9de8-471f-9b6b-22cd7a98025d
-XML: https://services.nationalmap.gov/arcgis/services/nhd/MapServer/WMSServer?request=GetCapabilities&service=WMS
- */
+//dictionarys for layer list and groups
 var layer_list = [];
 var layer_groups = [];
 
+//prevent map from being recognized as touchable, stops lorge annotate symbols
 L.Browser.touch = false;
 
 // Setup Zoom Controls
@@ -99,6 +128,7 @@ L.Control.zoomHome = L.Control.extend({
         }
     }
 });
+
 // add the new control to the map
 var zoomHome = new L.Control.zoomHome();
 zoomHome.addTo(mymap);
@@ -106,6 +136,7 @@ zoomHome.addTo(mymap);
 // Setup Scale View
 var scale_options = { metric: false, imperial: false, maxWidth: 200 };
 
+//select the correct units based on locality
 var language = window.navigator.userLanguage || window.navigator.language;
 if( language == "en-US" ){
     scale_options.imperial = true;
@@ -320,6 +351,7 @@ function add_layer_to_menu(layer, ul_id) {
     });
 }
 
+//used for features not yet implemented
 $(function () {
 $('.beta-feature-not-available').tooltip(
   {
@@ -329,7 +361,7 @@ $('.beta-feature-not-available').tooltip(
   });
 });
 
-//load map
+//load map data via AJAX call
 function load_map(){
 
   $.ajax({
@@ -475,9 +507,11 @@ function load_simulation(user_id, object){
       }
   }
 
-    if(!object.checked && object.id in heatmap){
-        mymap.removeLayer(heatmap[object.id]);
-        delete heatmap[object.id];
+    if(!object.checked){
+        if( object.id in heatmap ) {
+            mymap.removeLayer(heatmap[object.id]);
+            delete heatmap[object.id];
+        }
 
         if(object.id.includes("surge")){
             del_surge_legend();
@@ -507,7 +541,7 @@ function load_simulation(user_id, object){
     }
 }
 
-//get heatmap from S3
+//get heatmap from S3 bucket
 function load_heatmap_from_s3(owner, simulation, filename, sim_type){
   $.ajax({
     type: "GET",
@@ -521,7 +555,7 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type){
 
         //get correct
         if(sim_type.includes("surge")){
-            heatmap[sim_type] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
+            //heatmap[sim_type] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
             add_surge_legend(mymap);
         }else if(sim_type.includes("wind")){
             heatmap[sim_type] = create_wind_heatmap(addressPoints.wind).addTo(mymap);
@@ -555,7 +589,7 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type){
 });
 }
 
-//create blob from thumbnail
+//create blob from thumbnail, used to get snapshot of map for map explorer
 function dataURLtoBlob(dataurl) {
     var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
         bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
@@ -565,7 +599,7 @@ function dataURLtoBlob(dataurl) {
     return new Blob([u8arr], {type:mime});
 }
 
-//save current map
+//save the current map settings/info
 function save_map(notify) {
     //get general map data
     //save map state
@@ -890,16 +924,14 @@ function remove_simulation(name){
 //function to track map changes and save
 function map_changed(){
     save_map(false);
-    //console.log("Map has changed");
 }
 
 //update map changed with zoom
 mymap.on('zoomend', function (event) {
     if(!initial_load) map_changed();
-    //console.log("Map has zoomed");
 });
 
+//if dragging map wait until end before saving
 mymap.on('dragend', function() {
-    //console.log("Map has panned");
     if(!initial_load) map_changed();
 });

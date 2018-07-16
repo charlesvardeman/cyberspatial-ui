@@ -1,3 +1,28 @@
+/*
+ * Purpose:            js file for explore_layers.html.
+ * @author             Chris Sweet
+ * Org:                CRC at Notre Dame
+ * Date:               04/01/2018
+ *
+ * Associated files:   explore_layers.html    Explore layers page,
+ *
+ * @description        Provides functionality to view, filter and order layers that have been uploaded to GeoNode.
+                       Uses GeoNode /api/layers API.
+ *
+ * Functions:
+ *  $("#pageBackwards").on("click"  Paging for list.
+ *  $("#pageForward").on("click"    Paging for list.
+ *  $(document).ready               Setup date picker and load a page of layers with search catagories and keywords.
+ *  load_layers                     Load layers from GeoNode /api/layers API.
+ *  $(function()                    Handle LHS panel for open close search criterion.
+ *  setContentWidth                 Fix max width for LHS search panel.
+ *  reload_layer_data               Reload ordered data from layer db.
+ *  clear_search                    Clear text search.
+ *  do_text_search                  Search based on text.
+ *  do_date_search                  Search based on date.
+ *  add_layer_to_map                Add a layer to a map.
+ */
+
 //variables
 var orderby = '-date';
 var catagory = "";
@@ -313,6 +338,7 @@ function load_layers(append, orderby, pageing){
 
 }
 
+//Handle LHS panel for open close search criterion
 $(function() {
 
     $(".datepicker").datepicker();
@@ -355,7 +381,7 @@ function setContentWidth() {
     $(".tab-content").css('width', w + "px");
 }
 
-//reload ordered data from simulation db
+//reload ordered data from layer db
 function reload_layer_data(object) {
     //set selected
     $(object).parent().siblings().find('.' + "selected").removeClass("selected");
@@ -393,23 +419,6 @@ function clear_search() {
 
 //reload with text search
 function do_text_search() {
-
-    //var date_regex = /^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/(19|20)\d{2}$/;
-
-    /*//test start
-    if (start_date != "" && !(date_regex.test(start_date))) {
-        alert("Error in start date " + start_date);
-    }
-
-    //test start
-    if (end_date != "" && !(date_regex.test(end_date))) {
-        alert("Error in end date " + end_date);
-    }
-
-    //both dates?
-    if ((end_date == "" && start_date != "") || (end_date != "" && start_date == "")) {
-        alert("Please enter a start AND end date!");
-    }*/
 
     //get text
     text_search = document.getElementById('text_search_input').value;
@@ -477,7 +486,7 @@ $("#pageForward").on("click", function (e) {
 
 //add layer to map and go
 function add_layer_to_map(object, id){
-    console.log("Add layer. map id: "+object.name+", layer id: "+id);
+    //console.log("Add layer. map id: "+object.name+", layer id: "+id);
 
     //Do ajax
     $.ajax({
