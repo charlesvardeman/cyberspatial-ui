@@ -399,7 +399,19 @@ function load_expert_data_to_server(file_name, json_tag) {
                     }
                 }).addTo(mymap);
             } else {
-                heatmap[json_tag] = L.geoJSON(addressPoints).addTo(mymap);
+                heatmap[json_tag] = L.geoJSON(addressPoints, {
+                    style: function(feature) {
+                        console.log(feature.properties.type)
+                        if( feature.properties.type.includes("Boundary") ) {
+                            return {color: "darkmagenta"};
+                        }else{
+                            return {color: "magenta"};
+                        }
+                    },
+                    filter: function(feature, layer){
+                        return feature.properties.type != "Transect";
+                    }
+                }).addTo(mymap);
             }
 
             $.notify("Heatmap loaded", "success");
