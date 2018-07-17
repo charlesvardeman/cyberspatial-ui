@@ -190,7 +190,7 @@ function start_expert_simulation() {
     var protection = document.querySelector('input[name="protection"]:checked').value;
 
     //get analysis
-    var analysis = document.querySelector('input[name="analysis"]:checked').value;
+    var analysis = document.querySelector('input[name="analysis"]:checked');
 
     //get storm type
     var storm_type = "Nor'easter";
@@ -207,7 +207,7 @@ function start_expert_simulation() {
     data = {
         "index_SLT": [1, 1],
         "index_W": 1,
-        "index_prob": 0,
+        "index_prob": parseFloat(analysis.value),
         "indicator": 1,
         "param": [latitude, longitude, angle, input_cp, input_vf, input_rm],
         "timeMC": input_ttl,
@@ -217,7 +217,7 @@ function start_expert_simulation() {
         "tide": parseFloat(tide.value),
         "tide_td": tide.parentNode.innerText,
         "protection": protection,
-        "analysis": analysis,
+        "analysis": analysis.parentNode.innerText,
         "storm_type": storm_type,
         "surge_file": "heatmap.json",
         "wind_file": "wind_heatmap.json",
