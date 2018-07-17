@@ -133,8 +133,8 @@ js functions:
                             <td>&deg;</td>
                         </tr>
                     </table>
-                    <p class="slider-label">Storm Track Angle</p>
-                    <div class="shp-controls" style="margin-bottom: 30px">
+                    <p id="anglesliderlabel" class="slider-label" style="display:none">Storm Track Angle</p>
+                    <div id="angleslidercontrol" class="shp-controls" style="margin-bottom: 30px; display:none">
                         <input id="angleslider" class="range-input" data-target="rm" min="-60" max="40" step="5" value="0" type="range" oninput="update_storm_track(this)" onchange="updateInput(this)">
                         <input id="angle" class="num-input job-input" name="rm" value="0" type="text" onchange="update_storm_track(this);"> &deg;
                     </div>

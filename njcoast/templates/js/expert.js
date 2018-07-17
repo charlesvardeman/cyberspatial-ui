@@ -913,6 +913,10 @@ function tab_flip_tools(basic) {
         //switch on div containing basic
         document.getElementById("advanced_tools").style.display = "none";
         document.getElementById("basic_tools").style.display = "block";
+
+        // Hide Angle Slider
+        document.getElementById("anglesliderlabel").style.display = "none";
+        document.getElementById("angleslidercontrol").style.display = "none";
     } else {
         //flip tools header
         document.getElementById("basic").classList.remove("active");
@@ -921,6 +925,10 @@ function tab_flip_tools(basic) {
         //switch on div containing advanced
         document.getElementById("advanced_tools").style.display = "block";
         document.getElementById("basic_tools").style.display = "none";
+
+        // Show Angle Slider
+        document.getElementById("anglesliderlabel").style.display = "";
+        document.getElementById("angleslidercontrol").style.display = "";
     }
 }
 
