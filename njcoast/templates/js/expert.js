@@ -190,7 +190,7 @@ function start_expert_simulation() {
     var protection = document.querySelector('input[name="protection"]:checked').value;
 
     //get analysis
-    var analysis = document.querySelector('input[name="analysis"]:checked').value;
+    var analysis = document.querySelector('input[name="analysis"]:checked');
 
     //get storm type
     var storm_type = "Nor'easter";
@@ -207,7 +207,7 @@ function start_expert_simulation() {
     data = {
         "index_SLT": [1, 1],
         "index_W": 1,
-        "index_prob": 0,
+        "index_prob": parseFloat(analysis.value),
         "indicator": 1,
         "param": [latitude, longitude, angle, input_cp, input_vf, input_rm],
         "timeMC": input_ttl,
@@ -217,7 +217,7 @@ function start_expert_simulation() {
         "tide": parseFloat(tide.value),
         "tide_td": tide.parentNode.innerText,
         "protection": protection,
-        "analysis": analysis,
+        "analysis": analysis.parentNode.innerText,
         "storm_type": storm_type,
         "surge_file": "heatmap.json",
         "wind_file": "wind_heatmap.json",
@@ -399,7 +399,19 @@ function load_expert_data_to_server(file_name, json_tag) {
                     }
                 }).addTo(mymap);
             } else {
-                heatmap[json_tag] = L.geoJSON(addressPoints).addTo(mymap);
+                heatmap[json_tag] = L.geoJSON(addressPoints, {
+                    style: function(feature) {
+                        console.log(feature.properties.type)
+                        if( feature.properties.type.includes("Boundary") ) {
+                            return {color: "darkmagenta"};
+                        }else{
+                            return {color: "magenta"};
+                        }
+                    },
+                    filter: function(feature, layer){
+                        return feature.properties.type != "Transect";
+                    }
+                }).addTo(mymap);
             }
 
             $.notify("Heatmap loaded", "success");
@@ -901,6 +913,10 @@ function tab_flip_tools(basic) {
         //switch on div containing basic
         document.getElementById("advanced_tools").style.display = "none";
         document.getElementById("basic_tools").style.display = "block";
+
+        // Hide Angle Slider
+        document.getElementById("anglesliderlabel").style.display = "none";
+        document.getElementById("angleslidercontrol").style.display = "none";
     } else {
         //flip tools header
         document.getElementById("basic").classList.remove("active");
@@ -909,6 +925,10 @@ function tab_flip_tools(basic) {
         //switch on div containing advanced
         document.getElementById("advanced_tools").style.display = "block";
         document.getElementById("basic_tools").style.display = "none";
+
+        // Show Angle Slider
+        document.getElementById("anglesliderlabel").style.display = "";
+        document.getElementById("angleslidercontrol").style.display = "";
     }
 }
 
