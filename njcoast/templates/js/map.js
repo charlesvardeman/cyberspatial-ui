@@ -576,7 +576,19 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type){
                 }
             }).addTo(mymap);
         }else{
-            heatmap[sim_type] = L.geoJSON(addressPoints).addTo(mymap);
+            heatmap[sim_type] = L.geoJSON(addressPoints, {
+                style: function(feature) {
+                    console.log(feature.properties.type)
+                    if( feature.properties.type.includes("Boundary") ) {
+                        return {color: "darkmagenta"};
+                    }else{
+                        return {color: "magenta"};
+                    }
+                },
+                filter: function(feature, layer){
+                    return feature.properties.type != "Transect";
+                }
+            }).addTo(mymap);
         }
 
         //remove heatmap loaded for production
