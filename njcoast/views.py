@@ -20,6 +20,7 @@
         DCADashboardTemplateView    DCA_dashboard template for dca_dashboard.html.
         user_to_dictionary          Convert user model data to a dictionary to return to webpage.
         user_add_muni               Add new munis for user. Also approve/decline and get users awaiting approval.
+        add_approved_user_to_group_profile  Add user to group profile. Creates group profile (and underlying group) if does not exist.
         user_approval               Add municipality to user or decline etc.
         change_password             User change password from dashboard.html
         municipalities_in_county    Return the munis in county or all (all excludes users current munis)
@@ -48,6 +49,7 @@ from .models import NJCUserMeta
 from django import forms
 from django.db import IntegrityError
 from geonode.people.models import Profile
+from geonode.groups.models import GroupProfile
 from django.utils import timezone
 from django.core.mail import EmailMessage
 from django.contrib.sites.shortcuts import get_current_site
@@ -1335,9 +1337,12 @@ def user_add_muni(request):
             group_name = current_user.njcusermeta.role.group_name + "-" + current_user.njcusermeta.municipality.group_name
 
             #add to groups
-            group, created = Group.objects.get_or_create(name=group_name)
-            if group:
-                group.user_set.add(current_user)
+            #add user to group profile (create if required)
+            add_approved_user_to_group_profile(group_name, current_user.username)
+
+            #group, created = Group.objects.get_or_create(name=group_name)
+            #if group:
+            #    group.user_set.add(current_user)
 
             #get my new group's users for dropdown
             tempList = []
@@ -1379,6 +1384,22 @@ def user_add_muni(request):
 
     #catch all
     return JsonResponse({'updated': False});
+
+'''
+    Add newly approved user to group profile
+'''
+def add_approved_user_to_group_profile(group_name, username):
+    #try and open group, create if it does not exist
+    try:
+        group = GroupProfile.objects.get(title=group_name)
+    except GroupProfile.DoesNotExist:
+        group = GroupProfile.objects.create(title=group_name,slug=group_name,description="Layer tag group profile")
+
+    #add user to group
+    if group:
+        group.join(Profile.objects.get(username=username),role="member")
+
+
 
 '''
   Ajax calls to approve or modify users from DCA and Municipal dashboards.
@@ -1622,23 +1643,24 @@ def user_approval(request):
                     if user.njcusermeta.municipality:
                         #muni based groups
                         group_name = user.njcusermeta.role.group_name + '-' + user.njcusermeta.municipality.group_name
-                        group, created = Group.objects.get_or_create(name=group_name)
-                        if group:
-                            group.user_set.add(user)
-                        #if created:
+
+                        #add user to group profile (create if required)
+                        add_approved_user_to_group_profile(group_name, user.username)
+
                     else:
                         #county based groups
                         if user.njcusermeta.county:
                             group_name = user.njcusermeta.role.group_name + '-' + user.njcusermeta.county.group_name
-                            group, created = Group.objects.get_or_create(name=group_name)
-                            if group:
-                                group.user_set.add(user)
+
+                            #add user to group profile (create if required)
+                            add_approved_user_to_group_profile(group_name, user.username)
+
                         #otherwise region based
                         else:
                             group_name = user.njcusermeta.role.group_name + '-' + user.njcusermeta.region_level.group_name
-                            group, created = Group.objects.get_or_create(name=group_name)
-                            if group:
-                                group.user_set.add(user)
+
+                            #add user to group profile (create if required)
+                            add_approved_user_to_group_profile(group_name, user.username)
 
                 if is_muni:
                     #set muni approved
