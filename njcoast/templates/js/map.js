@@ -564,11 +564,10 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type){
             heatmap[sim_type] = L.geoJSON(addressPoints, {
                 style: function(feature) {
                     switch (feature.properties.height) {
-                        case 0: return {color: "blue"};
+                        case 0: return {color: "black"};
                         case 3: return {color: "yellow"};
                         case 6: return {color: "orange"};
                         case 9: return {color: "red"};
-                        case 12: return {color: "blue"};
                     }
                 },
                 filter: function(feature, layer) {
@@ -580,9 +579,9 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type){
                 style: function(feature) {
                     console.log(feature.properties.type)
                     if( feature.properties.type.includes("Boundary") ) {
-                        return {color: "darkmagenta"};
+                        return {color: "blue"};
                     }else{
-                        return {color: "magenta"};
+                        return {color: "green"};
                     }
                 },
                 filter: function(feature, layer){
