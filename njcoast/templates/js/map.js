@@ -517,6 +517,8 @@ function load_simulation(user_id, object){
             del_surge_legend();
         }else if(object.id.includes("wind")){
             del_wind_legend();
+        }else if(object.id.includes("runup")){
+            del_runup_legend();
         }
 
         //remove from layers
@@ -588,6 +590,7 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type){
                     return feature.properties.type != "Transect";
                 }
             }).addTo(mymap);
+            add_runup_legend(mymap);
         }
 
         //remove heatmap loaded for production
