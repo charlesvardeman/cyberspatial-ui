@@ -103,9 +103,9 @@ function add_active_storm_to_menu(active_storms) {
             "                    <li class=\"explore-scenario-controls controls-" + camelcaseName + "\">\n" +
             "                      <p>Tides</p>\n" +
             "                      <ul class=\"one-line " + camelcaseName + "_tide_radios\">\n" +
-            "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_tides\" value=\"1.0\" class=\"tides\"> High</li>\n" +
-            "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_tides\" value=\"0.5\" class=\"tides\" checked> Typical</li>\n" +
-            "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_tides\" value=\"0.0\" class=\"tides\"> None</li>\n" +
+            "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_tides\" value=\"high\" class=\"tides\"> High</li>\n" +
+            "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_tides\" value=\"zero\" class=\"tides\" checked> Typical</li>\n" +
+            "                        <li><input type=\"radio\" name=\"" + camelcaseName + "_tides\" value=\"low\" class=\"tides\"> None</li>\n" +
             "                      </ul>\n" +
             "                    </li>\n" +
             "                    <li class=\"explore-scenario-controls controls-" + camelcaseName + "\">\n" +
