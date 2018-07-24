@@ -12,6 +12,8 @@ from django.conf.urls.static import static
 urlpatterns = patterns('',
                        url(r'^/?$', TemplateView.as_view(template_name='site_index.html'), name='home'),
                        url(r'^about/$', TemplateView.as_view(template_name='site_about.html'), name='about'),
+                       url(r'^terms/$', TemplateView.as_view(template_name='site_terms.html'), name='terms'),
+                       url(r'^privacy/$', TemplateView.as_view(template_name='site_privacy.html'), name='privacy'),
                        url(r'^resources-faq/$', TemplateView.as_view(template_name='site_resources_faq.html'), name='faq'),
                        url(r'^resources-shp/$', TemplateView.as_view(template_name='site_resources_shp.html'), name='shp'),
                        url(r'^resources-documentation/$', TemplateView.as_view(template_name='site_resources_documentation.html'), name='documentation'),

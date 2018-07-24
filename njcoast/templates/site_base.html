@@ -277,14 +277,14 @@
         {% endif %}
         <div class="col-md-6 text-right">
           <ul class="list-unstyled">
+            <li>Developed for <a href="https://www.state.nj.us/dca/">New Jersey Department of Community Affairs</a></li>
+            <li>Tel: <a href="tel:+16092923000">(609) 292-3000</a> Email: <a href="mailto:njcoast@dca.nj.gov">njcoast@dca.nj.gov</a></li>
             <li>{% trans "Powered by" %} <a href="http://geonode.org">{% trans "GeoNode" %}</a> <em>{% trans "version" %} {{ VERSION }}</em></li>
-            <li><a href="/developer">Developers</a> | <a href="/about">About</a></li>
           </ul>
         </div>
       </div>
   </footer>
   {% endblock footer %}
-
 
     <!-- Modal must stay outside the navbar -->
     {% if not user.is_authenticated %}
