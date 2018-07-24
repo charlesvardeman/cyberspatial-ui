@@ -357,6 +357,8 @@ function load_heatmap(object) {
                 del_surge_legend();
             } else if (object.name == "wind") {
                 del_wind_legend();
+            } else if (object.name == "runup") {
+                del_runup_legend();
             }
         }
     }
@@ -410,6 +412,7 @@ function load_expert_data_to_server(file_name, json_tag) {
                         return feature.properties.type != "Transect";
                     }
                 }).addTo(mymap);
+                add_runup_legend(mymap);
             }
 
             $.notify("Heatmap loaded", "success");

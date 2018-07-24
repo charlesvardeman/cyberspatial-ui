@@ -121,11 +121,11 @@ function create_surge_legend(){
     legend.onAdd = function (map) {
 
         var div = L.DomUtil.create('div', 'info legend'),
-            heights = [1, 3, 6, 9],
+            heights = [0, 3, 6, 9],
             labels = [];
 
         // loop through our density intervals and generate a label with a colored square for each interval
-        div.innerHTML = "Surge (m):<br>";
+        div.innerHTML = "Surge (ft):<br>";
         for (var i = 0; i < heights.length; i++) {
             div.innerHTML += '<i style="background:' + getColor(heights[i] + 1) + '"></i> ' + heights[i];
             if(heights[i + 1]){
@@ -196,5 +196,36 @@ function del_wind_legend(){
     if( legend_count['wind'] == 0 ){
         legend['wind'].remove();
         delete legend['wind'];
+    }
+}
+
+function create_runup_legend(L){
+    var legend = L.control({position: 'bottomleft'});
+    legend.onAdd = function (map) {
+        var div = L.DomUtil.create('div', 'info legend');
+        div.innerHTML = "Runup:<br>";
+        div.innerHTML += '<i style="background:blue"></i>Run Up Limit</br>';
+        div.innerHTML += '<i style="background:green"></i>LiMWA';
+
+        return div;
+    };
+
+    return legend;
+}
+
+function add_runup_legend(mymap){
+    if( legend['runup'] == null ){
+        legend_count['runup'] = 1;
+        legend['runup'] = create_runup_legend(L).addTo(mymap);
+    }else{
+        legend_count['runup'] += 1;
+    }
+}
+
+function del_runup_legend(){
+    legend_count['runup'] -= 1;
+    if( legend_count['runup'] == 0 ){
+        legend['runup'].remove();
+        delete legend['runup'];
     }
 }

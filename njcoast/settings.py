@@ -107,6 +107,7 @@ TEMPLATES[0]['OPTIONS']['context_processors'].append('django.template.context_pr
 # Setup Emails
 DEFAULT_FROM_EMAIL = 'NJCoast@dca.nj.gov'
 SERVER_EMAIL = 'NJCoast@dca.nj.gov'
+THEME_ACCOUNT_CONTACT_EMAIL = 'NJCoast@dca.nj.gov'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'email-smtp.us-east-1.amazonaws.com'
 EMAIL_PORT = 587
