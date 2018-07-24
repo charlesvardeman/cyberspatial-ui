@@ -5,6 +5,39 @@
 
 {% block body %}
 <h2>Sign up</h2>
+<p>
+    Please note that NJcoast is not currently available for the public-at-large. 
+    Users must be affiliated with state, county or municipal governments in the state of New Jersey or work in a legitimate capacity with authorities at any of these levels of government. 
+    In the registration process, you will be asked to specify both their role and their region. 
+</p>
+
+<p>
+    <b>Region</b>: If you do not work with a specific county or municipality, select Region level: Statewide. 
+    If you work with a specific county or municipality, select that county or municipality in the registration process.
+    Doing so will pre-load GIS data from that county or municipality and center your map on that municipality.
+    Please note that only limited municipalities are supported in the system at this time.
+    If you work with more than one municipality, please select one to affiliate with for the purposes of enrollment.
+    This will be considered your primary municipality. 
+    Once approved, you will have the option to add more municipalities to your profile.
+    Note that regardless of the region selected, all users will have access to GIS data available publically from the State of New Jersey and can pan and zoom their map to view the entire state. 
+</p>
+
+<p>
+    <b>Role</b>: You must select a “Role,” which dictates the GIS data that will pre-load into your map view. 
+    These GIS data were selected based on their relevance to each role. 
+    The following roles are available in NJcoast:
+    <ul>
+        <li><b>Planner</b>: This role is best for those in planning, engineering, public works or other forms of service delivery and has the most comprehensive GIS data.</li>
+        <li><b>Emergency Manager</b>: This role is best for those who support critical decision making in response to landfalling storms and has a subset of the Planner role’s GIS data.</li>
+    <li><b>First Responder</b>: This role is best for those who are on the ground during routine calls or evacuation, rescue and response functions.This role has a subset of the Emergency Manager role’s GIS data.</li>
+    </ul>
+</p>
+
+<p>
+    All users must be approved by the New Jersey Department of Community Affairs and the affiliated municipality (if applicable). 
+    Please provide a clear justification explaining your relationship with state, county or municipal government to assist in the approval process.
+</p>
+
 <p style="color: red">{{ error_data }}</p>
 <form id="user_form" method="post">
  {% csrf_token %}
@@ -23,6 +56,7 @@
 
 </form>
 
+<p>By Clicking Sign Up, you agree to NJcoast’s Terms of Use and Privacy Policy.</p>
 <button class="btn btn-primary" onclick="form_submitted()">Sign up</button>
 {% endblock %}
 
