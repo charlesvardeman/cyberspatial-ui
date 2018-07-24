@@ -172,7 +172,6 @@ function start_expert_simulation() {
 
     //load SLR
     var input_slr = parseFloat(document.getElementById("input_slr").value) * 0.3048;
-    input_slr = (Math.round(input_slr * 2) / 2).toFixed(1)
 
     console.log("start sim with lat " + latitude.toString() + "long " + longitude.toString());
 
