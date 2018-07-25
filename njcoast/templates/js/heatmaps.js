@@ -150,9 +150,10 @@ function add_surge_legend(mymap){
 
 function del_surge_legend(mymap){
     legend_count['surge'] -= 1;
-    if( legend_count['surge'] == 0 ){
+    if( legend_count['surge'] <= 0 ){
         legend['surge'].remove();
         delete legend['surge'];
+        legend_count['surge'] = 0;
     }
 }
 
@@ -193,9 +194,10 @@ function add_wind_legend(mymap){
 
 function del_wind_legend(){
     legend_count['wind'] -= 1;
-    if( legend_count['wind'] == 0 ){
+    if( legend_count['wind'] <= 0 ){
         legend['wind'].remove();
         delete legend['wind'];
+        legend_count['wind'] = 0;
     }
 }
 
@@ -224,8 +226,9 @@ function add_runup_legend(mymap){
 
 function del_runup_legend(){
     legend_count['runup'] -= 1;
-    if( legend_count['runup'] == 0 ){
+    if( legend_count['runup'] <= 0 ){
         legend['runup'].remove();
         delete legend['runup'];
+        legend_count['runup'] = 0;
     }
 }

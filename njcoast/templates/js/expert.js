@@ -304,7 +304,7 @@ function get_expert_data_to_server() {
                 //load data via Ajax
                 //surge
                 if (document.getElementById("surge_checkbox").checked) {
-                    load_expert_data_to_server(data.surge_file, "surge");
+                    //load_expert_data_to_server(data.surge_file, "surge");
                     load_expert_data_to_server( "surge_line.json", "srg_line");
                 }
 
@@ -398,6 +398,7 @@ function load_expert_data_to_server(file_name, json_tag) {
                         return feature.properties.height <= 9;
                     }
                 }).addTo(mymap);
+                add_surge_legend(mymap);
             } else {
                 heatmap[json_tag] = L.geoJSON(addressPoints, {
                     style: function(feature) {
