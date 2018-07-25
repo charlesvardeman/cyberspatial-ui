@@ -250,6 +250,13 @@
   <footer>
     <div class="container">
       <div class="row">
+        <div class="col-md-2">
+            <ul class="list-unstyled">
+              <li>Policy</li>
+              <li><a href="/privacy/">Privacy</a></li>
+              <li><a href="/terms/">Terms and Conditions</a></li>
+            </ul>
+          </div>
         {% if user.is_authenticated %}
         <div class="col-md-2">
           <ul class="list-unstyled">
@@ -264,7 +271,7 @@
             <li><a href="/maps/">Explore Maps</a></li>
           </ul>
         </div>
-        <div class="col-md-2">
+        <div class="col-md-1">
           <ul class="list-unstyled">
             <li>About</li>
             <li><a href="/people/">People</a></li>
@@ -272,10 +279,10 @@
           </ul>
         </div>
         {% else %}
-        <div class="col-md-6">
+        <div class="col-md-5">
         </div>
         {% endif %}
-        <div class="col-md-6 text-right">
+        <div class="col-md-5 text-right">
           <ul class="list-unstyled">
             <li>Developed for <a href="https://www.state.nj.us/dca/">New Jersey Department of Community Affairs</a></li>
             <li>Tel: <a href="tel:+16092923000">(609) 292-3000</a> Email: <a href="mailto:njcoast@dca.nj.gov">njcoast@dca.nj.gov</a></li>
