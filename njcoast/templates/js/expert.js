@@ -212,7 +212,7 @@ function start_expert_simulation() {
         "timeMC": input_ttl,
         "lat_track": [lat_past_point, latitude],
         "long_track": [long_past_point, longitude],
-        "SLR": input_slr,
+        "SLR": parseFloat(input_slr),
         "tide": parseFloat(tide.value),
         "tide_td": tide.parentNode.innerText,
         "protection": protection,
