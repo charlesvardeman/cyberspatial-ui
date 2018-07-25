@@ -66,8 +66,8 @@
          </div>
        <div class="col-sm-9">
          <h3>Get Started</h3>
-           <p>Currently, NJcoast is only available to registered users with official roles at the state, county or municipal level.  Users must <a href="/account/signup/">request a user account</a> and be approved by NJcoast administrators. Once approved, registered users can access the system using their username and password through any standard web browser on a computer, smartphone or tablet.</p>
-           <p style="margin-top: 30px"><a class="btn btn-primary btn-lg" href="/account/signup/" role="button">Request a user account &raquo;</a></p>
+           <p>Currently, NJcoast is only available to registered users with official roles at the state, county or municipal level.  Users must <a href="{% url 'signup' %}">request a user account</a> and be approved by NJcoast administrators. Once approved, registered users can access the system using their username and password through any standard web browser on a computer, smartphone or tablet.</p>
+           <p style="margin-top: 30px"><a class="btn btn-primary btn-lg" href="{% url 'signup' %}" role="button">Request a user account &raquo;</a></p>
         </div>
       </div>
     </div><!-- close container -->
