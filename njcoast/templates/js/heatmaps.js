@@ -114,7 +114,7 @@ var legend_count = {}
 
 function create_surge_legend(){
     function getColor(d) {
-        return d > 9 ? 'red' : d > 6  ? 'orange' : d > 3  ? 'yellow' :  'blue';
+        return d > 9 ? 'red' : d > 6  ? 'orange' : d > 3  ? 'yellow' :  'black';
     }
 
     var legend = L.control({position: 'bottomleft'});
