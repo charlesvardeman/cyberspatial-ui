@@ -88,11 +88,20 @@ def my_gis_layers(request):
     layers_dictionary = {"layers":[]}
     for object in permitted_layers:
         try:
+            parts = object.layer.typename.split(":")
+            
+            if parts[0] is "TandM":
+                link = "https://gis.tandmassociates.com/arcgis/services/Keansburg/Keansburg/MapServer/WMSServer"
+            elif parts[0] is "TMBurkley":
+                link = "https://gis.tandmassociates.com/arcgis/services/Berkeley/Berkeley/MapServer/WMSServer"
+            else:
+                link = object.layer.ows_url
+            
             layers_dictionary["layers"].append({
                 "id": "layer__" + str(object.layer.id),
                 "name": object.layer.title,
                 "group": object.layer.category.gn_description,
-                "layer_link": object.layer.ows_url,
+                "layer_link": link,
                 "layer": object.layer.typename
             })
         except:
