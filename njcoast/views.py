@@ -89,11 +89,14 @@ def my_gis_layers(request):
     for object in permitted_layers:
         try:
             parts = object.layer.typename.split(":")
+            logger.info("Generating T&M Links for - %s", parts[0])
             
             if parts[0] is "TandM":
                 link = "https://gis.tandmassociates.com/arcgis/services/Keansburg/Keansburg/MapServer/WMSServer"
+                logger.info("T&M Keansburg Found")
             elif parts[0] is "TMBurkley":
                 link = "https://gis.tandmassociates.com/arcgis/services/Berkeley/Berkeley/MapServer/WMSServer"
+                logger.info("T&M Burkley Found")
             else:
                 link = object.layer.ows_url
             
