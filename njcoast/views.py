@@ -88,12 +88,27 @@ def my_gis_layers(request):
     layers_dictionary = {"layers":[]}
     for object in permitted_layers:
         try:
+            parts = object.layer.typename.split(":")
+            logger.info("Generating T&M Links for - %s", parts[0])
+            
+            if parts[0] == "TandM":
+                link = "https://gis.tandmassociates.com/arcgis/services/Keansburg/Keansburg/MapServer/WMSServer"
+                layer = parts[1]
+                logger.info("T&M Keansburg Found")
+            elif parts[0] == "TMBurkley":
+                link = "https://gis.tandmassociates.com/arcgis/services/Berkeley/Berkeley/MapServer/WMSServer"
+                layer = parts[1]
+                logger.info("T&M Burkley Found")
+            else:
+                link = object.layer.ows_url
+                layer = object.layer.typename
+            
             layers_dictionary["layers"].append({
                 "id": "layer__" + str(object.layer.id),
                 "name": object.layer.title,
                 "group": object.layer.category.gn_description,
-                "layer_link": object.layer.ows_url,
-                "layer": object.layer.typename
+                "layer_link": link,
+                "layer": layer
             })
         except:
             # simply ignore layers without categories assigned and continue on with the loop
