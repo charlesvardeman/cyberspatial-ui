@@ -868,10 +868,13 @@ def signup(request):
     if request.method == 'POST':
         print "POST signup",request.POST
         form = SignUpForm(request.POST)
-        print "Post form"
         try:
             if form.is_valid():
-                print "Form valid!"
+                # Clean Data
+                from account.models import EmailAddress
+                if EmailAddress.objects.filter(email__iexact=form.cleaned_data["email"]).exists():
+                    return render(request, 'signup.html', {'form': form, 'error_data': 'A user is registered with this email address.'})
+
                 #create user/profile
                 user = form.save(commit=False)
 
@@ -972,14 +975,13 @@ def signup(request):
 
             return render(request, 'signup.html', {'form': form, 'error_data': 'Email exists, please select an alternative!'})
 
-        except:
+        except Exception as e: 
             print "Undefined error!"
+            logger.exception(e)
 
     else:
-        print "GET signup"
         form = SignUpForm()
 
-    print "here!",form
     return render(request, 'signup.html', {'form': form, 'error_data': ''})
 
 
