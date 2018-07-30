@@ -146,6 +146,14 @@ if( language == "en-US" ){
 
 L.control.scale(scale_options).addTo(mymap);
 
+// Add Basemap Pane
+mymap.createPane('raster');
+mymap.getPane('raster').style.zIndex = 650;
+mymap.getPane('raster').style.pointerEvents = 'none';
+
+mymap.createPane('layer');
+mymap.getPane('layer').style.zIndex = 660;
+
 // Setup Feature Info Click Functionality
 L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
       onAdd: function (map) {
@@ -324,7 +332,13 @@ function add_layer_to_menu(layer, ul_id) {
     // Create the HTML <li> for each layer and append to the <ul>
     var layer_html = '<li><input id="' + $.trim(layer.id) + '" type="checkbox"> ' + $.trim(layer.name) + '</li>';
     $(ul_id).append(layer_html);
-    layer.maplayer = L.tileLayer.wms(layer.layer_link, {layers: layer.layer, transparent: true, format: 'image/png'});
+    
+    layer.maplayer = L.tileLayer.wms(layer.layer_link, {
+        layers: layer.layer, 
+        transparent: true, 
+        format: 'image/png', 
+        pane: ul_id == "#imageryBaseMapsEarthCover" ? 'raster' : 'layer'
+    });
     layer_list.push(layer);
 
     $('#' + $.trim(layer.id)).click(function () {
