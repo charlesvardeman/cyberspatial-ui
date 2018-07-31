@@ -147,12 +147,9 @@ if( language == "en-US" ){
 L.control.scale(scale_options).addTo(mymap);
 
 // Add Basemap Pane
-mymap.createPane('raster');
-mymap.getPane('raster').style.zIndex = 650;
-mymap.getPane('raster').style.pointerEvents = 'none';
-
 mymap.createPane('layer');
-mymap.getPane('layer').style.zIndex = 660;
+mymap.getPane('layer').style.zIndex = 300;
+mymap.getPane('layer').style.pointerEvents = 'none';
 
 // Setup Feature Info Click Functionality
 L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
@@ -333,13 +330,22 @@ function add_layer_to_menu(layer, ul_id) {
     var layer_html = '<li><input id="' + $.trim(layer.id) + '" type="checkbox"> ' + $.trim(layer.name) + '</li>';
     $(ul_id).append(layer_html);
     
-    layer.maplayer = L.tileLayer.wms(layer.layer_link, {
-        layers: layer.layer, 
-        transparent: true, 
-        format: 'image/png', 
-        pane: ul_id == "#imageryBaseMapsEarthCover" ? 'raster' : 'layer'
-    });
-    layer_list.push(layer);
+    if( ul_id == "#imageryBaseMapsEarthCover" ) {
+        layer.maplayer = L.tileLayer.wms(layer.layer_link, {
+            layers: layer.layer, 
+            transparent: true, 
+            format: 'image/png'
+        });
+        layer_list.push(layer);
+    }else {
+        layer.maplayer = L.tileLayer.wms(layer.layer_link, {
+            layers: layer.layer, 
+            transparent: true, 
+            format: 'image/png',
+            pane: 'layer'
+        });
+        layer_list.push(layer);
+    }
 
     $('#' + $.trim(layer.id)).click(function () {
         if ($(this).is(':checked')) {
@@ -502,7 +508,9 @@ function load_simulation(user_id, object){
 
   //if clicked, load
   if(object.checked && !(object.id in heatmap)){
-      load_heatmap_from_s3(user_id, object.name, object.value, object.id)
+      if( !object.id.includes("surge") ){
+        load_heatmap_from_s3(user_id, object.name, object.value, object.id);
+      }
 
       //add to layers if not there
       var index = layers_selected.indexOf(object.id);
@@ -571,10 +579,10 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type){
 
         //get correct
         if(sim_type.includes("surge")){
-            //heatmap[sim_type] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
+            //heatmap[sim_type] = create_surge_heatmap(addressPoints.surge,'layer').addTo(mymap);
             add_surge_legend(mymap);
         }else if(sim_type.includes("wind")){
-            heatmap[sim_type] = create_wind_heatmap(addressPoints.wind).addTo(mymap);
+            heatmap[sim_type] = create_wind_heatmap(addressPoints.wind, 'layer').addTo(mymap);
             add_wind_legend(mymap);
         }else if( sim_type.includes("srg")){
             heatmap[sim_type] = L.geoJSON(addressPoints, {
@@ -588,7 +596,8 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type){
                 },
                 filter: function(feature, layer) {
                     return feature.properties.height <= 9;
-                }
+                },
+                pane: 'layer'
             }).addTo(mymap);
         }else{
             heatmap[sim_type] = L.geoJSON(addressPoints, {
@@ -602,7 +611,8 @@ function load_heatmap_from_s3(owner, simulation, filename, sim_type){
                 },
                 filter: function(feature, layer){
                     return feature.properties.type != "Transect";
-                }
+                },
+                pane: 'layer'
             }).addTo(mymap);
             add_runup_legend(mymap);
         }

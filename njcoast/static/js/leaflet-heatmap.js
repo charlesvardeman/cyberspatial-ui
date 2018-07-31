@@ -58,7 +58,7 @@
 
       this._origin = this._map.layerPointToLatLng(new L.Point(0, 0));
 
-      map.getPanes().overlayPane.appendChild(this._el);
+      map.getPane(this.cfg.pane).appendChild(this._el);
 
       if (!this._heatmap) {
         this._heatmap = h337.create(this.cfg);
@@ -77,7 +77,7 @@
 
     onRemove: function (map) {
       // remove layer's DOM elements and listeners
-      map.getPanes().overlayPane.removeChild(this._el);
+      map.getPane(this.cfg.pane).removeChild(this._el);
 
       map.off('moveend', this._reset, this);
     },

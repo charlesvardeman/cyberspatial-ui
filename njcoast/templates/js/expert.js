@@ -379,10 +379,10 @@ function load_expert_data_to_server(file_name, json_tag) {
             addressPoints = data;
 
             if (json_tag == "surge") {
-                //heatmap[json_tag] = create_surge_heatmap(addressPoints.surge).addTo(mymap);
+                //heatmap[json_tag] = create_surge_heatmap(addressPoints.surge, 'overlayPane').addTo(mymap);
                 add_surge_legend(mymap);
             } else if (json_tag == "wind") {
-                heatmap[json_tag] = create_wind_heatmap(addressPoints.wind).addTo(mymap);
+                heatmap[json_tag] = create_wind_heatmap(addressPoints.wind, 'overlayPane').addTo(mymap);
                 add_wind_legend(mymap);
             } else if( json_tag.includes("srg")){
                 heatmap[json_tag] = L.geoJSON(addressPoints, {
