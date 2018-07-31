@@ -11,7 +11,7 @@
  *
  */
 
-function create_surge_heatmap(data){
+function create_surge_heatmap(data, lpane){
     var heatData = {
         max: 10.00,
         data: []
@@ -51,7 +51,8 @@ function create_surge_heatmap(data){
         // which field name in your data represents the longitude - default "lng"
         lngField: 'lng',
         // which field name in your data represents the data value - default "value"
-        valueField: 'value'
+        valueField: 'value',
+        pane: lpane
     };
 
     var hLayer = new HeatmapOverlay(cfg);
@@ -60,7 +61,7 @@ function create_surge_heatmap(data){
     return hLayer;
 }
 
-function create_wind_heatmap(data){
+function create_wind_heatmap(data, lpane){
     var heatData = {
         max: 200.00,
         data: []
@@ -99,7 +100,8 @@ function create_wind_heatmap(data){
         // which field name in your data represents the longitude - default "lng"
         lngField: 'lng',
         // which field name in your data represents the data value - default "value"
-        valueField: 'value'
+        valueField: 'value',
+        pane: lpane
     };
 
     var hLayer = new HeatmapOverlay(cfg);
