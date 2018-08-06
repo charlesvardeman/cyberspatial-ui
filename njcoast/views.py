@@ -925,7 +925,7 @@ def signup(request):
                             subject = 'NJcoast Account Request'
                             message = render_to_string('account_created_email.html', {
                                 'user': user.first_name+" "+user.last_name,
-                                'domain': current_site.domain + "/dca_dashboard/",
+                                'domain': current_site.domain
                                 'municipality': user.njcusermeta.municipality.name,
                             })
 
@@ -1208,7 +1208,7 @@ def user_add_muni(request):
                 subject = 'NJcoast Account Additional Municipality Request'
                 message = render_to_string('additional_muni_email.html', {
                     'user': current_user.first_name+" "+current_user.last_name,
-                    'domain': current_site.domain + "/dca_dashboard/",
+                    'domain': current_site.domain,
                     'municipalities': munis_string,
                 })
 
@@ -1707,7 +1707,7 @@ def user_approval(request):
                             subject = 'New NJcoast Account Request'
                             message = render_to_string('muni_approved_email.html', {
                                 'user': user.first_name+" "+user.last_name,
-                                'domain': current_site.domain + "/dca_dashboard/",
+                                'domain': current_site.domain,
                                 'municipality': muni_name,
                             })
 
