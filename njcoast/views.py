@@ -925,7 +925,7 @@ def signup(request):
                             subject = 'NJcoast Account Request'
                             message = render_to_string('account_created_email.html', {
                                 'user': user.first_name+" "+user.last_name,
-                                'domain': current_site.domain
+                                'domain': current_site.domain,
                                 'municipality': user.njcusermeta.municipality.name,
                             })
 
