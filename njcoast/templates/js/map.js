@@ -837,8 +837,10 @@ function load_simulation_data(sim_id){
               }
 
               var badge = 'n-badge';
+              var badge_text = 'N';
               if(data.storm_type.toLowerCase() == "hurricane"){
                   badge = 'h-badge';
+                  badge_text = 'H';
               }
 
               //files available to enable checkboxes
@@ -868,7 +870,7 @@ function load_simulation_data(sim_id){
               var html =  `<div id='${sim_id}'>
                       <div class="map-layer-group-heading what-if">
                         <a data-toggle="collapse" href="#storm-${sim_id}" aria-expanded="false" aria-controls="storm-${sim_id}">
-                          <i class="fa fa-chevron-right" aria-hidden="true"></i> <div class="${badge}">${sim_heading.charAt(0)}</div>${sim_heading}<span><i class="fa fa-close" aria-hidden="true" onclick="remove_simulation('${sim_id}');"></i></span>
+                          <i class="fa fa-chevron-right" aria-hidden="true"></i> <div class="${badge}">${badge_text}</div>${sim_heading}<span><i class="fa fa-close" aria-hidden="true" onclick="remove_simulation('${sim_id}');"></i></span>
                         </a>
                       </div>
                       <p class="follow-unfollow">by ${result.data.user_name} • ${modified}</p>
