@@ -152,6 +152,53 @@ mymap.getPane('layer').style.zIndex = 300;
 mymap.getPane('layer').style.pointerEvents = 'none';
 
 // Setup Feature Info Click Functionality
+if (!Object.keys) {
+    Object.keys = (function() {
+        'use strict';
+        var hasOwnProperty = Object.prototype.hasOwnProperty,
+            hasDontEnumBug = !({ toString: null }).propertyIsEnumerable('toString'),
+            dontEnums = [
+            'toString',
+            'toLocaleString',
+            'valueOf',
+            'hasOwnProperty',
+            'isPrototypeOf',
+            'propertyIsEnumerable',
+            'constructor'
+            ],
+            dontEnumsLength = dontEnums.length;
+
+        return function(obj) {
+        if (typeof obj !== 'function' && (typeof obj !== 'object' || obj === null)) {
+            throw new TypeError('Object.keys called on non-object');
+        }
+
+        var result = [], prop, i;
+
+        for (prop in obj) {
+            if (hasOwnProperty.call(obj, prop)) {
+            result.push(prop);
+            }
+        }
+
+        if (hasDontEnumBug) {
+            for (i = 0; i < dontEnumsLength; i++) {
+            if (hasOwnProperty.call(obj, dontEnums[i])) {
+                result.push(dontEnums[i]);
+            }
+            }
+        }
+        return result;
+        };
+    }());
+}
+
+function titleCase(str) {
+    return str.toLowerCase().split(' ').map(function(word) {
+        return (word.charAt(0).toUpperCase() + word.slice(1));
+    }).join(' ');
+}
+
 L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
       onAdd: function (map) {
         // Triggered when the layer is added to a map.
@@ -173,11 +220,22 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
         $.ajax({
             url: url,
             success: function (data, status, xhr) {
-                var err = typeof data === 'string' ? null : data;
-                //Fix for blank popup window
-                var doc = (new DOMParser()).parseFromString(data, "text/html");
-                if (doc.body.innerHTML.trim().length > 0)
-                    showResults(err, evt.latlng, data);
+                if( data.features[0] != undefined ){
+                    var result = "<table class=\"table\">";
+                    var keys = Object.keys(data.features[0].properties);
+                    for( var i = 0; i < keys.length; i++ ){
+                        var value = data.features[0].properties[keys[i]];
+                        if( typeof value === 'string' ){
+                            value = titleCase(value);
+                        }
+
+                        if( value != "" ){
+                            result += "<tr><td>" + titleCase(keys[i]) +"</td><td>" + value +"</td></tr>";
+                        }
+                    }
+                    result += "</table>"
+                    showResults(null, evt.latlng, result);
+                }
             },
             error: function (xhr, status, error) {
                 showResults(error);
@@ -203,7 +261,7 @@ L.TileLayer.BetterWMS = L.TileLayer.WMS.extend({
             width: size.x,
             layers: this.wmsParams.layers,
             query_layers: this.wmsParams.layers,
-            info_format: 'text/html'
+            info_format: 'application/json'
         };
 
         params[params.version === '1.3.0' ? 'i' : 'x'] = point.x;
@@ -338,7 +396,7 @@ function add_layer_to_menu(layer, ul_id) {
         });
         layer_list.push(layer);
     }else {
-        layer.maplayer = L.tileLayer.wms(layer.layer_link, {
+        layer.maplayer = L.tileLayer.betterWms(layer.layer_link, {
             layers: layer.layer, 
             transparent: true, 
             format: 'image/png',
