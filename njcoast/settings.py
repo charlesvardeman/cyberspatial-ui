@@ -141,3 +141,15 @@ LOGGING = {
 
 # Layer Preview
 LAYER_PREVIEW_LIBRARY = 'leaflet'
+
+# GeoNode Security
+OGC_SERVER_DEFAULT_USER = os.getenv(
+    'GEOSERVER_ADMIN_USER', 'admin'
+)
+
+OGC_SERVER_DEFAULT_PASSWORD = os.getenv(
+    'GEOSERVER_ADMIN_PASSWORD', 'geoserver'
+)
+
+OGC_SERVER['default']['USER'] = OGC_SERVER_DEFAULT_USER
+OGC_SERVER['default']['PASSWORD'] = OGC_SERVER_DEFAULT_PASSWORD
