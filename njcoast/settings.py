@@ -69,10 +69,18 @@ DATABASES = {
 
 # Basic Channels setup
 # TODO: Change to REDIS or better backend
+BROKER_HOST = os.getenv('BROKER_HOST')
+BROKER_USER = os.getenv('BROKER_USER')
+BROKER_PASS = os.getenv('BROKER_PASS')
+BROKER_PORT = os.getenv('BROKER_PORT')
+
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "asgiref.inmemory.ChannelLayer",
+        "BACKEND": "asgi_rabbitmq.RabbitmqChannelLayer",
         "ROUTING": "njcoast.routing.channel_routing",
+        "CONFIG": {
+            "url": "amqp://"+BROKER_USER+":"+BROKER_PASS+"@"+BROKER_HOST+":"+BROKER_PORT+"/%2F",
+        },
     },
 }
 
