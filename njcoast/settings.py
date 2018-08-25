@@ -21,10 +21,10 @@
 # Django settings for the GeoNode project.
 import os
 from geonode.settings import *
+
 #
 # General Django development settings
 #
-
 SITENAME = 'njcoast'
 
 DEBUG=True
@@ -68,33 +68,21 @@ DATABASES = {
 }
 
 # Basic Channels setup
-# TODO: Change to REDIS or better backend
-BROKER_HOST = os.getenv('BROKER_HOST')
-BROKER_USER = os.getenv('BROKER_USER')
-BROKER_PASS = os.getenv('BROKER_PASS')
-BROKER_PORT = os.getenv('BROKER_PORT')
-
+BROKER_URL = "amqp://"+os.getenv('BROKER_USER')+":"+os.getenv('BROKER_PASS')+"@"+os.getenv('BROKER_HOST')+":"+os.getenv('BROKER_PORT')
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "asgi_rabbitmq.RabbitmqChannelLayer",
         "ROUTING": "njcoast.routing.channel_routing",
         "CONFIG": {
-            "url": "amqp://"+BROKER_USER+":"+BROKER_PASS+"@"+BROKER_HOST+":"+BROKER_PORT+"/%2F",
+            "url": BROKER_URL+"/%2F",
         },
     },
 }
-
-# Load more settings from a file called local_settings.py if it exists
-try:
-    from local_settings import *
-except ImportError:
-    pass
 
 # Additional directories which hold static files
 STATICFILES_DIRS.append(
     os.path.join(LOCAL_ROOT, "static"),
 )
-
 
 # Location of url mappings
 ROOT_URLCONF = 'njcoast.urls'
@@ -102,7 +90,7 @@ ROOT_URLCONF = 'njcoast.urls'
 # Location of locale files
 LOCALE_PATHS = (
     os.path.join(LOCAL_ROOT, 'locale'),
-    ) + LOCALE_PATHS
+) + LOCALE_PATHS
 
 TEMPLATES[0]['DIRS'].insert(0, os.path.join(LOCAL_ROOT, "templates"))
 
@@ -151,13 +139,5 @@ LOGGING = {
 LAYER_PREVIEW_LIBRARY = 'leaflet'
 
 # GeoNode Security
-OGC_SERVER_DEFAULT_USER = os.getenv(
-    'GEOSERVER_ADMIN_USER', 'admin'
-)
-
-OGC_SERVER_DEFAULT_PASSWORD = os.getenv(
-    'GEOSERVER_ADMIN_PASSWORD', 'geoserver'
-)
-
-OGC_SERVER['default']['USER'] = OGC_SERVER_DEFAULT_USER
-OGC_SERVER['default']['PASSWORD'] = OGC_SERVER_DEFAULT_PASSWORD
+OGC_SERVER['default']['USER'] = os.getenv('GEOSERVER_ADMIN_USER', 'admin')
+OGC_SERVER['default']['PASSWORD'] = os.getenv('GEOSERVER_ADMIN_PASSWORD', 'geoserver')
