@@ -26,7 +26,5 @@ done
 
 >&2 echo "Postgres is up - continuing..."
 python /app/manage.py migrate --noinput
-python /app/manage.py collectstatic --noinput
-python /app/manage.py runworker &
 daphne -b 0.0.0.0 -p 8000 njcoast.asgi:channel_layer
 #exec python manage.py runserver 0.0.0.0:8000
