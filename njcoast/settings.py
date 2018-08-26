@@ -27,8 +27,6 @@ from geonode.settings import *
 #
 SITENAME = 'njcoast'
 
-DEBUG=True
-
 # Defines the directory that contains the settings file as the LOCAL_ROOT
 # It is used for relative settings elsewhere.
 LOCAL_ROOT = os.path.abspath(os.path.dirname(__file__))
@@ -45,8 +43,7 @@ MODIFY_TOPICCATEGORY = True
 INSTALLED_APPS += (
     'njcoast',
     'channels',
-    )
-
+)
 
 DATABASES = {
     'default': {
