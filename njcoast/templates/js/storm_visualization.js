@@ -36,9 +36,11 @@ TODO: Will need to update url
 */
 function get_rss_feed() {
     console.log('Requesting RSS Feed......');
+    var path = userSimulationPath + "/metadata.json";
+    path = path.replace("/simulation/", "/");
     $.ajax({
         type: "GET",
-        url: userSimulationPath.replace("/simulation","") + "/metadata.json",
+        url: path,
         data: {},
         dataType: "json",
         success: function (result) {
