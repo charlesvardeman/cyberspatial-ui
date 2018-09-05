@@ -38,7 +38,7 @@ function get_rss_feed() {
     console.log('Requesting RSS Feed......');
     $.ajax({
         type: "GET",
-        url: simulationPath + "/metadata.json",
+        url: userSimulationPath.replace("/simulation","") + "/metadata.json",
         data: {},
         dataType: "json",
         success: function (result) {
