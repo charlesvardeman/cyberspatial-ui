@@ -46,8 +46,11 @@ RUN npm run babel
 
 COPY ./celary.sh /celary.sh
 COPY ./entrypoint.sh /entrypoint.sh
+COPY ./init_worker.sh /init_worker.sh
 RUN sed -i 's/\r//' /celary.sh \
     && sed -i 's/\r//' /entrypoint.sh \
+    && sed -i 's/\r//' /init_worker.sh \
+    && chmod +x /init_worker.sh \
     && chmod +x /entrypoint.sh \
     && chmod +x /celary.sh
 
