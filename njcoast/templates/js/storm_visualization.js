@@ -312,7 +312,7 @@ function updateMapClick(storm_name) {
     if (surge_checkbox.is(":checked")) {
 
         //load heatmap data
-        var heatmap_url = s3_path + "heatmap__slr_" + parseInt(sea_level * 10) + "__tide_" + tides + "__analysis_" + analysis_type + ".json"
+        var heatmap_url = s3_path + "surge_line__slr_" + parseInt(sea_level * 10) + "__tide_" + tides + "__analysis_" + analysis_type + ".json"
         var addressPoints = (function () {
             var json = null;
             $.ajax({
