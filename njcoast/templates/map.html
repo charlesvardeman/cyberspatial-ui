@@ -83,6 +83,9 @@ Description:        Provides <div> to hold leaflet map, has LHS menu to allow th
     <!-- Load code to generate map thumbnails -->
     <script src="{% static 'js/template_js/leaflet-image.js' %}"></script>
 
+    <!-- Vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
 {% endblock extra_head %}
 
 
@@ -123,7 +126,51 @@ Description:        Provides <div> to hold leaflet map, has LHS menu to allow th
                 </div>
             </div>
             <div class="map-control-item">
-                {% include 'storm_visualization_menu.html' %}
+                <a data-toggle="collapse" href="#shpLayers" aria-expanded="false" aria-controls="shpLayers">
+                    <h4 class="map-control-item-heading">Storm Visualization
+                        <i class="fa fa-chevron-down pull-right" aria-hidden="true"></i>
+                    </h4>
+                    <p class="qualifier" style="margin-bottom: 0">created by Storm Hazard Projection Tool</p>
+                </a>
+                <div class="collapse in" id="shpLayers">
+                
+                    <div class="well rss-auto">
+                        <div class="shp-cat-title auto">Active Storms
+                            <div class="shp-cat" title="Based on latest track from NHC/NWS">active</div>
+                        </div>
+                        <div id="activeStormGroup">
+                            <div id="activeStorm" class="hidden">
+                                <div id="storm_heading" class="map-layer-group-heading auto">
+                                    <a id="storm_link" data-toggle="collapse" href="#hurricaneJose" aria-expanded="false"
+                                       aria-controls="hurricaneJose"></a>
+                                </div>
+                                <p class="follow-unfollow" id="last_updated"></p>
+                            </div>
+                            <div id="unfollowActiveStorm" class="hidden map-layer-group-heading auto not-following">
+                                <i class="fa fa-chevron-right invisible" aria-hidden="true"></i>
+                                <div id='unfollow-badge' class=""></div>
+                            </div>
+                
+                        </div>
+                    </div>
+
+                    <!-- Current simulations in database -->
+                    <div class="shp-cat-title what-if" style="margin-top: 30px">User-specified Scenarios <div class="shp-cat" title="Based on user-specified scenarios from manual SHP Tool runs">what-if</div></div>
+                    <div id="simulation_container">
+                    </div>
+                        
+                    
+                    <a class="btn btn-primary btn-md btn-block" href="/expert" style="margin-top: 30px" data-toggle="popover">Run New Simulation</a>
+                    <a class="btn btn-primary btn-md btn-block" href="/explore" style="margin-bottom: 20px" data-toggle="popover">Explore Simulations</a>
+                    
+                    <script src="{% static 'js/jquery.min.js'%}"></script>
+                    <script src="{% static 'js/template_js/utilities.js' %}"></script>
+                    <script src="{% static 'js/heatmap.min.js' %}"></script>
+                    <script src="{% static 'js/template_js/heatmaps.js' %}"></script>
+                    <script src="{% static 'js/leaflet-heatmap.js' %}"></script>
+                    <script src="{% static 'NJ-coast-heatmap/nj-coast.js' %}"></script>
+                    <script src="{% static 'js/template_js/storm_visualization.js' %}"></script>   
+                </div>           
             </div>
 
             <div class="map-control-item">
