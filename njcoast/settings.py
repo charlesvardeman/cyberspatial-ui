@@ -65,13 +65,13 @@ DATABASES = {
 }
 
 # Basic Channels setup
-BROKER_URL = "amqp://"+os.getenv('BROKER_USER')+":"+os.getenv('BROKER_PASS')+"@"+os.getenv('BROKER_HOST')+":"+os.getenv('BROKER_PORT')
+BROKER_URL = "redis://:"+os.getenv('BROKER_PASS')+"@"+os.getenv('BROKER_HOST')+":"+os.getenv('BROKER_PORT')
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "asgi_rabbitmq.RabbitmqChannelLayer",
+        "BACKEND": "asgi_redis.RedisChannelLayer",
         "ROUTING": "njcoast.routing.channel_routing",
         "CONFIG": {
-            "url": BROKER_URL+"/%2F",
+            "hosts": [BROKER_URL],
         },
     },
 }
