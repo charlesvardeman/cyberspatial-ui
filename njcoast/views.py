@@ -86,25 +86,28 @@ def my_gis_layers(request):
     # object properties
     permitted_layers = Layer.objects.filter(id__in=permitted_ids)
 
+    status = {}
     layers_dictionary = {"layers":[]}
     for object in permitted_layers:
         try:
             parts = object.layer.typename.split(":")
-            logger.info("Generating T&M Links for - %s", parts[0])
             
             if parts[0] == "TandM":
                 link = "https://gis.tandmassociates.com/arcgis/services/Keansburg/Keansburg/MapServer/WMSServer"
                 layer = parts[1]
-                logger.info("T&M Keansburg Found")
             elif parts[0] == "TMBurkley":
                 link = "https://gis.tandmassociates.com/arcgis/services/Berkeley/Berkeley/MapServer/WMSServer"
                 layer = parts[1]
-                logger.info("T&M Burkley Found")
             else:
                 link = object.layer.ows_url
                 layer = object.layer.typename
 
-            if requests.head(link+"?request=GetCapabilities&service=WMS").status_code == requests.codes.ok:
+            if parts[0] not in status:
+                status[parts[0]] = requests.head(link+"?request=GetCapabilities&service=WMS", timeout=0.1).status_code == requests.codes.ok
+                if not status[parts[0]]:
+                    logger.info("Layer Link Unavailable - %s", link)
+
+            if status[parts[0]]:
                 layers_dictionary["layers"].append({
                     "id": "layer__" + str(object.layer.id),
                     "name": object.layer.title,
