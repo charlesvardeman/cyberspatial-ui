@@ -102,13 +102,17 @@ def my_gis_layers(request):
                 link = object.layer.ows_url
                 layer = object.layer.typename
 
-            if not (parts[0] in status):
-                logger.info("Checking Link Layer - %s", link)
-                status[parts[0]] = requests.head(link+"?request=GetCapabilities&service=WMS", timeout=0.1).status_code == requests.codes.ok
-                if not status[parts[0]]:
+            logger.info("Checking Link Layer - %s", link)
+            if link in status:
+                pass
+            else:
+                status[link] = (requests.head(link+"?request=GetCapabilities&service=WMS", timeout=0.1).status_code == requests.codes.ok)
+                if status[link]:
+                    logger.info("Layer Link Available - %s", link)
+                else:
                     logger.info("Layer Link Unavailable - %s", link)
 
-            if status[parts[0]]:
+            if status[link]:
                 layers_dictionary["layers"].append({
                     "id": "layer__" + str(object.layer.id),
                     "name": object.layer.title,
