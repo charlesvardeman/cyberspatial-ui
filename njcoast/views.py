@@ -102,7 +102,8 @@ def my_gis_layers(request):
                 link = object.layer.ows_url
                 layer = object.layer.typename
 
-            if parts[0] not in status:
+            if not (parts[0] in status):
+                logger.info("Checking Link Layer - %s", link)
                 status[parts[0]] = requests.head(link+"?request=GetCapabilities&service=WMS", timeout=0.1).status_code == requests.codes.ok
                 if not status[parts[0]]:
                     logger.info("Layer Link Unavailable - %s", link)
