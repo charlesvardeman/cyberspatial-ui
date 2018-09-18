@@ -42,6 +42,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from itertools import chain
 from datetime import datetime
+import requests
 
 from django.shortcuts import render, redirect
 from .forms import SignUpForm
@@ -102,14 +103,15 @@ def my_gis_layers(request):
             else:
                 link = object.layer.ows_url
                 layer = object.layer.typename
-            
-            layers_dictionary["layers"].append({
-                "id": "layer__" + str(object.layer.id),
-                "name": object.layer.title,
-                "group": object.layer.category.gn_description,
-                "layer_link": link,
-                "layer": layer
-            })
+
+            if requests.head(link+"?request=GetCapabilities&service=WMS").status_code == requests.codes.ok:
+                layers_dictionary["layers"].append({
+                    "id": "layer__" + str(object.layer.id),
+                    "name": object.layer.title,
+                    "group": object.layer.category.gn_description,
+                    "layer_link": link,
+                    "layer": layer
+                })
         except:
             # simply ignore layers without categories assigned and continue on with the loop
             pass
