@@ -392,7 +392,8 @@ function add_layer_to_menu(layer, ul_id) {
         layer.maplayer = L.tileLayer.wms(layer.layer_link, {
             layers: layer.layer, 
             transparent: true, 
-            format: 'image/png'
+            format: 'image/png',
+            tiled: true
         });
         layer_list.push(layer);
     }else {
@@ -400,7 +401,8 @@ function add_layer_to_menu(layer, ul_id) {
             layers: layer.layer, 
             transparent: true, 
             format: 'image/png',
-            pane: 'layer'
+            pane: 'layer',
+            tiled: true
         });
         layer_list.push(layer);
     }
