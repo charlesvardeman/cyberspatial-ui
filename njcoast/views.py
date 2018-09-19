@@ -86,7 +86,6 @@ def my_gis_layers(request):
     # object properties
     permitted_layers = Layer.objects.filter(id__in=permitted_ids)
 
-    status = {}
     layers_dictionary = {"layers":[]}
     for object in permitted_layers:
         try:
@@ -102,24 +101,13 @@ def my_gis_layers(request):
                 link = object.layer.ows_url
                 layer = object.layer.typename
 
-            logger.info("Checking Link Layer - %s", link)
-            if link not in status:
-                try:
-                    status[link] = (requests.head(link+"?request=GetCapabilities&service=WMS", timeout=0.1).status_code == requests.codes.ok)
-                except:
-                    status[link] = False
-
-                if not status[link]:
-                    logger.info("Layer Link Unavailable - %s", link)
-
-            if status[link]:
-                layers_dictionary["layers"].append({
-                    "id": "layer__" + str(object.layer.id),
-                    "name": object.layer.title,
-                    "group": object.layer.category.gn_description,
-                    "layer_link": link,
-                    "layer": layer
-                })
+            layers_dictionary["layers"].append({
+                "id": "layer__" + str(object.layer.id),
+                "name": object.layer.title,
+                "group": object.layer.category.gn_description,
+                "layer_link": link,
+                "layer": layer
+            })
         except:
             # simply ignore layers without categories assigned and continue on with the loop
             pass
