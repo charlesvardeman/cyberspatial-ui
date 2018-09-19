@@ -299,6 +299,169 @@ $(document).ready(function () {
     //get layers
     get_layers_from_server();
 
+    var app = new Vue({
+        delimiters: ['${', '}'],
+        el: '#activeStormGroup',
+        data: {
+            items: []
+        },
+        created: function () {
+            this.fetchData();
+        },
+        methods: {
+          fetchData: function () {
+            var path = (userSimulationPath + "/metadata.json").replace("/simulation/", "/");
+            $.get(path, (data) => {
+                for(var i = 0; i < data.active_storms.length; i++ ){
+                    data.active_storms[i]['protection'] = '1';
+                    data.active_storms[i]['tides'] = '0.5';
+                    data.active_storms[i]['analysis'] = '0.0';
+                    data.active_storms[i]['state'] = { 'wind': false, 'surge': false, 'runup': false};
+                    data.active_storms[i]['following'] = true;
+                    this.items.push(data.active_storms[i]);
+                }
+            });
+          },
+          setFollow: function(index, value){
+            this.items[index].following = value;
+          },
+          update: function(index){
+              console.log(JSON.stringify(this.items[index], null, 2));
+              this.update_wind(index);
+              this.update_surge(index);
+              this.update_runup(index);
+          },
+          update_wind: function(index){
+            var path = this.path_string(index, "wind_heatmap");
+            $.get(path, (data) => {
+                if (data) {
+                    // Remove old layer
+                    if( path in storm_layer_dict ) {
+                        mymap.removeLayer(storm_layer_dict[path]);
+                    }
+                    storm_layer_dict[path] = create_wind_heatmap(data.wind).addTo(mymap);
+
+                    // Enable legend
+                    add_wind_legend(mymap);
+                }
+            });
+          },
+          update_surge: function(index){
+            var path = this.path_string(index, "surge_line");
+            $.get(path, (data) => {
+                if (data) {
+                    // Remove old layer
+                    if( path in storm_layer_dict ) {
+                        mymap.removeLayer(storm_layer_dict[path]);
+                    }
+                    storm_layer_dict[path] = L.geoJSON(data.surge, {
+                        style: function(feature) {
+                            switch (feature.properties.height) {
+                                case 0: return {color: "black"};
+                                case 3: return {color: "yellow"};
+                                case 6: return {color: "orange"};
+                                case 9: return {color: "red"};
+                            }
+                        },
+                        filter: function(feature, layer) {
+                            return feature.properties.height <= 9;
+                        }
+                    }).addTo(mymap);
+
+                    // Enable legend
+                    add_surge_legend(mymap);
+                }
+            });
+          },
+          update_runup: function(index){
+            var path = this.path_string(index, "transect_line");
+            $.get(path, (data) => {
+                if (data) {
+                    // Remove old layer
+                    if( path in storm_layer_dict ) {
+                        mymap.removeLayer(storm_layer_dict[path]);
+                    }
+                    storm_layer_dict[path] = L.geoJSON(addressPoints, {
+                        style: function(feature) {
+                            console.log(feature.properties.type)
+                            if( feature.properties.type.includes("Boundary") ) {
+                                return {color: "blue"};
+                            }else{
+                                return {color: "green"};
+                            }
+                        },
+                        filter: function(feature, layer){
+                            return feature.properties.type != "Transect";
+                        }
+                    }).addTo(mymap);
+
+                    // Enable legend
+                    add_runup_legend(mymap);
+                }
+            });
+          },
+          path_string: function(index, data_type) {
+            var path = this.items[index].s3_base_path + data_type + "__slr_" + parseInt(0 * 10) + "__tide_";
+            switch( this.items[index].tides ){
+                case '0.0':
+                    path += 'zero';
+                break;
+                case '0.5':
+                    path += 'low';
+                break;
+                case '1.0':
+                    path += 'high';
+                break;
+            }
+            path += "__analysis_";
+            switch( this.items[index].analysis ){
+                case '0.0':
+                    path += 'deterministic';
+                break;
+                case '0.5':
+                    path += 'expected';
+                break;
+                case '0.1':
+                    path += 'extreme';
+                break;
+            }
+            return path + ".json";
+          },
+          toggle_wind: function(index){
+            if(this.items[index]['state']['wind'] == true){
+                this.update_wind(index);
+            }else{
+                var path = this.path_string(index, "wind_heatmap");
+                if( path in storm_layer_dict ) {
+                    mymap.removeLayer(storm_layer_dict[path]);
+                    del_wind_legend();
+                }
+            }
+          },
+          toggle_surge: function(index){
+            if(this.items[index]['state']['surge'] == true){
+                this.update_surge(index);
+            }else{
+                var path = this.path_string(index, "surge_line");
+                if( path in storm_layer_dict ) {
+                    mymap.removeLayer(storm_layer_dict[path]);
+                    del_surge_legend();
+                }
+            }
+          },
+          toggle_runup: function(index){
+            if(this.items[index]['state']['runup'] == true){
+                this.update_runup(index);
+            }else{
+                var path = this.path_string(index, "transect_line");
+                if( path in storm_layer_dict ) {
+                    mymap.removeLayer(storm_layer_dict[path]);
+                    del_runup_legend();
+                }
+            }
+          }
+        }
+    })
 });
 
 /*
