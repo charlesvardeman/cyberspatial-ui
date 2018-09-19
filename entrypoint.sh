@@ -25,5 +25,6 @@ until postgres_ready; do
 done
 
 >&2 echo "Postgres is up - continuing..."
-python manage.py migrate --noinput
-exec python manage.py runserver 0.0.0.0:8000
+python /app/manage.py migrate --noinput
+daphne -b 0.0.0.0 -p 8000 njcoast.asgi:channel_layer
+#exec python manage.py runserver 0.0.0.0:8000

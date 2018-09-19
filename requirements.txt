@@ -99,3 +99,5 @@ psycopg2
 
 # Annotations and sockets
 channels>=1.1,<2
+asgi-rabbitmq
+asgi_redis

@@ -42,6 +42,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from itertools import chain
 from datetime import datetime
+import requests
 
 from django.shortcuts import render, redirect
 from .forms import SignUpForm
@@ -89,20 +90,17 @@ def my_gis_layers(request):
     for object in permitted_layers:
         try:
             parts = object.layer.typename.split(":")
-            logger.info("Generating T&M Links for - %s", parts[0])
             
             if parts[0] == "TandM":
                 link = "https://gis.tandmassociates.com/arcgis/services/Keansburg/Keansburg/MapServer/WMSServer"
                 layer = parts[1]
-                logger.info("T&M Keansburg Found")
             elif parts[0] == "TMBurkley":
                 link = "https://gis.tandmassociates.com/arcgis/services/Berkeley/Berkeley/MapServer/WMSServer"
                 layer = parts[1]
-                logger.info("T&M Burkley Found")
             else:
                 link = object.layer.ows_url
                 layer = object.layer.typename
-            
+
             layers_dictionary["layers"].append({
                 "id": "layer__" + str(object.layer.id),
                 "name": object.layer.title,
@@ -925,7 +923,7 @@ def signup(request):
                             subject = 'NJcoast Account Request'
                             message = render_to_string('account_created_email.html', {
                                 'user': user.first_name+" "+user.last_name,
-                                'domain': current_site.domain + "/dca_dashboard/",
+                                'domain': current_site.domain,
                                 'municipality': user.njcusermeta.municipality.name,
                             })
 
@@ -1208,7 +1206,7 @@ def user_add_muni(request):
                 subject = 'NJcoast Account Additional Municipality Request'
                 message = render_to_string('additional_muni_email.html', {
                     'user': current_user.first_name+" "+current_user.last_name,
-                    'domain': current_site.domain + "/dca_dashboard/",
+                    'domain': current_site.domain,
                     'municipalities': munis_string,
                 })
 
@@ -1707,7 +1705,7 @@ def user_approval(request):
                             subject = 'New NJcoast Account Request'
                             message = render_to_string('muni_approved_email.html', {
                                 'user': user.first_name+" "+user.last_name,
-                                'domain': current_site.domain + "/dca_dashboard/",
+                                'domain': current_site.domain,
                                 'municipality': muni_name,
                             })
 

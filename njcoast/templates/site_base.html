@@ -145,7 +145,7 @@
                         {% endif %}
                   </ul>
             {% elif user.is_authenticated %}
-	            <a href="#"resources" %}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Resources" %}<i class="fa fa-angle-down fa-lg"></i></a>
+	            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Resources" %}<i class="fa fa-angle-down fa-lg"></i></a>
                   <ul class="dropdown-menu">
                     <li><a href="{% url "faq" %}" role="button">{% trans "FAQ" %}</a></li>
                     <li><a href="{% url "shp" %}" role="button">{% trans "SHP Tool" %}</a></li>
@@ -156,7 +156,7 @@
                   </ul>
                 <li><a href="{% url "about" %}" role="button">{% trans "About" %}</a></li>
             {% else %}
-	            <a href="#"resources" %}" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Resources" %}<i class="fa fa-angle-down fa-lg"></i></a>
+	            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{% trans "Resources" %}<i class="fa fa-angle-down fa-lg"></i></a>
                   <ul class="dropdown-menu">
                     <li><a href="{% url "faq" %}" role="button">{% trans "FAQ" %}</a></li>
                     <li><a href="{% url "shp" %}" role="button">{% trans "SHP Tool" %}</a></li>

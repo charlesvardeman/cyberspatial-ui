@@ -36,9 +36,11 @@ TODO: Will need to update url
 */
 function get_rss_feed() {
     console.log('Requesting RSS Feed......');
+    var path = userSimulationPath + "/metadata.json";
+    path = path.replace("/simulation/", "/");
     $.ajax({
         type: "GET",
-        url: simulationPath + "/metadata.json",
+        url: path,
         data: {},
         dataType: "json",
         success: function (result) {
@@ -285,8 +287,7 @@ function updateMapClick(storm_name) {
 
     var storm_div = $("." + storm_name)
 
-    var sea_level = $("input[id='" + storm_name + "_input_slr']").val() * 0.3048;
-    sea_level = (Math.round(sea_level * 2) / 2).toFixed(1)
+    var sea_level = 1.0;
 
     var coastal_protection = $("input[name='" + storm_name + "_dunes']:checked").val();
     var tides = $("input[name='" + storm_name + "_tides']:checked").val();
@@ -311,7 +312,7 @@ function updateMapClick(storm_name) {
     if (surge_checkbox.is(":checked")) {
 
         //load heatmap data
-        var heatmap_url = s3_path + "heatmap__slr_" + parseInt(sea_level * 10) + "__tide_" + tides + "__analysis_" + analysis_type + ".json"
+        var heatmap_url = s3_path + "surge_line__slr_" + parseInt(sea_level * 10) + "__tide_" + tides + "__analysis_" + analysis_type + ".json"
         var addressPoints = (function () {
             var json = null;
             $.ajax({

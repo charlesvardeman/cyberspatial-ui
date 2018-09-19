@@ -21,13 +21,11 @@
 # Django settings for the GeoNode project.
 import os
 from geonode.settings import *
+
 #
 # General Django development settings
 #
-
 SITENAME = 'njcoast'
-
-DEBUG=True
 
 # Defines the directory that contains the settings file as the LOCAL_ROOT
 # It is used for relative settings elsewhere.
@@ -45,8 +43,7 @@ MODIFY_TOPICCATEGORY = True
 INSTALLED_APPS += (
     'njcoast',
     'channels',
-    )
-
+)
 
 DATABASES = {
     'default': {
@@ -68,25 +65,21 @@ DATABASES = {
 }
 
 # Basic Channels setup
-# TODO: Change to REDIS or better backend
+BROKER_URL = "redis://:"+os.getenv('BROKER_PASS')+"@"+os.getenv('BROKER_HOST')+":"+os.getenv('BROKER_PORT')
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "asgiref.inmemory.ChannelLayer",
+        "BACKEND": "asgi_redis.RedisChannelLayer",
         "ROUTING": "njcoast.routing.channel_routing",
+        "CONFIG": {
+            "hosts": [BROKER_URL],
+        },
     },
 }
-
-# Load more settings from a file called local_settings.py if it exists
-try:
-    from local_settings import *
-except ImportError:
-    pass
 
 # Additional directories which hold static files
 STATICFILES_DIRS.append(
     os.path.join(LOCAL_ROOT, "static"),
 )
-
 
 # Location of url mappings
 ROOT_URLCONF = 'njcoast.urls'
@@ -94,7 +87,7 @@ ROOT_URLCONF = 'njcoast.urls'
 # Location of locale files
 LOCALE_PATHS = (
     os.path.join(LOCAL_ROOT, 'locale'),
-    ) + LOCALE_PATHS
+) + LOCALE_PATHS
 
 TEMPLATES[0]['DIRS'].insert(0, os.path.join(LOCAL_ROOT, "templates"))
 
@@ -141,3 +134,7 @@ LOGGING = {
 
 # Layer Preview
 LAYER_PREVIEW_LIBRARY = 'leaflet'
+
+# GeoNode Security
+OGC_SERVER['default']['USER'] = os.getenv('GEOSERVER_ADMIN_USER', 'admin')
+OGC_SERVER['default']['PASSWORD'] = os.getenv('GEOSERVER_ADMIN_PASSWORD', 'geoserver')

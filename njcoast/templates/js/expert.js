@@ -186,7 +186,7 @@ function start_expert_simulation() {
     var tide = document.querySelector('input[name="tide"]:checked');
 
     //get protection
-    var protection = document.querySelector('input[name="protection"]:checked').value;
+    var protection = parseFloat(document.querySelector('input[name="protection"]:checked').value);
 
     //get analysis
     var analysis = document.querySelector('input[name="analysis"]:checked');
