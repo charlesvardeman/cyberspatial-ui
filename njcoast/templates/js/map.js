@@ -56,6 +56,8 @@ var initial_load = true;
 var layer_list = [];
 var layer_groups = [];
 
+var storm_layer_dict = {};
+
 //prevent map from being recognized as touchable, stops lorge annotate symbols
 L.Browser.touch = false;
 
@@ -317,13 +319,53 @@ $(document).ready(function () {
                     data.active_storms[i]['tides'] = '0.5';
                     data.active_storms[i]['analysis'] = '0.0';
                     data.active_storms[i]['state'] = { 'wind': false, 'surge': false, 'runup': false};
-                    data.active_storms[i]['following'] = true;
+                    data.active_storms[i]['following'] = false;
                     this.items.push(data.active_storms[i]);
                 }
             });
           },
           setFollow: function(index, value){
             this.items[index].following = value;
+            if( value == true ){
+                var path = this.items[index].s3_base_path + "input.geojson";
+                $.get(path, (data) => {
+                    if (data) {
+                        if( path in storm_layer_dict ) {
+                            mymap.removeLayer(storm_layer_dict[path]);
+                        }
+                        storm_layer_dict[path] = L.geoJSON(data, {
+                            onEachFeature: function (featureData, featureLayer) {
+                                featureLayer.on('click', function () {
+                                  var result = "<table class=\"table\">";
+                                  var keys = Object.keys(featureData.properties);
+                                  for( var i = 0; i < keys.length; i++ ){
+                                    var value = featureData.properties[keys[i]];
+                                    if( typeof value === 'string' ){
+                                        value = titleCase(value);
+                                    }
+
+                                    if( value != "" ){
+                                        result += "<tr><td>" + titleCase(keys[i]) +"</td><td>" + value +"</td></tr>";
+                                    }
+                                  }
+                                  result += "</table>"
+                                
+                                  // Otherwise show the content in a popup, or something.
+                                  L.popup({maxWidth: 800, maxHeight: window.innerHeight * 0.4})
+                                    .setLatLng(featureLayer._latlng)
+                                    .setContent(result)
+                                    .openOn(this._map);
+                                });
+                              }
+                        }).addTo(mymap);
+                    }
+                });
+            }else{
+                var path = this.items[index].s3_base_path + "input.geojson";
+                if( path in storm_layer_dict ) {
+                    mymap.removeLayer(storm_layer_dict[path]);
+                }
+            }
           },
           update: function(index){
               console.log(JSON.stringify(this.items[index], null, 2));
