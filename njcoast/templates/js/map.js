@@ -342,6 +342,14 @@ $(document).ready(function () {
                         return -1;
                     }
 
+                    if( Date.parse(a.last_updated) < Date.parse(b.last_updated) ){
+                        return 1;
+                    }
+                    
+                    if( Date.parse(a.last_updated) > Date.parse(b.last_updated) ){
+                        return -1;
+                    }
+
                     return 0;
                 });
 
@@ -350,6 +358,10 @@ $(document).ready(function () {
                     this.items.push(data.active_storms[i]);
                 }
             });
+          },
+          dateString: function(last_updated){
+            var result = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(Date.parse(last_updated));
+            return result.toString();
           },
           setFollow: function(index, value){
             this.items[index].following = value;

@@ -149,7 +149,7 @@ Description:        Provides <div> to hold leaflet map, has LHS menu to allow th
                                         </span>
                                     </a>
                                 </div>
-                                <p id="last_updated" class="follow-unfollow">${item.last_updated}</p>
+                                <p id="last_updated" class="follow-unfollow">${dateString(item.last_updated)}</p>
                                 <div class="collapse active_storm" v-if="!item.out_of_bounds" v-bind:id="item.name">
                                     <ul class="map-layers">
                                         <li><input type="checkbox" v-model="item.state.wind" v-on:change="toggle_wind(index)"> Wind Field </li>
@@ -197,7 +197,7 @@ Description:        Provides <div> to hold leaflet map, has LHS menu to allow th
                                 <span title="Follow">
                                     <i class="fa fa-plus-circle" aria-hidden="true" v-on:click="setFollow(index, true)"></i>
                                 </span>
-                                <p class="follow-unfollow">not following</p>
+                                <p class="follow-unfollow">${dateString(item.last_updated)}</p>
                             </div>
                         </div>
                     </div>
