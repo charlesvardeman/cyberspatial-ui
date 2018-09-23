@@ -140,17 +140,17 @@ Description:        Provides <div> to hold leaflet map, has LHS menu to allow th
                             <div v-for="(item, index) in items" id="activeStorm" v-if="item.following" v-bind:class="item.name">
                                 <div id="storm_heading" class="map-layer-group-heading auto">
                                     <a id="storm_link" data-toggle="collapse" aria-expanded="false" v-bind:aria-controls="item.name" v-bind:href="'#'+item.name">
-                                        <i class="fa fa-chevron-right" aria-hidden="true"></i>
+                                        <i class="fa fa-chevron-right" aria-hidden="true" v-bind:class="{ invisible: item.out_of_bounds}"></i>
                                         <div id="storm_type" class="storm_badge h-badge" v-if="item.type == 'H'">H</div>
                                         <div id="storm_type" class="storm_badge n-badge" v-if="item.type == 'N'">N</div>
-                                        ${ item.name }
+                                        ${ item.name } <template v-if="item.out_of_bounds">(Out Of Bounds)</template>
                                         <span title="Unfollow">
                                             <i class="fa fa-minus-circle" aria-hidden="true" v-on:click="setFollow(index, false)"></i>
                                         </span>
                                     </a>
                                 </div>
                                 <p id="last_updated" class="follow-unfollow">${item.last_updated}</p>
-                                <div class="collapse active_storm" v-bind:id="item.name">
+                                <div class="collapse active_storm" v-if="!item.out_of_bounds" v-bind:id="item.name">
                                     <ul class="map-layers">
                                         <li><input type="checkbox" v-model="item.state.wind" v-on:change="toggle_wind(index)"> Wind Field </li>
                                         <li><input type="checkbox" v-model="item.state.surge" v-on:change="toggle_surge(index)"> Surge </li>
@@ -193,7 +193,7 @@ Description:        Provides <div> to hold leaflet map, has LHS menu to allow th
                                 <i class="fa fa-chevron-right invisible" aria-hidden="true"></i>
                                 <div id="unfollow-badge" class="storm_badge h-badge" v-if="item.type == 'H'">H</div>
                                 <div id="unfollow-badge" class="storm_badge n-badge" v-if="item.type == 'N'">N</div>
-                                ${ item.name }
+                                ${ item.name } <template v-if="item.out_of_bounds">(Out Of Bounds)</template>
                                 <span title="Follow">
                                     <i class="fa fa-plus-circle" aria-hidden="true" v-on:click="setFollow(index, true)"></i>
                                 </span>

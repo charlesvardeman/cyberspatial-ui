@@ -287,6 +287,14 @@ L.tileLayer.betterWms = function (url, options) {
     return new L.TileLayer.BetterWMS(url, options);
 };
 
+var toTitleCase = function (str) {
+	str = str.toLowerCase().split(' ');
+	for (var i = 0; i < str.length; i++) {
+		str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1);
+	}
+	return str.join(' ');
+};
+
 //~~~~run once ready~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 $(document).ready(function () {
 
@@ -320,6 +328,25 @@ $(document).ready(function () {
                     data.active_storms[i]['analysis'] = '0.0';
                     data.active_storms[i]['state'] = { 'wind': false, 'surge': false, 'runup': false};
                     data.active_storms[i]['following'] = false;
+                    data.active_storms[i]['out_of_bounds'] = true;
+                    data.active_storms[i]['name'] = toTitleCase(data.active_storms[i]['name']);
+                }
+
+                // Sort Data
+                data.active_storms.sort(function(a, b) {
+                    if( a.out_of_bounds && !b.out_of_bounds ){
+                        return 1;
+                    }
+
+                    if( !a.out_of_bounds && b.out_of_bounds ){
+                        return -1;
+                    }
+
+                    return 0;
+                });
+
+                // Insert
+                for(var i = 0; i < data.active_storms.length; i++ ){
                     this.items.push(data.active_storms[i]);
                 }
             });
