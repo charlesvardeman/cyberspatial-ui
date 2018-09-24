@@ -328,7 +328,9 @@ $(document).ready(function () {
                     data.active_storms[i]['analysis'] = '0.0';
                     data.active_storms[i]['state'] = { 'wind': false, 'surge': false, 'runup': false};
                     data.active_storms[i]['following'] = false;
-                    data.active_storms[i]['out_of_bounds'] = true;
+                    if( data.active_storms[i]['out_of_bounds'] == undefined ){
+                        data.active_storms[i]['out_of_bounds'] = false;
+                    }
                     data.active_storms[i]['name'] = toTitleCase(data.active_storms[i]['name']);
                 }
 
@@ -373,6 +375,22 @@ $(document).ready(function () {
                             mymap.removeLayer(storm_layer_dict[path]);
                         }
                         storm_layer_dict[path] = L.geoJSON(data, {
+                            style: function(feature) {
+                                if( feature.properties.radius != undefined ){
+                                    return {fillColor:"red"};
+                                }
+                            },
+                            pointToLayer: function (feature, latlng) {
+                                var options = {
+                                    radius: 8,
+                                    fillColor: "blue",
+                                    color: "#000",
+                                    weight: 1,
+                                    opacity: 1,
+                                    fillOpacity: 0.8
+                                };
+                                return L.circleMarker(latlng, options);
+                            },
                             onEachFeature: function (featureData, featureLayer) {
                                 featureLayer.on('click', function () {
                                   var result = "<table class=\"table\">";
