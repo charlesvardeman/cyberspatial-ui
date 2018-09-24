@@ -25,6 +25,9 @@ Description:        Main user dashboard, allows the user to explore maps, layers
     <link rel="stylesheet" type="text/css" href="{% static "css/fontawesome-all.min.css" %}" media="screen" />
     <link rel="stylesheet" type="text/css" href="{% static "css/font-awesome.min.css" %}" media="screen" />
     <link href="{% static "css/select2.min.css" %}" rel="stylesheet" />
+
+    <!-- Vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 {% endblock extra_head %}
 
 {% block middle %}
@@ -210,6 +213,18 @@ Description:        Main user dashboard, allows the user to explore maps, layers
                                 <!--<div class="overlay-div">-->
                                 <div class="shp-cat-title auto">Active Storms
                                     <div class="shp-cat" title="Based on latest track from NHC/NWS">active</div>
+                                    <div id="activeStormGroup">
+                                        <div v-for="(item, index) in items" id="activeStorm" v-bind:class="item.name">
+                                            <div id="storm_heading" class="map-layer-group-heading auto">
+                                                <a id="storm_link" data-toggle="collapse" aria-expanded="false" v-bind:aria-controls="item.name" v-bind:href="'#'+item.name">
+                                                    <div id="storm_type" class="storm_badge h-badge" v-if="item.type == 'H'">H</div>
+                                                    <div id="storm_type" class="storm_badge n-badge" v-if="item.type == 'N'">N</div>
+                                                    ${ item.name } <template v-if="item.out_of_bounds">(Out Of Bounds)</template>
+                                                    <p id="last_updated" class="follow-unfollow">${dateString(item.last_updated)}</p>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <!--<div class="map-layer-group-heading auto">
                                     <a href="">
