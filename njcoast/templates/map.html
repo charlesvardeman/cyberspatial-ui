@@ -12,9 +12,7 @@ Org:                CRC at Notre Dame
 Date:               04/01/2018
 
 Associated files:   map.js                          main js for map page,
-                    annotate_maps.js                js for implementing annotations on leflet and communications with other clients,
-                    storm_visualization_menu.html   html to add storm visualization to map
-                    storm_visualization.js          js file for storm_visualization_menu.html
+                    annotate_maps.js                js for implementing annotations on leflet and communications with other clients
 
 Description:        Provides <div> to hold leaflet map, has LHS menu to allow the
                     user to display layers, live storm information and simulation
@@ -133,24 +131,74 @@ Description:        Provides <div> to hold leaflet map, has LHS menu to allow th
                     <p class="qualifier" style="margin-bottom: 0">created by Storm Hazard Projection Tool</p>
                 </a>
                 <div class="collapse in" id="shpLayers">
-                
                     <div class="well rss-auto">
                         <div class="shp-cat-title auto">Active Storms
                             <div class="shp-cat" title="Based on latest track from NHC/NWS">active</div>
                         </div>
+                       
                         <div id="activeStormGroup">
-                            <div id="activeStorm" class="hidden">
+                            <div v-for="(item, index) in items" id="activeStorm" v-if="item.following" v-bind:class="item.name">
                                 <div id="storm_heading" class="map-layer-group-heading auto">
-                                    <a id="storm_link" data-toggle="collapse" href="#hurricaneJose" aria-expanded="false"
-                                       aria-controls="hurricaneJose"></a>
+                                    <a id="storm_link" data-toggle="collapse" aria-expanded="false" v-bind:aria-controls="item.name" v-bind:href="'#'+item.name">
+                                        <i class="fa fa-chevron-right" aria-hidden="true" v-bind:class="{ invisible: item.out_of_bounds}"></i>
+                                        <div id="storm_type" class="storm_badge h-badge" v-if="item.type == 'H'">H</div>
+                                        <div id="storm_type" class="storm_badge n-badge" v-if="item.type == 'N'">N</div>
+                                        ${ item.name } <template v-if="item.out_of_bounds">(Out Of Bounds)</template>
+                                        <span title="Unfollow">
+                                            <i class="fa fa-minus-circle" aria-hidden="true" v-on:click="setFollow(index, false)"></i>
+                                        </span>
+                                    </a>
                                 </div>
-                                <p class="follow-unfollow" id="last_updated"></p>
+                                <p id="last_updated" class="follow-unfollow">${dateString(item.last_updated)}</p>
+                                <div class="collapse active_storm" v-if="!item.out_of_bounds" v-bind:id="item.name">
+                                    <ul class="map-layers">
+                                        <li><input type="checkbox" v-model="item.state.wind" v-on:change="toggle_wind(index)"> Wind Field </li>
+                                        <li><input type="checkbox" v-model="item.state.surge" v-on:change="toggle_surge(index)"> Surge </li>
+                                        <li><input type="checkbox" v-model="item.state.runup" v-on:change="toggle_runup(index)"> Total Run Up</li>
+                                    </ul>
+                                    <div class="well plain orange scenarios">
+                                        <h5>Explore Scenarios</h5>
+                                        <ul class="map-layers">
+                                            <li class="explore-scenario-controls">
+                                                <p>Coastal Protection (e.g. dunes)</p>
+                                                <ul class="one-line">
+                                                    <li><input type="radio" value="1" v-model="item.protection"> Current </li>
+                                                    <li><input type="radio" value="2" v-model="item.protection"> Degraded </li>
+                                                    <li><input type="radio" value="3" v-model="item.protection"> Compromised </li>
+                                                </ul>
+                                            </li>
+                                            <li class="explore-scenario-controls">
+                                                <p>Tides</p>
+                                                <ul class="one-line">
+                                                    <li><input type="radio" value="1.0" v-model="item.tides"> High </li>
+                                                    <li><input type="radio" value="0.5" v-model="item.tides"> Typical </li>
+                                                    <li><input type="radio" value="0.0" v-model="item.tides"> None </li>
+                                                </ul>
+                                            </li>
+                                            <li class="explore-scenario-controls">
+                                                <p>Analysis Type</p>
+                                                <ul>
+                                                    <li><input type="radio" value="0.0" v-model="item.analysis"> Deterministic</li>
+                                                    <li><input type="radio" value="0.5" v-model="item.analysis"> Probabilistic <span>expected</span></li>
+                                                    <li><input type="radio" value="0.1" v-model="item.analysis"> Probabilistic <span>extreme</span></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                        <a class="btn btn-primary btn-md btn-block" v-on:click="update(index)" style="margin-top: 30px">Update Map</a>
+                                    </div>
+                                </div>
                             </div>
-                            <div id="unfollowActiveStorm" class="hidden map-layer-group-heading auto not-following">
+
+                            <div v-for="(item, index) in items" id="unfollowActiveStorm" v-if="!item.following" class="map-layer-group-heading auto not-following" v-bind:class="item.name">
                                 <i class="fa fa-chevron-right invisible" aria-hidden="true"></i>
-                                <div id='unfollow-badge' class=""></div>
+                                <div id="unfollow-badge" class="storm_badge h-badge" v-if="item.type == 'H'">H</div>
+                                <div id="unfollow-badge" class="storm_badge n-badge" v-if="item.type == 'N'">N</div>
+                                ${ item.name } <template v-if="item.out_of_bounds">(Out Of Bounds)</template>
+                                <span title="Follow">
+                                    <i class="fa fa-plus-circle" aria-hidden="true" v-on:click="setFollow(index, true)"></i>
+                                </span>
+                                <p class="follow-unfollow">${dateString(item.last_updated)}</p>
                             </div>
-                
                         </div>
                     </div>
 
@@ -162,14 +210,6 @@ Description:        Provides <div> to hold leaflet map, has LHS menu to allow th
                     
                     <a class="btn btn-primary btn-md btn-block" href="/expert" style="margin-top: 30px" data-toggle="popover">Run New Simulation</a>
                     <a class="btn btn-primary btn-md btn-block" href="/explore" style="margin-bottom: 20px" data-toggle="popover">Explore Simulations</a>
-                    
-                    <script src="{% static 'js/jquery.min.js'%}"></script>
-                    <script src="{% static 'js/template_js/utilities.js' %}"></script>
-                    <script src="{% static 'js/heatmap.min.js' %}"></script>
-                    <script src="{% static 'js/template_js/heatmaps.js' %}"></script>
-                    <script src="{% static 'js/leaflet-heatmap.js' %}"></script>
-                    <script src="{% static 'NJ-coast-heatmap/nj-coast.js' %}"></script>
-                    <script src="{% static 'js/template_js/storm_visualization.js' %}"></script>   
                 </div>           
             </div>
 
