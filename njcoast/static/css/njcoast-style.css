@@ -292,7 +292,7 @@ ul.dashboard-list li span.status {
 
 .page-header .dropdown-item:focus,
 .page-header .dropdown-item:hover {
-  color: #116181b;
+  color: #116181;
   text-decoration: none;
   background-color: #f5f5f5;
 }
@@ -658,7 +658,7 @@ ul.shp-settings > li.active > a {
 
 .map-control-item .dropdown-item:focus,
 .map-control-item .dropdown-item:hover {
-  color: #116181b;
+  color: #116181;
   text-decoration: none;
   background-color: #f5f5f5;
 }
@@ -805,4 +805,54 @@ li.shp-scenario span {
     background-color: gray;
     padding: 10px;
     opacity: .2;
+}
+
+.njc #wrap {
+  margin-top: -60px;
+  padding-bottom: 0;
+}
+
+.njc .jumbotron {
+  margin-bottom: 0;
+}
+
+.home .navbar-inverse,
+.njc .navbar-inverse {
+  background-color: rgba(15,37,58,0.8); /* rgba(18,32,60,0.7); */
+}
+
+.home .navbar-inverse .navbar-nav > .active > a,
+.njc .navbar-inverse .navbar-nav > .active > a {
+  /* background-color: rgba(44,104,156,0.8); */
+  color: #fff; /* #eb6b00 #2c689c */
+  background-color: #2c689c; /* rgba(15,37,58,0); */
+}
+
+/* Sign-up form */
+.row.sign-up-form form label {
+  margin-right: .5em;
+}
+
+.row.sign-up-form form input,
+.row.sign-up-form select,
+.row.sign-up-form textarea {
+  border: 1px solid #ddd;
+}
+
+.row.sign-up-form .sign-up-logo {
+}
+.row.sign-up-form .sign-up-logo img {
+  height: 60px;
+  float: right;
+  margin-top: -20px;
+}
+@media screen and (max-width: 768px) {
+  .row.sign-up-form .sign-up-logo {
+      display:none;
+  }
+}
+@media screen and (min-width: 1000px) {
+  .row.sign-up-form .sign-up-logo img {
+    margin-top: 0px;
+  }
 }
