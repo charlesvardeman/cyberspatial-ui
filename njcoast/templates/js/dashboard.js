@@ -21,6 +21,15 @@
   *     swap_municipality   Set primary muni from those I have been given access to.
   */
 
+var toTitleCase = function (str) {
+	str = str.toLowerCase().split(' ');
+	for (var i = 0; i < str.length; i++) {
+		str[i] = str[i].charAt(0).toUpperCase() + str[i].slice(1);
+	}
+	return str.join(' ');
+};
+
+
 $(document).ready(function() {
 
      //setup for select input
@@ -60,6 +69,59 @@ $(document).ready(function() {
           }
       });
 
+      var app = new Vue({
+        delimiters: ['${', '}'],
+        el: '#activeStormGroup',
+        data: {
+            items: []
+        },
+        created: function () {
+            this.fetchData();
+        },
+        methods: {
+          fetchData: function () {
+            var path = (userSimulationPath + "/metadata.json").replace("/simulation/", "/");
+            $.get(path, (data) => {
+                for(var i = 0; i < data.active_storms.length; i++ ){
+                    if( data.active_storms[i]['out_of_bounds'] == undefined ){
+                        data.active_storms[i]['out_of_bounds'] = false;
+                    }
+                    data.active_storms[i]['name'] = toTitleCase(data.active_storms[i]['name']);
+                }
+
+                // Sort Data
+                data.active_storms.sort(function(a, b) {
+                    if( a.out_of_bounds && !b.out_of_bounds ){
+                        return 1;
+                    }
+
+                    if( !a.out_of_bounds && b.out_of_bounds ){
+                        return -1;
+                    }
+
+                    if( Date.parse(a.last_updated) < Date.parse(b.last_updated) ){
+                        return 1;
+                    }
+                    
+                    if( Date.parse(a.last_updated) > Date.parse(b.last_updated) ){
+                        return -1;
+                    }
+
+                    return 0;
+                });
+
+                // Insert
+                for(var i = 0; i < data.active_storms.length; i++ ){
+                    this.items.push(data.active_storms[i]);
+                }
+            });
+          },
+          dateString: function(last_updated){
+            var result = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(Date.parse(last_updated));
+            return result.toString();
+          }
+        }
+    })
 });
 
 
