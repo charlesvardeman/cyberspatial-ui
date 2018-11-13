@@ -12,7 +12,7 @@ python << END
 import sys
 import psycopg2
 try:
-    conn = psycopg2.connect(dbname="$DATABASE_NAME", user="$DATABASE_USER", password="$DATABASE_PASSWORD", host="$DATABASE_HOST")
+    conn = psycopg2.connect(dbname="$GEONODE_DATABASE", user="$GEONODE_DATABASE_USER", password="$GEONODE_DATABASE_PASSWORD", host="$DATABASE_HOST")
 except psycopg2.OperationalError:
     sys.exit(-1)
 sys.exit(0)
@@ -26,4 +26,16 @@ done
 
 >&2 echo "Postgres is up - continuing..."
 python manage.py migrate --noinput
-exec python manage.py runserver 0.0.0.0:8000
+
+python manage.py loaddata sample_admin
+python manage.py loaddata default_oauth_apps_docker
+python manage.py loaddata initial_data
+python manage.py loaddata roles
+python manage.py loaddata regionlevels
+python manage.py loaddata counties
+python manage.py loaddata municipalities
+python manage.py loaddata admingroups
+python manage.py loaddata geonodegroupprofiles
+python manage.py loaddata usermeta
+
+exec "$@"

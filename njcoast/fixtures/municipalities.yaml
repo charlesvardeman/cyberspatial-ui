@@ -1,0 +1,4 @@
+- fields: {code: 1506, county: 10, group_name: berkeley_township, home_latitude: '39.905348',
+    home_longitude: '-74.233428', name: Berkeley County, zoom_level: 14}
+  model: njcoast.njcmunicipality
+  pk: 1

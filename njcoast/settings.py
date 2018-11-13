@@ -36,7 +36,7 @@ LOCAL_ROOT = os.path.abspath(os.path.dirname(__file__))
 WSGI_APPLICATION = "njcoast.wsgi.application"
 ASGI_APPLICATION = "njcoast.asgi.application"
 
-PROXY_ALLOWED_HOSTS = (os.getenv('ALLOWED_HOSTS'),)
+PROXY_ALLOWED_HOSTS = (os.getenv('PROXY_ALLOWED_HOSTS'),)
 
 MAX_DOCUMENT_SIZE = 512
 
@@ -86,7 +86,6 @@ except ImportError:
 STATICFILES_DIRS.append(
     os.path.join(LOCAL_ROOT, "static"),
 )
-
 
 # Location of url mappings
 ROOT_URLCONF = 'njcoast.urls'
